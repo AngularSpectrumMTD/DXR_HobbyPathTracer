@@ -8,7 +8,7 @@
       <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\common\include;$(ProjectDir)..\Externals\imgui;$(ProjectDir)..\Externals\tinygltf</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\common\include;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
