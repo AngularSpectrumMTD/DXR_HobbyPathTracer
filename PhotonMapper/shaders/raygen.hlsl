@@ -12,7 +12,7 @@ void applyTimeDivision(inout float3 current, uint2 depthBufferIDxy)
     float currentDepth = gDepthBuffer[depthBufferIDxy];
     float prevDepth = gPrevDepthBuffer[depthBufferIDxy];
     
-    if(abs(currentDepth - prevDepth) < 0.000001)
+    if ((abs(currentDepth - prevDepth) < 0.000001) && (currentDepth != 0))
     {
         current = lerp(prev, current, tmpAccmuRatio);
     }

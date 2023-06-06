@@ -310,14 +310,13 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void depthPositionNormalStore(inout Payload payload, in float3 normal, bool isMiss = false)
+void depthPositionNormalStore(inout Payload payload, in float3 normal)
 {
     if (payload.stored == 0)
     {
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
-        float depth = compute01Depth(wPos);
         float2 writeIndex = payload.storeIndexXY;
-        gDepthBuffer[writeIndex] = isMiss ? 0 : depth;
+        gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
         gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
         payload.stored = 1;
