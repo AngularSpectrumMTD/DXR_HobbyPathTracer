@@ -29,13 +29,13 @@ mNormalSphereMaterialTbl()
     mLightPosX = 5.6f;mLightPosY = 33;mLightPosZ = 0;
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 411; mTheta = 245;
-    mTmpAccumuRatio = 0.05f;
+    mPhi = 441; mTheta = 261;
+    mTmpAccumuRatio = 0.15f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
     mCausticsBoost = 20;
-    mIsMoveModel = false;
+    mIsMoveModel = true;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
     mIsDebug = false;
@@ -45,7 +45,7 @@ mNormalSphereMaterialTbl()
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Crab;
+   mGlassModelType = ModelType::ModelType_Ocean;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)
@@ -53,8 +53,9 @@ mNormalSphereMaterialTbl()
         case  ModelType::ModelType_Crab:
         {
             mGlassFileName = L"crab.obj";
-            mDiaObjYOfsset = 0;
+            mDiaObjYOfsset = 5;
             mDiaObjScale = XMFLOAT3(12, 12, 12);
+            mDiaObjScale = XMFLOAT3(18, 18, 18);
         }
         break;
         case ModelType::ModelType_TwistCube:
@@ -120,7 +121,7 @@ mNormalSphereMaterialTbl()
     case  ModelType::ModelType_LikeWater:
     {
         mMetalFileName = L"likeWater.obj";
-        mMetalObjYOfsset = 20;
+        mMetalObjYOfsset = 2000;
         mMetalObjScale = XMFLOAT3(2, 4, 4);
     }
     break;
