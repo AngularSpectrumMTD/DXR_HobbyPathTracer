@@ -40,7 +40,7 @@ struct OpticalGlass
 };
 
 //http://nalab.mind.meiji.ac.jp/2017/2018-suzuki.pdf
-static float3 XYZTbl380to770_10nmDelta[40] =
+static float3 XYZ380to770_10nmTbl[40] =
 {
     float3(0.0014, 0, 0.0065),
     float3(0.0042, 0.0001, 0.0201),
@@ -96,8 +96,8 @@ float3 lambda2XYZ(float lambdaNM)
     float fid = clamp((lambdaNM - 380) / 10, 0, 38);
     int baseID = int(fid + 0.5);
     float t = fid - baseID;
-    float3 XYZ0 = XYZTbl380to770_10nmDelta[baseID];
-    float3 XYZ1 = XYZTbl380to770_10nmDelta[baseID + 1];
+    float3 XYZ0 = XYZ380to770_10nmTbl[baseID];
+    float3 XYZ1 = XYZ380to770_10nmTbl[baseID + 1];
 
     return lerp(XYZ0, XYZ1, t);
 }
@@ -114,26 +114,24 @@ float gamma(float val)
     }
 }
 
+static float3x3 XYZtoRGB = 
+{
+    + 3.240479, - 1.537150, - 0.498535,
+    - 0.969256, + 1.875992, + 0.041556,
+    + 0.055648, - 0.204043, + 1.057311
+};
+
 float3 lambda2sRGB_D65_BT709(float lambdaNM)
 {
     float3 XYZ = lambda2XYZ(lambdaNM);
-    float X = XYZ.x;
-    float Y = XYZ.y;
-    float Z = XYZ.z;
 
-    float R = 3.240479 * X - 1.537150 * Y - 0.498535 * Z;
-    float G = -0.969256 * X + 1.875992 * Y + 0.041556 * Z;
-    float B = 0.055648 * X - 0.204043 * Y + 1.057311 * Z;
+    float3 RGB = mul(XYZtoRGB, XYZ);
 
-    R = (R - Rmin) / (Rmax - Rmin);
-    G = (G - Gmin) / (Gmax - Gmin);
-    B = (B - Bmin) / (Bmax - Bmin);
-    
-    R = gamma(R);
-    G = gamma(G);
-    B = gamma(B);
+    RGB.r = gamma((RGB.r - Rmin) / (Rmax - Rmin));
+    RGB.g = gamma((RGB.g - Gmin) / (Gmax - Gmin));
+    RGB.b = gamma((RGB.b - Bmin) / (Bmax - Bmin));
 
-    return float3(R, G, B);
+    return RGB;
 }
 
 float3 lambda2RGB(float lambda)
