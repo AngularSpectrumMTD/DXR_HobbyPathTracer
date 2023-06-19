@@ -178,7 +178,8 @@ private:
         ModelType_TwistCube,
         ModelType_Teapot,
         ModelType_LikeWater,
-        ModelType_Ocean
+        ModelType_Ocean,
+        ModelType_Ocean2
     };
 
     enum Spectrum

@@ -45,7 +45,7 @@ mNormalSphereMaterialTbl()
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Ocean;
+   mGlassModelType = ModelType::ModelType_Ocean2;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)
@@ -82,6 +82,13 @@ mNormalSphereMaterialTbl()
         case  ModelType::ModelType_Ocean:
         {
             mGlassFileName = L"ocean.obj";
+            mDiaObjYOfsset = 0;
+            mDiaObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        }
+        break;
+        case  ModelType::ModelType_Ocean2:
+        {
+            mGlassFileName = L"ocean2.obj";
             mDiaObjYOfsset = 0;
             mDiaObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
         }
