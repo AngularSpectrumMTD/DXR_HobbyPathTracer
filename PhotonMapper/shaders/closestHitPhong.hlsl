@@ -59,7 +59,7 @@ void phongMaterialClosestHit(inout Payload payload, TriangleIntersectionAttribut
 [shader("closesthit")]
 void phongMaterialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
-    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
+    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload) || isOverSplitted(payload)) {
         return;
     }
 
@@ -68,7 +68,7 @@ void phongMaterialStorePhotonClosestHit(inout PhotonPayload payload, TriangleInt
     uint instanceID = InstanceID();
 
     if (instanceID == 2) {
-        photonStore(payload);
+        storePhoton(payload);
     } else {
         payload.throughput = float3(0,0,0); // meaningless.
     }

@@ -46,8 +46,7 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
 
     if(!isUseTextureForStage())
     {
-        float v = 0.2;
-        diffuseColor = float4(v.xxx * float3(1.5, 1.5, 1), 1);
+        diffuseColor = float4(0.1, 0.1, 0.1 , 1);
     }
     
     uint instanceID = InstanceID();
@@ -82,11 +81,11 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
 void floorStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
     // ClosestHit.
-    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
+    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload) || isOverSplitted(payload)) {
         return;
     }
 
-    photonStore(payload);
+    storePhoton(payload);
 }
 
 [shader("closesthit")]

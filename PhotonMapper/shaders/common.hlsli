@@ -35,7 +35,7 @@ struct PhotonPayload
     int recursive;
     int storeIndex;
     int stored;
-    int reThroughRequired;
+    int offsetCoef;
     float lambdaNM;
 };
 
@@ -74,7 +74,7 @@ bool isDirectionalLight()
 
 bool isUseTextureForStage()
 {
-    return gSceneParam.flags.y == 0;
+    return gSceneParam.flags.y == 1;
 }
 
 bool isVisualizePhotonDebugDraw()

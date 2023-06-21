@@ -1,7 +1,5 @@
 #include "opticalFunction.hlsli"
 
-#define LANBDA_INF_NM 780
-#define LAMBDA_VIO_NM 420
 #define SPP 1
 
 void applyTimeDivision(inout float3 current, uint2 depthBufferIDxy)
@@ -108,13 +106,16 @@ void photonEmitting()
     int serialIndex = SerialRaysIndex(launchIndex, dispatchDimensions);
     const int COLOR_ID = serialIndex % getLightLambdaNum();
 
-    gPhotonMap[serialIndex] = photon;
+    uint photonOffset = dispatchDimensions.x * dispatchDimensions.y;
+    gPhotonMap[serialIndex] = photon;//initialize
+    gPhotonMap[serialIndex + photonOffset] = photon;//initialize
 
     float coneAngle = acos(dot(lightDir, normalize((spotLightPosition)))) * 2.0 * getLightRange();
     float randSeed = 0.5 * (randGenState * rnd01Converter + LightSeed * rnd01Converter);
     float3 photonEmitDir = getConeSample(randSeed, lightDir, coneAngle);
     
-    float LAMBDA_NM = lerp(LANBDA_INF_NM, LAMBDA_VIO_NM, COLOR_ID * 1.0f / getLightLambdaNum());
+    //float LAMBDA_NM = lerp(LANBDA_INF_NM, LAMBDA_VIO_NM, COLOR_ID * 1.0f / getLightLambdaNum());
+    float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (serialIndex % LAMBDA_NUM);
 
     RayDesc rayDesc;
     rayDesc.Origin = spotLightPosition;
@@ -124,11 +125,11 @@ void photonEmitting()
 
     PhotonPayload payload;
     float emitIntensity = length(gSceneParam.lightColor.xyz);
-    payload.throughput = emitIntensity * getBaseLightColor(LAMBDA_NM);
+    payload.throughput = emitIntensity * getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.storeIndex = serialIndex;
     payload.stored = 0;//empty
-    payload.reThroughRequired = 0;
+    payload.offsetCoef = 0;
     payload.lambdaNM = LAMBDA_NM;
 
     RAY_FLAG flags = RAY_FLAG_NONE;

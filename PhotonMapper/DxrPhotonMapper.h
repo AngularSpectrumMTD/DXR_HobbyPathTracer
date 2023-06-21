@@ -27,7 +27,7 @@
 
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
-#define MAX_RECURSION_DEPTH 16//0---31
+#define MAX_RECURSION_DEPTH 8//0---31
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -179,7 +179,8 @@ private:
         ModelType_Teapot,
         ModelType_LikeWater,
         ModelType_Ocean,
-        ModelType_Ocean2
+        ModelType_Ocean2,
+        ModelType_Diamond
     };
 
     enum Spectrum
@@ -378,8 +379,8 @@ private:
 
     std::wstring mAssetPath;
 
-    f32 mDiaObjYOfsset;
-    XMFLOAT3 mDiaObjScale;
+    f32 mGlassObjYOfsset;
+    XMFLOAT3 mGlassObjScale;
     f32 mMetalObjYOfsset;
     XMFLOAT3 mMetalObjScale;
     f32 mLightRange;
@@ -412,6 +413,7 @@ private:
     bool mIsUseDenoise;
     s32 mSpectrumMode;
     bool mIsMoveModel;
+    bool mIsUseTexture;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;

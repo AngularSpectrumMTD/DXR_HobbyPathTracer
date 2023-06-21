@@ -39,8 +39,13 @@ struct OpticalGlass
     }
 };
 
+#define LANBDA_INF_NM 770
+#define LAMBDA_VIO_NM 380
+#define LAMBDA_NUM 40
+#define LAMBDA_STEP 10
+
 //http://nalab.mind.meiji.ac.jp/2017/2018-suzuki.pdf
-static float3 XYZ380to770_10nmTbl[40] =
+static float3 XYZ380to770_10nmTbl[LAMBDA_NUM] =
 {
     float3(0.0014, 0, 0.0065),
     float3(0.0042, 0.0001, 0.0201),
@@ -93,7 +98,7 @@ static float Bmax = 1.88461602;
 
 float3 lambda2XYZ(float lambdaNM)
 {
-    float fid = clamp((lambdaNM - 380) / 10, 0, 38);
+    float fid = clamp((lambdaNM - LAMBDA_VIO_NM) / LAMBDA_STEP, 0, LAMBDA_NUM);
     int baseID = int(fid + 0.5);
     float t = fid - baseID;
     float3 XYZ0 = XYZ380to770_10nmTbl[baseID];
@@ -119,6 +124,13 @@ static float3x3 XYZtoRGB =
     + 3.240479, - 1.537150, - 0.498535,
     - 0.969256, + 1.875992, + 0.041556,
     + 0.055648, - 0.204043, + 1.057311
+};
+
+static float3x3 XYZtoRGB2 = 
+{
+    + 2.3706743, - 0.51388850, + 0.0052982,
+    - 0.9000405, + 1.4253036, - 0.0146949,
+    - 0.470638, + 0.0885814, + 1.0093968
 };
 
 float3 lambda2sRGB_D65_BT709(float lambdaNM)
@@ -199,6 +211,11 @@ float3 getBaseLightColor(float lambda)
         break;
     }
     return color;
+}
+
+float3 getBaseLightXYZ(float lambda)
+{
+    return lambda2XYZ(lambda);
 }
 
 //in n0 n1(coat d1 thickness) n2 out 
@@ -421,11 +438,6 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         reflectance = FresnelAR(worldRayDir, -worldNormal, photonPayload.lambdaNM, IoR, IoR_Air);
     }
 
-    // if (length(refracted) < 0.00001)
-    // {
-    //     ReflectionPhoton(vertexPosition, vertexNormal, photonPayload);
-    // }
-    // else
     {
         photonPayload.throughput *= reflectance;
 
@@ -438,6 +450,23 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         rayDesc.TMin = 0.001;
         rayDesc.TMax = 100000;
 
+        //split
+        PhotonPayload photonPayloadReflect;
+        float weight = length(photonPayload.throughput);
+        weight = 0.1 * max(0, 2 - weight);
+        photonPayloadReflect.throughput = (weight).xxx;
+        photonPayloadReflect.recursive = photonPayload.recursive;//if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
+        photonPayloadReflect.storeIndex = photonPayload.storeIndex;
+        photonPayloadReflect.stored = 0;//empty
+        photonPayloadReflect.offsetCoef = photonPayload.offsetCoef + 1;
+        photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
+        RayDesc rayDescReflect;
+        rayDescReflect.Origin = worldPos;
+        rayDescReflect.Direction = reflect(worldRayDir, worldNormal);
+        rayDescReflect.TMin = 0.001;
+        rayDescReflect.TMax = 100000;
+
+        //refract
         TraceRay(
             gRtScene,
             flags,
@@ -447,6 +476,9 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
             0, // miss index
             rayDesc,
             photonPayload);
+
+        //split reflect
+        ReflectionPhoton(vertexPosition, vertexNormal, photonPayloadReflect);
     }
 }
 

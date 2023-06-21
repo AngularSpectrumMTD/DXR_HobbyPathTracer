@@ -162,7 +162,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     std::string strValue;
     strValue.assign(mGlassFileName.begin(), mGlassFileName.end());
     const char* charValue = strValue.c_str();
-    bool isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mDiaObjScale);
+    bool isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale);
     mMeshGlass.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
 
     strValue.assign(mMetalFileName.begin(), mMetalFileName.end());
@@ -211,7 +211,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     s32 dcount = 0;
     for (auto& pos : mGlasssNormalTbl)
     {
-        f32 y = mDiaObjYOfsset;
+        f32 y = mGlassObjYOfsset;
 
         f32 x = 0.01f * rnd2(mt) + 5 * rnd3(mt);
         f32 z = 0.01f * rnd2(mt) + 5 * rnd3(mt);

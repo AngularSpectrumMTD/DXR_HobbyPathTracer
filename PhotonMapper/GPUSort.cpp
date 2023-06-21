@@ -5,7 +5,7 @@ void DxrPhotonMapper::BitonicSortLDS()
 {
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
-    const u32 NUM_ELEMENTS = mPhotonMapSize1D * mPhotonMapSize1D;
+    const u32 NUM_ELEMENTS = mPhotonMapSize1D * mPhotonMapSize1D * 2;//[2] is for Reflection at Refraction
     const u32 MATRIX_WIDTH = BITONIC_BLOCK_SIZE;
     const u32 MATRIX_HEIGHT = (u32)NUM_ELEMENTS / MATRIX_WIDTH;
 
@@ -98,7 +98,7 @@ void DxrPhotonMapper::BitonicSortSimple()
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
     //Limitation Elements: 1 << 8(=256) -- 1 << 27(134,217,728)
-    s32 n = mPhotonMapSize1D * mPhotonMapSize1D;
+    s32 n = mPhotonMapSize1D * mPhotonMapSize1D * 2;;//[2] is for Reflection at Refraction
 
     s32 nlog = (s32)(log2(n));
     s32 inc;
@@ -139,7 +139,7 @@ void DxrPhotonMapper::BitonicSortSimple()
 void DxrPhotonMapper::Grid3DSort()
 {
     auto frameIndex = mDevice->GetCurrentFrameIndex();
-    const u32 photonNum = mPhotonMapSize1D * mPhotonMapSize1D;
+    const u32 photonNum = mPhotonMapSize1D * mPhotonMapSize1D * 2;
     const u32 gridNum = GRID_DIMENSION * GRID_DIMENSION * GRID_DIMENSION;
 
     GridCB gridSortCBStruct;
@@ -171,8 +171,8 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);
 
     //Photon Hash / Serial Index Pair Sorting By Photon Hash
-    BitonicSortLDS();
-    //BitonicSortSimple();
+    //BitonicSortLDS();
+    BitonicSortSimple();
 
     mCommandList->ResourceBarrier(u32(uavBarriersGridId.size()), uavBarriersGridId.data());
 

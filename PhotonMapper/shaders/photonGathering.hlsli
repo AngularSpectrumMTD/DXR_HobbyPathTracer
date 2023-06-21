@@ -1,25 +1,32 @@
 #ifndef __PHOTONGATHERING_HLSLI__
 #define __PHOTONGATHERING_HLSLI__
 
-#include "common.hlsli"
+#include "opticalFunction.hlsli"
 
-bool isPhotonStored(inout PhotonPayload payload)
+bool isPhotonStored(in PhotonPayload payload)
 {
     return (payload.stored == 1);
 }
 
-void photonStore(inout PhotonPayload payload, bool isMiss = false)
+bool isOverSplitted(in PhotonPayload payload)
+{
+    return (payload.offsetCoef >= 2);
+}
+
+void storePhoton(inout PhotonPayload payload, bool isMiss = false)
 {
     bool ignore = isMiss || (isVisualizeLightRange() ? false : (payload.recursive <= 1));
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    uint photonOffset = dispatchDimensions.x * dispatchDimensions.y;
+
     if (ignore)
     {
         PhotonInfo photon;
         photon.throughput = float3(0, 0, 0);
         photon.position = float3(0, 0, 0);
         photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex] = photon;
+        gPhotonMap[payload.storeIndex + payload.offsetCoef * photonOffset] = photon;
         payload.stored = 1;
-        payload.reThroughRequired = 1;
     }
     else
     {
@@ -27,7 +34,7 @@ void photonStore(inout PhotonPayload payload, bool isMiss = false)
         photon.throughput = (payload.recursive <= 1) ? payload.throughput : getCausticsBoost() * payload.throughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex] = photon;
+        gPhotonMap[payload.storeIndex + payload.offsetCoef * photonOffset] = photon;
         payload.stored = 1;
     }
 
@@ -64,7 +71,7 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     }
 
     int X = 0, Y = 0, Z = 0, G = 0;
-    float3 power = float3(0, 0, 0);
+    float3 accumulateXYZ = float3(0, 0, 0);
 
     //Search Near Cell
     for (Z = max(GridXYZ.z - range, 0); Z <= min(GridXYZ.z + range, gGridParam.gridDimensions.z - 1); Z++)
@@ -91,31 +98,31 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                     ((dot(normalize(comparePhoton.inDir), normalize(worldNormal)) > 0) == (dot(normalize(eyeDir), normalize(worldNormal)) > 0)))//eliminate invisible photon effect
                     {
                         //power += comparePhoton.throughput * weightFunction(gatherRadius);
-                        power += comparePhoton.throughput * poly6Kernel2D(distance, gatherRadius);
+                        accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(distance, gatherRadius);
                     }
                 }
 
                 if (isVisualizePhotonDebugDraw())
                 {
                     float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
-                    power += float3(db, db, 0); //debug
+                    accumulateXYZ += float3(db, db, 0); //debug
                 }
             }
         }
     }
 
-    if (power.x < 0)
-        power.x = 0;
-    if (power.y < 0)
-        power.y = 0;
-    if (power.z < 0)
-        power.z = 0;
+    if (accumulateXYZ.x < 0)
+        accumulateXYZ.x = 0;
+    if (accumulateXYZ.y < 0)
+        accumulateXYZ.y = 0;
+    if (accumulateXYZ.z < 0)
+        accumulateXYZ.z = 0;
 
     uint photonMapWidth = 1;
     uint photonStride = 1;
     gPhotonMap.GetDimensions(photonMapWidth, photonStride);
 
-    return boost * power / photonMapWidth;
+    return boost * mul(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
 }
 
 float3 photonGather(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal)
