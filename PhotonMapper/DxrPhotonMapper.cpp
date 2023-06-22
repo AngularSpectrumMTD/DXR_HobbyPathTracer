@@ -46,7 +46,7 @@ mNormalSphereMaterialTbl()
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Ocean2;
+   mGlassModelType = ModelType::ModelType_Crab;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)

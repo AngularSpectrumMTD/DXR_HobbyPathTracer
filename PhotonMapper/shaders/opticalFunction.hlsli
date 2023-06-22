@@ -317,7 +317,18 @@ float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, flo
     glassJ_FK5.A7 = 0.00000000E+00;
     glassJ_FK5.A8 = 0.00000000E+00;
 
-    const float IoR = glassJ_FK5.computeRefIndex(780 * 1e-3);
+    OpticalGlass glassJ_Bak4;
+    glassJ_Bak4.A0 = 2.42114503E+00;
+    glassJ_Bak4.A1 = -8.99959341E-03;
+    glassJ_Bak4.A2 = -9.30006854E-05;
+    glassJ_Bak4.A3 = 1.43071120E-02;
+    glassJ_Bak4.A4 = 1.89993274E-04;
+    glassJ_Bak4.A5 = 6.09602388E-06;
+    glassJ_Bak4.A6 = 2.25737069E-07;
+    glassJ_Bak4.A7 = 0.00000000E+00;
+    glassJ_Bak4.A8 = 0.00000000E+00;
+
+    const float IoR = glassJ_Bak4.computeRefIndex(780 * 1e-3);
     const float IoR_Air = 1.0f;
 
     float nr = dot(worldNormal, worldRayDir);
@@ -417,7 +428,18 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
     glassJ_FK5.A7 = 0.00000000E+00;
     glassJ_FK5.A8 = 0.00000000E+00;
 
-    const float IoR = glassJ_FK5.computeRefIndex(photonPayload.lambdaNM * 1e-3);
+    OpticalGlass glassJ_Bak4;
+    glassJ_Bak4.A0 = 2.42114503E+00;
+    glassJ_Bak4.A1 = -8.99959341E-03;
+    glassJ_Bak4.A2 = -9.30006854E-05;
+    glassJ_Bak4.A3 = 1.43071120E-02;
+    glassJ_Bak4.A4 = 1.89993274E-04;
+    glassJ_Bak4.A5 = 6.09602388E-06;
+    glassJ_Bak4.A6 = 2.25737069E-07;
+    glassJ_Bak4.A7 = 0.00000000E+00;
+    glassJ_Bak4.A8 = 0.00000000E+00;
+
+    const float IoR = glassJ_Bak4.computeRefIndex(photonPayload.lambdaNM * 1e-3);
 
     float reflectance = 0.0f;
     const float IoR_Air = 1.0f;
