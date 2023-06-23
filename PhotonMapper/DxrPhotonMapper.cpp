@@ -34,7 +34,7 @@ mNormalSphereMaterialTbl()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 100;
+    mCausticsBoost = 1;
     mIsMoveModel = true;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -46,7 +46,7 @@ mNormalSphereMaterialTbl()
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Crab;
+   mGlassModelType = ModelType::ModelType_Ocean2;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)
@@ -336,7 +336,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(10, 400, mCausticsBoost + (mReverseMove ? -2 : 2));
+        mCausticsBoost = Clamp(1, 400, mCausticsBoost + (mReverseMove ? -2 : 2));
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;

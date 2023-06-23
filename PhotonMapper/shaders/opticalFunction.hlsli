@@ -3,6 +3,8 @@
 
 #include "common.hlsli"
 
+#define REFLECTANCE_BOOST 4
+
 struct OpticalGlass
 {
     float A0;
@@ -395,9 +397,6 @@ void ReflectionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
     rayDesc.TMin = 0.01;
     rayDesc.TMax = 100000;
 
-    //adjust
-    photonPayload.throughput *= 0.1;
-
     TraceRay(
         gRtScene,
         flags,
@@ -451,6 +450,7 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         float eta = IoR_Air / IoR; //roi(before)/roi(after)
         refracted = refract(worldRayDir, worldNormal, eta);
         reflectance = FresnelAR(worldRayDir, worldNormal, photonPayload.lambdaNM, IoR_Air, IoR);
+        reflectance = clamp(reflectance, 0, 1);
     }
     else
     {
@@ -458,10 +458,12 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         float eta = IoR / IoR_Air;
         refracted = refract(worldRayDir, -worldNormal, eta);
         reflectance = FresnelAR(worldRayDir, -worldNormal, photonPayload.lambdaNM, IoR, IoR_Air);
+        reflectance = clamp(reflectance, 0, 1);
     }
 
     {
-        photonPayload.throughput *= reflectance;
+        const float3 src = photonPayload.throughput;
+        photonPayload.throughput *= abs(1 - reflectance);
 
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = ~(LIGHT_INSTANCE_MASK); //light remove
@@ -474,9 +476,7 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
 
         //split
         PhotonPayload photonPayloadReflect;
-        float weight = length(photonPayload.throughput);
-        weight = 0.1 * max(0, 2 - weight);
-        photonPayloadReflect.throughput = (weight).xxx;
+        photonPayloadReflect.throughput = length(src).xxx * reflectance * REFLECTANCE_BOOST;
         photonPayloadReflect.recursive = photonPayload.recursive;//if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
         photonPayloadReflect.storeIndex = photonPayload.storeIndex;
         photonPayloadReflect.stored = 0;//empty
