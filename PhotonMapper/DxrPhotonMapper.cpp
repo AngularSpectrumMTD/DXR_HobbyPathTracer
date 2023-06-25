@@ -30,7 +30,7 @@ mNormalSphereMaterialTbl()
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 441; mTheta = 261;
-    mTmpAccumuRatio = 0.15f;
+    mTmpAccumuRatio = 0.05f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
@@ -243,7 +243,7 @@ void DxrPhotonMapper::Update()
         mMoveFrame++;
         for (auto& pos : mGlasssNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.1 * mMoveFrame * OneRadian), 0);
+            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.5 * mMoveFrame * OneRadian), 0);
         }
     }
 
@@ -336,7 +336,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(1, 3, mCausticsBoost + (mReverseMove ? -0.5 : 0.5));
+        mCausticsBoost = Clamp(1, 5, mCausticsBoost + (mReverseMove ? -0.5 : 0.5));
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;
