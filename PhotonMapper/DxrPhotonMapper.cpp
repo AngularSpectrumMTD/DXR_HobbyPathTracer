@@ -26,15 +26,15 @@ mNormalSphereMaterialTbl()
     mGatherBlockRange = 1;
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     mSceneParam.photonParams.w = MAX_RECURSION_DEPTH;
-    mLightPosX = 5.6f;mLightPosY = 33;mLightPosZ = 0;
+    mLightPosX = 11.f;mLightPosY = 20;mLightPosZ = 1.2;
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 441; mTheta = 261;
+    mPhi = 412; mTheta = 261;
     mTmpAccumuRatio = 0.05f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 1.5;
+    mCausticsBoost = 3;
     mIsMoveModel = true;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -46,7 +46,7 @@ mNormalSphereMaterialTbl()
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Ocean2;
+   mGlassModelType = ModelType::ModelType_Skull;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)
@@ -105,6 +105,13 @@ mNormalSphereMaterialTbl()
             mGlassObjScale = XMFLOAT3(20, 20, 20);
         }
         break;
+        case ModelType::ModelType_Skull:
+        {
+            mGlassFileName = L"skull.obj";
+            mGlassObjYOfsset = 0;
+            mGlassObjScale = XMFLOAT3(30, 30, 30);
+        }
+        break;
         default:
         {
             mGlassFileName = L"crab.obj";
@@ -156,6 +163,13 @@ mNormalSphereMaterialTbl()
         mMetalFileName = L"diamond.obj";
         mMetalObjYOfsset = 1;
         mMetalObjScale = XMFLOAT3(20, 20, 20);
+    }
+    break;
+    case ModelType::ModelType_Skull:
+    {
+        mMetalFileName = L"skull.obj";
+        mMetalObjYOfsset = 0;
+        mMetalObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:

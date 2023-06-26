@@ -1,9 +1,9 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![ocean](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ec2301f1-7c04-42d4-9a70-677efa15e21a)
+![GITHUB](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/03118c5b-2b9e-434c-a2ae-72e0ef981bb6)
 
-![GITHUB](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/79a418f4-5fc3-4d47-b188-de15a7247271)
+![ocean](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ec2301f1-7c04-42d4-9a70-677efa15e21a)
 
 ### Algorithm
 Hashed Grid

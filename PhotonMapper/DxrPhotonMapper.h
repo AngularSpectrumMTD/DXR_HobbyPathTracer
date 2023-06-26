@@ -27,7 +27,7 @@
 
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
-#define MAX_RECURSION_DEPTH 8//0---31
+#define MAX_RECURSION_DEPTH 16//0---31
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -180,7 +180,8 @@ private:
         ModelType_LikeWater,
         ModelType_Ocean,
         ModelType_Ocean2,
-        ModelType_Diamond
+        ModelType_Diamond,
+        ModelType_Skull
     };
 
     enum Spectrum
