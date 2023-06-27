@@ -27,7 +27,7 @@ void DxrPhotonMapper::CreateStateObject()
 
     //Normal State Object
     {
-        const u32 MaxPayloadSize = 3 * sizeof(XMFLOAT3) + 4 * sizeof(INT);//sizeof(Payload)
+        const u32 MaxPayloadSize = 3 * sizeof(XMFLOAT3) + 4 * sizeof(INT) + sizeof(f32);//sizeof(Payload)
         const u32 MaxAttributeSize = sizeof(XMFLOAT2);//sizeof(TriangleIntersectionAttributes)
         const u32 MaxRecursionDepth = MAX_RECURSION_DEPTH;
 

@@ -52,7 +52,7 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
     uint instanceID = InstanceID();
     
     float3 color = diffuseColor.xyz;
-    float3 reflectColor = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir);
+    float3 reflectColor = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
 
     bool isSpecular = (instanceID == 0);
     
@@ -67,12 +67,26 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
 #endif
 
     {//Apply Caustics
-        payload.photonColor.xyz = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
+        if(payload.weight > 0)
+        {
+            payload.photonColor.xyz += payload.weight + photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
+        }
+        else
+        {
+            payload.photonColor.xyz += photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
+        }
 
         //for seeing througth Object
         if(payload.recursive >= 2)
         {
-            payload.color.xyz += payload.photonColor.xyz;
+            if(payload.weight > 0)
+            {
+                payload.color.xyz += payload.weight * payload.photonColor.xyz;
+            }
+            else{
+                payload.color.xyz += payload.photonColor.xyz;
+            }
+            
         }
     }
 }

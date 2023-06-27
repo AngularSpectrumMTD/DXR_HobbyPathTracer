@@ -265,7 +265,7 @@ float FresnelAR(float3 normalizedRayDir, float3 normalizedSurfaceNorm, float lam
     return (outS2 + outP2) / 2;
 }
 
-float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir)
+float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir, float weight)
 {
     float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
     float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
@@ -288,6 +288,7 @@ float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive, flo
     reflectPayload.storeIndexXY = int2(0, 0);
     reflectPayload.stored = 0; //empty
     reflectPayload.eyeDir = eyeDir;
+    reflectPayload.weight = weight;
     TraceRay(
         gRtScene,
         flags,
@@ -300,7 +301,7 @@ float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive, flo
     return reflectPayload.color;
 }
 
-float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir)
+float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir, float weight)
 {
     float4x3 mtx = ObjectToWorld4x3();
     float3 worldPos = mul(float4(vertexPosition, 1), mtx);
@@ -330,6 +331,7 @@ float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, flo
     glassJ_Bak4.A7 = 0.00000000E+00;
     glassJ_Bak4.A8 = 0.00000000E+00;
 
+    float reflectance = 0.0f;
     const float IoR = glassJ_Bak4.computeRefIndex(780 * 1e-3);
     const float IoR_Air = 1.0f;
 
@@ -337,18 +339,25 @@ float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, flo
     float3 refracted;
     if (nr < 0)
     {
-        float eta = IoR_Air / IoR;
+         //Air -> Glass
+        float eta = IoR_Air / IoR; //roi(before)/roi(after)
         refracted = refract(worldRayDir, worldNormal, eta);
+        reflectance = FresnelAR(getViewVec(), worldNormal, 780, IoR_Air, IoR);
+        reflectance = clamp(reflectance, 0, 1);
     }
     else
     {
+         //Glass -> Air
         float eta = IoR / IoR_Air;
         refracted = refract(worldRayDir, -worldNormal, eta);
+        reflectance = FresnelAR(getViewVec(), -worldNormal, 780, IoR, IoR_Air);
+        reflectance = clamp(reflectance, 0, 1);
     }
     
-    if (length(refracted) < 0.00001)
+    if (length(refracted) < 0.000001)
     {
-        return Reflection(vertexPosition, vertexNormal, recursive, eyeDir);
+        return Reflection(vertexPosition, vertexNormal, recursive, eyeDir, 0);
+        //return 0.xxx;
     }
     else
     {
@@ -368,6 +377,7 @@ float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, flo
         refractPayload.storeIndexXY = int2(0, 0);
         refractPayload.stored = 0; //empty
         refractPayload.eyeDir = eyeDir;
+        refractPayload.weight = 0;
         TraceRay(
             gRtScene,
             flags,

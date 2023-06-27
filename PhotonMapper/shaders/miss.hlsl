@@ -10,7 +10,15 @@ float2 equirecFetchUV(float3 dir)
 void miss(inout Payload payload) {
     depthPositionNormalStore(payload, gSceneParam.backgroundColor.rgb);
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, equirecFetchUV(WorldRayDirection()), 0.0);
-    payload.color = cubemap.rgb;
+
+     if(payload.weight > 0)
+    {
+        payload.color = payload.weight + cubemap.rgb;
+    }
+    else
+    {
+        payload.color = cubemap.rgb;
+    }
 }
 
 [shader("miss")]

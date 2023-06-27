@@ -17,6 +17,7 @@ struct SceneCB
     float4 gatherParams;
     float4 gatherParams2;
     float4 spotLightParams;
+    float4 viewVec;
 };
 
 struct Payload
@@ -26,6 +27,7 @@ struct Payload
     int recursive;
     int2 storeIndexXY;
     float3 eyeDir;
+    float weight;
     int stored;
 };
 
@@ -160,6 +162,11 @@ float getLightLambdaNum()
 float getCausticsBoost()
 {
     return gSceneParam.spotLightParams.w;
+}
+
+float3 getViewVec()
+{
+    return gSceneParam.viewVec.xyz;
 }
 
 ////////////////////////////////////

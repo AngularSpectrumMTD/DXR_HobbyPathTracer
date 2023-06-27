@@ -49,8 +49,14 @@ void phongMaterialClosestHit(inout Payload payload, TriangleIntersectionAttribut
         float3 worldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
         float3 worldNormal = mul(vtx.Normal, (float3x3)ObjectToWorld4x3());
         
-        payload.color = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal) + 0.3 * albedo;
-        
+        if(payload.weight > 0)
+        {
+            payload.color = payload.weight + (photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal) + 0.3 * albedo);
+        }
+        else
+        {
+            payload.color = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal) + 0.3 * albedo;
+        }
     } else {
         payload.color = float3(0,0,0); // meaningless.
     }

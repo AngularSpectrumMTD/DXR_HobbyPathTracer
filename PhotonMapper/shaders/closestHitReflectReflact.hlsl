@@ -48,11 +48,11 @@ void reflectReflactMaterialClosestHit(inout Payload payload, TriangleIntersectio
 
     uint instanceID = InstanceID();
     if (instanceID == 0) {
-        payload.color = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir);
+        payload.color = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
     }
     else if(instanceID == 1)
     {
-        payload.color = Refraction(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir);
+        payload.color = Refraction(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
     }
 }
 

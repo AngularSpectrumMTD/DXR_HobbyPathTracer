@@ -279,6 +279,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.y = mTmpAccumuRatio;
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
+    mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
 
     mRenderFrame++;
 
