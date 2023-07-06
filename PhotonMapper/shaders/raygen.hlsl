@@ -10,11 +10,11 @@ void applyTimeDivision(inout float3 current, uint2 depthBufferIDxy)
     float currentDepth = gDepthBuffer[depthBufferIDxy];
     float prevDepth = gPrevDepthBuffer[depthBufferIDxy];
 
-    bool isNearColor = abs(dot(normalize(prev), normalize(current))) > 0.8;
+    bool isNearColor = false;//abs(dot(normalize(prev), normalize(current))) > 0.95;
     bool isNearDepth = abs(currentDepth - prevDepth) < 0.000001;
-    bool isAccept = isNearColor ? true : isNearDepth;
+    bool isAccept = (isNearColor ? true : isNearDepth) && (currentDepth != 0);
     
-    if (isAccept && (currentDepth != 0))
+    if (isAccept)
     {
         current = lerp(prev, current, tmpAccmuRatio);
     }

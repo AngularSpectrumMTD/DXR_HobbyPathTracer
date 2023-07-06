@@ -1,6 +1,10 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
+1M Photon
+![ギャラリー](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3864c9dd-1527-4cb5-9668-577ad41988b8)
+
+0.25M Photon
 ![GITHUB](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/03118c5b-2b9e-434c-a2ae-72e0ef981bb6)
 
 Gather Radius of Photon
