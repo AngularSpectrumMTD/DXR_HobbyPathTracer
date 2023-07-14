@@ -72,6 +72,11 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
 
     int X = 0, Y = 0, Z = 0, G = 0;
     float3 accumulateXYZ = float3(0, 0, 0);
+    int count = 0;
+
+    float3 normWN = normalize(worldNormal);
+    float3 normEYE = normalize(eyeDir);
+    bool isEyeFlag = dot(normEYE, normWN) > 0;
 
     //Search Near Cell
     for (Z = max(GridXYZ.z - range, 0); Z <= min(GridXYZ.z + range, gGridParam.gridDimensions.z - 1); Z++)
@@ -88,17 +93,20 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                     continue; //avoid infinite loop
                 if (photonIDstardEnd.y == UINT32_MAX)
                     continue; //avoid infinite loop
-
-                for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
+                
+                if (count < getPhotonUnitNum())
                 {
-                    PhotonInfo comparePhoton = gPhotonMap[G];
-
-                    float distance = length(gatherCenterPos - comparePhoton.position);
-                    if ((distance < gatherRadius) &&
-                    ((dot(normalize(comparePhoton.inDir), normalize(worldNormal)) > 0) == (dot(normalize(eyeDir), normalize(worldNormal)) > 0)))//eliminate invisible photon effect
+                    for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                     {
-                        //power += comparePhoton.throughput * weightFunction(gatherRadius);
-                        accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(distance, gatherRadius);
+                        PhotonInfo comparePhoton = gPhotonMap[G];
+
+                        float distance = length(gatherCenterPos - comparePhoton.position);
+                        if ((distance < gatherRadius) &&
+                         ((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag))//eliminate invisible photon effect
+                        {
+                            count++;
+                            accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(distance, gatherRadius);
+                        }
                     }
                 }
 

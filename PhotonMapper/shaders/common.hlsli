@@ -104,7 +104,7 @@ float getSpectrumMode()
     return gSceneParam.photonParams.z;
 }
 
-float getMaxRecursionDepth()
+float getMaxBounceNum()
 {
     return gSceneParam.photonParams.w;
 }
@@ -235,7 +235,7 @@ float3 ComputeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxRecursionDepth())
+    if (payload.recursive >= getMaxBounceNum())
     {
         payload.color = float3(0, 0, 0);
         return true;
@@ -246,7 +246,7 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxRecursionDepth())
+    if (payload.recursive >= getMaxBounceNum())
     {
         payload.throughput = float3(0, 0, 0);
         return true;
