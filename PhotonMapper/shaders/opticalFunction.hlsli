@@ -483,7 +483,27 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         rayDesc.Direction = refracted;
         rayDesc.TMin = 0.001;
         rayDesc.TMax = 100000;
+        
+        bool isExecuteReflect = (photonPayload.storeIndex % 10 < 3); //30%Reflect
+    
+        if (isExecuteReflect)
+        {
+            PhotonPayload photonPayloadReflect;
+            photonPayloadReflect.throughput = length(src).xxx * reflectance * REFLECTANCE_BOOST;
+            photonPayloadReflect.recursive = photonPayload.recursive; //if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
+            photonPayloadReflect.storeIndex = photonPayload.storeIndex;
+            photonPayloadReflect.stored = 0; //empty
+            photonPayloadReflect.offsetCoef = photonPayload.offsetCoef + 1;
+            photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
+            RayDesc rayDescReflect;
+            rayDescReflect.Origin = worldPos;
+            rayDescReflect.Direction = reflect(worldRayDir, worldNormal);
+            rayDescReflect.TMin = 0.001;
+            rayDescReflect.TMax = 100000;
 
+            ReflectionPhoton(vertexPosition, vertexNormal, photonPayloadReflect);
+        }
+        else
         {
              //refract
             TraceRay(
@@ -495,23 +515,6 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
                 0, // miss index
                 rayDesc,
                 photonPayload);
-        }
-        
-        {
-            PhotonPayload photonPayloadReflect;
-            photonPayloadReflect.throughput = length(src).xxx * reflectance * REFLECTANCE_BOOST;
-            photonPayloadReflect.recursive = photonPayload.recursive;//if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
-            photonPayloadReflect.storeIndex = photonPayload.storeIndex;
-            photonPayloadReflect.stored = 0;//empty
-            photonPayloadReflect.offsetCoef = photonPayload.offsetCoef + 1;
-            photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
-            RayDesc rayDescReflect;
-            rayDescReflect.Origin = worldPos;
-            rayDescReflect.Direction = reflect(worldRayDir, worldNormal);
-            rayDescReflect.TMin = 0.001;
-            rayDescReflect.TMax = 100000;
-
-            ReflectionPhoton(vertexPosition, vertexNormal, photonPayloadReflect);
         }
     }
 }

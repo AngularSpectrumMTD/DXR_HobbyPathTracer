@@ -119,8 +119,7 @@ void photonEmitting()
     float randSeed = 0.5 * (randGenState * rnd01Converter + LightSeed * rnd01Converter);
     float3 photonEmitDir = getConeSample(randSeed, lightDir, coneAngle);
     
-    //float LAMBDA_NM = lerp(LANBDA_INF_NM, LAMBDA_VIO_NM, COLOR_ID * 1.0f / getLightLambdaNum());
-    float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (serialIndex % LAMBDA_NUM);
+    float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
     RayDesc rayDesc;
     rayDesc.Origin = spotLightPosition;
