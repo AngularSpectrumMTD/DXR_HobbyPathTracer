@@ -37,7 +37,6 @@ struct PhotonPayload
     int recursive;
     int storeIndex;
     int stored;
-    int offsetCoef;
     float lambdaNM;
 };
 

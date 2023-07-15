@@ -8,16 +8,10 @@ bool isPhotonStored(in PhotonPayload payload)
     return (payload.stored == 1);
 }
 
-bool isOverSplitted(in PhotonPayload payload)
-{
-    return (payload.offsetCoef >= 2);
-}
-
 void storePhoton(inout PhotonPayload payload, bool isMiss = false)
 {
     bool ignore = isMiss || (isVisualizeLightRange() ? false : (payload.recursive <= 1));
     uint3 dispatchDimensions = DispatchRaysDimensions();
-    uint photonOffset = dispatchDimensions.x * dispatchDimensions.y;
 
     if (ignore)
     {
@@ -25,7 +19,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.throughput = float3(0, 0, 0);
         photon.position = float3(0, 0, 0);
         photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex + payload.offsetCoef * photonOffset] = photon;
+        gPhotonMap[payload.storeIndex] = photon;
         payload.stored = 1;
     }
     else
@@ -34,7 +28,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.throughput = (payload.recursive <= 1) ? payload.throughput : getCausticsBoost() * payload.throughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex + payload.offsetCoef * photonOffset] = photon;
+        gPhotonMap[payload.storeIndex] = photon;
         payload.stored = 1;
     }
 

@@ -133,7 +133,6 @@ void photonEmitting()
     payload.recursive = 0;
     payload.storeIndex = serialIndex;
     payload.stored = 0;//empty
-    payload.offsetCoef = 0;
     payload.lambdaNM = LAMBDA_NM;
 
     RAY_FLAG flags = RAY_FLAG_NONE;

@@ -37,7 +37,7 @@ mNormalSphereMaterialTbl()
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
     mCausticsBoost = 3;
-    mIsMoveModel = true;
+    mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
     mIsDebug = false;

@@ -59,7 +59,7 @@ void reflectReflactMaterialClosestHit(inout Payload payload, TriangleIntersectio
 [shader("closesthit")]
 void reflectReflactMaterialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
-    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload) || isOverSplitted(payload))
+    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload))
     {
         return;
     }

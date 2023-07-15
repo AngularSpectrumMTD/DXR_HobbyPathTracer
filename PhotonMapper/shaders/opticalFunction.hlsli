@@ -493,7 +493,6 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
             photonPayloadReflect.recursive = photonPayload.recursive; //if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
             photonPayloadReflect.storeIndex = photonPayload.storeIndex;
             photonPayloadReflect.stored = 0; //empty
-            photonPayloadReflect.offsetCoef = photonPayload.offsetCoef + 1;
             photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
             RayDesc rayDescReflect;
             rayDescReflect.Origin = worldPos;

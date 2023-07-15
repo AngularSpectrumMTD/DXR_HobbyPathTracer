@@ -95,7 +95,7 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
 void floorStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
     // ClosestHit.
-    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload) || isOverSplitted(payload)) {
+    if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
 
