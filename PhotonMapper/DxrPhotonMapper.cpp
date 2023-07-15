@@ -27,7 +27,7 @@ mNormalSphereMaterialTbl()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
-    mSceneParam.photonParams.w = MAX_RECURSION_DEPTH / 2;
+    mSceneParam.photonParams.w = 6;
     mLightPosX = 11.f;mLightPosY = 20;mLightPosZ = 1.2;
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
@@ -222,7 +222,7 @@ void DxrPhotonMapper::InitializeCamera()
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
     mCamera.SetLookAt(eyePos, target);
 
-    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, 0, 0);
+    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, MAX_RECURSION_DEPTH / 2, 0);
     mCamera.SetPerspective(
         XM_PIDIV4, GetAspect(), 0.1f, 100.0f
     );
@@ -446,25 +446,28 @@ void DxrPhotonMapper::Draw()
     auto gridCB = mGridSortCB.Get();
     auto sceneCB = mSceneCB.Get();
 
-    //PhotonMapping
-    mCommandList->SetComputeRootSignature(mGrsPhoton.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
-    mCommandList->SetComputeRootConstantBufferView(3, sceneCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(4, mPhotonMapDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(5, mDepthBufferDescriptorUAVTbl[mRenderFrame % 2].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(6, mDepthBufferDescriptorUAVTbl[(mRenderFrame + 1) % 2].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(7, mPhotonGridIdDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(8, mPositionBufferDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(9, mNormalBufferDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(10, mMainOutputDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(11, mOutputDescriptorUAV.hGpu);
-    mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
-    mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
+    if (mIsApplyCaustics)
+    {
+        //PhotonMapping
+        mCommandList->SetComputeRootSignature(mGrsPhoton.Get());
+        mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(3, sceneCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(4, mPhotonMapDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(5, mDepthBufferDescriptorUAVTbl[mRenderFrame % 2].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(6, mDepthBufferDescriptorUAVTbl[(mRenderFrame + 1) % 2].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(7, mPhotonGridIdDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(8, mPositionBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(9, mNormalBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(10, mMainOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(11, mOutputDescriptorUAV.hGpu);
+        mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
+        mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
 
-    mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
-    Grid3DSort();
+        mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
+        Grid3DSort();
+    }
 
     //RayTracing
     mCommandList->SetComputeRootSignature(mGrs.Get());

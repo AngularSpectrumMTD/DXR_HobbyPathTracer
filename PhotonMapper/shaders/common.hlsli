@@ -103,7 +103,7 @@ float getSpectrumMode()
     return gSceneParam.photonParams.z;
 }
 
-float getMaxBounceNum()
+float getMaxPhotonBounceNum()
 {
     return gSceneParam.photonParams.w;
 }
@@ -116,6 +116,11 @@ float getNearPlaneDistance()
 float getFarPlaneDistance()
 {
     return gSceneParam.cameraParams.y;
+}
+
+float getMaxBounceNum()
+{
+    return gSceneParam.cameraParams.z;
 }
 
 float getGatherRadius()
@@ -245,7 +250,7 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum())
+    if (payload.recursive >= getMaxPhotonBounceNum())
     {
         payload.throughput = float3(0, 0, 0);
         return true;
