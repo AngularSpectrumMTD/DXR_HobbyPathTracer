@@ -23,7 +23,7 @@
 
 #define GRID_SORT_THREAD_NUM 1024
 #define GRID_DIMENSION 256//if increase this param, grid lines are occured in caustics. (Cause : Photon Accumuration)
-#define PLANE_SIZE 40
+#define PLANE_SIZE 100
 
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
@@ -96,6 +96,11 @@ private:
         ReflectBoxes = 1,
         RefractBoxes = 1,
         BoxesAll = (NormalBoxes + ReflectBoxes + RefractBoxes),
+    };
+
+    enum StageType {
+        StageType_Plane,
+        StageType_Box
     };
 
     enum LightTypeCount {
@@ -424,4 +429,6 @@ private:
     u32 mLightLambdaNum;
 
     u32 mPhotonMapSize1D;
+
+    StageType mStageType;
 };

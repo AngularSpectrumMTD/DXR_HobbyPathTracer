@@ -115,7 +115,7 @@ void DxrPhotonMapper::CreateDepthBuffer()
 
 void DxrPhotonMapper::CreatePhotonMappingBuffer()
 {
-    const u32 photonMapElements = mPhotonMapSize1D * mPhotonMapSize1D;//[2] is for Reflection at Refraction
+    const u32 photonMapElements = mPhotonMapSize1D * mPhotonMapSize1D;
     const u32 photonMapSizeInBytes = photonMapElements * sizeof(PhotonInfo);
     const u32 gridElements = GRID_DIMENSION * GRID_DIMENSION * GRID_DIMENSION;
     const u32 gridSizeInBytes = gridElements * sizeof(XMUINT2);

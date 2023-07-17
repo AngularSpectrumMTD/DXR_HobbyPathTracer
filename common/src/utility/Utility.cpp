@@ -254,13 +254,12 @@ namespace utility {
 
     void CreatePlane(std::vector<VertexPNT>& vertices, std::vector<u32>& indices, f32 size)
     {
-        VertexPNT srcVertices[] = {
+        vertices = {
             VertexPNT{ {-1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f} },
             VertexPNT{ {-1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f} },
             VertexPNT{ { 1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f} },
             VertexPNT{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f} },
         };
-        vertices.resize(4);
 
         for (auto& v : vertices)
         {

@@ -149,7 +149,20 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 {
     std::vector<utility::VertexPNT> verticesPNT;
     std::vector<u32> indices;
-    utility::CreateOpenedCube(verticesPNT, indices, PLANE_SIZE * 0.99f);
+
+    if (mStageType == StageType_Box)
+    {
+        utility::CreateOpenedCube(verticesPNT, indices, PLANE_SIZE * 0.99f);
+    }
+    else
+    {
+        utility::CreatePlane(verticesPNT, indices, PLANE_SIZE * 0.99f);
+        for (auto& v : verticesPNT)
+        {
+            v.Position.y = -PLANE_SIZE * 0.99f * 0.5;
+        }
+    }
+
     mMeshStage.CreateMeshBuffer(mDevice, verticesPNT, indices, L"PlaneVB", L"PlaneIB", L"");
 
     const f32 sphereRadius = 5;
@@ -181,7 +194,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
     std::uniform_int_distribution rnd(-splatRange, splatRange);
 
-    const f32 sphereY = -PLANE_SIZE * 0.99f + sphereRadius;
+    const f32 sphereY = -PLANE_SIZE * 0.99f * (mStageType == StageType_Box ? 1: 0.5) + sphereRadius;
 
     for (auto& type : mSpheresRefractTbl) {
         f32 y = sphereY;
@@ -250,7 +263,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         pos = XMMatrixTranslation(mLightPosX, mLightPosY, mLightPosZ);
     }
 
-    const f32 BoxY = -PLANE_SIZE * 0.98f + boxYLength;
+    const f32 BoxY = -PLANE_SIZE * 0.98f * (mStageType == StageType_Box ? 1 : 0.5) + boxYLength;
     std::uniform_int_distribution rnd4(-20, -5);
     std::uniform_int_distribution rnd5(5, 30);
     std::uniform_int_distribution rndz(0, 30);

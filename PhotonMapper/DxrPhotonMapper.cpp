@@ -24,9 +24,9 @@ mNormalSphereMaterialTbl()
     mIntenceBoost = 5000;
     mGatherRadius = 0.45f;
     mGatherBlockRange = 1;
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightPosX = 11.f;mLightPosY = 20;mLightPosZ = 1.2;
     mLightRange = 0.21f;
@@ -43,12 +43,14 @@ mNormalSphereMaterialTbl()
     mIsDebug = false;
     mVisualizeLightRange = true;
     mReverseMove = false;
-    mIsUseTexture = true;
+    mIsUseTexture = false;
     mStageTextureFileName = L"tileTex.png";
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
-   mGlassModelType = ModelType::ModelType_Skull;
+    mStageType = StageType_Plane;
+
+   mGlassModelType = ModelType::ModelType_Crab;
    mMetalModelType = ModelType::ModelType_LikeWater;
 
     switch (mGlassModelType)
@@ -56,7 +58,6 @@ mNormalSphereMaterialTbl()
         case  ModelType::ModelType_Crab:
         {
             mGlassFileName = L"crab.obj";
-            mCausticsBoost *= 3;
             mGlassObjYOfsset = 5;
             mGlassObjScale = XMFLOAT3(12, 12, 12);
         }
@@ -86,6 +87,7 @@ mNormalSphereMaterialTbl()
         break;
         case  ModelType::ModelType_Ocean:
         {
+            mStageType = StageType_Box;
             mGlassRotateRange *= 2;
             mGlassFileName = L"ocean.obj";
             mGlassObjYOfsset = 0;
@@ -94,6 +96,7 @@ mNormalSphereMaterialTbl()
         break;
         case  ModelType::ModelType_Ocean2:
         {
+            mStageType = StageType_Box;
             mGlassRotateRange *= 2;
             mGlassFileName = L"ocean2.obj";
             mGlassObjYOfsset = 0;
@@ -155,7 +158,16 @@ mNormalSphereMaterialTbl()
     break;
     case  ModelType::ModelType_Ocean:
     {
+        mStageType = StageType_Box;
         mMetalFileName = L"ocean.obj";
+        mMetalObjYOfsset = 20;
+        mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+    }
+    break;
+    case  ModelType::ModelType_Ocean2:
+    {
+        mStageType = StageType_Box;
+        mMetalFileName = L"ocean2.obj";
         mMetalObjYOfsset = 20;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
