@@ -213,13 +213,12 @@ namespace utility {
 namespace utility {
     void CreatePlane(std::vector<VertexPN>& vertices, std::vector<u32>& indices, f32 size)
     {
-        VertexPN srcVertices[] = {
+        vertices = {
             VertexPN{ {-1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f } },
             VertexPN{ {-1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
             VertexPN{ { 1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f } },
             VertexPN{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
         };
-        vertices.resize(_countof(srcVertices));
 
         for (auto& v : vertices)
         {
@@ -234,13 +233,12 @@ namespace utility {
     void CreatePlane(std::vector<VertexPNC>& vertices, std::vector<u32>& indices, f32 size)
     {
         const auto white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-        VertexPNC srcVertices[] = {
+        vertices = {
             VertexPNC{ {-1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, white },
             VertexPNC{ {-1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, white },
             VertexPNC{ { 1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, white },
             VertexPNC{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, white },
         };
-        vertices.resize(_countof(srcVertices));
 
         for (auto& v : vertices)
         {
