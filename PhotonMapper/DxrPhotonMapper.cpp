@@ -28,10 +28,10 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 11.f;mLightPosY = 20;mLightPosZ = 1.2;
+    mLightPosX = -2.f;mLightPosY = 18;mLightPosZ = -16.8;
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 412; mTheta = 261;
+    mPhi = 401; mTheta = 352;
     mTmpAccumuRatio = 0.05f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
@@ -230,7 +230,7 @@ void DxrPhotonMapper::Initialize()
 
 void DxrPhotonMapper::InitializeCamera()
 {
-    XMFLOAT3 eyePos(0, 0, 150.0f);
+    XMFLOAT3 eyePos(0, 50.0f, 280.0f);
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
     mCamera.SetLookAt(eyePos, target);
 
