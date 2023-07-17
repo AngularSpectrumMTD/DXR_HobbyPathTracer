@@ -171,8 +171,8 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);
 
     //Photon Hash / Serial Index Pair Sorting By Photon Hash
-    //BitonicSortLDS();
-    BitonicSortSimple();
+    BitonicSortLDS();
+    //BitonicSortSimple();
 
     mCommandList->ResourceBarrier(u32(uavBarriersGridId.size()), uavBarriersGridId.data());
 
