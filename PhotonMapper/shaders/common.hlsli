@@ -339,4 +339,9 @@ float depthLoad(uint2 index)
     return gDepthBuffer[index];
 }
 
+float lengthSqr(float3 v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
 #endif//__COMMON_HLSLI__

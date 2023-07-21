@@ -105,7 +105,6 @@ float3 lambda2XYZ(float lambdaNM)
     float t = fid - baseID;
     float3 XYZ0 = XYZ380to770_10nmTbl[baseID];
     float3 XYZ1 = XYZ380to770_10nmTbl[baseID + 1];
-
     return lerp(XYZ0, XYZ1, t);
 }
 
@@ -134,6 +133,18 @@ static float3x3 XYZtoRGB2 =
     - 0.9000405, + 1.4253036, - 0.0146949,
     - 0.470638, + 0.0885814, + 1.0093968
 };
+
+float3 integralColor()
+{
+    int i = 0;
+    float3 XYZ = 0.xxx;
+    for(i = 0; i < LAMBDA_NUM; i++)
+    {
+        XYZ += XYZ380to770_10nmTbl[i];
+    }
+
+    return mul(XYZ, XYZtoRGB2);
+}
 
 float3 lambda2sRGB_D65_BT709(float lambdaNM)
 {

@@ -81,6 +81,8 @@ void rayGen() {
     applyTimeDivision(finalCol, launchIndex);
     //applyTimeDivision(pcol, launchIndex);
 
+    //float3 intC = integralColor();
+
     gOutput[launchIndex.xy] = float4(finalCol, 1);
     //gOutput[launchIndex.xy] = float4(col + pcol, 1);
 }
@@ -93,7 +95,6 @@ void photonEmitting()
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
-    const int SAMPLE_LAMBDA_NUM = dispatchDimensions.z;
     
     float LightSeed = getLightRandomSeed();
     uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 10000 * (uint)LightSeed.x) * launchIndex.y);

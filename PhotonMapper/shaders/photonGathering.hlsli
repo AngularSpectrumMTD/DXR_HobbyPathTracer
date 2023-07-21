@@ -94,12 +94,12 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                     {
                         PhotonInfo comparePhoton = gPhotonMap[G];
 
-                        float distance = length(gatherCenterPos - comparePhoton.position);
-                        if ((distance < gatherRadius) &&
+                        float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
+                        if ((distanceSqr < gatherRadius * gatherRadius) &&
                          ((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag))//eliminate invisible photon effect
                         {
                             count++;
-                            accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(distance, gatherRadius);
+                            accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                         }
                     }
                 }
