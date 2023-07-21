@@ -5,7 +5,7 @@ void DxrPhotonMapper::Denoise()
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
     std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDXROutput.Get()));
+    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDXRMainOutput.Get()));
     uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDenoisedColorBuffer.Get()));
     mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
 
@@ -28,7 +28,7 @@ void DxrPhotonMapper::Denoise()
 
         mCommandList->SetComputeRootSignature(mRsDenoise.Get());
         mCommandList->SetComputeRootConstantBufferView(0, denoiseCB->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable((i % 2 == 0) ? 1 : 2, mOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable((i % 2 == 0) ? 1 : 2, mMainOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable((i % 2 == 0) ? 2 : 1, mDenoisedColorBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(3, mPositionBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(4, mNormalBufferDescriptorUAV.hGpu);
@@ -37,5 +37,22 @@ void DxrPhotonMapper::Denoise()
 
         mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
         mCommandList->ResourceBarrier(u32(uavBarriers2.size()), uavBarriers2.data());
+    }
+
+    if (DENOISE_ITE % 2 == 0)
+    {
+        D3D12_RESOURCE_BARRIER barriers[] = {
+        CD3DX12_RESOURCE_BARRIER::Transition(mDXRMainOutput.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
+        CD3DX12_RESOURCE_BARRIER::Transition(mDenoisedColorBuffer.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
+        };
+
+        mCommandList->ResourceBarrier(_countof(barriers), barriers);
+        mCommandList->CopyResource(mDXRMainOutput.Get(), mDenoisedColorBuffer.Get());
+
+        CD3DX12_RESOURCE_BARRIER barrier[] = {
+        CD3DX12_RESOURCE_BARRIER::Transition(mDXRMainOutput.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+        CD3DX12_RESOURCE_BARRIER::Transition(mDenoisedColorBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+        };
+        mCommandList->ResourceBarrier(_countof(barrier), barrier);
     }
 }

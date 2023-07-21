@@ -26,7 +26,7 @@
 #define PLANE_SIZE 100
 
 #define PHOTON_NUM_1D 1024
-#define DENOISE_ITE 2
+#define DENOISE_ITE 3
 #define MAX_RECURSION_DEPTH 31//0---31
 
 namespace HitGroups {
