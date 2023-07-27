@@ -24,9 +24,9 @@ mNormalSphereMaterialTbl()
     mIntenceBoost = 5000;
     mGatherRadius = 0.45f;
     mGatherBlockRange = 1;
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightPosX = -2.f;mLightPosY = 18;mLightPosZ = -16.8;
     mLightRange = 0.21f;
