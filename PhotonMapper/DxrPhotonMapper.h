@@ -53,6 +53,9 @@ namespace ComputeShaders {
     const LPCWSTR RearrangePhoton = L"Grid3D_RearrangePhoton.cso";
 
     const LPCWSTR Denoise = L"Denoise.cso";
+
+    const LPCWSTR ComputeVariance = L"computeVariance.cso";
+    const LPCWSTR A_Trous = L"A-trous.cso";
 }
 
 template<class T>
@@ -215,12 +218,13 @@ private:
     void CreateResultBuffer();
     void CreatePhotonMappingBuffer();
     void CreateDepthBuffer();
+    void CreateLuminanceMomentBuffer();
+    void CreateLuminanceVarianceBuffer();
     void CreateDenoisedColorBuffer();
     void CreatePositionBuffer();
     void CreateNormalBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
-    void CreateLocalRootSignatureRayGen();
     void CreateSphereLocalRootSignature();
     void CreateFloorLocalRootSignature();
     void CreateGlassLocalRootSignature();
@@ -253,6 +257,7 @@ private:
     void BitonicSortSimple();
 
     void Denoise();
+    void SpatiotemporalVarianceGuidedFiltering();
 
     ComPtr<ID3D12GraphicsCommandList4> mCommandList;
     static const u32 BackBufferCount = dx12::RenderDeviceDX12::BackBufferCount;
@@ -299,6 +304,7 @@ private:
     //Buffers
     ComPtr <ID3D12Resource> mDXRMainOutput;
     dx12::Descriptor mMainOutputDescriptorUAV;
+    dx12::Descriptor mMainOutputDescriptorSRV;
     ComPtr<ID3D12Resource> mDXROutput;
     dx12::Descriptor mOutputDescriptorUAV;
     ComPtr<ID3D12Resource> mPhotonMap;
@@ -329,6 +335,14 @@ private:
     dx12::Descriptor mNormalBufferDescriptorSRV;
     dx12::Descriptor mNormalBufferDescriptorUAV;
 
+    std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
+    std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorUAVTbl;
+
+    std::vector < ComPtr<ID3D12Resource>> mLuminanceVarianceBufferTbl;
+    std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorUAVTbl;
+
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB1Tbl;
@@ -343,7 +357,6 @@ private:
     ComPtr<ID3D12Resource> mShaderTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
     ComPtr<ID3D12RootSignature> mGrs;
-    ComPtr<ID3D12RootSignature> mRsRGS;
     ComPtr<ID3D12RootSignature> mRsFloor;
     ComPtr<ID3D12RootSignature> mRsSphereRR;
     ComPtr<ID3D12RootSignature> mRsSpherePhong;
@@ -353,7 +366,6 @@ private:
     ComPtr<ID3D12Resource> mShaderPhotonTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
     ComPtr<ID3D12RootSignature> mGrsPhoton;
-    ComPtr<ID3D12RootSignature> mRsRGSPhoton;
     ComPtr<ID3D12RootSignature> mRsFloorPhoton;
     ComPtr<ID3D12RootSignature> mRsSphereRRPhoton;
     ComPtr<ID3D12RootSignature> mRsSpherePhongPhoton;
@@ -380,6 +392,12 @@ private:
 
     ComPtr<ID3D12RootSignature> mRsDenoise;
     ComPtr<ID3D12PipelineState> mDenoisePSO;
+
+    ComPtr<ID3D12RootSignature> mRsComputeVariance;
+    ComPtr<ID3D12PipelineState> mComputeVariancePSO;
+
+    ComPtr<ID3D12RootSignature> mRsA_TrousWaveletFilter;
+    ComPtr<ID3D12PipelineState> mA_TrousWaveletFilterPSO;
 
     u32 mRenderFrame = 0;
     u32 mMoveFrame = 0;

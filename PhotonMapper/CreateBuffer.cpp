@@ -15,6 +15,14 @@ void DxrPhotonMapper::CreateResultBuffer()
         L"DXRMainOutput"
     );
 
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mMainOutputDescriptorSRV = mDevice->CreateShaderResourceView(mDXRMainOutput.Get(), &srvDesc);
+
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     mMainOutputDescriptorUAV = mDevice->CreateUnorderedAccessView(mDXRMainOutput.Get(), &uavDesc);
@@ -43,6 +51,14 @@ void DxrPhotonMapper::CreateDenoisedColorBuffer()
         L"DenoisedColorBuffer"
     );
 
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mDenoisedColorBufferDescriptorSRV = mDevice->CreateShaderResourceView(mDenoisedColorBuffer.Get(), &srvDesc);
+
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     mDenoisedColorBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDenoisedColorBuffer.Get(), &uavDesc);
@@ -60,6 +76,14 @@ void DxrPhotonMapper::CreatePositionBuffer()
         D3D12_HEAP_TYPE_DEFAULT,
         L"PositionBuffer"
     );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mPositionBufferDescriptorSRV = mDevice->CreateShaderResourceView(mPositionBuffer.Get(), &srvDesc);
 
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
@@ -79,6 +103,14 @@ void DxrPhotonMapper::CreateNormalBuffer()
         L"NormalBuffer"
     );
 
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mNormalBufferDescriptorSRV = mDevice->CreateShaderResourceView(mNormalBuffer.Get(), &srvDesc);
+
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     mNormalBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mNormalBuffer.Get(), &uavDesc);
@@ -92,6 +124,7 @@ void DxrPhotonMapper::CreateDepthBuffer()
     const u32 size = 2;
 
     mDepthBufferTbl.resize(size);
+    mDepthBufferDescriptorSRVTbl.resize(size);
     mDepthBufferDescriptorUAVTbl.resize(size);
 
     for (u32 i = 0; i < size; i++)
@@ -106,12 +139,93 @@ void DxrPhotonMapper::CreateDepthBuffer()
             name
         );
 
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mDepthBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mDepthBufferTbl.at(i).Get(), &srvDesc);
+
         D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
         mDepthBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mDepthBufferTbl.at(i).Get(), &uavDesc);
     }
 }
 
+void DxrPhotonMapper::CreateLuminanceMomentBuffer()
+{
+    auto width = GetWidth();
+    auto height = GetHeight();
+
+    const u32 size = 2;
+
+    mLuminanceMomentBufferTbl.resize(size);
+    mLuminanceMomentBufferDescriptorUAVTbl.resize(size);
+    mLuminanceMomentBufferDescriptorSRVTbl.resize(size);
+
+    for (u32 i = 0; i < size; i++)
+    {
+        wchar_t name[30];
+        swprintf(name, 30, L"LuminanceMomentBufferTbl[%d]", i);
+        mLuminanceMomentBufferTbl.at(i) = mDevice->CreateTexture2D(
+            width, height, DXGI_FORMAT_R16G16_FLOAT,//float2
+            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+            (i % 2 == 0) ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,//renderframe will be 1 on first execute time
+            D3D12_HEAP_TYPE_DEFAULT,
+            name
+        );
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mLuminanceMomentBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mLuminanceMomentBufferTbl.at(i).Get(), &srvDesc);
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        mLuminanceMomentBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mLuminanceMomentBufferTbl.at(i).Get(), &uavDesc);
+    }
+}
+
+void DxrPhotonMapper::CreateLuminanceVarianceBuffer()
+{
+    auto width = GetWidth();
+    auto height = GetHeight();
+
+    const u32 size = 2;
+
+    mLuminanceVarianceBufferTbl.resize(size);
+    mLuminanceVarianceBufferDescriptorUAVTbl.resize(size);
+    mLuminanceVarianceBufferDescriptorSRVTbl.resize(size);
+
+    for (u32 i = 0; i < size; i++)
+    {
+        wchar_t name[30];
+        swprintf(name, 30, L"LuminanceVarianceBufferTbl[%d]", i);
+        mLuminanceVarianceBufferTbl.at(i) = mDevice->CreateTexture2D(
+            width, height, DXGI_FORMAT_R16_FLOAT,//float
+            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+            (i % 2 == 0) ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+            D3D12_HEAP_TYPE_DEFAULT,
+            name
+        );
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mLuminanceVarianceBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mLuminanceVarianceBufferTbl.at(i).Get(), &srvDesc);
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        mLuminanceVarianceBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mLuminanceVarianceBufferTbl.at(i).Get(), &uavDesc);
+    }
+}
 
 void DxrPhotonMapper::CreatePhotonMappingBuffer()
 {
@@ -301,6 +415,8 @@ void DxrPhotonMapper::CreateRegularBuffer()
     CreatePositionBuffer();
     CreateNormalBuffer();
     CreateDepthBuffer();
+    CreateLuminanceMomentBuffer();
+    CreateLuminanceVarianceBuffer();
     CreatePhotonMappingBuffer();
     mGroundTex = LoadTextureFromFile(mStageTextureFileName);
     mCubeMapTex = LoadTextureFromFile(mCubeMapTextureFileName);

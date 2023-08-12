@@ -17,6 +17,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
@@ -26,6 +27,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.PushStaticSampler(0);
         mGrs = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
     }
@@ -36,6 +38,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
@@ -45,6 +48,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.PushStaticSampler(0);
         mGrsPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
     }
@@ -52,19 +56,9 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
 
 void DxrPhotonMapper::CreateRootSignatureLocal()
 {
-    CreateLocalRootSignatureRayGen();
     CreateSphereLocalRootSignature();
     CreateFloorLocalRootSignature();
     CreateGlassLocalRootSignature();
-}
-
-void DxrPhotonMapper::CreateLocalRootSignatureRayGen()
-{
-    {
-        utility::RootSignatureCreater rsCreater;
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
-        mRsRGS = rsCreater.Create(mDevice, true, L"lrsRayGen");
-    }
 }
 
 void DxrPhotonMapper::CreateSphereLocalRootSignature()

@@ -2,24 +2,31 @@
 
 #define SPP 1
 
-void applyTimeDivision(inout float3 current, uint2 depthBufferIDxy)
+void applyTimeDivision(inout float3 current, uint2 ID)
 {
     float tmpAccmuRatio = getTempAccumuRatio();
-    float3 prev = gOutput1[DispatchRaysIndex().xy].rgb;
+    float3 prev = gOutput1[ID].rgb;
     
-    float currentDepth = gDepthBuffer[depthBufferIDxy];
-    float prevDepth = gPrevDepthBuffer[depthBufferIDxy];
+    float currentDepth = gDepthBuffer[ID];
+    float prevDepth = gPrevDepthBuffer[ID];
 
     bool isNearColor = false;//abs(dot(normalize(prev), normalize(current))) > 0.95;
     bool isNearDepth = abs(currentDepth - prevDepth) < 0.000001;
     bool isAccept = (isNearColor ? true : isNearDepth) && (currentDepth != 0);
+
+    float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[ID];
+    float luminance = luminanceFromRGB(current);
+    float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
     
     if (isAccept)
     {
         current = lerp(prev, current, tmpAccmuRatio);
+        curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
+        curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
     }
 
-    gOutput1[DispatchRaysIndex().xy].rgb = current;
+    gOutput1[ID].rgb = current;
+    gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
 }
 
 //

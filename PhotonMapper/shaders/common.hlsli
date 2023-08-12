@@ -53,6 +53,7 @@ struct TriangleIntersectionAttributes
 // Global Root Signature
 RaytracingAccelerationStructure gRtScene : register(t0);
 Texture2D<float4> gEquiRecEnvMap : register(t1);
+Texture2D<float2> gLuminanceMomentBufferSrc : register(t2);
 ConstantBuffer<SceneCB> gSceneParam : register(b1);
 SamplerState gSampler : register(s0);
 
@@ -64,6 +65,7 @@ RWTexture2D<float4> gPositionBuffer : register(u4);
 RWTexture2D<float4> gNormalBuffer : register(u5);
 RWTexture2D<float4> gOutput : register(u6);
 RWTexture2D<float4> gOutput1 : register(u7);
+RWTexture2D<float2> gLuminanceMomentBufferDst : register(u8);
 
 ////////////////////////////////////
 //Interpret Scene Param

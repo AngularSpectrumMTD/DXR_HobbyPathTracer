@@ -45,7 +45,6 @@ void DxrPhotonMapper::CreateComputeShaderStateObject(const LPCWSTR& compiledComp
     }
 }
 
-
 void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
 {
     {
@@ -117,5 +116,28 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         mRsDenoise = rsCreater.Create(mDevice, false, L"rsDenoise");
         CreateComputeShaderStateObject(ComputeShaders::Denoise, mDenoisePSO, mRsDenoise);
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        mRsComputeVariance = rsCreater.Create(mDevice, false, L"rsComputeVariance");
+        CreateComputeShaderStateObject(ComputeShaders::ComputeVariance, mComputeVariancePSO, mRsComputeVariance);
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        mRsA_TrousWaveletFilter = rsCreater.Create(mDevice, false, L"rsA_TrousWaveletFilter");
+        CreateComputeShaderStateObject(ComputeShaders::A_Trous, mA_TrousWaveletFilterPSO, mRsA_TrousWaveletFilter);
     }
 }

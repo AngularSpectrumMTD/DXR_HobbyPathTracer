@@ -125,6 +125,9 @@
     <None Include="shaders\common.hlsli">
       <Filter>ソース ファイル\shaders</Filter>
     </None>
+    <None Include="shaders\weightsUtility.hlsli">
+      <Filter>ソース ファイル\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\closestHitPhong.hlsl">
@@ -170,6 +173,12 @@
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
     <FxCompile Include="shaders\Denoise.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\A-trous.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\computeVariance.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
   </ItemGroup>
