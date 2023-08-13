@@ -175,10 +175,6 @@ private:
     struct DenoiseCB
     {
         u32 stepScale;
-        f32 sigmaScale;
-        f32 clrSigma;
-        f32 nmlSigma;
-        f32 posSigma;
     };
 
     enum ModelType

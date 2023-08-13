@@ -2,6 +2,8 @@
 
 void DxrPhotonMapper::Denoise()
 {
+    return;
+
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
     std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
@@ -18,10 +20,6 @@ void DxrPhotonMapper::Denoise()
     {
         DenoiseCB cb;
         cb.stepScale = 1 << i;
-        cb.sigmaScale = (f32)pow(2.0f, i);
-        cb.clrSigma = 1.f / DENOISE_ITE;
-        cb.nmlSigma = 0.1f / DENOISE_ITE;
-        cb.posSigma = 0.5f / DENOISE_ITE;
 
         auto denoiseCB = mDenoiseCBTbl.at(i).Get();
         mDevice->ImmediateBufferUpdateHostVisible(denoiseCB, &cb, sizeof(cb));
@@ -105,10 +103,6 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
         {
             DenoiseCB cb;
             cb.stepScale = 1 << i;
-            cb.sigmaScale = (f32)pow(2.0f, i);
-            cb.clrSigma = 1.f / DENOISE_ITE;
-            cb.nmlSigma = 0.1f / DENOISE_ITE;
-            cb.posSigma = 0.5f / DENOISE_ITE;
 
             auto denoiseCB = mDenoiseCBTbl.at(i).Get();
             mDevice->ImmediateBufferUpdateHostVisible(denoiseCB, &cb, sizeof(cb));

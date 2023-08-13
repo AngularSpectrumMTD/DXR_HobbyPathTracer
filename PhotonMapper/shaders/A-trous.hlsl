@@ -2,11 +2,7 @@
 
 struct WaveletCB
 {
-    uint stepScale; //pow(2, iter)
-    float sigmaScale; //pow(2, -iter)
-    float clrSigma;
-    float nmlSigma;
-    float posSigma;
+    uint stepScale;
 };
 
 ConstantBuffer<WaveletCB> gWaveletParam : register(b0);
@@ -32,7 +28,7 @@ void A_TrousWaveletFilter(uint3 dtid : SV_DispatchThreadID)
     const float depth = depthBuffer[computePix];
     const float3 normal = normalBuffer[computePix].xyz;
     const float dx = computePix.x < bufferSize.x / 2 ? 1 : -1;
-    const float dy = computePix.x < bufferSize.x / 2 ? 1 : -1;
+    const float dy = computePix.y < bufferSize.y / 2 ? 1 : -1;
     const float xDepth = depthBuffer[computePix + int2(dx, 0)];
     const float yDepth = depthBuffer[computePix + int2(0, dy)];
     const float dzdx = (xDepth - depth) * dx;
