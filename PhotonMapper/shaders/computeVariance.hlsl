@@ -27,9 +27,12 @@ void computeVariance(uint3 dtid : SV_DispatchThreadID)
     float wSum = 0;
     
     int i = 0, j = 0;
+
+    [unroll]
     for (i = -FILTER_FOOTPRINT; i < FILTER_FOOTPRINT; i++)
     {
         float ky = cKernel[i + FILTER_FOOTPRINT];
+        [unroll]
         for (j = -FILTER_FOOTPRINT; j < FILTER_FOOTPRINT; j++)
         {
             if (i == 0 && j == 0)

@@ -40,9 +40,11 @@ void A_TrousWaveletFilter(uint3 dtid : SV_DispatchThreadID)
         float varSum = 0;
         float wSum = 0;
         int i = 0, j = 0;
+        [unroll]
         for (i = -1; i <= 1; i++)
         {
             float ky = gaussKernel[i + 1];
+            [unroll]
             for (j = -1; j <= 1; j++)
             {
                 int2 neighborPix = computePix + int2(j, i);
@@ -65,6 +67,7 @@ void A_TrousWaveletFilter(uint3 dtid : SV_DispatchThreadID)
         float3 filteredColor = waveletW_center * currentColor;
         float filteredVar = waveletW_center * waveletW_center * variance;
         int i = 0;
+        [unroll]
         for (i = 0; i < WAVELET_FILTERELEMENTS; i++)
         {
             if (i == WAVELET_CENTER)

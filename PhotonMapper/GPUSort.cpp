@@ -207,13 +207,4 @@ void DxrPhotonMapper::Grid3DSort()
 
     mCommandList->ResourceBarrier(u32(uavBarriersPhotonMap.size()), uavBarriersPhotonMap.data());
     mCommandList->ResourceBarrier(u32(uavBarriersPhotonMapSorted.size()), uavBarriersPhotonMapSorted.data());
-
-    mCommandList->SetComputeRootSignature(mRsCopy.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mPhotonMapSortedDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(2, mPhotonMapDescriptorUAV.hGpu);
-    mCommandList->SetPipelineState(mCopyPSO.Get());
-    mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);
-
-    mCommandList->ResourceBarrier(u32(uavBarriersPhotonMap.size()), uavBarriersPhotonMap.data());
 }

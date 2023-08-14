@@ -499,7 +499,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
     mCommandList->SetComputeRootDescriptorTable(3, mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
     mCommandList->SetComputeRootConstantBufferView(4, sceneCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(5, mPhotonMapDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(5, mPhotonMapSortedDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(6, mDepthBufferDescriptorUAVTbl[src].hGpu);
     mCommandList->SetComputeRootDescriptorTable(7, mDepthBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(8, mPhotonGridIdDescriptorUAV.hGpu);
