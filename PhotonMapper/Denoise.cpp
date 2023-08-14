@@ -31,7 +31,9 @@ void DxrPhotonMapper::Denoise()
         mCommandList->SetComputeRootDescriptorTable(3, mPositionBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(4, mNormalBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mDenoisePSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "DenoiseFiltering");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
 
         mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
         mCommandList->ResourceBarrier(u32(uavBarriers2.size()), uavBarriers2.data());
@@ -87,7 +89,9 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
         mCommandList->SetComputeRootDescriptorTable(2, mLuminanceMomentBufferDescriptorSRVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(3, mLuminanceVarianceBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetPipelineState(mComputeVariancePSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "ComputeVariance");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
     }
 
     //wavelet
@@ -116,7 +120,9 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
             mCommandList->SetComputeRootDescriptorTable(5, (i % 2 == 1) ? mMainOutputDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(6, mLuminanceVarianceBufferDescriptorUAVTbl[(i % 2 == 0) ? src : dst].hGpu);
             mCommandList->SetPipelineState(mA_TrousWaveletFilterPSO.Get());
+            PIXBeginEvent(mCommandList.Get(), 0, "A_TrousWaveletFiltering");
             mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+            PIXEndEvent(mCommandList.Get());
 
             D3D12_RESOURCE_BARRIER wavelet_barrier[] = {
                 CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceVarianceBufferTbl[(i % 2 == 1) ? dst : src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),

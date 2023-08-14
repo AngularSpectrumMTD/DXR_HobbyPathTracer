@@ -486,7 +486,9 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
+        PIXEndEvent(mCommandList.Get());
 
         mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
         Grid3DSort();
@@ -509,7 +511,9 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
+    PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
+    PIXEndEvent(mCommandList.Get());
 
     if (mIsUseDenoise)
     {
