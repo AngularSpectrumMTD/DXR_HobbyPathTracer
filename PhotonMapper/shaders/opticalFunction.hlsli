@@ -506,7 +506,7 @@ void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload 
         {
             PhotonPayload photonPayloadReflect;
             photonPayloadReflect.throughput = length(src).xxx * reflectance * REFLECTANCE_BOOST;
-            photonPayloadReflect.recursive = photonPayload.recursive; //if reset this param, infinite photon emission occured. This cause GPU HUNG!!!
+            photonPayloadReflect.recursive = photonPayload.recursive; //if reset this param, infinite photon emission is occurred. This cause GPU HUNG!!!
             photonPayloadReflect.storeIndex = photonPayload.storeIndex;
             photonPayloadReflect.stored = 0; //empty
             photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
