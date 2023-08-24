@@ -119,9 +119,7 @@ void photonEmitting()
     int serialIndex = SerialRaysIndex(launchIndex, dispatchDimensions);
     const int COLOR_ID = serialIndex % getLightLambdaNum();
 
-    uint photonOffset = dispatchDimensions.x * dispatchDimensions.y;
     gPhotonMap[serialIndex] = photon;//initialize
-    gPhotonMap[serialIndex + photonOffset] = photon;//initialize
 
     float coneAngle = acos(dot(lightDir, normalize((spotLightPosition)))) * 2.0 * getLightRange();
     float randSeed = 0.5 * (randGenState * rnd01Converter + LightSeed * rnd01Converter);

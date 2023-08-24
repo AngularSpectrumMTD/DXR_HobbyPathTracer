@@ -28,15 +28,15 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 9.f;mLightPosY = 18;mLightPosZ = -16.8;
+    mLightPosX = -1.f;mLightPosY = 17;mLightPosZ = -14.8;
     mLightRange = 0.21f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 401; mTheta = 352;
+    mPhi = 467; mTheta = 317;
     mTmpAccumuRatio = 0.15f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 3;
+    mCausticsBoost = 8;
     mIsMoveModel = true;
     mIsApplyCaustics = true;
     mIsUseDenoise = true;
@@ -50,8 +50,8 @@ mNormalSphereMaterialTbl()
 
     mStageType = StageType_Plane;
 
-   mGlassModelType = ModelType::ModelType_Crab;
-   mMetalModelType = ModelType::ModelType_LikeWater;
+   mGlassModelType = ModelType::ModelType_Teapot;
+   mMetalModelType = ModelType::ModelType_TwistCube;
 
     switch (mGlassModelType)
     {
@@ -152,7 +152,7 @@ mNormalSphereMaterialTbl()
     case  ModelType::ModelType_LikeWater:
     {
         mMetalFileName = L"likeWater.obj";
-        mMetalObjYOfsset = 2000;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(2, 4, 4);
     }
     break;
@@ -365,7 +365,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(1, 5, mCausticsBoost + (mReverseMove ? -0.5 : 0.5));
+        mCausticsBoost = Clamp(1, 10, mCausticsBoost + (mReverseMove ? -0.5 : 0.5));
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;

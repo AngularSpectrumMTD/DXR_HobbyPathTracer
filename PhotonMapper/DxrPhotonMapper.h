@@ -81,9 +81,9 @@ public:
 private:
 
     enum SphereTypeCount {
-        NormalSpheres = 5,
-        ReflectSpheres = 1,
-        RefractSpheres = 1,
+        NormalSpheres = 2,
+        ReflectSpheres = 3,
+        RefractSpheres = 3,
         SpheresAll = (NormalSpheres + ReflectSpheres + RefractSpheres),
     };
 
@@ -96,7 +96,7 @@ private:
     };
 
     enum BoxTypeCount {
-        NormalBoxes = 1,
+        NormalBoxes = 2,
         ReflectBoxes = 1,
         RefractBoxes = 1,
         BoxesAll = (NormalBoxes + ReflectBoxes + RefractBoxes),
