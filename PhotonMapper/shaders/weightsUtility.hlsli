@@ -23,8 +23,8 @@ bool isInsideBounds(int2 ij, int2 size)
 float depthWeight(const float depth, const float neighborDepth, const float dzdx, const float dzdy, const int dx, const int dy)
 {
     const float sig = 1.f;
-    const float eps = 1e-2f;
-    return exp(-abs(depth - neighborDepth + eps) / (sig * abs(dzdx * dx + dzdy * dy)) + eps);
+    const float eps = 1e-5f;
+    return saturate(exp(-abs(depth - neighborDepth + eps) / (sig * abs(dzdx * dx + dzdy * dy)) + eps));
 }
 
 float normalWeight(const float3 normal, const float3 neighborNormal)

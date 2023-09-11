@@ -11,7 +11,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     float prevDepth = gPrevDepthBuffer[ID];
 
     bool isNearColor = false;//abs(dot(normalize(prev), normalize(current))) > 0.95;
-    bool isNearDepth = abs(currentDepth - prevDepth) < 0.000001;
+    bool isNearDepth = abs(currentDepth - prevDepth) < 0.0001;
     bool isAccept = (isNearColor ? true : isNearDepth) && (currentDepth != 0);
 
     float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[ID];

@@ -166,7 +166,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mMeshStage.CreateMeshBuffer(mDevice, verticesPNT, indices, L"PlaneVB", L"PlaneIB", L"");
 
     const f32 sphereRadius = 5;
-    const f32 boxYLength = 2;
+    const f32 boxYLength = 5;
+    const f32 boxXLength = 3;
+    const f32 boxZLength = 3;
 
     std::vector<utility::VertexPN> verticesPN;
     utility::CreateSphere(verticesPN, indices, sphereRadius, 30, 30);
@@ -186,7 +188,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateSphere(verticesPN, indices, 1.f, 30, 30);
     mMeshLightSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereLightVB", L"SphereLightIB", L"");
 
-    utility::CreateCube(verticesPN, indices, 7, boxYLength, 7);
+    utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
     std::mt19937 mt;
@@ -237,50 +239,62 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     std::uniform_real_distribution<> rndScale(1, 4);
     for (auto& trs : mSpheresRefractTbl) {
         f32 scale = (f32)rndScale(mt);
-        f32 y = -PLANE_SIZE * 0.99f * (mStageType == StageType_Box ? 1 : 0.5) + sphereRadius * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
+        const f32 scaledSize = sphereRadius * scale;
+        f32 y = -PLANE_SIZE * 0.99f + scaledSize;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
     }
     for (auto& trs : mSpheresReflectTbl) {
         f32 scale = (f32)rndScale(mt);
-        f32 y = -PLANE_SIZE * 0.99f * (mStageType == StageType_Box ? 1 : 0.5) + sphereRadius * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
+        const f32 scaledSize = sphereRadius * scale;
+        f32 y = -PLANE_SIZE * 0.99f + scaledSize;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
     }
     for (auto& trs : mSpheresNormalTbl) {
         f32 scale = (f32)rndScale(mt);
-        f32 y = -PLANE_SIZE * 0.99f * (mStageType == StageType_Box ? 1 : 0.5) + sphereRadius * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
+        const f32 scaledSize = sphereRadius * scale;
+        f32 y = -PLANE_SIZE * 0.99f + scaledSize;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
     }
     std::uniform_real_distribution<> rndScale2(3, 8);
     for (auto& trs : mBoxesRefractTbl) {
         f32 scale = (f32)rndScale2(mt) ;
-        f32 y = -PLANE_SIZE * 0.98f * (mStageType == StageType_Box ? 1 : 0.5) + boxYLength * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
+        const f32 scaledSizeY = boxYLength * scale;
+        const f32 scaledSizeX = boxXLength * scale;
+        const f32 scaledSizeZ = boxZLength * scale;
+        f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
     }
     for (auto& trs : mBoxesReflectTbl) {
         f32 scale = (f32)rndScale2(mt) ;
-        f32 y = -PLANE_SIZE * 0.98f * (mStageType == StageType_Box ? 1 : 0.5) + boxYLength * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt) + PLANE_SIZE * 0.1);
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt) + PLANE_SIZE * 0.3);
+        const f32 scaledSizeY = boxYLength * scale;
+        const f32 scaledSizeX = boxXLength * scale;
+        const f32 scaledSizeZ = boxZLength * scale;
+        f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt) + PLANE_SIZE * 0.1);
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.3);
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
     }
     for (auto& trs : mBoxesNormalTbl) {
         f32 scale = (f32)rndScale2(mt) ;
-        f32 y = -PLANE_SIZE * 0.98f * (mStageType == StageType_Box ? 1 : 0.5) + boxYLength * scale;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + sphereRadius, PLANE_SIZE * 0.99f - sphereRadius, (f32)rndPos(mt) + PLANE_SIZE * 0.2);
+        const f32 scaledSizeY = boxYLength * scale;
+        const f32 scaledSizeX = boxXLength * scale;
+        const f32 scaledSizeZ = boxZLength * scale;
+        f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
+        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt));
+        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.2);
 
         trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
     }
