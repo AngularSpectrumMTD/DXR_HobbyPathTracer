@@ -187,7 +187,8 @@ private:
         ModelType_Ocean,
         ModelType_Ocean2,
         ModelType_Diamond,
-        ModelType_Skull
+        ModelType_Skull,
+        ModelType_HorseStatue,
     };
 
     enum Spectrum

@@ -28,15 +28,15 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -45.f;mLightPosY = 62;mLightPosZ = -49;
-    mLightRange = 0.38f;
+    mLightPosX = -14.f;mLightPosY = 15;mLightPosZ = -4;
+    mLightRange = 0.065f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 470; mTheta = 317;
-    mTmpAccumuRatio = 0.15f;
+    mPhi = 459; mTheta = 276;
+    mTmpAccumuRatio = 0.05f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 20;
+    mCausticsBoost = 7;
     mIsMoveModel = true;
     mIsApplyCaustics = true;
     mIsUseDenoise = true;
@@ -50,7 +50,7 @@ mNormalSphereMaterialTbl()
 
     mStageType = StageType_Plane;
 
-   mGlassModelType = ModelType::ModelType_Ocean2;
+   mGlassModelType = ModelType::ModelType_HorseStatue;
    mMetalModelType = ModelType::ModelType_TwistCube;
 
     switch (mGlassModelType)
@@ -122,6 +122,13 @@ mNormalSphereMaterialTbl()
             mGlassFileName = L"crab.obj";
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(12, 12, 12);
+        }
+        break;
+        case  ModelType::ModelType_HorseStatue:
+        {
+            mGlassFileName = L"horse_statue_Tri.obj";
+            mGlassObjYOfsset = -80;
+            mGlassObjScale = XMFLOAT3(350, 350, 350);
         }
         break;
     }

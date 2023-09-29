@@ -159,7 +159,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         utility::CreatePlane(verticesPNT, indices, PLANE_SIZE * 0.99f);
         for (auto& v : verticesPNT)
         {
-            v.Position.y = -PLANE_SIZE * 0.99f * 0.5;
+            v.Position.y = -PLANE_SIZE * 0.99f;
         }
     }
 
