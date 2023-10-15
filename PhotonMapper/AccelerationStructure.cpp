@@ -16,6 +16,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         Default = 2
     };
 
+    //NOTE: InstanceContributionToHitGroupIndex is HitGroup ID(decided in CreateShaderTable())
     {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
@@ -332,6 +333,30 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
         index++;
     }
+    index = 0;
+    for (auto& material : mReflectRefractSphereMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        index++;
+    }
+    index = 0;
+    for (auto& material : mReflectRefractBoxMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        index++;
+    }
+    index = 0;
+    for (auto& material : mMetalMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        index++;
+    }
+    index = 0;
+    for (auto& material : mGlassBoxMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        index++;
+    }
 
     auto bufferSize = sizeof(MaterialParam) * mNormalSphereMaterialTbl.size();
     mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
@@ -340,6 +365,22 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     bufferSize = sizeof(MaterialParam) * mNormalBoxMaterialTbl.size();
     mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mReflectRefractSphereMaterialTbl.size();
+    mReflectRefractSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mReflectRefractSphereMaterialCB.Get(), mReflectRefractSphereMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mReflectRefractBoxMaterialTbl.size();
+    mReflectRefractBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mReflectRefractBoxMaterialCB.Get(), mReflectRefractBoxMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mMetalMaterialTbl.size();
+    mMetalMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mMetalMaterialCB.Get(), mMetalMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mGlassBoxMaterialTbl.size();
+    mGlassMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mGlassMaterialCB.Get(), mGlassBoxMaterialTbl.data(), bufferSize);
 }
 
 void DxrPhotonMapper::CreateSceneBLAS()

@@ -2,12 +2,27 @@
 
 void DxrPhotonMapper::CreateStateObject()
 {
+    //ShaderOBJ
     const auto RayGenShader = L"raygen.dxlib";
     const auto MissShader = L"miss.dxlib";
     const auto FloorClosestHitShader = L"closestHitFloor.dxlib";
     const auto DefaultMaterialClosestHitShader = L"closestHitMaterial.dxlib";
     const auto ReflectReflactMaterialClosestHitShader = L"closestHitReflectReflact.dxlib";
     const auto LightClosestHitShader = L"closestHitLight.dxlib";
+
+    //ShaderEntryPoints
+    const auto EntryPoint_RayGen_Normal = L"rayGen";
+    const auto EntryPoint_Miss_Normal = L"miss";
+    const auto EntryPoint_ClosestHit_Floor_Normal = L"floorClosestHit";
+    const auto EntryPoint_ClosestHit_Material_Normal = L"materialClosestHit";
+    const auto EntryPoint_ClosestHit_ReflectRefract_Normal = L"reflectReflactMaterialClosestHit";
+    const auto EntryPoint_ClosestHit_Light_Normal = L"lightClosestHit";
+
+    const auto EntryPoint_RayGen_Photon = L"photonEmitting";
+    const auto EntryPoint_Miss_Photon = L"photonMiss";
+    const auto EntryPoint_ClosestHit_Floor_Photon = L"floorStorePhotonClosestHit";
+    const auto EntryPoint_ClosestHit_Material_Photon = L"materialStorePhotonClosestHit";
+    const auto EntryPoint_ClosestHit_ReflectRefract_Photon = L"reflectReflactMaterialStorePhotonClosestHit";
 
     std::unordered_map<std::wstring, D3D12_SHADER_BYTECODE> shaders;
     const auto shaderFiles = {
@@ -38,75 +53,75 @@ void DxrPhotonMapper::CreateStateObject()
         {
             auto dxilRayGen = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilRayGen->SetDXILLibrary(&shaders[RayGenShader]);
-            dxilRayGen->DefineExport(L"rayGen");
+            dxilRayGen->DefineExport(EntryPoint_RayGen_Normal);
         }
 
         //Miss
         {
             auto dxilMiss = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilMiss->SetDXILLibrary(&shaders[MissShader]);
-            dxilMiss->DefineExport(L"miss");
+            dxilMiss->DefineExport(EntryPoint_Miss_Normal);
         }
 
         //Closest Hit
         {
             auto dxilChsFloor = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsFloor->SetDXILLibrary(&shaders[FloorClosestHitShader]);
-            dxilChsFloor->DefineExport(L"floorClosestHit");
+            dxilChsFloor->DefineExport(EntryPoint_ClosestHit_Floor_Normal);
 
             auto dxilChsSphere1 = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsSphere1->SetDXILLibrary(&shaders[DefaultMaterialClosestHitShader]);
-            dxilChsSphere1->DefineExport(L"materialClosestHit");
+            dxilChsSphere1->DefineExport(EntryPoint_ClosestHit_Material_Normal);
 
             auto dxilChsGlass = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsGlass->SetDXILLibrary(&shaders[ReflectReflactMaterialClosestHitShader]);
-            dxilChsGlass->DefineExport(L"reflectReflactMaterialClosestHit");
+            dxilChsGlass->DefineExport(EntryPoint_ClosestHit_ReflectRefract_Normal);
 
             auto dxilChsLight = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsLight->SetDXILLibrary(&shaders[LightClosestHitShader]);
-            dxilChsLight->DefineExport(L"lightClosestHit");
+            dxilChsLight->DefineExport(EntryPoint_ClosestHit_Light_Normal);
         }
     
         //Hit Group
         {
             auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupLight->SetClosestHitShaderImport(L"lightClosestHit");
+            hitgroupLight->SetClosestHitShaderImport(EntryPoint_ClosestHit_Light_Normal);
             hitgroupLight->SetHitGroupExport(HitGroups::Light);
 
             auto hitgroupGlass = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupGlass->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupGlass->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
+            hitgroupGlass->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Normal);
             hitgroupGlass->SetHitGroupExport(HitGroups::Glass);
 
             auto hitgroupMetal = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupMetal->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupMetal->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
+            hitgroupMetal->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Normal);
             hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
 
             auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupDefault->SetClosestHitShaderImport(L"materialClosestHit");
+            hitgroupDefault->SetClosestHitShaderImport(EntryPoint_ClosestHit_Material_Normal);
             hitgroupDefault->SetHitGroupExport(HitGroups::DefaultMaterialSphere);
 
             auto hitgroupReflectReflact = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflact->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupReflectReflact->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
+            hitgroupReflectReflact->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Normal);
             hitgroupReflectReflact->SetHitGroupExport(HitGroups::ReflectReflactMaterialSphere);
 
             auto hitgroupDefaultBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefaultBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupDefaultBox->SetClosestHitShaderImport(L"materialClosestHit");
+            hitgroupDefaultBox->SetClosestHitShaderImport(EntryPoint_ClosestHit_Material_Normal);
             hitgroupDefaultBox->SetHitGroupExport(HitGroups::DefaultMaterialBox);
 
             auto hitgroupReflectReflactBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflactBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupReflectReflactBox->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
+            hitgroupReflectReflactBox->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Normal);
             hitgroupReflectReflactBox->SetHitGroupExport(HitGroups::ReflectReflactMaterialBox);
 
             auto hitgroupFloor = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupFloor->SetClosestHitShaderImport(L"floorClosestHit");
+            hitgroupFloor->SetClosestHitShaderImport(EntryPoint_ClosestHit_Floor_Normal);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
         }
 
@@ -196,66 +211,66 @@ void DxrPhotonMapper::CreateStateObject()
         {
             auto dxilRayGen = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilRayGen->SetDXILLibrary(&shaders[RayGenShader]);
-            dxilRayGen->DefineExport(L"photonEmitting");
+            dxilRayGen->DefineExport(EntryPoint_RayGen_Photon);
         }
 
         //Miss
         {
             auto dxilMiss = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilMiss->SetDXILLibrary(&shaders[MissShader]);
-            dxilMiss->DefineExport(L"photonMiss");
+            dxilMiss->DefineExport(EntryPoint_Miss_Photon);
         }
 
         //Closest Hit
         {
             auto dxilChsFloor = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsFloor->SetDXILLibrary(&shaders[FloorClosestHitShader]);
-            dxilChsFloor->DefineExport(L"floorStorePhotonClosestHit");
+            dxilChsFloor->DefineExport(EntryPoint_ClosestHit_Floor_Photon);
 
             auto dxilChsSphere1 = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsSphere1->SetDXILLibrary(&shaders[DefaultMaterialClosestHitShader]);
-            dxilChsSphere1->DefineExport(L"materialStorePhotonClosestHit");
+            dxilChsSphere1->DefineExport(EntryPoint_ClosestHit_Material_Photon);
 
             auto dxilChsGlass = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsGlass->SetDXILLibrary(&shaders[ReflectReflactMaterialClosestHitShader]);
-            dxilChsGlass->DefineExport(L"reflectReflactMaterialStorePhotonClosestHit");
+            dxilChsGlass->DefineExport(EntryPoint_ClosestHit_ReflectRefract_Photon);
         }
 
         //Hit Group
         {
             auto hitgroupGlass = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupGlass->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupGlass->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
+            hitgroupGlass->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Photon);
             hitgroupGlass->SetHitGroupExport(HitGroups::Glass);
 
             auto hitgroupMetal = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupMetal->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupMetal->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
+            hitgroupMetal->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Photon);
             hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
 
             auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupDefault->SetClosestHitShaderImport(L"materialStorePhotonClosestHit");
+            hitgroupDefault->SetClosestHitShaderImport(EntryPoint_ClosestHit_Material_Photon);
             hitgroupDefault->SetHitGroupExport(HitGroups::DefaultMaterialSphere);
 
             auto hitgroupReflectReflact = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflact->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupReflectReflact->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
+            hitgroupReflectReflact->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Photon);
             hitgroupReflectReflact->SetHitGroupExport(HitGroups::ReflectReflactMaterialSphere);
 
             auto hitgroupDefaultBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefaultBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupDefaultBox->SetClosestHitShaderImport(L"materialStorePhotonClosestHit");
+            hitgroupDefaultBox->SetClosestHitShaderImport(EntryPoint_ClosestHit_Material_Photon);
             hitgroupDefaultBox->SetHitGroupExport(HitGroups::DefaultMaterialBox);
 
             auto hitgroupReflectReflactBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflactBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupReflectReflactBox->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
+            hitgroupReflectReflactBox->SetClosestHitShaderImport(EntryPoint_ClosestHit_ReflectRefract_Photon);
             hitgroupReflectReflactBox->SetHitGroupExport(HitGroups::ReflectReflactMaterialBox);
 
             auto hitgroupFloor = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupFloor->SetClosestHitShaderImport(L"floorStorePhotonClosestHit");
+            hitgroupFloor->SetClosestHitShaderImport(EntryPoint_ClosestHit_Floor_Photon);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
         }
 

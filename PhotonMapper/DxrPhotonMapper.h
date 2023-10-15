@@ -287,10 +287,20 @@ private:
     std::array<XMMATRIX, NormalGlasses> mGlasssNormalTbl;
     std::array<XMMATRIX, NormalMetals> mMetalsNormalTbl;
     std::array<XMMATRIX, NormalLight> mLightTbl;
+
+    //Materials
     std::array<MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;
     std::array<MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
+    std::array<MaterialParam, ReflectSpheres + RefractSpheres> mReflectRefractSphereMaterialTbl;
+    std::array<MaterialParam, ReflectBoxes + RefractBoxes> mReflectRefractBoxMaterialTbl;
+    std::array<MaterialParam, NormalMetals> mMetalMaterialTbl;
+    std::array<MaterialParam, NormalGlasses> mGlassBoxMaterialTbl;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
     ComPtr<ID3D12Resource> mNormalBoxMaterialCB;
+    ComPtr<ID3D12Resource> mReflectRefractSphereMaterialCB;
+    ComPtr<ID3D12Resource> mReflectRefractBoxMaterialCB;
+    ComPtr<ID3D12Resource> mMetalMaterialCB;
+    ComPtr<ID3D12Resource> mGlassMaterialCB;
 
     SceneParam mSceneParam;
     utility::TextureResource mGroundTex;

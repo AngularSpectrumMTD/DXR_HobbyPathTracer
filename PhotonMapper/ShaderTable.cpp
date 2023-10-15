@@ -96,6 +96,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
            
             {
+                auto cbAddress = mReflectRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -112,6 +115,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
         
             {
+                auto cbAddress = mReflectRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -130,7 +136,7 @@ void DxrPhotonMapper::CreateShaderTable()
             {
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
-                for (auto& sphere : mSpheresNormalTbl) {
+                for (auto& instances : mSpheresNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -153,7 +159,7 @@ void DxrPhotonMapper::CreateShaderTable()
             {
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
-                for (auto& box : mBoxesNormalTbl) {
+                for (auto& instances : mBoxesNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -174,6 +180,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
          
             {
+                auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -190,6 +199,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
 
             {
+                auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -337,6 +349,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
           
             {
+                auto cbAddress = mReflectRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -353,6 +368,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
          
             {
+                auto cbAddress = mReflectRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -371,7 +389,7 @@ void DxrPhotonMapper::CreateShaderTable()
             {
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
-                for (auto& sphere : mSpheresNormalTbl) {
+                for (auto& instances : mSpheresNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -394,7 +412,7 @@ void DxrPhotonMapper::CreateShaderTable()
             {
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
-                for (auto& box : mBoxesNormalTbl) {
+                for (auto& instances : mBoxesNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -415,6 +433,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
           
             {
+                auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -431,6 +452,9 @@ void DxrPhotonMapper::CreateShaderTable()
             }
 
             {
+                auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");

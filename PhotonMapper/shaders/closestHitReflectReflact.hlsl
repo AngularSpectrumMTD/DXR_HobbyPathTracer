@@ -7,6 +7,17 @@ struct VertexPN
     float3 Normal;
 };
 
+struct MaterialCB
+{
+    float4 albedo;
+    float metalic;
+    float roughness;
+    float specular;
+    float specularTrans;
+    float4 transColor;
+    float4 emission;
+};
+
 StructuredBuffer<uint> indexBuffer : register(t0, space1);
 StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);
 
