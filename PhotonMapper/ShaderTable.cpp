@@ -131,7 +131,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
                 for (auto& sphere : mSpheresNormalTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::PhongMaterialSphere);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -154,7 +154,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
                 for (auto& box : mBoxesNormalTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::PhongMaterialBox);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -372,7 +372,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
                 for (auto& sphere : mSpheresNormalTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::PhongMaterialSphere);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -395,7 +395,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
                 for (auto& box : mBoxesNormalTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::PhongMaterialBox);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }

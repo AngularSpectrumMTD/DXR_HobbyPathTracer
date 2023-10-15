@@ -6,11 +6,6 @@ struct VertexPN
     float3 Position;
     float3 Normal;
 };
-struct MaterialCB
-{
-    float4 diffuseColor;
-    float4 specular;
-};
 
 StructuredBuffer<uint> indexBuffer : register(t0, space1);
 StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);

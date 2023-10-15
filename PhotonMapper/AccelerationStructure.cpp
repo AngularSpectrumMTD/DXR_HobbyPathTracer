@@ -13,14 +13,14 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
     {
         Reflect = 0,
         Refract = 1,
-        Phong = 2
+        Default = 2
     };
 
     {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), XMMatrixIdentity());
-        desc.InstanceID = InstanceType::Phong;
+        desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = 0;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -81,7 +81,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Phong;
+        desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -94,7 +94,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Phong;
+        desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -301,7 +301,12 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
     MaterialParam defaultMaterial{};
     defaultMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    defaultMaterial.specular = XMVectorSet(1.0f, 1.0f, 1.0f, 40.0f);
+    defaultMaterial.metalic = 0.1;
+    defaultMaterial.roughness = 0.2;
+    defaultMaterial.specular = 0.3;
+    defaultMaterial.specularTrans = 0.4;
+    defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultMaterial.emission = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 
     XMVECTOR colorTbl[] = {
         XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),

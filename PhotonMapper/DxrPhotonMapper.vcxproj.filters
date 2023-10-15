@@ -130,9 +130,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\closestHitPhong.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\miss.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
@@ -179,6 +176,9 @@
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
     <FxCompile Include="shaders\computeVariance.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\closestHitMaterial.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -33,8 +33,8 @@
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
     static const wchar_t* ReflectReflactMaterialBox = L"hgReflectReflactBoxes";
-    static const wchar_t* PhongMaterialSphere = L"hgPhongSpheres";
-    static const wchar_t* PhongMaterialBox = L"hgPhongBoxes";
+    static const wchar_t* DefaultMaterialSphere = L"hgMaterialSpheres";
+    static const wchar_t* DefaultMaterialBox = L"hgMaterlalBoxes";
     static const wchar_t* Floor = L"hgFloor";
     static const wchar_t* Glass = L"hgGlass";
     static const wchar_t* Metal = L"hgMetal";
@@ -114,7 +114,12 @@ private:
     struct MaterialParam
     {
         XMVECTOR albedo;
-        XMVECTOR specular;
+        f32 metalic;
+        f32 roughness;
+        f32 specular;
+        f32 specularTrans;
+        XMVECTOR transColor;
+        XMVECTOR emission;
     };
 
     struct SceneParam
@@ -357,7 +362,7 @@ private:
     ComPtr<ID3D12RootSignature> mGrs;
     ComPtr<ID3D12RootSignature> mRsFloor;
     ComPtr<ID3D12RootSignature> mRsSphereRR;
-    ComPtr<ID3D12RootSignature> mRsSpherePhong;
+    ComPtr<ID3D12RootSignature> mRsSphereDefault;
     ComPtr<ID3D12RootSignature> mRsGlass;
 
     ComPtr<ID3D12StateObject> mRTPSOPhoton;
@@ -366,7 +371,7 @@ private:
     ComPtr<ID3D12RootSignature> mGrsPhoton;
     ComPtr<ID3D12RootSignature> mRsFloorPhoton;
     ComPtr<ID3D12RootSignature> mRsSphereRRPhoton;
-    ComPtr<ID3D12RootSignature> mRsSpherePhongPhoton;
+    ComPtr<ID3D12RootSignature> mRsSphereDefaultPhoton;
     ComPtr<ID3D12RootSignature> mRsGlassPhoton;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortLDS;

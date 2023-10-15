@@ -22,14 +22,14 @@ mSpheresReflectTbl(), mSpheresRefractTbl(), mSpheresNormalTbl(),
 mNormalSphereMaterialTbl()
 {
     mIntenceBoost = 5000;
-    mGatherRadius = 0.45f;
+    mGatherRadius = 0.25f;
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -14.f;mLightPosY = 15;mLightPosZ = -4;
-    mLightRange = 0.065f;
+    mLightPosX = -5.f;mLightPosY = -4;mLightPosZ = -8;
+    mLightRange = 0.15f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
     mTmpAccumuRatio = 0.05f;

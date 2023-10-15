@@ -4,9 +4,15 @@ struct VertexPN {
     float3 Position;
     float3 Normal;
 };
+
 struct MaterialCB {
     float4 albedo;
-    float4 specular;
+    float metalic;
+    float roughness;
+    float specular;
+    float specularTrans;
+    float4 transColor;
+    float4 emission;
 };
 
 ConstantBuffer<MaterialCB> constantBuffer: register(b0, space1);
@@ -31,7 +37,7 @@ VertexPN GetVertex(TriangleIntersectionAttributes attrib)
 }
 
 [shader("closesthit")]
-void phongMaterialClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
+void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
     if (isReachedRecursiveLimitPayload(payload)) {
         return;
@@ -42,20 +48,21 @@ void phongMaterialClosestHit(inout Payload payload, TriangleIntersectionAttribut
 
     uint instanceID = InstanceID();
     float3 albedo = constantBuffer.albedo.xyz;
-    float power = constantBuffer.specular.w;
+    float power = constantBuffer.specular;
 
     if (instanceID == 2) {
 
         float3 worldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
         float3 worldNormal = mul(vtx.Normal, (float3x3)ObjectToWorld4x3());
         
+        const float3 photonIrradiance = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
         if(payload.weight > 0)
         {
-            payload.color = payload.weight + (photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal) + 0.3 * albedo);
+            payload.color = payload.weight + photonIrradiance * albedo;
         }
         else
         {
-            payload.color = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal) + 0.3 * albedo;
+            payload.color = photonIrradiance * albedo;
         }
     } else {
         payload.color = float3(0,0,0); // meaningless.
@@ -63,7 +70,7 @@ void phongMaterialClosestHit(inout Payload payload, TriangleIntersectionAttribut
 }
 
 [shader("closesthit")]
-void phongMaterialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
+void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
@@ -81,7 +88,7 @@ void phongMaterialStorePhotonClosestHit(inout PhotonPayload payload, TriangleInt
 }
 
 [shader("closesthit")]
-void phongMaterialDummyClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
+void materialDummyClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
     // no op
 }

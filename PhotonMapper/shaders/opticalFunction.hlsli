@@ -3,6 +3,123 @@
 
 #include "common.hlsli"
 
+//metalic
+//roughness
+//opacity
+//IoR
+//emissive
+
+//BRDF / BTDF
+float3x3 computeTransformMatrix(float3 normal)
+{
+    float3 tangentGen = normal.x > 0.99f ? float3(0, 0, 1) : float3(1, 0, 0);
+    float3 tangent = normalize(cross(normal, tangentGen));
+    float3 binormal = normalize(cross(normal, tangent));
+    return float3x3(tangent, binormal, normal);
+}
+
+float3 HemisphereORCosineSampling(float3 normal, bool isHemi)
+{
+    float randF = randXorshift();
+    float cosT = isHemi ? randF : sqrt(randF);
+    float sinT = 1 - cosT * cosT;
+
+    float P = 2 * PI * randXorshift();
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+    
+    return mul(tangentDir, computeTransformMatrix(normal));
+}
+
+float3 FresnelSchlick(float dotVH, float3 F0)
+{
+    return F0 + (1 - F0) * pow(1 - dotVH, 5.0);
+}
+
+//alpha = roughness * roughness
+
+//alpha^2
+//---------
+//pi * ((dot(N, H))^2 * (alpha^2 - 1) + 1)^2
+float GGX_Distribution(float3 N, float3 H, float roughness)
+{
+    float alpha = roughness * roughness;
+    float alpha_pow2 = alpha * alpha;
+    float dotNH = max(0.0, dot(N, H));
+    float dotNH_pow2 = dotNH * dotNH;
+    
+    float denom = (dotNH_pow2 * (alpha_pow2 - 1.0) + 1.0);
+    denom *= PI * denom;
+    
+    return alpha_pow2 / denom;
+}
+
+//k = alpha / 2
+//dot(N, V)
+//---------
+//dot(N, V) * (1 - k) + k
+float GGX_Geometry_Schlick(float dotNX, float roughness)
+{
+    float alpha = roughness * roughness;
+    float k = alpha / 2;
+    return dotNX / (dotNX * (1 - k) + k);
+}
+
+//GGX_Geometry_Schlick(V) * GGX_Geometry_Schlick(L)
+float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)
+{
+    return GGX_Geometry_Schlick(dot(N, V), roughness) * GGX_Geometry_Schlick(dot(N, L), roughness);
+}
+
+float3 GGX_ImportanceSampling(float3 N, float3 V, float roughness)
+{
+    float alpha = roughness * roughness;
+    float randX = randXorshift();
+    float randY = randXorshift();
+
+    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
+    float sinT = sqrt(1 - cosT * cosT);
+    
+    float3 up = abs(N.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
+    float3 tangent = normalize(cross(up, N));
+    float3 bitangent = cross(N, tangent);
+        
+    float P = 2.0 * PI * randX;
+    float3 H = tangent * cos(P) * sinT + bitangent * sin(P) * sinT + N * cosT;
+    return normalize(H);
+}
+
+float GGX_ImportanceSamplingPDF(float NDF, float dotNH, float dotVH)
+{
+    return NDF * dotNH / (4 * dotVH);
+}
+
+float FresnelReflectance(float3 I, float3 N, float IoR)
+{
+    float dotNI = clamp(-1, 1, dot(N, I));
+    float etaInput = 1, etaTrans = IoR;
+    if (dotNI)
+    {
+        float temp = etaInput;
+        etaInput = etaTrans;
+        etaTrans = temp;
+    }  
+    
+    float kr = 1;
+
+    //Fresnel equations(Snell)
+    float sinTrans = etaInput / etaTrans * sqrt(max(0, 1 - dotNI * dotNI));
+    if (sinTrans < 1)
+    {
+        float cosTrans = sqrt(max(0, 1 - sinTrans * sinTrans));
+        dotNI = abs(dotNI);
+        float Rs = ((etaTrans * dotNI) - (etaInput * cosTrans)) / ((etaTrans * dotNI) + (etaInput * cosTrans));
+        float Rp = ((etaInput * dotNI) - (etaTrans * cosTrans)) / ((etaInput * dotNI) + (etaTrans * cosTrans));
+        kr = (Rs * Rs + Rp * Rp) / 2;
+    }
+    
+    return kr;
+}
+
 #define REFLECTANCE_BOOST 4
 
 struct OpticalGlass

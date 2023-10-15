@@ -5,7 +5,7 @@ void DxrPhotonMapper::CreateStateObject()
     const auto RayGenShader = L"raygen.dxlib";
     const auto MissShader = L"miss.dxlib";
     const auto FloorClosestHitShader = L"closestHitFloor.dxlib";
-    const auto PhongMaterialClosestHitShader = L"closestHitPhong.dxlib";
+    const auto DefaultMaterialClosestHitShader = L"closestHitMaterial.dxlib";
     const auto ReflectReflactMaterialClosestHitShader = L"closestHitReflectReflact.dxlib";
     const auto LightClosestHitShader = L"closestHitLight.dxlib";
 
@@ -13,7 +13,7 @@ void DxrPhotonMapper::CreateStateObject()
     const auto shaderFiles = {
         RayGenShader, MissShader,
         FloorClosestHitShader,
-        PhongMaterialClosestHitShader,
+        DefaultMaterialClosestHitShader,
         ReflectReflactMaterialClosestHitShader,
         LightClosestHitShader };
 
@@ -55,8 +55,8 @@ void DxrPhotonMapper::CreateStateObject()
             dxilChsFloor->DefineExport(L"floorClosestHit");
 
             auto dxilChsSphere1 = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-            dxilChsSphere1->SetDXILLibrary(&shaders[PhongMaterialClosestHitShader]);
-            dxilChsSphere1->DefineExport(L"phongMaterialClosestHit");
+            dxilChsSphere1->SetDXILLibrary(&shaders[DefaultMaterialClosestHitShader]);
+            dxilChsSphere1->DefineExport(L"materialClosestHit");
 
             auto dxilChsGlass = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsGlass->SetDXILLibrary(&shaders[ReflectReflactMaterialClosestHitShader]);
@@ -84,20 +84,20 @@ void DxrPhotonMapper::CreateStateObject()
             hitgroupMetal->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
             hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
 
-            auto hitgroupPhong = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-            hitgroupPhong->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupPhong->SetClosestHitShaderImport(L"phongMaterialClosestHit");
-            hitgroupPhong->SetHitGroupExport(HitGroups::PhongMaterialSphere);
+            auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+            hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+            hitgroupDefault->SetClosestHitShaderImport(L"materialClosestHit");
+            hitgroupDefault->SetHitGroupExport(HitGroups::DefaultMaterialSphere);
 
             auto hitgroupReflectReflact = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflact->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupReflectReflact->SetClosestHitShaderImport(L"reflectReflactMaterialClosestHit");
             hitgroupReflectReflact->SetHitGroupExport(HitGroups::ReflectReflactMaterialSphere);
 
-            auto hitgroupPhongBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-            hitgroupPhongBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupPhongBox->SetClosestHitShaderImport(L"phongMaterialClosestHit");
-            hitgroupPhongBox->SetHitGroupExport(HitGroups::PhongMaterialBox);
+            auto hitgroupDefaultBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+            hitgroupDefaultBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+            hitgroupDefaultBox->SetClosestHitShaderImport(L"materialClosestHit");
+            hitgroupDefaultBox->SetHitGroupExport(HitGroups::DefaultMaterialBox);
 
             auto hitgroupReflectReflactBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflactBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
@@ -130,11 +130,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocReflectReflactSphere->AddExport(HitGroups::ReflectReflactMaterialSphere);
             lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsReflectReflactSphere);
 
-            auto rsPhongSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsPhongSphere->SetRootSignature(mRsSpherePhong.Get());
-            auto lrsAssocPhongSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocPhongSphere->AddExport(HitGroups::PhongMaterialSphere);
-            lrsAssocPhongSphere->SetSubobjectToAssociate(*rsPhongSphere);
+            auto rsDefaultSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefaultSphere->SetRootSignature(mRsSphereDefault.Get());
+            auto lrsAssocDefaultSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+            lrsAssocDefaultSphere->AddExport(HitGroups::DefaultMaterialSphere);
+            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefaultSphere);
 
             auto rsReflectReflactBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
             rsReflectReflactBox->SetRootSignature(mRsSphereRR.Get());
@@ -142,11 +142,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocReflectReflactBox->AddExport(HitGroups::ReflectReflactMaterialBox);
             lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsReflectReflactBox);
 
-            auto rsPhongBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsPhongBox->SetRootSignature(mRsSpherePhong.Get());
-            auto lrsAssocPhongBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocPhongBox->AddExport(HitGroups::PhongMaterialBox);
-            lrsAssocPhongBox->SetSubobjectToAssociate(*rsPhongBox);
+            auto rsDefaultBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefaultBox->SetRootSignature(mRsSphereDefault.Get());
+            auto lrsAssocDefaultBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+            lrsAssocDefaultBox->AddExport(HitGroups::DefaultMaterialBox);
+            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefaultBox);
 
             auto rsGlass = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
             rsGlass->SetRootSignature(mRsGlass.Get());
@@ -213,8 +213,8 @@ void DxrPhotonMapper::CreateStateObject()
             dxilChsFloor->DefineExport(L"floorStorePhotonClosestHit");
 
             auto dxilChsSphere1 = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-            dxilChsSphere1->SetDXILLibrary(&shaders[PhongMaterialClosestHitShader]);
-            dxilChsSphere1->DefineExport(L"phongMaterialStorePhotonClosestHit");
+            dxilChsSphere1->SetDXILLibrary(&shaders[DefaultMaterialClosestHitShader]);
+            dxilChsSphere1->DefineExport(L"materialStorePhotonClosestHit");
 
             auto dxilChsGlass = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsGlass->SetDXILLibrary(&shaders[ReflectReflactMaterialClosestHitShader]);
@@ -233,20 +233,20 @@ void DxrPhotonMapper::CreateStateObject()
             hitgroupMetal->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
             hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
 
-            auto hitgroupPhong = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-            hitgroupPhong->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupPhong->SetClosestHitShaderImport(L"phongMaterialStorePhotonClosestHit");
-            hitgroupPhong->SetHitGroupExport(HitGroups::PhongMaterialSphere);
+            auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+            hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+            hitgroupDefault->SetClosestHitShaderImport(L"materialStorePhotonClosestHit");
+            hitgroupDefault->SetHitGroupExport(HitGroups::DefaultMaterialSphere);
 
             auto hitgroupReflectReflact = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflact->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupReflectReflact->SetClosestHitShaderImport(L"reflectReflactMaterialStorePhotonClosestHit");
             hitgroupReflectReflact->SetHitGroupExport(HitGroups::ReflectReflactMaterialSphere);
 
-            auto hitgroupPhongBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-            hitgroupPhongBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupPhongBox->SetClosestHitShaderImport(L"phongMaterialStorePhotonClosestHit");
-            hitgroupPhongBox->SetHitGroupExport(HitGroups::PhongMaterialBox);
+            auto hitgroupDefaultBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+            hitgroupDefaultBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+            hitgroupDefaultBox->SetClosestHitShaderImport(L"materialStorePhotonClosestHit");
+            hitgroupDefaultBox->SetHitGroupExport(HitGroups::DefaultMaterialBox);
 
             auto hitgroupReflectReflactBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflactBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
@@ -279,11 +279,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocReflectReflactSphere->AddExport(HitGroups::ReflectReflactMaterialSphere);
             lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsReflectReflactSphere);
 
-            auto rsPhongSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsPhongSphere->SetRootSignature(mRsSpherePhongPhoton.Get());
-            auto lrsAssocPhongSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocPhongSphere->AddExport(HitGroups::PhongMaterialSphere);
-            lrsAssocPhongSphere->SetSubobjectToAssociate(*rsPhongSphere);
+            auto rsDefaultSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefaultSphere->SetRootSignature(mRsSphereDefaultPhoton.Get());
+            auto lrsAssocDefaultSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+            lrsAssocDefaultSphere->AddExport(HitGroups::DefaultMaterialSphere);
+            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefaultSphere);
 
             auto rsReflectReflactBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
             rsReflectReflactBox->SetRootSignature(mRsSphereRRPhoton.Get());
@@ -291,11 +291,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocReflectReflactBox->AddExport(HitGroups::ReflectReflactMaterialBox);
             lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsReflectReflactBox);
 
-            auto rsPhongBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsPhongBox->SetRootSignature(mRsSpherePhongPhoton.Get());
-            auto lrsAssocPhongBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocPhongBox->AddExport(HitGroups::PhongMaterialBox);
-            lrsAssocPhongBox->SetSubobjectToAssociate(*rsPhongBox);
+            auto rsDefaultBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefaultBox->SetRootSignature(mRsSphereDefaultPhoton.Get());
+            auto lrsAssocDefaultBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+            lrsAssocDefaultBox->AddExport(HitGroups::DefaultMaterialBox);
+            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefaultBox);
 
             auto rsMetal = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
             rsMetal->SetRootSignature(mRsGlassPhoton.Get());
