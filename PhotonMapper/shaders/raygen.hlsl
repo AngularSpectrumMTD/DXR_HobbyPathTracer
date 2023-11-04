@@ -1,6 +1,17 @@
 #include "opticalFunction.hlsli"
 
 #define SPP 1
+#define REINHARD_L 1000
+
+float reinhard(float x, float L)
+{
+    return (x / (1 + x)) * (1 + x / L / L);
+}
+
+float3 reinhard3f(float3 v, float L)
+{
+    return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
+}
 
 void applyTimeDivision(inout float3 current, uint2 ID)
 {
@@ -39,7 +50,12 @@ void rayGen() {
     float2 dims = float2(DispatchRaysDimensions().xy);
 
     float3 accumColor = 0.xxx;
-    float3 accumPhotonColor = 0.xxx;
+
+    //random
+    float LightSeed = getLightRandomSeed();
+    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 10 * (uint) LightSeed.x) * launchIndex.y);
+    randGenState = uint(pcgHash(seed));
+    rseed = LightSeed.x;
 
     for(int i = 0; i < SPP ; i++)
     {
@@ -56,13 +72,12 @@ void rayGen() {
         rayDesc.TMax = 100000;
 
         Payload payload;
-        payload.color = float3(0, 0, 0.5);
-        payload.photonColor = float3(0, 0, 0);
+        payload.energy = float3(1, 1, 1);
+        payload.color = float3(0, 0, 0);
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;
         payload.stored = 0;//empty
         payload.eyeDir = rayDesc.Direction;
-        payload.weight = 0;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -79,19 +94,11 @@ void rayGen() {
             payload);
 
         accumColor += payload.color;
-        accumPhotonColor += payload.photonColor;
     }
-    
-    float3 col = accumColor / SPP;
-    float3 pcol = accumPhotonColor / SPP;
-    float3 finalCol = col + pcol;
+    float3 finalCol = accumColor / SPP;
+    //float3 finalCol = reinhard3f((accumColor + accumPhotonColor) / SPP, REINHARD_L);
     applyTimeDivision(finalCol, launchIndex);
-    //applyTimeDivision(pcol, launchIndex);
-
-    //float3 intC = integralColor();
-
     gOutput[launchIndex.xy] = float4(finalCol, 1);
-    //gOutput[launchIndex.xy] = float4(col + pcol, 1);
 }
 
 //
@@ -103,9 +110,9 @@ void photonEmitting()
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
     
+    //random
     float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 10000 * (uint)LightSeed.x) * launchIndex.y);
-    //randGenState = uint(wangHash(seed));
+    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint)LightSeed.x) * launchIndex.y);
     randGenState = uint(pcgHash(seed));
     
     float3 spotLightPosition = gSceneParam.spotLightPosition.xyz;

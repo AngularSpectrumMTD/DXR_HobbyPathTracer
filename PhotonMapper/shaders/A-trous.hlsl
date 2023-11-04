@@ -26,6 +26,12 @@ void A_TrousWaveletFilter(uint3 dtid : SV_DispatchThreadID)
     const float3 currentColor = colorBufferSrc[computePix].rgb;
     const float luminance = computeLuminance(currentColor);
     const float depth = depthBuffer[computePix];
+    if (depth == 0)
+    {
+        colorBufferDst[computePix] = float4(currentColor, 1);
+        varianceBufferDst[computePix] = variance;
+        return;
+    }
     const float3 normal = normalBuffer[computePix].xyz;
     const float dx = computePix.x < bufferSize.x / 2 ? 1 : -1;
     const float dy = computePix.y < bufferSize.y / 2 ? 1 : -1;
@@ -85,7 +91,7 @@ void A_TrousWaveletFilter(uint3 dtid : SV_DispatchThreadID)
             float3 neighborNormal = normalBuffer[neighborPix].rgb;
             float neighborLuminance = computeLuminance(colorBufferSrc[neighborPix].rgb);
             
-            float wDepth = (depth == 0) ? 1 : depthWeight(depth, neighborDepth, dzdx, dzdy, ofs.x, ofs.y);
+            float wDepth = depthWeight(depth, neighborDepth, dzdx, dzdy, ofs.x, ofs.y);
             float wNormal = normalWeight(normal, neighborNormal);
             float wLuminance = luminanceWeight(luminance, neighborLuminance, meanLocal);//if mean is small, weight reaches to 0
             float wComposite = w * wDepth * wNormal * wLuminance;//IBL vanished by DepthWeight

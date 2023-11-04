@@ -41,6 +41,26 @@ namespace HitGroups {
     static const wchar_t* Light = L"hgLight";
 }
 
+namespace RayTracingDxlibs {
+    static const wchar_t* RayGen = L"raygen.dxlib";
+    static const wchar_t* Miss = L"miss.dxlib";
+    static const wchar_t* FloorClosestHit = L"closestHitFloor.dxlib";
+    static const wchar_t* DefaultMaterialClosestHit = L"closestHitMaterial.dxlib";
+    static const wchar_t* LightClosestHit = L"closestHitLight.dxlib";
+}
+
+namespace RayTracingEntryPoints {
+    static const wchar_t* RayGen = L"rayGen";
+    static const wchar_t* Miss = L"miss";
+    static const wchar_t* ClosestHitFloor = L"floorClosestHit";
+    static const wchar_t* ClosestHitMaterial = L"materialClosestHit";
+    static const wchar_t* ClosestHitLight = L"lightClosestHit";    
+    static const wchar_t* RayGenPhoton = L"photonEmitting";
+    static const wchar_t* MissPhoton = L"photonMiss";
+    static const wchar_t* ClosestHitFloorPhoton = L"floorStorePhotonClosestHit";
+    static const wchar_t* ClosestHitMaterialPhoton = L"materialStorePhotonClosestHit";
+}
+
 namespace ComputeShaders {
     const LPCWSTR BitonicSort = L"BitonicSort_BitonicSort.cso";
     const LPCWSTR Transpose = L"BitonicSort_Transpose.cso";
@@ -80,10 +100,53 @@ public:
 
 private:
 
+    struct float2
+    {
+        f32 x;
+        f32 y;
+    };
+
+    struct float3
+    {
+        f32 x;
+        f32 y;
+        f32 z;
+    };
+
+    struct uint2
+    {
+        u32 x;
+        u32 y;
+    };
+
+    struct Payload
+    {
+        float3 energy;
+        float3 color;
+        s32 recursive;
+        uint2 storeIndexXY;
+        float3 eyeDir;
+        s32 stored;
+    };
+
+    struct PhotonPayload
+    {
+        float3 throughput;
+        s32 recursive;
+        s32 storeIndex;
+        s32 stored;
+        f32 lambdaNM;
+    };
+
+    struct TriangleIntersectionAttributes
+    {
+        float2 barys;
+    };
+
     enum SphereTypeCount {
-        NormalSpheres = 2,
-        ReflectSpheres = 3,
-        RefractSpheres = 3,
+        NormalSpheres = 1,
+        ReflectSpheres = 1,
+        RefractSpheres = 1,
         SpheresAll = (NormalSpheres + ReflectSpheres + RefractSpheres),
     };
 
@@ -96,7 +159,7 @@ private:
     };
 
     enum BoxTypeCount {
-        NormalBoxes = 2,
+        NormalBoxes = 1,
         ReflectBoxes = 1,
         RefractBoxes = 1,
         BoxesAll = (NormalBoxes + ReflectBoxes + RefractBoxes),
@@ -114,10 +177,10 @@ private:
     struct MaterialParam
     {
         XMVECTOR albedo;
-        f32 metalic;
+        f32 metallic;
         f32 roughness;
         f32 specular;
-        f32 specularTrans;
+        f32 transRatio;
         XMVECTOR transColor;
         XMVECTOR emission;
     };
@@ -194,6 +257,7 @@ private:
         ModelType_Diamond,
         ModelType_Skull,
         ModelType_HorseStatue,
+        ModelType_Dragon,
     };
 
     enum Spectrum
@@ -245,6 +309,7 @@ private:
 
     void UpdateSceneTLAS();
     void UpdateSceneParams();
+    void UpdateMaterialParams();
     void UpdateWindowText();
 
     void GetAssetsPath(_Out_writes_(pathSize) WCHAR* path, u32 pathSize);
@@ -259,7 +324,6 @@ private:
     void BitonicSortLDS();
     void BitonicSortSimple();
 
-    void Denoise();
     void SpatiotemporalVarianceGuidedFiltering();
 
     ComPtr<ID3D12GraphicsCommandList4> mCommandList;
@@ -291,14 +355,18 @@ private:
     //Materials
     std::array<MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;
     std::array<MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
-    std::array<MaterialParam, ReflectSpheres + RefractSpheres> mReflectRefractSphereMaterialTbl;
-    std::array<MaterialParam, ReflectBoxes + RefractBoxes> mReflectRefractBoxMaterialTbl;
+    std::array<MaterialParam, ReflectSpheres> mReflectSphereMaterialTbl;
+    std::array<MaterialParam, RefractSpheres> mRefractSphereMaterialTbl;
+    std::array<MaterialParam, ReflectBoxes> mReflectBoxMaterialTbl;
+    std::array<MaterialParam, RefractBoxes> mRefractBoxMaterialTbl;
     std::array<MaterialParam, NormalMetals> mMetalMaterialTbl;
-    std::array<MaterialParam, NormalGlasses> mGlassBoxMaterialTbl;
+    std::array<MaterialParam, NormalGlasses> mGlassMaterialTbl;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
     ComPtr<ID3D12Resource> mNormalBoxMaterialCB;
-    ComPtr<ID3D12Resource> mReflectRefractSphereMaterialCB;
-    ComPtr<ID3D12Resource> mReflectRefractBoxMaterialCB;
+    ComPtr<ID3D12Resource> mReflectSphereMaterialCB;
+    ComPtr<ID3D12Resource> mRefractSphereMaterialCB;
+    ComPtr<ID3D12Resource> mReflectBoxMaterialCB;
+    ComPtr<ID3D12Resource> mRefractBoxMaterialCB;
     ComPtr<ID3D12Resource> mMetalMaterialCB;
     ComPtr<ID3D12Resource> mGlassMaterialCB;
 
@@ -403,9 +471,6 @@ private:
     ComPtr<ID3D12PipelineState> mClearGridIndicesPSO;
     ComPtr<ID3D12PipelineState> mRearrangePhotonPSO;
 
-    ComPtr<ID3D12RootSignature> mRsDenoise;
-    ComPtr<ID3D12PipelineState> mDenoisePSO;
-
     ComPtr<ID3D12RootSignature> mRsComputeVariance;
     ComPtr<ID3D12PipelineState> mComputeVariancePSO;
 
@@ -462,4 +527,9 @@ private:
     u32 mPhotonMapSize1D;
 
     StageType mStageType;
+
+    MaterialParam mMaterialParam0;
+    MaterialParam mMaterialParam1;
+
+    bool mIsTargetGlass;
 };

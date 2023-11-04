@@ -11,14 +11,11 @@ void miss(inout Payload payload) {
     depthPositionNormalStore(payload, gSceneParam.backgroundColor.rgb);
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, equirecFetchUV(WorldRayDirection()), 0.0);
 
-     if(payload.weight > 0)
-    {
-        payload.color = payload.weight + cubemap.rgb;
-    }
-    else
-    {
-        payload.color = cubemap.rgb;
-    }
+    //payload.color += 0.1.xxx;
+    //payload.color = 0;
+
+    float3 curEnergy = payload.energy;
+    payload.color += curEnergy * cubemap.rgb;
 }
 
 [shader("miss")]

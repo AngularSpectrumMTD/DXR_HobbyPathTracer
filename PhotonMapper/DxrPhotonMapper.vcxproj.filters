@@ -139,9 +139,6 @@
     <FxCompile Include="shaders\closestHitFloor.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\closestHitReflectReflact.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\BitonicSort_BitonicSort.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>

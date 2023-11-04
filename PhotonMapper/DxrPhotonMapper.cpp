@@ -14,14 +14,14 @@
 
 using namespace DirectX;
 
-//This Program is only support TRIANGULAR POLYGON
-//If u see beautiful caustics, polygon normal must be smooth!!!
+//This Program supports TRIANGULAR POLYGON only
+//If u wanna see beautiful caustics, polygon normal must be smooth!!!
 DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"PhotonMapper"),
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
 mSpheresReflectTbl(), mSpheresRefractTbl(), mSpheresNormalTbl(),
 mNormalSphereMaterialTbl()
 {
-    mIntenceBoost = 5000;
+    mIntenceBoost = 8000;
     mGatherRadius = 0.25f;
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
@@ -29,29 +29,30 @@ mNormalSphereMaterialTbl()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightPosX = -5.f;mLightPosY = -4;mLightPosZ = -8;
-    mLightRange = 0.15f;
+    mLightRange = 0.25f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
-    mTmpAccumuRatio = 0.05f;
+    mTmpAccumuRatio = 0.1f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
     mCausticsBoost = 7;
-    mIsMoveModel = true;
+    mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = true;
     mIsDebug = false;
     mVisualizeLightRange = true;
     mReverseMove = false;
     mIsUseTexture = false;
+    mIsTargetGlass = true;
     mStageTextureFileName = L"tileTex.png";
     mCubeMapTextureFileName = L"ParisEquirec.png";
     //mCubeMapTextureFileName = L"ForestEquirec.png";
 
     mStageType = StageType_Plane;
 
-   mGlassModelType = ModelType::ModelType_HorseStatue;
-   mMetalModelType = ModelType::ModelType_TwistCube;
+   mGlassModelType = ModelType::ModelType_Dragon;
+   mMetalModelType = ModelType::ModelType_Teapot;
 
     switch (mGlassModelType)
     {
@@ -65,7 +66,7 @@ mNormalSphereMaterialTbl()
         case ModelType::ModelType_TwistCube:
         {
             mGlassFileName = L"twistCube.obj";
-            mGlassObjYOfsset = -5;
+            mGlassObjYOfsset = -30;
             mGlassObjScale = XMFLOAT3(15, 15, 15);
         }
         break;
@@ -106,7 +107,7 @@ mNormalSphereMaterialTbl()
         case ModelType::ModelType_Diamond:
         {
             mGlassFileName = L"diamond.obj";
-            mGlassObjYOfsset = 1;
+            mGlassObjYOfsset = -50;
             mGlassObjScale = XMFLOAT3(20, 20, 20);
         }
         break;
@@ -131,6 +132,13 @@ mNormalSphereMaterialTbl()
             mGlassObjScale = XMFLOAT3(350, 350, 350);
         }
         break;
+        case  ModelType::ModelType_Dragon:
+        {
+            mGlassFileName = L"dragon.obj";
+            mGlassObjYOfsset = -60;
+            mGlassObjScale = XMFLOAT3(80, 80, 80);
+        }
+        break;
     }
 
     switch (mMetalModelType)
@@ -138,22 +146,22 @@ mNormalSphereMaterialTbl()
     case  ModelType::ModelType_Crab:
     {
         mMetalFileName = L"crab.obj";
-        mMetalObjYOfsset = 20;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
         mMetalFileName = L"twistCube.obj";
-        mMetalObjYOfsset = 30;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
         mMetalFileName = L"teapot.obj";
-        mMetalObjYOfsset = 10;
-        mMetalObjScale = XMFLOAT3(6, 6, 6);
+        mMetalObjYOfsset = -40;
+        mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case  ModelType::ModelType_LikeWater:
@@ -182,21 +190,21 @@ mNormalSphereMaterialTbl()
     case ModelType::ModelType_Diamond:
     {
         mMetalFileName = L"diamond.obj";
-        mMetalObjYOfsset = 1;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
         mMetalFileName = L"skull.obj";
-        mMetalObjYOfsset = 0;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
         mMetalFileName = L"crab.obj";
-        mMetalObjYOfsset = 20;
+        mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
@@ -257,7 +265,7 @@ void DxrPhotonMapper::UpdateWindowText()
     std::wstringstream windowText;
     windowText.str(L"");
     windowText << L" R : Reverse" << (mReverseMove ? L"[ON]" : L"[OFF]")
-        << L"  G: Gather XYZ: Pos L: Range TP: LAngle I: Intensity B: Block C: Accumurate V: Visualize W: Lambda K: Caustics D: Denoise Q: Boost U: Texture"
+        << L"  SPACE : ChangeTargetModel R : Roughness S : TransRatio M : Metallic"
         << L"    <PhotonNum> " << mPhotonMapSize1D * mPhotonMapSize1D << L"    Exe " << getFrameRate() << L"[ms]";
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
@@ -278,7 +286,7 @@ void DxrPhotonMapper::Update()
         mMoveFrame++;
         for (auto& pos : mGlasssNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.2 * mMoveFrame * OneRadian), 0);
+            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * OneRadian), 0);
         }
     }
 
@@ -318,25 +326,27 @@ void DxrPhotonMapper::Update()
 
 void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
 {
+    const f32 clampRange = (mStageType == StageType_Plane) ? 1.5 * PLANE_SIZE : 0.9 * PLANE_SIZE;
+
     switch (wparam)
     {
-    case 'R':
+    case 'I':
         mReverseMove = !mReverseMove;
         break;
-    case 'M':
+    case 'J':
         mIsMoveModel = !mIsMoveModel;
         break;
     case 'G':
         mGatherRadius = Clamp(0.01f, 2, mGatherRadius + (mReverseMove ? -0.01f : 0.01f));
         break;
     case 'X':
-        mLightPosX = Clamp(-PLANE_SIZE * 0.9f, PLANE_SIZE * 0.9f, mLightPosX + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'Y':
-        mLightPosY = Clamp(-PLANE_SIZE * 0.9f, PLANE_SIZE * 0.9f, mLightPosY + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'Z':
-        mLightPosZ = Clamp(-PLANE_SIZE * 0.9f, PLANE_SIZE * 0.9f, mLightPosZ + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'L':
         mLightRange = Clamp(0.01f, 0.4f, mLightRange + (mReverseMove ? -0.002f : 0.002f));
@@ -347,7 +357,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'P':
         mPhi += mReverseMove ? -1 : 1;
         break;
-    case 'I':
+    case 'K':
         mIntenceBoost = Clamp(100, 10000, mIntenceBoost + (mReverseMove ? -100 : 100));
         break;
     case 'B':
@@ -356,16 +366,13 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'C':
         mTmpAccumuRatio = Clamp(0.05f, 1, mTmpAccumuRatio + (mReverseMove ? -0.05f : 0.05f));
         break;
-    //case 'S':
-    //    mSpectrumMode = (s32)Clamp(0, Spectrum_Count - 1, (f32)mSpectrumMode + (mReverseMove ? -1 : 1));
-    //    break;
     case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
         break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mReverseMove ? -1 : 1));
         break;
-    case 'K':
+    case 'N':
         mIsApplyCaustics = !mIsApplyCaustics;
         break;
     case 'D':
@@ -376,6 +383,28 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;
+        break;
+        //material start
+    case 'R':
+        if(mIsTargetGlass)
+        mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mReverseMove ? -0.1 : 0.1));
+        else
+            mMaterialParam1.roughness = Clamp(0.1, 1, mMaterialParam1.roughness + (mReverseMove ? -0.1 : 0.1));
+        break;
+    case 'S':
+        if (mIsTargetGlass)
+        mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mReverseMove ? -0.1 : 0.1));
+        else
+            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mReverseMove ? -0.1 : 0.1));
+        break;
+    case 'M':
+        if (mIsTargetGlass)
+        mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mReverseMove ? -0.1 : 0.1));
+        else
+            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mReverseMove ? -0.1 : 0.1));
+        break;
+    case VK_SPACE:
+        mIsTargetGlass = !mIsTargetGlass;
         break;
     }
 }
@@ -424,6 +453,15 @@ void DxrPhotonMapper::UpdateSceneParams()
     mDevice->ImmediateBufferUpdateHostVisible(sceneConstantBuffer, &mSceneParam, sizeof(mSceneParam));
 }
 
+void DxrPhotonMapper::UpdateMaterialParams()
+{
+    auto materialConstantBuffer0 = mGlassMaterialCB.Get();
+    mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer0, &mMaterialParam0, sizeof(mMaterialParam0));
+
+    auto materialConstantBuffer1 = mMetalMaterialCB.Get();
+    mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer1, &mMaterialParam1, sizeof(mMaterialParam1));
+}
+
 void DxrPhotonMapper::Draw()
 {
     QueryPerformanceFrequency(&mCpuFreq);
@@ -470,6 +508,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->ResourceBarrier(_countof(meanBarriers), meanBarriers);
 
     UpdateSceneTLAS();
+    UpdateMaterialParams();
 
     auto gridCB = mGridSortCB.Get();
     auto sceneCB = mSceneCB.Get();
@@ -524,7 +563,6 @@ void DxrPhotonMapper::Draw()
 
     if (mIsUseDenoise)
     {
-        //Denoise();
         SpatiotemporalVarianceGuidedFiltering();
     }
     

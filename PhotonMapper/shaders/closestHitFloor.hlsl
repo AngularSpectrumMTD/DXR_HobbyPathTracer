@@ -46,49 +46,16 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
 
     if(!isUseTextureForStage())
     {
-        diffuseColor = float4(0.1, 0.1, 0.1 , 1);
+        diffuseColor = float4(1, 1, 1 , 1);
     }
     
-    uint instanceID = InstanceID();
+    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
-    float3 color = diffuseColor.xyz;
-    float3 reflectColor = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
-
-    bool isSpecular = (instanceID == 0);
+    const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
+    float3 curEnergy = payload.energy;
     
-    payload.color = lerp(reflectColor, color, isSpecular ? 0.8 : 1.0);
-    float3 worldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
-
-#ifdef SHADOW_PASS_ENABLE
-    if(isInShadow(vtx.Position, vtx.Normal, worldNormal))
-    {
-        payload.color.xyz *= 0.5;
-    }
-#endif
-
-    {//Apply Caustics
-        if(payload.weight > 0)
-        {
-            payload.photonColor.xyz += payload.weight + photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
-        }
-        else
-        {
-            payload.photonColor.xyz += photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
-        }
-
-        //for seeing througth Object
-        if(payload.recursive >= 2)
-        {
-            if(payload.weight > 0)
-            {
-                payload.color.xyz += payload.weight * payload.photonColor.xyz;
-            }
-            else{
-                payload.color.xyz += payload.photonColor.xyz;
-            }
-            
-        }
-    }
+    payload.color += diffuseColor.xyz * curEnergy * photonIrradiance;
 }
 
 [shader("closesthit")]
@@ -98,7 +65,7 @@ void floorStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectio
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
-
+    
     storePhoton(payload);
 }
 

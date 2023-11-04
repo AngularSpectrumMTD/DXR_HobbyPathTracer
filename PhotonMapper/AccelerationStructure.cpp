@@ -16,6 +16,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         Default = 2
     };
 
+    auto entryOffset = 0; // use other shader table
     //NOTE: InstanceContributionToHitGroupIndex is HitGroup ID(decided in CreateShaderTable())
     {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
@@ -23,62 +24,66 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), XMMatrixIdentity());
         desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 0;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshStage.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& spherePos : mSpheresReflectTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
         desc.InstanceID = InstanceType::Reflect;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 1;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& spherePos : mSpheresRefractTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 1;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& spherePos : mBoxesReflectTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
         desc.InstanceID = InstanceType::Reflect;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 2;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& spherePos : mBoxesRefractTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 2;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
-    auto entryOffset = 3; // use other shader table
     for (const auto& spherePos : mSpheresNormalTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
@@ -88,10 +93,10 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-        entryOffset++;
     }
 
     for (const auto& spherePos : mBoxesNormalTbl) {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
@@ -101,39 +106,39 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-        entryOffset++;
     }
 
     for (const auto& glassPos : mGlasssNormalTbl)
     {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), glassPos);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;// use other shader table
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshGlass.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-        entryOffset++;
     }
 
     for (const auto& metalPos : mMetalsNormalTbl)
     {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), metalPos);
         desc.InstanceID = InstanceType::Reflect;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;// use other shader table
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshMetal.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-        entryOffset++;
     }
 
     for (const auto& lightPos : mLightTbl)
     {
+        entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
             reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), lightPos);
@@ -172,7 +177,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     const f32 boxZLength = 3;
 
     std::vector<utility::VertexPN> verticesPN;
-    utility::CreateSphere(verticesPN, indices, sphereRadius, 30, 30);
+    utility::CreateSphere(verticesPN, indices, sphereRadius, 100, 100);
     mMeshSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereVB", L"SphereIB", L"");
 
     std::string strValue;
@@ -223,7 +228,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         if (dcount == 0 && NormalMetals == 1)
         {
-            trs = XMMatrixTranslation(-PLANE_SIZE * 0.5f, y, -PLANE_SIZE * 0.5f);
+            trs = XMMatrixTranslation(PLANE_SIZE * 0.5f, y, PLANE_SIZE * 0.5f);
         }
         else
         {
@@ -300,62 +305,114 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
     }
 
-    MaterialParam defaultMaterial{};
-    defaultMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    defaultMaterial.metalic = 0.1;
-    defaultMaterial.roughness = 0.2;
-    defaultMaterial.specular = 0.3;
-    defaultMaterial.specularTrans = 0.4;
-    defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    defaultMaterial.emission = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-
     XMVECTOR colorTbl[] = {
+        XMVectorSet(1.0f, 0.2f, 1.0f, 0.0f),
         XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),
-        XMVectorSet(0.1f, 0.8f, 0.4f, 0.0f),
-        XMVectorSet(0.2f, 0.8f, 0.7f, 0.0f),
         XMVectorSet(0.8f, 0.6f, 0.1f, 0.0f),
+        XMVectorSet(0.2f, 0.8f, 0.7f, 0.0f),
+        XMVectorSet(0.1f, 0.8f, 0.4f, 0.0f),
         XMVectorSet(0.3f, 0.2f, 0.8f, 0.0f),
         XMVectorSet(0.8f, 0.4f, 0.4f, 0.0f),
-        XMVectorSet(1.0f, 0.2f, 1.0f, 0.0f),
         XMVectorSet(0.1f, 0.2f, 0.8f, 0.0f),
         XMVectorSet(0.5f, 0.5f, 0.4f, 0.0f),
     };
 
+    MaterialParam defaultMaterial{};
+    defaultMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultMaterial.metallic = 0;//blend diffuse specular at specTrans == 0
+    defaultMaterial.roughness = 0;
+    defaultMaterial.specular = 0;//spec power
+    defaultMaterial.transRatio = 1;//0:diffuse  1:trans
+    defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultMaterial.emission = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+
     u32 index = 0;
+    std::uniform_int_distribution rndID(0, 4);
+    u32 albedoIndex = rndID(mt);
     for (auto& material : mNormalSphereMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[index % _countof(colorTbl)];
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.metallic = 1.0f * (index + 1) / mNormalSphereMaterialTbl.size();
+        material.roughness = 1.0f * (index + 1) / mNormalSphereMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 3) % _countof(colorTbl)];
         index++;
+        albedoIndex++;
     }
     index = 0;
     for (auto& material : mNormalBoxMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1.0f * (index + 1) / mNormalBoxMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 7) % _countof(colorTbl)];
+        material.transRatio = 0;//0:diffuse  1:trans
         index++;
+        albedoIndex++;
     }
     index = 0;
-    for (auto& material : mReflectRefractSphereMaterialTbl) {
+    for (auto& material : mReflectSphereMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1.0f * (index + 1) / mReflectSphereMaterialTbl.size();
+        material.transRatio = 1.0f * (index + 1) / mReflectSphereMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 4) % _countof(colorTbl)];
         index++;
+        albedoIndex++;
     }
     index = 0;
-    for (auto& material : mReflectRefractBoxMaterialTbl) {
+    for (auto& material : mRefractSphereMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1.0f * (index + 1) / mRefractSphereMaterialTbl.size();
+        material.metallic = 1.0f * (index + 1) / mRefractSphereMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 1) % _countof(colorTbl)];
         index++;
+        albedoIndex++;
+    }
+    index = 0;
+    for (auto& material : mReflectBoxMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1.0f * (index + 1) / mReflectBoxMaterialTbl.size();
+        material.transRatio = 1.0f * (index + 1) / mReflectBoxMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 6) % _countof(colorTbl)];
+        index++;
+        albedoIndex++;
+    }
+    index = 0;
+    for (auto& material : mRefractBoxMaterialTbl) {
+        material = defaultMaterial;
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1.0f * (index + 1) / mRefractBoxMaterialTbl.size();
+        material.transRatio = 1.0f * (index + 1) / mRefractBoxMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 8) % _countof(colorTbl)];
+        index++;
+        albedoIndex++;
     }
     index = 0;
     for (auto& material : mMetalMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.roughness = 1;// *(index + 1) / mMetalMaterialTbl.size();
+        material.transRatio = 0;// 1.0f * (index + 1) / mMetalMaterialTbl.size();
+        material.metallic = 0.1;// 1.0f * (index + 1) / mMetalMaterialTbl.size();
+        material.transColor = colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
         index++;
+        albedoIndex++;
+
+        mMaterialParam1 = material;
     }
     index = 0;
-    for (auto& material : mGlassBoxMaterialTbl) {
+    for (auto& material : mGlassMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(index + 5) % _countof(colorTbl)];
+        material.albedo = colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
+        material.roughness = 0.8;// 1.0f * (index + 1) / mGlassMaterialTbl.size();
+        material.transRatio = 1;// 1.0f * (index + 1) / mGlassMaterialTbl.size();
+        material.transColor = XMVectorSet(1.0f, 1, 1, 0.0f);// colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
+        material.metallic = 0.2;
         index++;
+        albedoIndex++;
+
+        mMaterialParam0 = material;
     }
 
     auto bufferSize = sizeof(MaterialParam) * mNormalSphereMaterialTbl.size();
@@ -366,21 +423,29 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mReflectRefractSphereMaterialTbl.size();
-    mReflectRefractSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mReflectRefractSphereMaterialCB.Get(), mReflectRefractSphereMaterialTbl.data(), bufferSize);
+    bufferSize = sizeof(MaterialParam) * mReflectBoxMaterialTbl.size();
+    mReflectBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mReflectBoxMaterialCB.Get(), mReflectBoxMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mReflectRefractBoxMaterialTbl.size();
-    mReflectRefractBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mReflectRefractBoxMaterialCB.Get(), mReflectRefractBoxMaterialTbl.data(), bufferSize);
+    bufferSize = sizeof(MaterialParam) * mRefractBoxMaterialTbl.size();
+    mRefractBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mRefractBoxMaterialCB.Get(), mRefractBoxMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mReflectSphereMaterialTbl.size();
+    mReflectSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mReflectSphereMaterialCB.Get(), mReflectSphereMaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(MaterialParam) * mRefractSphereMaterialTbl.size();
+    mRefractSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mRefractSphereMaterialCB.Get(), mRefractSphereMaterialTbl.data(), bufferSize);
 
     bufferSize = sizeof(MaterialParam) * mMetalMaterialTbl.size();
     mMetalMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mMetalMaterialCB.Get(), mMetalMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mGlassBoxMaterialTbl.size();
+    bufferSize = sizeof(MaterialParam) * mGlassMaterialTbl.size();
     mGlassMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mGlassMaterialCB.Get(), mGlassBoxMaterialTbl.data(), bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mGlassMaterialCB.Get(), mGlassMaterialTbl.data(), bufferSize);
 }
 
 void DxrPhotonMapper::CreateSceneBLAS()

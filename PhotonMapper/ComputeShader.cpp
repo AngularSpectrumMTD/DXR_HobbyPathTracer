@@ -109,17 +109,6 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
 
     {
         utility::RootSignatureCreater rsCreater;
-        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
-        mRsDenoise = rsCreater.Create(mDevice, false, L"rsDenoise");
-        CreateComputeShaderStateObject(ComputeShaders::Denoise, mDenoisePSO, mRsDenoise);
-    }
-
-    {
-        utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);

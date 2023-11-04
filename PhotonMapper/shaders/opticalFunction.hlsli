@@ -3,125 +3,6 @@
 
 #include "common.hlsli"
 
-//metalic
-//roughness
-//opacity
-//IoR
-//emissive
-
-//BRDF / BTDF
-float3x3 computeTransformMatrix(float3 normal)
-{
-    float3 tangentGen = normal.x > 0.99f ? float3(0, 0, 1) : float3(1, 0, 0);
-    float3 tangent = normalize(cross(normal, tangentGen));
-    float3 binormal = normalize(cross(normal, tangent));
-    return float3x3(tangent, binormal, normal);
-}
-
-float3 HemisphereORCosineSampling(float3 normal, bool isHemi)
-{
-    float randF = randXorshift();
-    float cosT = isHemi ? randF : sqrt(randF);
-    float sinT = 1 - cosT * cosT;
-
-    float P = 2 * PI * randXorshift();
-    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
-    
-    return mul(tangentDir, computeTransformMatrix(normal));
-}
-
-float3 FresnelSchlick(float dotVH, float3 F0)
-{
-    return F0 + (1 - F0) * pow(1 - dotVH, 5.0);
-}
-
-//alpha = roughness * roughness
-
-//alpha^2
-//---------
-//pi * ((dot(N, H))^2 * (alpha^2 - 1) + 1)^2
-float GGX_Distribution(float3 N, float3 H, float roughness)
-{
-    float alpha = roughness * roughness;
-    float alpha_pow2 = alpha * alpha;
-    float dotNH = max(0.0, dot(N, H));
-    float dotNH_pow2 = dotNH * dotNH;
-    
-    float denom = (dotNH_pow2 * (alpha_pow2 - 1.0) + 1.0);
-    denom *= PI * denom;
-    
-    return alpha_pow2 / denom;
-}
-
-//k = alpha / 2
-//dot(N, V)
-//---------
-//dot(N, V) * (1 - k) + k
-float GGX_Geometry_Schlick(float dotNX, float roughness)
-{
-    float alpha = roughness * roughness;
-    float k = alpha / 2;
-    return dotNX / (dotNX * (1 - k) + k);
-}
-
-//GGX_Geometry_Schlick(V) * GGX_Geometry_Schlick(L)
-float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)
-{
-    return GGX_Geometry_Schlick(dot(N, V), roughness) * GGX_Geometry_Schlick(dot(N, L), roughness);
-}
-
-float3 GGX_ImportanceSampling(float3 N, float3 V, float roughness)
-{
-    float alpha = roughness * roughness;
-    float randX = randXorshift();
-    float randY = randXorshift();
-
-    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
-    float sinT = sqrt(1 - cosT * cosT);
-    
-    float3 up = abs(N.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
-    float3 tangent = normalize(cross(up, N));
-    float3 bitangent = cross(N, tangent);
-        
-    float P = 2.0 * PI * randX;
-    float3 H = tangent * cos(P) * sinT + bitangent * sin(P) * sinT + N * cosT;
-    return normalize(H);
-}
-
-float GGX_ImportanceSamplingPDF(float NDF, float dotNH, float dotVH)
-{
-    return NDF * dotNH / (4 * dotVH);
-}
-
-float FresnelReflectance(float3 I, float3 N, float IoR)
-{
-    float dotNI = clamp(-1, 1, dot(N, I));
-    float etaInput = 1, etaTrans = IoR;
-    if (dotNI)
-    {
-        float temp = etaInput;
-        etaInput = etaTrans;
-        etaTrans = temp;
-    }  
-    
-    float kr = 1;
-
-    //Fresnel equations(Snell)
-    float sinTrans = etaInput / etaTrans * sqrt(max(0, 1 - dotNI * dotNI));
-    if (sinTrans < 1)
-    {
-        float cosTrans = sqrt(max(0, 1 - sinTrans * sinTrans));
-        dotNI = abs(dotNI);
-        float Rs = ((etaTrans * dotNI) - (etaInput * cosTrans)) / ((etaTrans * dotNI) + (etaInput * cosTrans));
-        float Rp = ((etaInput * dotNI) - (etaTrans * cosTrans)) / ((etaInput * dotNI) + (etaTrans * cosTrans));
-        kr = (Rs * Rs + Rp * Rp) / 2;
-    }
-    
-    return kr;
-}
-
-#define REFLECTANCE_BOOST 4
-
 struct OpticalGlass
 {
     float A0;
@@ -157,6 +38,328 @@ struct OpticalGlass
 		+ A8 * invLambdaPow12);
     }
 };
+
+static OpticalGlass J_Bak4 =
+{
+    2.42114503E+00,
+    -8.99959341E-03,
+    -9.30006854E-05,
+    1.43071120E-02,
+    1.89993274E-04,
+    6.09602388E-06,
+    2.25737069E-07,
+    0.00000000E+00,
+    0.00000000E+00
+};
+
+struct MaterialParams
+{
+    float4 albedo;
+    float metallic;
+    float roughness;
+    float specular;
+    float transRatio;
+    float4 transColor;
+    float4 emission;
+};
+
+static uint rseed;
+
+float rand()//0-1
+{
+    rseed += 1.0;
+    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) + rseed + getLightRandomSeed() * 0.01) * 43758.5453);
+}
+
+bool isPhotonStoreRequired(in MaterialParams params)
+{
+    return rand() < params.roughness;
+}
+
+//Sampling
+float3 tangentToWorld(float3 normal, float3 tangentSpaceVec)
+{
+    float3 up = abs(normal.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
+    float3 tangent = normalize(cross(up, normal));
+    float3 bitangent = cross(normal, tangent);
+
+    return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + normal * tangentSpaceVec.z);
+}
+
+float3 HemisphereORCosineSampling(float3 normal, bool isHemi)
+{
+    float cosT = isHemi ? rand() : sqrt(rand());
+    float sinT = sqrt(1 - cosT * cosT);
+    float P = 2 * PI * rand();
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+
+    return tangentToWorld(normal, tangentDir);
+}
+
+float3 GGX_ImportanceSampling(float3 N, float roughness)
+{
+    float alpha = roughness * roughness;
+    float randX = randXorshift();
+    float randY = randXorshift();
+
+    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
+    float sinT = sqrt(1 - cosT * cosT);
+        
+    float P = 2.0 * PI * randX;
+
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+    return tangentToWorld(N, tangentDir);
+}
+
+//PDF
+float CosineSamplingPDF(float dotNL)
+{
+    return dotNL / PI;
+}
+
+float GGX_ImportanceSamplingPDF(float NDF, float dotNH, float dotVH)
+{
+    return NDF * dotNH / (4 * dotVH);
+}
+
+//Fresnel
+float3 FresnelSchlick(float dotVH, float3 F0)
+{
+    return F0 + (1 - F0) * pow(1 - dotVH, 5.0);
+}
+
+float FresnelReflectance(float3 I, float3 N, float IoR)
+{
+    float dotNI = clamp(-1, 1, dot(N, I));
+    float etaInput = 1, etaTrans = IoR;
+    if (dotNI > 0)
+    {
+        float temp = etaInput;
+        etaInput = etaTrans;
+        etaTrans = temp;
+    }
+    
+    float kr = 1;
+
+    //Fresnel equations(Snell)
+    dotNI = abs(dotNI);
+    float sinTrans = etaInput / etaTrans * sqrt(max(0, 1 - dotNI * dotNI));
+    if (sinTrans < 1)
+    {
+        float cosTrans = sqrt(max(0, 1 - sinTrans * sinTrans));
+        float Rs = ((etaTrans * dotNI) - (etaInput * cosTrans)) / ((etaTrans * dotNI) + (etaInput * cosTrans));
+        float Rp = ((etaInput * dotNI) - (etaTrans * cosTrans)) / ((etaInput * dotNI) + (etaTrans * cosTrans));
+        kr = (Rs * Rs + Rp * Rp) / 2;
+    }
+    
+    return kr;
+}
+
+//BRDF / BTDF
+//alpha = roughness * roughness
+
+//alpha^2
+//---------
+//pi * ((dot(N, H))^2 * (alpha^2 - 1) + 1)^2
+float GGX_Distribution(float3 N, float3 H, float roughness)
+{
+    float alpha = roughness * roughness;
+    float alpha_pow2 = alpha * alpha;
+    float dotNH = max(0.0, dot(N, H));
+    float dotNH_pow2 = dotNH * dotNH;
+    
+    float denom = (dotNH_pow2 * (alpha_pow2 - 1.0) + 1.0);
+    denom *= PI * denom;
+    
+    return alpha_pow2 / denom;
+}
+
+//k = alpha / 2
+//dot(N, V)
+//---------
+//dot(N, V) * (1 - k) + k
+float GGX_Geometry_Schlick(float dotNX, float roughness)
+{
+    float alpha = roughness * roughness;
+    float k = alpha / 2;
+    return dotNX / (dotNX * (1 - k) + k);
+}
+
+//GGX_Geometry_Schlick(V) * GGX_Geometry_Schlick(L)
+float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)
+{
+    float dotNV = abs(dot(N, V));
+    float dotNL = abs(dot(N, L));
+    return GGX_Geometry_Schlick(dotNV, roughness) * GGX_Geometry_Schlick(dotNL, roughness);
+}
+
+float3 DiffuseBRDF(float3 albedo)
+{
+    return albedo / PI;
+}
+
+float3 SpecularBRDF(float D, float G, float3 F, float3 V, float3 L, float3 N)
+{
+    float dotNL = abs(dot(N, L));
+    float dotNV = abs(dot(N, V));
+    float eps = 0.001;
+
+    return (D * G * F) / (4 * dotNV * dotNL + eps);
+}
+
+float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, float3 H, float etaIN, float etaOUT)
+{
+    float dotNL = abs(dot(N, L));
+    float dotNV = abs(dot(N, V));
+    float dotVH = abs(dot(V, H));
+    float dotLH = abs(dot(L, H));
+    float eps = 0.001;
+    
+    float A = dotVH * dotLH / (dotNV * dotNL);
+    float3 XYZ = etaOUT * etaOUT * (1 - F) * G * D;
+    float B = (etaIN * dotVH + etaOUT * dotLH) * (etaIN * dotVH + etaOUT * dotLH) + eps;
+    return A * XYZ / B;
+}
+
+//Shading
+float3 SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
+{
+    nextRay.TMin = 0.001;
+    nextRay.TMax = 10000;
+    
+    const float eps = 0.001;
+    const float3 currentRayDir = WorldRayDirection();
+    const float3 currentRayOrigin = nextRay.Origin;
+
+    const float roulette = rand();
+    const float blending = rand();
+
+    if (blending < 1 - material.transRatio)
+    {
+        float3 reflectDir = 0.xxx;
+        
+        const float diffRatio = 1.0 - material.metallic;
+        const float specRatio = 1 - diffRatio;
+
+        const float3 V = normalize(-currentRayDir);
+        
+        if (roulette < diffRatio)//diffuse
+        {
+            reflectDir = HemisphereORCosineSampling(N, false);
+        }
+        else//specular
+        {
+            const float3 halfVec = GGX_ImportanceSampling(N, material.roughness);
+            reflectDir = normalize(2.0f * dot(V, halfVec) * halfVec - V);
+        }
+        
+        const float3 L = normalize(reflectDir);
+        const float3 H = normalize(L + V);
+
+        const float dotNL = abs(dot(N, L));
+        const float dotNH = abs(dot(N, H));
+        const float dotVH= abs(dot(V, H));
+
+        float3 F0 = 0.08.xxx;
+        F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+        
+        const float NDF = GGX_Distribution(N, H, material.roughness);
+        const float G = GGX_Geometry_Smith(N, V, L, material.roughness);
+        const float3 F = FresnelSchlick(max(dot(V, H), 0), F0);
+
+        const float3 kS = F;
+        const float3 kD = (1 - kS) * (1 - material.metallic);
+        
+        const float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+        const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+        const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+        const float diffPDF = CosineSamplingPDF(dotNL);
+        const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
+        const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
+        
+        nextRay.Origin = currentRayOrigin + N * eps;
+        nextRay.Direction = reflectDir;
+
+        if (sumPDF > 0)
+        {
+            throughput *= sumBRDF / sumPDF;
+        }
+    }
+    else
+    {
+        bool isFromOutside = dot(currentRayDir, N) < 0;
+        N *= isFromOutside ? 1 : -1;
+        
+        float etaIN = 1;
+        float etaOUT = 1.7;
+
+        if (lambda > 0)
+        {
+            etaOUT = J_Bak4.computeRefIndex(lambda * 1e-3);
+        }
+
+        float3 V = normalize(-currentRayDir);
+        float3 H = GGX_ImportanceSampling(N, material.roughness);
+
+        float3 F0 = 0.08.xxx * material.specular;
+        float3 F = FresnelSchlick(max(dot(H, V), 0), F0);
+
+        const float kR = FresnelReflectance(currentRayDir, N, etaOUT);
+        
+        const float specRatio = kR;
+        const float refrRatio = 1 - kR;
+
+        float3 L = 0.xxx;
+
+        if (roulette <= specRatio)
+        {
+            nextRay.Origin = currentRayOrigin + N * eps;
+            L = reflect(currentRayDir, H);
+            nextRay.Direction = L;
+        }
+        else
+        {
+            float eta = isFromOutside ? etaIN / etaOUT : etaOUT / etaIN;
+            L = normalize(refract(currentRayDir, H, eta));
+            nextRay.Direction = L;
+            nextRay.Origin = currentRayOrigin - N * eps;
+            if (!isFromOutside)
+            {
+                float3 tmp = L;
+                L = V;
+                V = tmp;
+                N *= -1;
+                H *= -1;
+            }
+        }
+
+        const float dotNL = abs(dot(N, L));
+        const float dotNV = abs(dot(N, V));
+        const float dotNH = abs(dot(N, H));
+        const float dotVH = abs(dot(V, H));
+        const float dotLH = abs(dot(L, H));
+
+        float NDF = GGX_Distribution(N, H, material.roughness);
+        float G = GGX_Geometry_Smith(N, V, L, material.roughness);
+
+        float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+        float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+        float3 refrBTDF = RefractionBTDF(NDF, G, F, V, L, N, H, etaIN, etaOUT);
+        float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+        const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
+        const float sumPDF = specRatio * specPDF + refrRatio * refrPDF;
+        
+        if (sumPDF > 0)
+        {
+            throughput *= sumBRDF / sumPDF;
+        }
+    }
+    
+    return material.emission.rgb;
+}
+
+//Spectral Rendering Helper
+#define REFLECTANCE_BOOST 4
 
 #define LANBDA_INF_NM 770
 #define LAMBDA_VIO_NM 380
@@ -352,303 +555,4 @@ float3 getBaseLightXYZ(float lambda)
 {
     return lambda2XYZ(lambda);
 }
-
-//in n0 n1(coat d1 thickness) n2 out 
-float FresnelAR(float3 normalizedRayDir, float3 normalizedSurfaceNorm, float lambda, float n0, float n2, float n1 = 1, float d1 = 0)
-{
-    if (d1 > 0)
-        n1 = max(sqrt(n0 * n2), 1.38);
-
-    float cosThetaRAD0 = dot(-normalizedRayDir, normalizedSurfaceNorm);
-    float theta0RAD = acos(cosThetaRAD0);
-
-    //refraction angles in coating and the 2nd medium
-    float sinTheta0 = sqrt(1 - cosThetaRAD0 * cosThetaRAD0);//sin(acos(x)) = sqrt(1 - x^2)
-    float theta1RAD = asin(sinTheta0 * n0 / n1);
-    float theta2RAD = asin(sinTheta0 * n0 / n2);
-
-    //transmission on topmost interface
-    float theta0plus1 = theta0RAD + theta1RAD;
-    float theta0minus1 = theta0RAD - theta1RAD;
-    float rs01 = -sin(theta0minus1) / sin(theta0plus1);
-    float rp01 = tan(theta0minus1) / tan(theta0plus1);
-    float ts01 = 2 * (sinTheta0 * n0 / n1) * cosThetaRAD0 / sin(theta0plus1);
-    float tp01 = ts01 * cos(theta0minus1);
-
-    //amplitude for inner reflection
-    float theta1plus2RAD = theta1RAD + theta2RAD;
-    float theta1minus2RAD = theta1RAD - theta2RAD;
-    float rs12 = -sin(theta1minus2RAD) / sin(theta1plus2RAD);
-    float rp12 = +tan(theta1minus2RAD) / tan(theta1plus2RAD);
-
-    //after passing throught first surface twice (2 transmissions and 1 reflection)
-    float ris = ts01 * ts01 * rs12;
-    float rip = tp01 * tp01 * rp12;
-
-    //phase difference between outer and inner reflections
-    float dy = d1 * n1;
-    float dx = dy * theta1RAD / sqrt(1 - theta1RAD * theta1RAD);//tan(asin(X)) = x / sqrt(1 - x^2)
-    float delay = sqrt(dx * dx + dy * dy);
-    float cosRelPhase = cos(4 * PI / lambda * (delay - dx * sinTheta0));
-
-    float outS2 = rs01 * rs01 + ris * ris + 2 * rs01 * ris * cosRelPhase;
-    float outP2 = rp01 * rp01 + rip * rip + 2 * rp01 * rip * cosRelPhase;
-
-    //reflectivity
-    return (outS2 + outP2) / 2;
-}
-
-float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir, float weight)
-{
-    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
-    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
-    float3 worldRayDir = WorldRayDirection();
-    float3 reflectDir = reflect(worldRayDir, worldNormal);
-
-    RAY_FLAG flags = RAY_FLAG_NONE;
-    uint rayMask = 0xff;
-
-    RayDesc rayDesc;
-    rayDesc.Origin = worldPos;
-    rayDesc.Direction = reflectDir;
-    rayDesc.TMin = 0.01;
-    rayDesc.TMax = 100000;
-
-    Payload reflectPayload;
-    reflectPayload.color = float3(0, 0, 0);
-    reflectPayload.photonColor = float3(0, 0, 0);
-    reflectPayload.recursive = recursive;
-    reflectPayload.storeIndexXY = int2(0, 0);
-    reflectPayload.stored = 0; //empty
-    reflectPayload.eyeDir = eyeDir;
-    reflectPayload.weight = weight;
-    TraceRay(
-        gRtScene,
-        flags,
-        rayMask,
-        0, // ray index
-        1, // MultiplierForGeometryContrib
-        0, // miss index
-        rayDesc,
-        reflectPayload);
-    return reflectPayload.color;
-}
-
-float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive, float3 eyeDir, float weight)
-{
-    float4x3 mtx = ObjectToWorld4x3();
-    float3 worldPos = mul(float4(vertexPosition, 1), mtx);
-    float3 worldNormal = mul(vertexNormal, (float3x3) mtx);
-    float3 worldRayDir = normalize(WorldRayDirection());
-    worldNormal = normalize(worldNormal);
-
-    OpticalGlass glassJ_FK5;
-    glassJ_FK5.A0 = 2.18826855E+00;
-    glassJ_FK5.A1 = 9.19044724E-03;
-    glassJ_FK5.A2 = 1.11621071E-04;
-    glassJ_FK5.A3 = 9.26372815E-03;
-    glassJ_FK5.A4 = 7.34900733E-05;
-    glassJ_FK5.A5 = 4.19724242E-06;
-    glassJ_FK5.A6 = 1.15412203E-07;
-    glassJ_FK5.A7 = 0.00000000E+00;
-    glassJ_FK5.A8 = 0.00000000E+00;
-
-    OpticalGlass glassJ_Bak4;
-    glassJ_Bak4.A0 = 2.42114503E+00;
-    glassJ_Bak4.A1 = -8.99959341E-03;
-    glassJ_Bak4.A2 = -9.30006854E-05;
-    glassJ_Bak4.A3 = 1.43071120E-02;
-    glassJ_Bak4.A4 = 1.89993274E-04;
-    glassJ_Bak4.A5 = 6.09602388E-06;
-    glassJ_Bak4.A6 = 2.25737069E-07;
-    glassJ_Bak4.A7 = 0.00000000E+00;
-    glassJ_Bak4.A8 = 0.00000000E+00;
-
-    float reflectance = 0.0f;
-    const float IoR = glassJ_Bak4.computeRefIndex(780 * 1e-3);
-    const float IoR_Air = 1.0f;
-
-    float nr = dot(worldNormal, worldRayDir);
-    float3 refracted;
-    if (nr < 0)
-    {
-         //Air -> Glass
-        float eta = IoR_Air / IoR; //roi(before)/roi(after)
-        refracted = refract(worldRayDir, worldNormal, eta);
-        reflectance = FresnelAR(getViewVec(), worldNormal, 780, IoR_Air, IoR);
-        reflectance = clamp(reflectance, 0, 1);
-    }
-    else
-    {
-         //Glass -> Air
-        float eta = IoR / IoR_Air;
-        refracted = refract(worldRayDir, -worldNormal, eta);
-        reflectance = FresnelAR(getViewVec(), -worldNormal, 780, IoR, IoR_Air);
-        reflectance = clamp(reflectance, 0, 1);
-    }
-    
-    if (length(refracted) < 0.000001)
-    {
-        return Reflection(vertexPosition, vertexNormal, recursive, eyeDir, 0);
-        //return 0.xxx;
-    }
-    else
-    {
-        RAY_FLAG flags = RAY_FLAG_NONE;
-        uint rayMask = 0xff;
-
-        RayDesc rayDesc;
-        rayDesc.Origin = worldPos;
-        rayDesc.Direction = refracted;
-        rayDesc.TMin = 0.001;
-        rayDesc.TMax = 100000;
-
-        Payload refractPayload;
-        refractPayload.color = float3(0, 1, 0);
-        refractPayload.photonColor = float3(0, 0, 0);
-        refractPayload.recursive = recursive;
-        refractPayload.storeIndexXY = int2(0, 0);
-        refractPayload.stored = 0; //empty
-        refractPayload.eyeDir = eyeDir;
-        refractPayload.weight = 0;
-        TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            rayDesc,
-            refractPayload);
-        return refractPayload.color;
-    }
-}
-
-void ReflectionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload photonPayload)
-{
-    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
-    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
-    float3 worldRayDir = WorldRayDirection();
-    float3 reflectDir = reflect(worldRayDir, worldNormal);
-
-    RAY_FLAG flags = RAY_FLAG_NONE;
-    uint rayMask = ~(LIGHT_INSTANCE_MASK); //light remove
-
-    RayDesc rayDesc;
-    rayDesc.Origin = worldPos;
-    rayDesc.Direction = reflectDir;
-    rayDesc.TMin = 0.01;
-    rayDesc.TMax = 100000;
-
-    TraceRay(
-        gRtScene,
-        flags,
-        rayMask,
-        0, // ray index
-        1, // MultiplierForGeometryContrib
-        0, // miss index
-        rayDesc,
-        photonPayload);
-}
-
-void RefractionPhoton(float3 vertexPosition, float3 vertexNormal, PhotonPayload photonPayload)
-{
-    float4x3 mtx = ObjectToWorld4x3();
-    float3 worldPos = mul(float4(vertexPosition, 1), mtx);
-    float3 worldNormal = mul(vertexNormal, (float3x3) mtx);
-    float3 worldRayDir = normalize(WorldRayDirection());
-    worldNormal = normalize(worldNormal);
-
-    OpticalGlass glassJ_FK5;
-    glassJ_FK5.A0 = 2.18826855E+00;
-    glassJ_FK5.A1 = 9.19044724E-03;
-    glassJ_FK5.A2 = 1.11621071E-04;
-    glassJ_FK5.A3 = 9.26372815E-03;
-    glassJ_FK5.A4 = 7.34900733E-05;
-    glassJ_FK5.A5 = 4.19724242E-06;
-    glassJ_FK5.A6 = 1.15412203E-07;
-    glassJ_FK5.A7 = 0.00000000E+00;
-    glassJ_FK5.A8 = 0.00000000E+00;
-
-    OpticalGlass glassJ_Bak4;
-    glassJ_Bak4.A0 = 2.42114503E+00;
-    glassJ_Bak4.A1 = -8.99959341E-03;
-    glassJ_Bak4.A2 = -9.30006854E-05;
-    glassJ_Bak4.A3 = 1.43071120E-02;
-    glassJ_Bak4.A4 = 1.89993274E-04;
-    glassJ_Bak4.A5 = 6.09602388E-06;
-    glassJ_Bak4.A6 = 2.25737069E-07;
-    glassJ_Bak4.A7 = 0.00000000E+00;
-    glassJ_Bak4.A8 = 0.00000000E+00;
-
-    const float IoR = glassJ_Bak4.computeRefIndex(photonPayload.lambdaNM * 1e-3);
-
-    float reflectance = 0.0f;
-    const float IoR_Air = 1.0f;
-    float nr = dot(worldNormal, worldRayDir);
-    float3 refracted;
-    if (nr < 0)
-    {
-        //Air -> Glass
-        float eta = IoR_Air / IoR; //roi(before)/roi(after)
-        refracted = refract(worldRayDir, worldNormal, eta);
-        reflectance = FresnelAR(worldRayDir, worldNormal, photonPayload.lambdaNM, IoR_Air, IoR);
-        reflectance = clamp(reflectance, 0, 1);
-    }
-    else
-    {
-        //Glass -> Air
-        float eta = IoR / IoR_Air;
-        refracted = refract(worldRayDir, -worldNormal, eta);
-        reflectance = FresnelAR(worldRayDir, -worldNormal, photonPayload.lambdaNM, IoR, IoR_Air);
-        reflectance = clamp(reflectance, 0, 1);
-    }
-
-    {
-        const float3 src = photonPayload.throughput;
-        photonPayload.throughput *= abs(1 - reflectance);
-
-        RAY_FLAG flags = RAY_FLAG_NONE;
-        uint rayMask = ~(LIGHT_INSTANCE_MASK); //light remove
-
-        RayDesc rayDesc;
-        rayDesc.Origin = worldPos;
-        rayDesc.Direction = refracted;
-        rayDesc.TMin = 0.001;
-        rayDesc.TMax = 100000;
-        
-        bool isExecuteReflect = (photonPayload.storeIndex % 10 < 3); //30%Reflect
-    
-        if (isExecuteReflect)
-        {
-            PhotonPayload photonPayloadReflect;
-            photonPayloadReflect.throughput = length(src).xxx * reflectance * REFLECTANCE_BOOST;
-            photonPayloadReflect.recursive = photonPayload.recursive; //if reset this param, infinite photon emission is occurred. This cause GPU HUNG!!!
-            photonPayloadReflect.storeIndex = photonPayload.storeIndex;
-            photonPayloadReflect.stored = 0; //empty
-            photonPayloadReflect.lambdaNM = photonPayload.lambdaNM;
-            RayDesc rayDescReflect;
-            rayDescReflect.Origin = worldPos;
-            rayDescReflect.Direction = reflect(worldRayDir, worldNormal);
-            rayDescReflect.TMin = 0.001;
-            rayDescReflect.TMax = 100000;
-
-            ReflectionPhoton(vertexPosition, vertexNormal, photonPayloadReflect);
-        }
-        else
-        {
-             //refract
-            TraceRay(
-                gRtScene,
-                flags,
-                rayMask,
-                0, // ray index
-                1, // MultiplierForGeometryContrib
-                0, // miss index
-                rayDesc,
-                photonPayload);
-        }
-    }
-}
-
 #endif//__OPTICALFUNCTION_HLSLI__

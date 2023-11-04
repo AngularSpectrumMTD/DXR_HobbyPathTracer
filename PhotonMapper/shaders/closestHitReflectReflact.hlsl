@@ -7,17 +7,7 @@ struct VertexPN
     float3 Normal;
 };
 
-struct MaterialCB
-{
-    float4 albedo;
-    float metalic;
-    float roughness;
-    float specular;
-    float specularTrans;
-    float4 transColor;
-    float4 emission;
-};
-
+ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint> indexBuffer : register(t0, space1);
 StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);
 
@@ -51,15 +41,29 @@ void reflectReflactMaterialClosestHit(inout Payload payload, TriangleIntersectio
     VertexPN vtx = GetVertex(attrib);
 
     depthPositionNormalStore(payload, vtx.Normal);
+    
+    MaterialParams currentMaterial = constantBuffer;
 
-    uint instanceID = InstanceID();
-    if (instanceID == 0) {
-        payload.color = Reflection(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
-    }
-    else if(instanceID == 1)
-    {
-        payload.color = Refraction(vtx.Position, vtx.Normal, payload.recursive, payload.eyeDir, payload.weight);
-    }
+    RayDesc nextRay;
+    nextRay.Origin = 0.xxx;
+    nextRay.Direction = 0.xxx;
+    float3 curEnergy = payload.energy;
+    float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
+    float3 worldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+    const float3 photonIrradiance = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
+    payload.color += shading * curEnergy * photonIrradiance;
+    payload.energy = curEnergy;
+    RAY_FLAG flags = RAY_FLAG_NONE;
+    uint rayMask = 0xff;
+    TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            nextRay,
+            payload);
 }
 
 [shader("closesthit")]
@@ -73,12 +77,31 @@ void reflectReflactMaterialStorePhotonClosestHit(inout PhotonPayload payload, Tr
 
     uint instanceID = InstanceID();
 
-    if (instanceID == 0) {
-        ReflectionPhoton(vtx.Position, vtx.Normal, payload);
-    }
-    else if(instanceID == 1)
+    MaterialParams currentMaterial = constantBuffer;
+
+    RayDesc nextRay;
+    nextRay.Origin = 0.xxx;
+    nextRay.Direction = 0.xxx;
+    float3 curEnergy = payload.throughput;
+    float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy, payload.lambdaNM);
+    payload.throughput = shading * curEnergy;
+    if (currentMaterial.roughness > 0.8 && currentMaterial.specularTrans < 0.8)
     {
-        RefractionPhoton(vtx.Position, vtx.Normal, payload);
+        storePhoton(payload);
+    }
+    else
+    {
+        RAY_FLAG flags = RAY_FLAG_NONE;
+        uint rayMask = 0xff;
+        TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            nextRay,
+            payload);
     }
 }
 

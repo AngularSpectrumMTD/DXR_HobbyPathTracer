@@ -12,6 +12,7 @@ void DxrPhotonMapper::CreateShaderTable()
 
         u32 hitgroupRecordSize = 0;
         hitgroupRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//constant buffer
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//StructuredBuffer<u32>   indexBuffer : register(t0, space1);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//StructuredBuffer<VertexPNT> vertexBuffer: register(t1, space1);
         hitgroupRecordSize = utility::RoundUp(hitgroupRecordSize, ShaderRecordAlignment);
@@ -24,12 +25,12 @@ void DxrPhotonMapper::CreateShaderTable()
         u32 missSize = 1 * missRecordSize;
         u32 hitgroupCount = 
             1 //floor
-            + 1 //sphere reflect/reflact
-            + 1 //box reflect/reflact
+            + ReflectSpheres + RefractSpheres //sphere reflect/reflact
+            + ReflectBoxes + RefractBoxes //box reflect/reflact
             + NormalSpheres //sphere normal
             + NormalBoxes //box normal
-            + 1 //glass
-            + 1 //metal
+            + NormalGlasses //glass
+            + NormalMetals; //metal
             + 1;//light
         u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
@@ -96,41 +97,99 @@ void DxrPhotonMapper::CreateShaderTable()
             }
            
             {
-                auto cbAddress = mReflectRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mReflectSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mSpheresReflectTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
+            }
+
+            {
+                auto cbAddress = mRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
+                for (auto& instances : mSpheresRefractTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
         
             {
-                auto cbAddress = mReflectRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mReflectBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mBoxesReflectTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
+            }
+
+            {
+                auto cbAddress = mRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
+                for (auto& instances : mBoxesRefractTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
          
             {
@@ -151,8 +210,8 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
-                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                     cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                 }
             }
        
@@ -174,8 +233,8 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
-                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                     cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                 }
             }
          
@@ -183,38 +242,48 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mGlassMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
 
             {
                 auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mMetalMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
           
             {
@@ -278,14 +347,15 @@ void DxrPhotonMapper::CreateShaderTable()
 
         u32 raygenSize = 1 * raygenRecordSize;
         u32 missSize = 1 * missRecordSize;
+        //combination of shader and resource(vertivces)
         u32 hitgroupCount =
             1 //floor
-            + 1 //sphere reflect/reflact
-            + 1 //box reflect/reflact
+            + ReflectSpheres + RefractSpheres //sphere reflect/reflact
+            + ReflectBoxes + RefractBoxes //box reflect/reflact
             + NormalSpheres //sphere normal
             + NormalBoxes //box normal
-            + 1 //glass
-            + 1; //metal
+            + NormalGlasses //glass
+            + NormalMetals; //metal
         u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
         auto tableAlign = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
@@ -349,41 +419,99 @@ void DxrPhotonMapper::CreateShaderTable()
             }
           
             {
-                auto cbAddress = mReflectRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mReflectSphereMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mReflectSphereMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
+            }
+
+            {
+                auto cbAddress = mRefractSphereMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
+                for (auto& instances : mRefractSphereMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialSphere);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
          
             {
-                auto cbAddress = mReflectRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mReflectBoxMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mReflectBoxMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
+            }
+
+            {
+                auto cbAddress = mRefractBoxMaterialCB->GetGPUVirtualAddress();
+                auto cbStride = sizeof(MaterialParam);
+
+                for (auto& instances : mRefractBoxMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::ReflectReflactMaterialBox);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
        
             {
@@ -404,8 +532,8 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
-                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                     cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                 }
             }
          
@@ -427,8 +555,8 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
-                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                     cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                 }
             }
           
@@ -436,38 +564,48 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mGlassMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
 
             {
                 auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
-                if (idPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto recordTmpPtr = recordStartPtr;
-                memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+                for (auto& instances : mMetalMaterialTbl) {
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
+                    if (idPtr == nullptr) {
+                        throw std::logic_error("Not found ShaderIdentifier");
+                    }
+                    auto recordTmpPtr = recordStartPtr;
+                    memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+                    recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
 
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                    cbAddress += cbStride;
+                    recordStartPtr = recordTmpPtr + hitgroupRecordSize;
+                }
             }
         }
 

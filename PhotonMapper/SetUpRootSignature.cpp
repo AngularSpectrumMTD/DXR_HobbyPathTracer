@@ -68,6 +68,7 @@ void DxrPhotonMapper::CreateSphereLocalRootSignature()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         mRsSphereRR = rsCreater.Create(mDevice, true, L"lrsSphere(Reflect/Refract)");
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
@@ -80,6 +81,7 @@ void DxrPhotonMapper::CreateSphereLocalRootSignature()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         mRsSphereRRPhoton = rsCreater.Create(mDevice, true, L"lrsSphere(Reflect/Refract)Photon");
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
@@ -96,6 +98,7 @@ void DxrPhotonMapper::CreateGlassLocalRootSignature()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         mRsGlass = rsCreater.Create(mDevice, true, L"lrsGlass(Reflect/Refract)");
     }
     {
@@ -103,6 +106,7 @@ void DxrPhotonMapper::CreateGlassLocalRootSignature()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         mRsGlassPhoton = rsCreater.Create(mDevice, true, L"lrsGlass(Reflect/Refract)Photon");
     }
 }

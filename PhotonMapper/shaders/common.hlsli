@@ -22,12 +22,11 @@ struct SceneCB
 
 struct Payload
 {
+    float3 energy;
     float3 color;
-    float3 photonColor;
     int recursive;
     int2 storeIndexXY;
     float3 eyeDir;
-    float weight;
     int stored;
 };
 

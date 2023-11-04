@@ -24,7 +24,7 @@ float depthWeight(const float depth, const float neighborDepth, const float dzdx
 {
     const float sig = 1.f;
     const float eps = 1e-5f;
-    return saturate(exp(-abs(depth - neighborDepth + eps) / (sig * abs(dzdx * dx + dzdy * dy)) + eps));
+    return saturate(exp(-abs(depth - neighborDepth + eps) / (sig * abs(dzdx * dx + dzdy * dy) + eps)));
 }
 
 float normalWeight(const float3 normal, const float3 neighborNormal)

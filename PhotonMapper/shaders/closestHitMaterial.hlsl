@@ -5,17 +5,7 @@ struct VertexPN {
     float3 Normal;
 };
 
-struct MaterialCB {
-    float4 albedo;
-    float metalic;
-    float roughness;
-    float specular;
-    float specularTrans;
-    float4 transColor;
-    float4 emission;
-};
-
-ConstantBuffer<MaterialCB> constantBuffer: register(b0, space1);
+ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint>   indexBuffer : register(t0,space1);
 StructuredBuffer<VertexPN>  vertexBuffer : register(t1,space1);
 
@@ -46,27 +36,30 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     depthPositionNormalStore(payload, vtx.Normal);
 
-    uint instanceID = InstanceID();
-    float3 albedo = constantBuffer.albedo.xyz;
-    float power = constantBuffer.specular;
+    MaterialParams currentMaterial = constantBuffer;
+    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
-    if (instanceID == 2) {
-
-        float3 worldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-        float3 worldNormal = mul(vtx.Normal, (float3x3)ObjectToWorld4x3());
+    RayDesc nextRay;
+    nextRay.Origin = bestFitWorldPosition;
+    nextRay.Direction = 0.xxx;
+    float3 curEnergy = payload.energy;
+    float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
         
-        const float3 photonIrradiance = photonGather(WorldRayOrigin() + WorldRayDirection() * RayTCurrent(), payload.eyeDir, worldNormal);
-        if(payload.weight > 0)
-        {
-            payload.color = payload.weight + photonIrradiance * albedo;
-        }
-        else
-        {
-            payload.color = photonIrradiance * albedo;
-        }
-    } else {
-        payload.color = float3(0,0,0); // meaningless.
-    }
+    const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
+    payload.color += shading * curEnergy * photonIrradiance;
+    payload.energy = curEnergy;
+    RAY_FLAG flags = RAY_FLAG_NONE;
+    uint rayMask = 0xff;
+    TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            nextRay,
+            payload);
 }
 
 [shader("closesthit")]
@@ -80,10 +73,33 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
 
     uint instanceID = InstanceID();
 
-    if (instanceID == 2) {
+    MaterialParams currentMaterial = constantBuffer;
+    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+
+    RayDesc nextRay;
+    nextRay.Origin = bestFitWorldPosition;
+    nextRay.Direction = 0.xxx;
+    float3 curEnergy = payload.throughput;
+    float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
+    payload.throughput = shading * curEnergy;
+    if (isPhotonStoreRequired(currentMaterial))
+    {
         storePhoton(payload);
-    } else {
-        payload.throughput = float3(0,0,0); // meaningless.
+    }
+    else
+    {
+        RAY_FLAG flags = RAY_FLAG_NONE;
+        uint rayMask = 0xff;
+        TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            nextRay,
+            payload);
     }
 }
 

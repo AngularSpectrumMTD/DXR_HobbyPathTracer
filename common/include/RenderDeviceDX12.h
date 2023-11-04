@@ -162,6 +162,7 @@ namespace dx12
         u32 mFrameIndex = 0;
 
         DXGI_FORMAT mBackbufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        //DXGI_FORMAT mBackbufferFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
         DXGI_FORMAT mDepthFormat = DXGI_FORMAT_D32_FLOAT;
 
         std::array<ComPtr<ID3D12Resource>, BackBufferCount> mRenderTargetTbl;
