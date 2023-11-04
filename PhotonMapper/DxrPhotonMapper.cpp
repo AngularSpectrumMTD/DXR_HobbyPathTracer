@@ -18,7 +18,6 @@ using namespace DirectX;
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
 DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"PhotonMapper"),
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
-mSpheresReflectTbl(), mSpheresRefractTbl(), mSpheresNormalTbl(),
 mNormalSphereMaterialTbl()
 {
     mIntenceBoost = 8000;
@@ -28,7 +27,7 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f;mLightPosY = -4;mLightPosZ = -8;
+    mLightPosX = -5.f;mLightPosY = 30;mLightPosZ = -8;
     mLightRange = 0.25f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
@@ -42,7 +41,7 @@ mNormalSphereMaterialTbl()
     mIsUseDenoise = true;
     mIsDebug = false;
     mVisualizeLightRange = true;
-    mReverseMove = false;
+    mInverseMove = false;
     mIsUseTexture = false;
     mIsTargetGlass = true;
     mStageTextureFileName = L"tileTex.png";
@@ -66,7 +65,7 @@ mNormalSphereMaterialTbl()
         case ModelType::ModelType_TwistCube:
         {
             mGlassFileName = L"twistCube.obj";
-            mGlassObjYOfsset = -30;
+            mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(15, 15, 15);
         }
         break;
@@ -107,7 +106,7 @@ mNormalSphereMaterialTbl()
         case ModelType::ModelType_Diamond:
         {
             mGlassFileName = L"diamond.obj";
-            mGlassObjYOfsset = -50;
+            mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(20, 20, 20);
         }
         break;
@@ -128,14 +127,14 @@ mNormalSphereMaterialTbl()
         case  ModelType::ModelType_HorseStatue:
         {
             mGlassFileName = L"horse_statue_Tri.obj";
-            mGlassObjYOfsset = -80;
+            mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(350, 350, 350);
         }
         break;
         case  ModelType::ModelType_Dragon:
         {
             mGlassFileName = L"dragon.obj";
-            mGlassObjYOfsset = -60;
+            mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(80, 80, 80);
         }
         break;
@@ -264,9 +263,9 @@ void DxrPhotonMapper::UpdateWindowText()
 {
     std::wstringstream windowText;
     windowText.str(L"");
-    windowText << L" R : Reverse" << (mReverseMove ? L"[ON]" : L"[OFF]")
-        << L"  SPACE : ChangeTargetModel R : Roughness S : TransRatio M : Metallic"
-        << L"    <PhotonNum> " << mPhotonMapSize1D * mPhotonMapSize1D << L"    Exe " << getFrameRate() << L"[ms]";
+    windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
+        << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L"    Photon : " << mPhotonMapSize1D * mPhotonMapSize1D << L"    " << getFrameRate() << L"[ms]";
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
@@ -331,46 +330,46 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     switch (wparam)
     {
     case 'I':
-        mReverseMove = !mReverseMove;
+        mInverseMove = !mInverseMove;
         break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
         break;
     case 'G':
-        mGatherRadius = Clamp(0.01f, 2, mGatherRadius + (mReverseMove ? -0.01f : 0.01f));
+        mGatherRadius = Clamp(0.01f, 2, mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
         break;
     case 'X':
-        mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'Y':
-        mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'Z':
-        mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mReverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
         break;
     case 'L':
-        mLightRange = Clamp(0.01f, 0.4f, mLightRange + (mReverseMove ? -0.002f : 0.002f));
+        mLightRange = Clamp(0.01f, 0.4f, mLightRange + (mInverseMove ? -0.002f : 0.002f));
         break;
     case 'T':
-        mTheta += mReverseMove ? -1 : 1;
+        mTheta += mInverseMove ? -1 : 1;
         break;
     case 'P':
-        mPhi += mReverseMove ? -1 : 1;
+        mPhi += mInverseMove ? -1 : 1;
         break;
     case 'K':
-        mIntenceBoost = Clamp(100, 10000, mIntenceBoost + (mReverseMove ? -100 : 100));
+        mIntenceBoost = Clamp(100, 10000, mIntenceBoost + (mInverseMove ? -100 : 100));
         break;
     case 'B':
-        mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mReverseMove ? -1 : 1));
+        mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         break;
     case 'C':
-        mTmpAccumuRatio = Clamp(0.05f, 1, mTmpAccumuRatio + (mReverseMove ? -0.05f : 0.05f));
+        mTmpAccumuRatio = Clamp(0.05f, 1, mTmpAccumuRatio + (mInverseMove ? -0.05f : 0.05f));
         break;
     case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
         break;
     case 'W':
-        mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mReverseMove ? -1 : 1));
+        mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         break;
     case 'N':
         mIsApplyCaustics = !mIsApplyCaustics;
@@ -379,7 +378,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(1, 50, mCausticsBoost + (mReverseMove ? -0.5 : 0.5));
+        mCausticsBoost = Clamp(1, 50, mCausticsBoost + (mInverseMove ? -0.5 : 0.5));
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;
@@ -387,21 +386,21 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         //material start
     case 'R':
         if(mIsTargetGlass)
-        mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mReverseMove ? -0.1 : 0.1));
+        mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mInverseMove ? -0.1 : 0.1));
         else
-            mMaterialParam1.roughness = Clamp(0.1, 1, mMaterialParam1.roughness + (mReverseMove ? -0.1 : 0.1));
+            mMaterialParam1.roughness = Clamp(0.1, 1, mMaterialParam1.roughness + (mInverseMove ? -0.1 : 0.1));
         break;
     case 'S':
         if (mIsTargetGlass)
-        mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mReverseMove ? -0.1 : 0.1));
+        mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1 : 0.1));
         else
-            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mReverseMove ? -0.1 : 0.1));
+            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mInverseMove ? -0.1 : 0.1));
         break;
     case 'M':
         if (mIsTargetGlass)
-        mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mReverseMove ? -0.1 : 0.1));
+        mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1 : 0.1));
         else
-            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mReverseMove ? -0.1 : 0.1));
+            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mInverseMove ? -0.1 : 0.1));
         break;
     case VK_SPACE:
         mIsTargetGlass = !mIsTargetGlass;

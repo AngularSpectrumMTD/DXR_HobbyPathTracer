@@ -144,10 +144,11 @@ private:
     };
 
     enum SphereTypeCount {
-        NormalSpheres = 1,
-        ReflectSpheres = 1,
-        RefractSpheres = 1,
-        SpheresAll = (NormalSpheres + ReflectSpheres + RefractSpheres),
+        NormalSpheres = 8
+    };
+
+    enum BoxTypeCount {
+        NormalBoxes = 5
     };
 
     enum GlassTypeCount {
@@ -156,13 +157,6 @@ private:
 
     enum MetalTypeCount {
         NormalMetals = 1
-    };
-
-    enum BoxTypeCount {
-        NormalBoxes = 1,
-        ReflectBoxes = 1,
-        RefractBoxes = 1,
-        BoxesAll = (NormalBoxes + ReflectBoxes + RefractBoxes),
     };
 
     enum StageType {
@@ -342,11 +336,7 @@ private:
     std::wstring mCubeMapTextureFileName;
 
     //ObjectAttributes of TLAS
-    std::array<XMMATRIX, ReflectSpheres> mSpheresReflectTbl;
-    std::array<XMMATRIX, RefractSpheres> mSpheresRefractTbl;
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;
-    std::array<XMMATRIX, ReflectBoxes> mBoxesReflectTbl;
-    std::array<XMMATRIX, RefractBoxes> mBoxesRefractTbl;
     std::array<XMMATRIX, NormalBoxes> mBoxesNormalTbl;
     std::array<XMMATRIX, NormalGlasses> mGlasssNormalTbl;
     std::array<XMMATRIX, NormalMetals> mMetalsNormalTbl;
@@ -355,10 +345,6 @@ private:
     //Materials
     std::array<MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;
     std::array<MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
-    std::array<MaterialParam, ReflectSpheres> mReflectSphereMaterialTbl;
-    std::array<MaterialParam, RefractSpheres> mRefractSphereMaterialTbl;
-    std::array<MaterialParam, ReflectBoxes> mReflectBoxMaterialTbl;
-    std::array<MaterialParam, RefractBoxes> mRefractBoxMaterialTbl;
     std::array<MaterialParam, NormalMetals> mMetalMaterialTbl;
     std::array<MaterialParam, NormalGlasses> mGlassMaterialTbl;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
@@ -511,7 +497,7 @@ private:
 
     bool mVisualizeLightRange;
 
-    bool mReverseMove;
+    bool mInverseMove;
     bool mIsApplyCaustics;
     bool mIsUseDenoise;
     s32 mSpectrumMode;

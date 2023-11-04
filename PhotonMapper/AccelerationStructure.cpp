@@ -3,6 +3,8 @@
 
 using namespace DirectX;
 
+#define STAGE_DIVISION 4
+
 void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
 {
     D3D12_RAYTRACING_INSTANCE_DESC templateDesc{};
@@ -30,63 +32,11 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& spherePos : mSpheresReflectTbl) {
+    for (const auto& pos : mSpheresNormalTbl) {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Reflect;
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
-    }
-
-    for (const auto& spherePos : mSpheresRefractTbl) {
-        entryOffset++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Refract;
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
-    }
-
-    for (const auto& spherePos : mBoxesReflectTbl) {
-        entryOffset++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Reflect;
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
-    }
-
-    for (const auto& spherePos : mBoxesRefractTbl) {
-        entryOffset++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
-        desc.InstanceID = InstanceType::Refract;
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
-    }
-
-    for (const auto& spherePos : mSpheresNormalTbl) {
-        entryOffset++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
         desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -95,11 +45,11 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& spherePos : mBoxesNormalTbl) {
+    for (const auto& pos : mBoxesNormalTbl) {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), spherePos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
         desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -108,12 +58,12 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& glassPos : mGlasssNormalTbl)
+    for (const auto& pos : mGlasssNormalTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), glassPos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -122,12 +72,12 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& metalPos : mMetalsNormalTbl)
+    for (const auto& pos : mMetalsNormalTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), metalPos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
         desc.InstanceID = InstanceType::Reflect;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -136,12 +86,12 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& lightPos : mLightTbl)
+    for (const auto& pos : mLightTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), lightPos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0x08;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -197,18 +147,18 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
+    s32 count = 0;
     std::mt19937 mt;
-    s32 splatRange = 100;
-    std::uniform_int_distribution rndPos(-splatRange, splatRange);
-    s32 dcount = 0;
+    const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION;
+
     for (auto& trs : mGlasssNormalTbl)
     {
         f32 y = mGlassObjYOfsset;
 
-        f32 x = 0.01f * rndPos(mt) + 5 * rndPos(mt);
-        f32 z = 0.01f * rndPos(mt) + 5 * rndPos(mt);
+        f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION);
+        f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION);
 
-        if (dcount == 0 && NormalGlasses == 1)
+        if (count == 0 && NormalGlasses == 1)
         {
             trs = XMMatrixTranslation(0, y, 0);
         }
@@ -216,17 +166,16 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         {
             trs = XMMatrixTranslation(x, y, z);
         }
-        dcount++;
+        count++;
     }
-    dcount = 0;
     for (auto& trs : mMetalsNormalTbl)
     {
         f32 y = mMetalObjYOfsset;
 
-        f32 x = 0.01f * rndPos(mt) + 5 * rndPos(mt);
-        f32 z = 0.01f * rndPos(mt) + 5 * rndPos(mt);
+        f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
+        f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
 
-        if (dcount == 0 && NormalMetals == 1)
+        if (count == 0 && NormalMetals == 1)
         {
             trs = XMMatrixTranslation(PLANE_SIZE * 0.5f, y, PLANE_SIZE * 0.5f);
         }
@@ -234,7 +183,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         {
             trs = XMMatrixTranslation(x, y, z);
         }
-        dcount++;
+        count++;
     }
 
     for (auto& trs : mLightTbl)
@@ -242,67 +191,26 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         trs = XMMatrixTranslation(mLightPosX, mLightPosY, mLightPosZ);
     }
 
-    std::uniform_real_distribution<> rndScale(1, 4);
-    for (auto& trs : mSpheresRefractTbl) {
-        f32 scale = (f32)rndScale(mt);
-        const f32 scaledSize = sphereRadius * scale;
-        f32 y = -PLANE_SIZE * 0.99f + scaledSize;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-
-        trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
-    }
-    for (auto& trs : mSpheresReflectTbl) {
-        f32 scale = (f32)rndScale(mt);
-        const f32 scaledSize = sphereRadius * scale;
-        f32 y = -PLANE_SIZE * 0.99f + scaledSize;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-
-        trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
-    }
+    std::uniform_real_distribution<> rndScale(1, 3);
     for (auto& trs : mSpheresNormalTbl) {
         f32 scale = (f32)rndScale(mt);
         const f32 scaledSize = sphereRadius * scale;
         f32 y = -PLANE_SIZE * 0.99f + scaledSize;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSize, PLANE_SIZE * 0.99f - scaledSize, (f32)rndPos(mt));
-
+        f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
+        f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
         trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
-    }
-    std::uniform_real_distribution<> rndScale2(3, 8);
-    for (auto& trs : mBoxesRefractTbl) {
-        f32 scale = (f32)rndScale2(mt) ;
-        const f32 scaledSizeY = boxYLength * scale;
-        const f32 scaledSizeX = boxXLength * scale;
-        const f32 scaledSizeZ = boxZLength * scale;
-        f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.5);
-
-        trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
-    }
-    for (auto& trs : mBoxesReflectTbl) {
-        f32 scale = (f32)rndScale2(mt) ;
-        const f32 scaledSizeY = boxYLength * scale;
-        const f32 scaledSizeX = boxXLength * scale;
-        const f32 scaledSizeZ = boxZLength * scale;
-        f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt) + PLANE_SIZE * 0.1);
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.3);
-
-        trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
+        count++;
     }
     for (auto& trs : mBoxesNormalTbl) {
-        f32 scale = (f32)rndScale2(mt) ;
+        f32 scale = (f32)rndScale(mt) ;
         const f32 scaledSizeY = boxYLength * scale;
         const f32 scaledSizeX = boxXLength * scale;
         const f32 scaledSizeZ = boxZLength * scale;
         f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
-        f32 x = Clamp(-PLANE_SIZE * 0.99f + scaledSizeX, PLANE_SIZE * 0.99f - scaledSizeX, (f32)rndPos(mt));
-        f32 z = Clamp(-PLANE_SIZE * 0.99f + scaledSizeZ, PLANE_SIZE * 0.99f - scaledSizeZ, (f32)rndPos(mt) + PLANE_SIZE * 0.2);
-
-        trs = XMMatrixMultiply(XMMatrixScaling(scale * 0.3, scale, scale * 0.3), XMMatrixTranslation(x, y, z));
+        f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
+        f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
+        trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
+        count++;
     }
 
     XMVECTOR colorTbl[] = {
@@ -313,7 +221,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         XMVectorSet(0.1f, 0.8f, 0.4f, 0.0f),
         XMVectorSet(0.3f, 0.2f, 0.8f, 0.0f),
         XMVectorSet(0.8f, 0.4f, 0.4f, 0.0f),
-        XMVectorSet(0.1f, 0.2f, 0.8f, 0.0f),
+        XMVectorSet(0.2f, 0.8f, 0.8f, 0.0f),
         XMVectorSet(0.5f, 0.5f, 0.4f, 0.0f),
     };
 
@@ -326,91 +234,51 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     defaultMaterial.emission = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 
-    u32 index = 0;
     std::uniform_int_distribution rndID(0, 4);
+    std::uniform_real_distribution rndF(0.f, 1.f);
     u32 albedoIndex = rndID(mt);
+    u32 transIndex = rndID(mt);
     for (auto& material : mNormalSphereMaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.metallic = 1.0f * (index + 1) / mNormalSphereMaterialTbl.size();
-        material.roughness = 1.0f * (index + 1) / mNormalSphereMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 3) % _countof(colorTbl)];
-        index++;
+        material.metallic = rndF(mt);
+        material.roughness = rndF(mt);
+        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+        material.transRatio = rndF(mt);
         albedoIndex++;
+        transIndex++;
     }
-    index = 0;
     for (auto& material : mNormalBoxMaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1.0f * (index + 1) / mNormalBoxMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 7) % _countof(colorTbl)];
-        material.transRatio = 0;//0:diffuse  1:trans
-        index++;
+        material.metallic = rndF(mt);
+        material.roughness = rndF(mt);
+        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+        material.transRatio = rndF(mt);
         albedoIndex++;
+        transIndex++;
     }
-    index = 0;
-    for (auto& material : mReflectSphereMaterialTbl) {
-        material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1.0f * (index + 1) / mReflectSphereMaterialTbl.size();
-        material.transRatio = 1.0f * (index + 1) / mReflectSphereMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 4) % _countof(colorTbl)];
-        index++;
-        albedoIndex++;
-    }
-    index = 0;
-    for (auto& material : mRefractSphereMaterialTbl) {
-        material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1.0f * (index + 1) / mRefractSphereMaterialTbl.size();
-        material.metallic = 1.0f * (index + 1) / mRefractSphereMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 1) % _countof(colorTbl)];
-        index++;
-        albedoIndex++;
-    }
-    index = 0;
-    for (auto& material : mReflectBoxMaterialTbl) {
-        material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1.0f * (index + 1) / mReflectBoxMaterialTbl.size();
-        material.transRatio = 1.0f * (index + 1) / mReflectBoxMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 6) % _countof(colorTbl)];
-        index++;
-        albedoIndex++;
-    }
-    index = 0;
-    for (auto& material : mRefractBoxMaterialTbl) {
-        material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1.0f * (index + 1) / mRefractBoxMaterialTbl.size();
-        material.transRatio = 1.0f * (index + 1) / mRefractBoxMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 8) % _countof(colorTbl)];
-        index++;
-        albedoIndex++;
-    }
-    index = 0;
     for (auto& material : mMetalMaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.roughness = 1;// *(index + 1) / mMetalMaterialTbl.size();
-        material.transRatio = 0;// 1.0f * (index + 1) / mMetalMaterialTbl.size();
-        material.metallic = 0.1;// 1.0f * (index + 1) / mMetalMaterialTbl.size();
-        material.transColor = colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
-        index++;
+        material.metallic = rndF(mt);
+        material.roughness = rndF(mt);
+        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+        material.transRatio = rndF(mt);
         albedoIndex++;
+        transIndex++;
 
         mMaterialParam1 = material;
     }
-    index = 0;
     for (auto& material : mGlassMaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
-        material.roughness = 0.8;// 1.0f * (index + 1) / mGlassMaterialTbl.size();
-        material.transRatio = 1;// 1.0f * (index + 1) / mGlassMaterialTbl.size();
-        material.transColor = XMVectorSet(1.0f, 1, 1, 0.0f);// colorTbl[(albedoIndex + 2) % _countof(colorTbl)];
-        material.metallic = 0.2;
-        index++;
+        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.metallic = rndF(mt);
+        material.roughness = rndF(mt);
+        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+        material.transRatio = rndF(mt);
         albedoIndex++;
+        transIndex++;
 
         mMaterialParam0 = material;
     }
@@ -422,22 +290,6 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     bufferSize = sizeof(MaterialParam) * mNormalBoxMaterialTbl.size();
     mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
-
-    bufferSize = sizeof(MaterialParam) * mReflectBoxMaterialTbl.size();
-    mReflectBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mReflectBoxMaterialCB.Get(), mReflectBoxMaterialTbl.data(), bufferSize);
-
-    bufferSize = sizeof(MaterialParam) * mRefractBoxMaterialTbl.size();
-    mRefractBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mRefractBoxMaterialCB.Get(), mRefractBoxMaterialTbl.data(), bufferSize);
-
-    bufferSize = sizeof(MaterialParam) * mReflectSphereMaterialTbl.size();
-    mReflectSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mReflectSphereMaterialCB.Get(), mReflectSphereMaterialTbl.data(), bufferSize);
-
-    bufferSize = sizeof(MaterialParam) * mRefractSphereMaterialTbl.size();
-    mRefractSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mRefractSphereMaterialCB.Get(), mRefractSphereMaterialTbl.data(), bufferSize);
 
     bufferSize = sizeof(MaterialParam) * mMetalMaterialTbl.size();
     mMetalMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
