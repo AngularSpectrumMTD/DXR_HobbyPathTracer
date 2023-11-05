@@ -113,47 +113,31 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocFloor->AddExport(HitGroups::Floor);
             lrsAssocFloor->SetSubobjectToAssociate(*rsFloor);
 
-            auto rsReflectReflactSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsReflectReflactSphere->SetRootSignature(mRsSphereRR.Get());
+            auto rsDefault = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefault->SetRootSignature(mRsDefault.Get());
             auto lrsAssocReflectReflactSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocReflectReflactSphere->AddExport(HitGroups::ReflectReflactMaterialSphere);
-            lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsReflectReflactSphere);
+            lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsDefaultSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsDefaultSphere->SetRootSignature(mRsSphereDefault.Get());
             auto lrsAssocDefaultSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocDefaultSphere->AddExport(HitGroups::DefaultMaterialSphere);
-            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefaultSphere);
-
-            auto rsReflectReflactBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsReflectReflactBox->SetRootSignature(mRsSphereRR.Get());
+            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefault);
+            
             auto lrsAssocReflectReflactBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocReflectReflactBox->AddExport(HitGroups::ReflectReflactMaterialBox);
-            lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsReflectReflactBox);
+            lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsDefaultBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsDefaultBox->SetRootSignature(mRsSphereDefault.Get());
             auto lrsAssocDefaultBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocDefaultBox->AddExport(HitGroups::DefaultMaterialBox);
-            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefaultBox);
+            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsGlass = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsGlass->SetRootSignature(mRsGlass.Get());
             auto lrsAssocGlass = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocGlass->AddExport(HitGroups::Glass);
-            lrsAssocGlass->SetSubobjectToAssociate(*rsGlass);
+            lrsAssocGlass->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsMetal = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsMetal->SetRootSignature(mRsGlass.Get());
             auto lrsAssocMetal = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocMetal->AddExport(HitGroups::Metal);
-            lrsAssocMetal->SetSubobjectToAssociate(*rsMetal);
-
-            auto rsLight = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsLight->SetRootSignature(mRsSphereRR.Get());
-            auto lrsAssocLight = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocLight->AddExport(HitGroups::Light);
-            lrsAssocLight->SetSubobjectToAssociate(*rsLight);
+            lrsAssocMetal->SetSubobjectToAssociate(*rsDefault);
         }
 
         auto shaderConfig = subobjects.CreateSubobject<CD3DX12_RAYTRACING_SHADER_CONFIG_SUBOBJECT>();
@@ -253,46 +237,37 @@ void DxrPhotonMapper::CreateStateObject()
         //Bind Local Root Signature For Shader
         {
             auto rsFloor = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsFloor->SetRootSignature(mRsFloorPhoton.Get());
+            rsFloor->SetRootSignature(mRsFloor.Get());
             auto lrsAssocFloor = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocFloor->AddExport(HitGroups::Floor);
             lrsAssocFloor->SetSubobjectToAssociate(*rsFloor);
 
-            auto rsReflectReflactSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsReflectReflactSphere->SetRootSignature(mRsSphereRRPhoton.Get());
+            auto rsDefault = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+            rsDefault->SetRootSignature(mRsDefault.Get());
+
             auto lrsAssocReflectReflactSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocReflectReflactSphere->AddExport(HitGroups::ReflectReflactMaterialSphere);
-            lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsReflectReflactSphere);
+            lrsAssocReflectReflactSphere->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsDefaultSphere = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsDefaultSphere->SetRootSignature(mRsSphereDefaultPhoton.Get());
             auto lrsAssocDefaultSphere = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocDefaultSphere->AddExport(HitGroups::DefaultMaterialSphere);
-            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefaultSphere);
+            lrsAssocDefaultSphere->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsReflectReflactBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsReflectReflactBox->SetRootSignature(mRsSphereRRPhoton.Get());
             auto lrsAssocReflectReflactBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocReflectReflactBox->AddExport(HitGroups::ReflectReflactMaterialBox);
-            lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsReflectReflactBox);
+            lrsAssocReflectReflactBox->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsDefaultBox = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsDefaultBox->SetRootSignature(mRsSphereDefaultPhoton.Get());
             auto lrsAssocDefaultBox = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocDefaultBox->AddExport(HitGroups::DefaultMaterialBox);
-            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefaultBox);
+            lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsMetal = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsMetal->SetRootSignature(mRsGlassPhoton.Get());
             auto lrsAssocMetal = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocMetal->AddExport(HitGroups::Metal);
-            lrsAssocMetal->SetSubobjectToAssociate(*rsMetal);
+            lrsAssocMetal->SetSubobjectToAssociate(*rsDefault);
 
-            auto rsGlass = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rsGlass->SetRootSignature(mRsGlassPhoton.Get());
             auto lrsAssocGlass = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
             lrsAssocGlass->AddExport(HitGroups::Glass);
-            lrsAssocGlass->SetSubobjectToAssociate(*rsGlass);
+            lrsAssocGlass->SetSubobjectToAssociate(*rsDefault);
         }
 
         auto shaderConfig = subobjects.CreateSubobject<CD3DX12_RAYTRACING_SHADER_CONFIG_SUBOBJECT>();

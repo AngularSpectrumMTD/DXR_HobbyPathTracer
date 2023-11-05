@@ -151,12 +151,12 @@ private:
         NormalBoxes = 5
     };
 
-    enum GlassTypeCount {
-        NormalGlasses = 1
+    enum OBJ0TypeCount {
+        NormalOBJ0s = 1
     };
 
-    enum MetalTypeCount {
-        NormalMetals = 1
+    enum OBJ1TypeCount {
+        NormalOBJ1s = 1
     };
 
     enum StageType {
@@ -288,7 +288,6 @@ private:
     void CreateRootSignatureLocal();
     void CreateSphereLocalRootSignature();
     void CreateFloorLocalRootSignature();
-    void CreateGlassLocalRootSignature();
     void CreateShaderTable();
     void CreateComputeRootSignatureAndPSO();
     void CreateBitonicSortCBs();
@@ -327,34 +326,34 @@ private:
     utility::PolygonMesh mMeshStage;
     utility::PolygonMesh mMeshSphere;
     utility::PolygonMesh mMeshBox;
-    utility::PolygonMesh mMeshGlass;
-    utility::PolygonMesh mMeshMetal;
+    utility::PolygonMesh mMeshOBJ0;
+    utility::PolygonMesh mMeshOBJ1;
     utility::PolygonMesh mMeshLightSphere;
-    std::wstring mMetalFileName;
-    std::wstring mGlassFileName;
+    std::wstring mOBJ0FileName;
+    std::wstring mOBJ1FileName;
     std::wstring mStageTextureFileName;
     std::wstring mCubeMapTextureFileName;
 
     //ObjectAttributes of TLAS
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;
     std::array<XMMATRIX, NormalBoxes> mBoxesNormalTbl;
-    std::array<XMMATRIX, NormalGlasses> mGlasssNormalTbl;
-    std::array<XMMATRIX, NormalMetals> mMetalsNormalTbl;
+    std::array<XMMATRIX, NormalOBJ0s> mOBJ0sNormalTbl;
+    std::array<XMMATRIX, NormalOBJ1s> mOBJ1sNormalTbl;
     std::array<XMMATRIX, NormalLight> mLightTbl;
 
     //Materials
     std::array<MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;
     std::array<MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
-    std::array<MaterialParam, NormalMetals> mMetalMaterialTbl;
-    std::array<MaterialParam, NormalGlasses> mGlassMaterialTbl;
+    std::array<MaterialParam, NormalOBJ0s> mOBJ0MaterialTbl;
+    std::array<MaterialParam, NormalOBJ1s> mOBJ1MaterialTbl;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
     ComPtr<ID3D12Resource> mNormalBoxMaterialCB;
     ComPtr<ID3D12Resource> mReflectSphereMaterialCB;
     ComPtr<ID3D12Resource> mRefractSphereMaterialCB;
     ComPtr<ID3D12Resource> mReflectBoxMaterialCB;
     ComPtr<ID3D12Resource> mRefractBoxMaterialCB;
-    ComPtr<ID3D12Resource> mMetalMaterialCB;
-    ComPtr<ID3D12Resource> mGlassMaterialCB;
+    ComPtr<ID3D12Resource> mOBJ0MaterialCB;
+    ComPtr<ID3D12Resource> mOBJ1MaterialCB;
 
     SceneParam mSceneParam;
     utility::TextureResource mGroundTex;
@@ -425,18 +424,12 @@ private:
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
     ComPtr<ID3D12RootSignature> mGrs;
     ComPtr<ID3D12RootSignature> mRsFloor;
-    ComPtr<ID3D12RootSignature> mRsSphereRR;
-    ComPtr<ID3D12RootSignature> mRsSphereDefault;
-    ComPtr<ID3D12RootSignature> mRsGlass;
+    ComPtr<ID3D12RootSignature> mRsDefault;
 
     ComPtr<ID3D12StateObject> mRTPSOPhoton;
     ComPtr<ID3D12Resource> mShaderPhotonTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
     ComPtr<ID3D12RootSignature> mGrsPhoton;
-    ComPtr<ID3D12RootSignature> mRsFloorPhoton;
-    ComPtr<ID3D12RootSignature> mRsSphereRRPhoton;
-    ComPtr<ID3D12RootSignature> mRsSphereDefaultPhoton;
-    ComPtr<ID3D12RootSignature> mRsGlassPhoton;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortLDS;
     ComPtr<ID3D12RootSignature> mRsTranspose;

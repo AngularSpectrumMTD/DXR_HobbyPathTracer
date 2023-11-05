@@ -25,10 +25,10 @@ void DxrPhotonMapper::CreateShaderTable()
         u32 missSize = 1 * missRecordSize;
         u32 hitgroupCount = 
             1 //floor
-            + NormalSpheres //sphere normal
-            + NormalBoxes //box normal
-            + NormalGlasses //glass
-            + NormalMetals; //metal
+            + NormalSpheres
+            + NormalBoxes
+            + NormalOBJ0s
+            + NormalOBJ1s;
             + 1;//light
         u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
@@ -47,22 +47,25 @@ void DxrPhotonMapper::CreateShaderTable()
         mShaderTable->Map(0, nullptr, &mappedResPtr);
         uint8_t* startPtr = static_cast<uint8_t*>(mappedResPtr);
 
-        auto rgsStartPtr = startPtr;
+        auto rgStartPtr = startPtr;
         {
-            uint8_t* ptr = rgsStartPtr;
-            auto idPtr = rtsoProps->GetShaderIdentifier(L"rayGen");
+            auto recordStartPtr = rgStartPtr;
+            uint8_t* ptr = rgStartPtr;
+            auto idPtr = rtsoProps->GetShaderIdentifier(RayTracingEntryPoints::RayGen);
             if (idPtr == nullptr) {
                 throw std::logic_error("Not found ShaderIdentifier");
             }
             memcpy(ptr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
             ptr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+
+            recordStartPtr += raygenRecordSize;
         }
 
         auto missStartPtr = startPtr + raygenRegion;
         {
             auto recordStartPtr = missStartPtr;
             uint8_t* ptr = missStartPtr;
-            auto idPtr = rtsoProps->GetShaderIdentifier(L"miss");
+            auto idPtr = rtsoProps->GetShaderIdentifier(RayTracingEntryPoints::Miss);
             if (idPtr == nullptr) {
                 throw std::logic_error("Not found ShaderIdentifier");
             }
@@ -141,10 +144,10 @@ void DxrPhotonMapper::CreateShaderTable()
             }
          
             {
-                auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mOBJ0MaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                for (auto& instances : mGlassMaterialTbl) {
+                for (auto& instances : mOBJ0MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -152,9 +155,9 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
@@ -165,10 +168,10 @@ void DxrPhotonMapper::CreateShaderTable()
             }
 
             {
-                auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mOBJ1MaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                for (auto& instances : mMetalMaterialTbl) {
+                for (auto& instances : mOBJ1MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -176,9 +179,9 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
@@ -196,12 +199,6 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto recordTmpPtr = recordStartPtr;
                 memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                 recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshLightSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshLightSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-
-                recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
         }
 
@@ -252,10 +249,10 @@ void DxrPhotonMapper::CreateShaderTable()
         //combination of shader and resource(vertivces)
         u32 hitgroupCount =
             1 //floor
-            + NormalSpheres //sphere normal
-            + NormalBoxes //box normal
-            + NormalGlasses //glass
-            + NormalMetals; //metal
+            + NormalSpheres
+            + NormalBoxes
+            + NormalOBJ0s
+            + NormalOBJ1s;
         u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
         auto tableAlign = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
@@ -273,22 +270,25 @@ void DxrPhotonMapper::CreateShaderTable()
         mShaderPhotonTable->Map(0, nullptr, &mappedResPtr);
         uint8_t* startPtr = static_cast<uint8_t*>(mappedResPtr);
 
-        auto rgsStartPtr = startPtr;
+        auto rgStartPtr = startPtr;
         {
-            uint8_t* ptr = rgsStartPtr;
-            auto idPtr = rtsoProps->GetShaderIdentifier(L"photonEmitting");
+            auto recordStartPtr = rgStartPtr;
+            uint8_t* ptr = rgStartPtr;
+            auto idPtr = rtsoProps->GetShaderIdentifier(RayTracingEntryPoints::RayGenPhoton);
             if (idPtr == nullptr) {
                 throw std::logic_error("Not found ShaderIdentifier");
             }
             memcpy(ptr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
             ptr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+
+            recordStartPtr += raygenRecordSize;
         }
 
         auto missStartPtr = startPtr + raygenRegion;
         {
             auto recordStartPtr = missStartPtr;
             uint8_t* ptr = missStartPtr;
-            auto idPtr = rtsoProps->GetShaderIdentifier(L"photonMiss");
+            auto idPtr = rtsoProps->GetShaderIdentifier(RayTracingEntryPoints::MissPhoton);
             if (idPtr == nullptr) {
                 throw std::logic_error("Not found ShaderIdentifier");
             }
@@ -365,10 +365,10 @@ void DxrPhotonMapper::CreateShaderTable()
             }
           
             {
-                auto cbAddress = mGlassMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mOBJ0MaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                for (auto& instances : mGlassMaterialTbl) {
+                for (auto& instances : mOBJ0MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -376,9 +376,9 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &mMeshGlass.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshGlass.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
@@ -389,10 +389,10 @@ void DxrPhotonMapper::CreateShaderTable()
             }
 
             {
-                auto cbAddress = mMetalMaterialCB->GetGPUVirtualAddress();
+                auto cbAddress = mOBJ1MaterialCB->GetGPUVirtualAddress();
                 auto cbStride = sizeof(MaterialParam);
 
-                for (auto& instances : mMetalMaterialTbl) {
+                for (auto& instances : mOBJ1MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
@@ -400,9 +400,9 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &mMeshMetal.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshMetal.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);

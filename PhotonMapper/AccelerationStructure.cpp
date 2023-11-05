@@ -32,11 +32,11 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& pos : mSpheresNormalTbl) {
+    for (const auto& instances : mSpheresNormalTbl) {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
         desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -45,11 +45,11 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& pos : mBoxesNormalTbl) {
+    for (const auto& instances : mBoxesNormalTbl) {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
         desc.InstanceID = InstanceType::Default;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -58,40 +58,40 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& pos : mGlasssNormalTbl)
+    for (const auto& instances : mOBJ0sNormalTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshGlass.blas->GetGPUVirtualAddress();
+        desc.AccelerationStructure = mMeshOBJ0.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& pos : mMetalsNormalTbl)
+    for (const auto& instances : mOBJ1sNormalTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
         desc.InstanceID = InstanceType::Reflect;
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshMetal.blas->GetGPUVirtualAddress();
+        desc.AccelerationStructure = mMeshOBJ1.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& pos : mLightTbl)
+    for (const auto& instances : mLightTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
         XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), pos);
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
         desc.InstanceID = InstanceType::Refract;
         desc.InstanceMask = 0x08;
         desc.InstanceContributionToHitGroupIndex = entryOffset;
@@ -131,15 +131,15 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mMeshSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereVB", L"SphereIB", L"");
 
     std::string strValue;
-    strValue.assign(mGlassFileName.begin(), mGlassFileName.end());
+    strValue.assign(mOBJ0FileName.begin(), mOBJ0FileName.end());
     const char* charValue = strValue.c_str();
     bool isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale);
-    mMeshGlass.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
+    mMeshOBJ0.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
 
-    strValue.assign(mMetalFileName.begin(), mMetalFileName.end());
+    strValue.assign(mOBJ1FileName.begin(), mOBJ1FileName.end());
     charValue = strValue.c_str();
     isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mMetalObjScale);
-    mMeshMetal.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
+    mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
 
     utility::CreateSphere(verticesPN, indices, 1.f, 30, 30);
     mMeshLightSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereLightVB", L"SphereLightIB", L"");
@@ -151,14 +151,14 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     std::mt19937 mt;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION;
 
-    for (auto& trs : mGlasssNormalTbl)
+    for (auto& trs : mOBJ0sNormalTbl)
     {
         f32 y = mGlassObjYOfsset;
 
         f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION);
         f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION);
 
-        if (count == 0 && NormalGlasses == 1)
+        if (count == 0 && NormalOBJ0s == 1)
         {
             trs = XMMatrixTranslation(0, y, 0);
         }
@@ -168,14 +168,14 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         }
         count++;
     }
-    for (auto& trs : mMetalsNormalTbl)
+    for (auto& trs : mOBJ1sNormalTbl)
     {
         f32 y = mMetalObjYOfsset;
 
         f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
         f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
 
-        if (count == 0 && NormalMetals == 1)
+        if (count == 0 && NormalOBJ1s == 1)
         {
             trs = XMMatrixTranslation(PLANE_SIZE * 0.5f, y, PLANE_SIZE * 0.5f);
         }
@@ -258,7 +258,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         albedoIndex++;
         transIndex++;
     }
-    for (auto& material : mMetalMaterialTbl) {
+    for (auto& material : mOBJ1MaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
         material.metallic = rndF(mt);
@@ -270,7 +270,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         mMaterialParam1 = material;
     }
-    for (auto& material : mGlassMaterialTbl) {
+    for (auto& material : mOBJ0MaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
         material.metallic = rndF(mt);
@@ -291,13 +291,13 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mMetalMaterialTbl.size();
-    mMetalMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mMetalMaterialCB.Get(), mMetalMaterialTbl.data(), bufferSize);
+    bufferSize = sizeof(MaterialParam) * mOBJ1MaterialTbl.size();
+    mOBJ1MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mOBJ1MaterialCB.Get(), mOBJ1MaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mGlassMaterialTbl.size();
-    mGlassMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-    mDevice->ImmediateBufferUpdateHostVisible(mGlassMaterialCB.Get(), mGlassMaterialTbl.data(), bufferSize);
+    bufferSize = sizeof(MaterialParam) * mOBJ0MaterialTbl.size();
+    mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mOBJ0MaterialCB.Get(), mOBJ0MaterialTbl.data(), bufferSize);
 }
 
 void DxrPhotonMapper::CreateSceneBLAS()
@@ -361,11 +361,11 @@ void DxrPhotonMapper::CreateSceneBLAS()
     glassGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
     {
         auto& triangles = glassGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshGlass.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshGlass.vertexStride;
-        triangles.VertexCount = mMeshGlass.vertexCount;
-        triangles.IndexBuffer = mMeshGlass.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshGlass.indexCount;
+        triangles.VertexBuffer.StartAddress = mMeshOBJ0.vertexBuffer->GetGPUVirtualAddress();
+        triangles.VertexBuffer.StrideInBytes = mMeshOBJ0.vertexStride;
+        triangles.VertexCount = mMeshOBJ0.vertexCount;
+        triangles.IndexBuffer = mMeshOBJ0.indexBuffer->GetGPUVirtualAddress();
+        triangles.IndexCount = mMeshOBJ0.indexCount;
         triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
         triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
     }
@@ -385,11 +385,11 @@ void DxrPhotonMapper::CreateSceneBLAS()
     metalGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
     {
         auto& triangles = metalGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshMetal.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshMetal.vertexStride;
-        triangles.VertexCount = mMeshMetal.vertexCount;
-        triangles.IndexBuffer = mMeshMetal.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshMetal.indexCount;
+        triangles.VertexBuffer.StartAddress = mMeshOBJ1.vertexBuffer->GetGPUVirtualAddress();
+        triangles.VertexBuffer.StrideInBytes = mMeshOBJ1.vertexStride;
+        triangles.VertexCount = mMeshOBJ1.vertexCount;
+        triangles.IndexBuffer = mMeshOBJ1.indexBuffer->GetGPUVirtualAddress();
+        triangles.IndexCount = mMeshOBJ1.indexCount;
         triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
         triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
     }
@@ -467,8 +467,8 @@ void DxrPhotonMapper::CreateSceneBLAS()
     // after exit this function,  local ASBs are destructed, so copy to member variables
     mMeshStage.blas = planeASB.ASBuffer;
     mMeshSphere.blas = sphereASB.ASBuffer;
-    mMeshGlass.blas = glassASB.ASBuffer;
-    mMeshMetal.blas = metalASB.ASBuffer;
+    mMeshOBJ0.blas = glassASB.ASBuffer;
+    mMeshOBJ1.blas = metalASB.ASBuffer;
     mMeshLightSphere.blas = lightSphereASB.ASBuffer;
     mMeshBox.blas = boxASB.ASBuffer;
 

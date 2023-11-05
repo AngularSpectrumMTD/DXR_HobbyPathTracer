@@ -27,8 +27,8 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f;mLightPosY = 30;mLightPosZ = -8;
-    mLightRange = 0.25f;
+    mLightPosX = -5.f;mLightPosY = 70;mLightPosZ = -8;
+    mLightRange = 0.10f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
     mTmpAccumuRatio = 0.1f;
@@ -57,21 +57,21 @@ mNormalSphereMaterialTbl()
     {
         case  ModelType::ModelType_Crab:
         {
-            mGlassFileName = L"crab.obj";
+            mOBJ0FileName = L"crab.obj";
             mGlassObjYOfsset = 5;
             mGlassObjScale = XMFLOAT3(12, 12, 12);
         }
         break;
         case ModelType::ModelType_TwistCube:
         {
-            mGlassFileName = L"twistCube.obj";
+            mOBJ0FileName = L"twistCube.obj";
             mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(15, 15, 15);
         }
         break;
         case ModelType::ModelType_Teapot:
         {
-            mGlassFileName = L"teapot.obj";
+            mOBJ0FileName = L"teapot.obj";
             mCausticsBoost *= 0.5;
             mGlassObjYOfsset = -15;
             mGlassObjScale = XMFLOAT3(8, 8, 8);
@@ -79,7 +79,7 @@ mNormalSphereMaterialTbl()
         break;
         case  ModelType::ModelType_LikeWater:
         {
-            mGlassFileName = L"likeWater.obj";
+            mOBJ0FileName = L"likeWater.obj";
             mCausticsBoost *= 3;
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(4, 4, 4);
@@ -89,7 +89,7 @@ mNormalSphereMaterialTbl()
         {
             mStageType = StageType_Box;
             mGlassRotateRange *= 2;
-            mGlassFileName = L"ocean.obj";
+            mOBJ0FileName = L"ocean.obj";
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
         }
@@ -98,42 +98,42 @@ mNormalSphereMaterialTbl()
         {
             mStageType = StageType_Box;
             mGlassRotateRange *= 2;
-            mGlassFileName = L"ocean2.obj";
+            mOBJ0FileName = L"ocean2.obj";
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
         }
         break;
         case ModelType::ModelType_Diamond:
         {
-            mGlassFileName = L"diamond.obj";
+            mOBJ0FileName = L"diamond.obj";
             mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(20, 20, 20);
         }
         break;
         case ModelType::ModelType_Skull:
         {
-            mGlassFileName = L"skull.obj";
+            mOBJ0FileName = L"skull.obj";
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(30, 30, 30);
         }
         break;
         default:
         {
-            mGlassFileName = L"crab.obj";
+            mOBJ0FileName = L"crab.obj";
             mGlassObjYOfsset = 0;
             mGlassObjScale = XMFLOAT3(12, 12, 12);
         }
         break;
         case  ModelType::ModelType_HorseStatue:
         {
-            mGlassFileName = L"horse_statue_Tri.obj";
+            mOBJ0FileName = L"horse_statue_Tri.obj";
             mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(350, 350, 350);
         }
         break;
         case  ModelType::ModelType_Dragon:
         {
-            mGlassFileName = L"dragon.obj";
+            mOBJ0FileName = L"dragon.obj";
             mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(80, 80, 80);
         }
@@ -144,28 +144,28 @@ mNormalSphereMaterialTbl()
     {
     case  ModelType::ModelType_Crab:
     {
-        mMetalFileName = L"crab.obj";
+        mOBJ1FileName = L"crab.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
-        mMetalFileName = L"twistCube.obj";
+        mOBJ1FileName = L"twistCube.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
-        mMetalFileName = L"teapot.obj";
+        mOBJ1FileName = L"teapot.obj";
         mMetalObjYOfsset = -40;
         mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case  ModelType::ModelType_LikeWater:
     {
-        mMetalFileName = L"likeWater.obj";
+        mOBJ1FileName = L"likeWater.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(2, 4, 4);
     }
@@ -173,7 +173,7 @@ mNormalSphereMaterialTbl()
     case  ModelType::ModelType_Ocean:
     {
         mStageType = StageType_Box;
-        mMetalFileName = L"ocean.obj";
+        mOBJ1FileName = L"ocean.obj";
         mMetalObjYOfsset = 20;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
@@ -181,28 +181,28 @@ mNormalSphereMaterialTbl()
     case  ModelType::ModelType_Ocean2:
     {
         mStageType = StageType_Box;
-        mMetalFileName = L"ocean2.obj";
+        mOBJ1FileName = L"ocean2.obj";
         mMetalObjYOfsset = 20;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
-        mMetalFileName = L"diamond.obj";
+        mOBJ1FileName = L"diamond.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
-        mMetalFileName = L"skull.obj";
+        mOBJ1FileName = L"skull.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
-        mMetalFileName = L"crab.obj";
+        mOBJ1FileName = L"crab.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
@@ -283,7 +283,7 @@ void DxrPhotonMapper::Update()
     if (mIsMoveModel)
     {
         mMoveFrame++;
-        for (auto& pos : mGlasssNormalTbl)
+        for (auto& pos : mOBJ0sNormalTbl)
         {
             pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * OneRadian), 0);
         }
@@ -454,10 +454,10 @@ void DxrPhotonMapper::UpdateSceneParams()
 
 void DxrPhotonMapper::UpdateMaterialParams()
 {
-    auto materialConstantBuffer0 = mGlassMaterialCB.Get();
+    auto materialConstantBuffer0 = mOBJ0MaterialCB.Get();
     mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer0, &mMaterialParam0, sizeof(mMaterialParam0));
 
-    auto materialConstantBuffer1 = mMetalMaterialCB.Get();
+    auto materialConstantBuffer1 = mOBJ1MaterialCB.Get();
     mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer1, &mMaterialParam1, sizeof(mMaterialParam1));
 }
 
