@@ -7,7 +7,9 @@ Photon Mapper By Use Of DirectX Raytracing
 
 ### Algorithm
 Photon Mapping : Hashed Grid
+
 Denoiser : SVGF
+
 Shading : GGX
 
 ### Graphics API
