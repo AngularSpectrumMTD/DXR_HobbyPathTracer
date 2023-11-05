@@ -148,7 +148,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbStride = sizeof(MaterialParam);
 
                 for (auto& instances : mOBJ0MaterialTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj0);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -172,7 +172,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbStride = sizeof(MaterialParam);
 
                 for (auto& instances : mOBJ1MaterialTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj1);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -369,7 +369,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbStride = sizeof(MaterialParam);
 
                 for (auto& instances : mOBJ0MaterialTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Glass);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj0);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }
@@ -393,7 +393,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto cbStride = sizeof(MaterialParam);
 
                 for (auto& instances : mOBJ1MaterialTbl) {
-                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Metal);
+                    auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj1);
                     if (idPtr == nullptr) {
                         throw std::logic_error("Not found ShaderIdentifier");
                     }

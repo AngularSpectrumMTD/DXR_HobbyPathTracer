@@ -66,12 +66,12 @@ void DxrPhotonMapper::CreateStateObject()
             auto hitgroupGlass = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupGlass->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupGlass->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
-            hitgroupGlass->SetHitGroupExport(HitGroups::Glass);
+            hitgroupGlass->SetHitGroupExport(HitGroups::Obj0);
 
             auto hitgroupMetal = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupMetal->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupMetal->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
-            hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
+            hitgroupMetal->SetHitGroupExport(HitGroups::Obj1);
 
             auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
@@ -132,11 +132,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefault);
 
             auto lrsAssocGlass = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocGlass->AddExport(HitGroups::Glass);
+            lrsAssocGlass->AddExport(HitGroups::Obj0);
             lrsAssocGlass->SetSubobjectToAssociate(*rsDefault);
 
             auto lrsAssocMetal = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocMetal->AddExport(HitGroups::Metal);
+            lrsAssocMetal->AddExport(HitGroups::Obj1);
             lrsAssocMetal->SetSubobjectToAssociate(*rsDefault);
         }
 
@@ -195,12 +195,12 @@ void DxrPhotonMapper::CreateStateObject()
             auto hitgroupGlass = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupGlass->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupGlass->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialPhoton);
-            hitgroupGlass->SetHitGroupExport(HitGroups::Glass);
+            hitgroupGlass->SetHitGroupExport(HitGroups::Obj0);
 
             auto hitgroupMetal = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupMetal->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupMetal->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialPhoton);
-            hitgroupMetal->SetHitGroupExport(HitGroups::Metal);
+            hitgroupMetal->SetHitGroupExport(HitGroups::Obj1);
 
             auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
@@ -262,11 +262,11 @@ void DxrPhotonMapper::CreateStateObject()
             lrsAssocDefaultBox->SetSubobjectToAssociate(*rsDefault);
 
             auto lrsAssocMetal = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocMetal->AddExport(HitGroups::Metal);
+            lrsAssocMetal->AddExport(HitGroups::Obj1);
             lrsAssocMetal->SetSubobjectToAssociate(*rsDefault);
 
             auto lrsAssocGlass = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-            lrsAssocGlass->AddExport(HitGroups::Glass);
+            lrsAssocGlass->AddExport(HitGroups::Obj0);
             lrsAssocGlass->SetSubobjectToAssociate(*rsDefault);
         }
 

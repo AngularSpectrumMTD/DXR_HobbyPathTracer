@@ -37,6 +37,27 @@
     <Filter Include="ソース ファイル\PhotonMapper">
       <UniqueIdentifier>{7a2aacda-20b2-44d7-9287-ba1346c6de0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\shaders\SVGF">
+      <UniqueIdentifier>{91dabe60-637b-45ac-82a3-91d4492419be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\Sort">
+      <UniqueIdentifier>{b014cac4-aefd-4bb6-bc80-ed94cd530fb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\PhotonMap">
+      <UniqueIdentifier>{01696b6e-e8b0-425b-aa84-18487c11b5a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\Lighting">
+      <UniqueIdentifier>{23fc5db8-6580-4a75-ae13-5484009f27c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\ClosestHit">
+      <UniqueIdentifier>{ab8b3d36-aeb3-4bf2-a334-cf6683a71358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\Miss">
+      <UniqueIdentifier>{d5297095-dc7c-4972-bdd8-4d113cbb9f8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\shaders\Raygen">
+      <UniqueIdentifier>{8891e5ed-c72a-4909-a130-8e338a9fbf34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -110,73 +131,70 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="shaders\BitonicSort_Header.hlsli">
-      <Filter>ソース ファイル\shaders</Filter>
-    </None>
-    <None Include="shaders\Grid3D_Header.hlsli">
-      <Filter>ソース ファイル\shaders</Filter>
-    </None>
-    <None Include="shaders\photonGathering.hlsli">
-      <Filter>ソース ファイル\shaders</Filter>
-    </None>
-    <None Include="shaders\opticalFunction.hlsli">
-      <Filter>ソース ファイル\shaders</Filter>
-    </None>
     <None Include="shaders\common.hlsli">
       <Filter>ソース ファイル\shaders</Filter>
     </None>
     <None Include="shaders\weightsUtility.hlsli">
-      <Filter>ソース ファイル\shaders</Filter>
+      <Filter>ソース ファイル\shaders\SVGF</Filter>
+    </None>
+    <None Include="shaders\BitonicSort_Header.hlsli">
+      <Filter>ソース ファイル\shaders\Sort</Filter>
+    </None>
+    <None Include="shaders\Grid3D_Header.hlsli">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </None>
+    <None Include="shaders\opticalFunction.hlsli">
+      <Filter>ソース ファイル\shaders\Lighting</Filter>
+    </None>
+    <None Include="shaders\photonGathering.hlsli">
+      <Filter>ソース ファイル\shaders\Lighting</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\miss.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\raygen.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\closestHitFloor.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\BitonicSort_BitonicSort.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\BitonicSort_Transpose.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Grid3D_BuildGrid.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Grid3D_BuildGridIndices.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Grid3D_ClearGridIndices.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Grid3D_Copy.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Grid3D_RearrangePhoton.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\BitonicSort.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\closestHitLight.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Denoise.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\A-trous.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
+      <Filter>ソース ファイル\shaders\SVGF</Filter>
     </FxCompile>
     <FxCompile Include="shaders\computeVariance.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
+      <Filter>ソース ファイル\shaders\SVGF</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\BitonicSort.hlsl">
+      <Filter>ソース ファイル\shaders\Sort</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\BitonicSort_BitonicSort.hlsl">
+      <Filter>ソース ファイル\shaders\Sort</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\BitonicSort_Transpose.hlsl">
+      <Filter>ソース ファイル\shaders\Sort</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Grid3D_BuildGrid.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Grid3D_BuildGridIndices.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Grid3D_ClearGridIndices.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Grid3D_Copy.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Grid3D_RearrangePhoton.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\raygen.hlsl">
+      <Filter>ソース ファイル\shaders\Raygen</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\closestHitFloor.hlsl">
+      <Filter>ソース ファイル\shaders\ClosestHit</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\closestHitLight.hlsl">
+      <Filter>ソース ファイル\shaders\ClosestHit</Filter>
     </FxCompile>
     <FxCompile Include="shaders\closestHitMaterial.hlsl">
-      <Filter>ソース ファイル\shaders</Filter>
+      <Filter>ソース ファイル\shaders\ClosestHit</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\miss.hlsl">
+      <Filter>ソース ファイル\shaders\Miss</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -36,8 +36,8 @@ namespace HitGroups {
     static const wchar_t* DefaultMaterialSphere = L"hgMaterialSpheres";
     static const wchar_t* DefaultMaterialBox = L"hgMaterlalBoxes";
     static const wchar_t* Floor = L"hgFloor";
-    static const wchar_t* Glass = L"hgGlass";
-    static const wchar_t* Metal = L"hgMetal";
+    static const wchar_t* Obj0 = L"hgObj0";
+    static const wchar_t* Obj1 = L"hgObj1";
     static const wchar_t* Light = L"hgLight";
 }
 
