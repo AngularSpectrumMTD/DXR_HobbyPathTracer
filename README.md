@@ -1,7 +1,7 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![main](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ed223f1f-8947-4eda-89ad-6857766ebf05)
+![caustics](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/80c8eb25-4e5a-47ab-8071-e4a96004cfb7)
 
 ![models](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5e011057-4728-4d4d-979d-1e8f254361ed)
 
@@ -14,3 +14,23 @@ Shading : GGX
 
 ### Graphics API
 DirectX12
+
+### Action
+
+- I : determine other button meaning (+ / -)
+- J : start / stop model
+- G : increase / decrease photon gather radius
+- X / Y / Z : light position
+- L : increase / decrease light emission range
+- T / P : light emission angle(theta / phi)
+- K : increase / decrease light intensity
+- B : increase / decrease photon gathering block num
+- C : increase / decrease temporal accumulation factor(EMA)
+- V : visualize DI emission element
+- N : visualize caustics
+- D : enable / disable SVGF
+- Q : increase / decrease caustics boost
+- U : enable / disable texture
+- R : increase / decrease roughness
+- S : increase / decrease translucency
+- M : increase / decrease metallic

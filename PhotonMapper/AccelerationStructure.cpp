@@ -274,9 +274,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
         material.metallic = rndF(mt);
-        material.roughness = rndF(mt);
+        material.roughness = 0.1;// rndF(mt);
         material.transColor = colorTbl[transIndex % _countof(colorTbl)];
-        material.transRatio = rndF(mt);
+        material.transRatio = 0.6;// rndF(mt);
         albedoIndex++;
         transIndex++;
 

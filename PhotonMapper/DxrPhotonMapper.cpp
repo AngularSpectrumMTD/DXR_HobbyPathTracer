@@ -20,15 +20,15 @@ DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height,
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
 mNormalSphereMaterialTbl()
 {
-    mIntenceBoost = 8000;
+    mIntenceBoost = 10000;
     mGatherRadius = 0.25f;
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f;mLightPosY = 70;mLightPosZ = -8;
-    mLightRange = 0.10f;
+    mLightPosX = -5.f;mLightPosY = 70;mLightPosZ = -14;
+    mLightRange = 0.03f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
     mTmpAccumuRatio = 0.1f;
@@ -363,7 +363,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         break;
     case 'C':
-        mTmpAccumuRatio = Clamp(0.05f, 1, mTmpAccumuRatio + (mInverseMove ? -0.05f : 0.05f));
+        mTmpAccumuRatio = Clamp(0.02f, 1, mTmpAccumuRatio + (mInverseMove ? -0.05f : 0.05f));
         break;
     case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
