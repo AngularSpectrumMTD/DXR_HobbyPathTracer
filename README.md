@@ -3,6 +3,8 @@ Photon Mapper By Use Of DirectX Raytracing
 
 ![caustics](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/80c8eb25-4e5a-47ab-8071-e4a96004cfb7)
 
+![SVGF](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/afbf735e-1958-4975-9843-abd79c8d8288)
+
 ![models](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5e011057-4728-4d4d-979d-1e8f254361ed)
 
 ### Algorithm
