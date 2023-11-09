@@ -1,6 +1,8 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
+![Beautiful](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4e7c237a-4c42-4098-b627-ff0582b509b3)
+
 ![caustics](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/80c8eb25-4e5a-47ab-8071-e4a96004cfb7)
 
 ![SVGF](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/afbf735e-1958-4975-9843-abd79c8d8288)
