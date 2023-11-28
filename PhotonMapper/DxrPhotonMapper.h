@@ -1,8 +1,10 @@
-#pragma once
+#ifndef __DXRPHOTONMAPPER_H__
+#define __DXRPHOTONMAPPER_H__
 
 #include "AppBase.h"
 #include "Camera.h"
 #include "utility/Utility.h"
+#include "utility/OBJ.h"
 #include <DirectXMath.h>
 
 #define WIN32_LEAN_AND_MEAN
@@ -252,6 +254,7 @@ private:
         ModelType_Skull,
         ModelType_HorseStatue,
         ModelType_Dragon,
+        ModelType_Sponza,
     };
 
     enum Spectrum
@@ -309,7 +312,7 @@ private:
     std::wstring GetAssetFullPath(LPCWSTR assetName);
     f32 Clamp(f32 min, f32 max, f32 src);
     f32 getFrameRate();
-    utility::TextureResource LoadTextureFromFile(const std::wstring& fileName);
+    //utility::TextureResource LoadTextureFromFile(const std::wstring& fileName);
     
     void SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs);
 
@@ -333,6 +336,8 @@ private:
     std::wstring mOBJ1FileName;
     std::wstring mStageTextureFileName;
     std::wstring mCubeMapTextureFileName;
+
+    OBJ_MODEL mOBJModel;
 
     //ObjectAttributes of TLAS
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;
@@ -512,3 +517,5 @@ private:
 
     bool mIsTargetGlass;
 };
+
+#endif

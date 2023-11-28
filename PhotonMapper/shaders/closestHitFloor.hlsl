@@ -48,14 +48,14 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
     {
         diffuseColor = float4(1, 1, 1 , 1);
     }
-    
+
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
     const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
     float3 curEnergy = payload.energy;
     
-    payload.color += diffuseColor.xyz * curEnergy * photonIrradiance;
+    payload.color += diffuseColor.xyz * curEnergy * photonIrradiance + diffuseColor.xyz * float3(0.1f, 0.1f, 0.1f);
 }
 
 [shader("closesthit")]

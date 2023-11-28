@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __RENDERDEVICEDX12_H__
+#define __RENDERDEVICEDX12_H__
 
 #include <d3d12.h>
 #include <dxgi1_5.h>
@@ -181,3 +182,5 @@ namespace dx12
         std::string mAdapterName;
     };
 } // dx12
+
+#endif

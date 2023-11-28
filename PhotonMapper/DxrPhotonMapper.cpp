@@ -27,7 +27,7 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f;mLightPosY = 70;mLightPosZ = -14;
+    mLightPosX = -5.f;mLightPosY = 120;mLightPosZ = -14;
     mLightRange = 0.03f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
@@ -51,6 +51,7 @@ mNormalSphereMaterialTbl()
     mStageType = StageType_Plane;
 
    mGlassModelType = ModelType::ModelType_Dragon;
+   //mGlassModelType = ModelType::ModelType_Sponza;
    mMetalModelType = ModelType::ModelType_Teapot;
 
     switch (mGlassModelType)
@@ -134,8 +135,16 @@ mNormalSphereMaterialTbl()
         case  ModelType::ModelType_Dragon:
         {
             mOBJ0FileName = L"dragon.obj";
+            //mOBJ0FileName = L"san-miguel-low-poly.obj";
             mGlassObjYOfsset = -10;
             mGlassObjScale = XMFLOAT3(80, 80, 80);
+        }
+        break;
+        case  ModelType::ModelType_Sponza:
+        {
+            mOBJ0FileName = L"triangulateSponza.obj";
+            mGlassObjYOfsset = 0;
+            mGlassObjScale = XMFLOAT3(5, 5, 5);
         }
         break;
     }
@@ -224,6 +233,8 @@ void DxrPhotonMapper::Initialize()
 
     if ((hr == S_OK) || (hr == S_FALSE))
     {
+        //mOBJModel.OBJ_Load(mDevice, "triangulateSponza.obj");
+
         CreateRegularBuffer();
         CreateConstantBuffer();
         CreateAccelerationStructure();
@@ -357,7 +368,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mPhi += mInverseMove ? -1 : 1;
         break;
     case 'K':
-        mIntenceBoost = Clamp(100, 10000, mIntenceBoost + (mInverseMove ? -100 : 100));
+        mIntenceBoost = Clamp(100, 100000, mIntenceBoost + (mInverseMove ? -100 : 100));
         break;
     case 'B':
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));

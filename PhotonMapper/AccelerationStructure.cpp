@@ -273,10 +273,13 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     for (auto& material : mOBJ0MaterialTbl) {
         material = defaultMaterial;
         material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.metallic = rndF(mt);
-        material.roughness = 0.1;// rndF(mt);
+        //material.metallic = rndF(mt);
+        material.metallic = 0;
+        //material.roughness = 0.1;// rndF(mt);
+        material.roughness = 1.0;// rndF(mt);
         material.transColor = colorTbl[transIndex % _countof(colorTbl)];
-        material.transRatio = 0.6;// rndF(mt);
+        //material.transRatio = 0.6;// rndF(mt);
+        material.transRatio = 0;// rndF(mt);
         albedoIndex++;
         transIndex++;
 
@@ -302,178 +305,12 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
 void DxrPhotonMapper::CreateSceneBLAS()
 {
-    D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC asDesc{};
-    D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs = asDesc.Inputs;
-    inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
-    inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
-    auto command = mDevice->CreateCommandList();
-
-    D3D12_RAYTRACING_GEOMETRY_DESC planeGeomDesc{};
-    planeGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    planeGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = planeGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshStage.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshStage.vertexStride;
-        triangles.VertexCount = mMeshStage.vertexCount;
-        triangles.IndexBuffer = mMeshStage.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshStage.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &planeGeomDesc;
-    auto planeASB = mDevice->CreateAccelerationStructure(asDesc);
-    planeASB.ASBuffer->SetName(L"Plane-BLAS");
-    asDesc.ScratchAccelerationStructureData = planeASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = planeASB.ASBuffer->GetGPUVirtualAddress();
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    std::vector<dx12::AccelerationStructureBuffers> asbuffers;
-    D3D12_RAYTRACING_GEOMETRY_DESC sphereGeomDesc{};
-    sphereGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    sphereGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = sphereGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshSphere.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshSphere.vertexStride;
-        triangles.VertexCount = mMeshSphere.vertexCount;
-        triangles.IndexBuffer = mMeshSphere.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshSphere.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &sphereGeomDesc;
-    auto sphereASB = mDevice->CreateAccelerationStructure(asDesc);
-    sphereASB.ASBuffer->SetName(L"Sphere-BLAS");
-    asDesc.ScratchAccelerationStructureData = sphereASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = sphereASB.ASBuffer->GetGPUVirtualAddress();
-
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    D3D12_RAYTRACING_GEOMETRY_DESC glassGeomDesc{};
-    glassGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    glassGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = glassGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshOBJ0.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshOBJ0.vertexStride;
-        triangles.VertexCount = mMeshOBJ0.vertexCount;
-        triangles.IndexBuffer = mMeshOBJ0.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshOBJ0.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &glassGeomDesc;
-    auto glassASB = mDevice->CreateAccelerationStructure(asDesc);
-    glassASB.ASBuffer->SetName(L"Glass-BLAS");
-    asDesc.ScratchAccelerationStructureData = glassASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = glassASB.ASBuffer->GetGPUVirtualAddress();
-
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    D3D12_RAYTRACING_GEOMETRY_DESC metalGeomDesc{};
-    metalGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    metalGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = metalGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshOBJ1.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshOBJ1.vertexStride;
-        triangles.VertexCount = mMeshOBJ1.vertexCount;
-        triangles.IndexBuffer = mMeshOBJ1.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshOBJ1.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &metalGeomDesc;
-    auto metalASB = mDevice->CreateAccelerationStructure(asDesc);
-    metalASB.ASBuffer->SetName(L"Metal-BLAS");
-    asDesc.ScratchAccelerationStructureData = metalASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = metalASB.ASBuffer->GetGPUVirtualAddress();
-
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    D3D12_RAYTRACING_GEOMETRY_DESC lightSphereGeomDesc{};
-    lightSphereGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    lightSphereGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = lightSphereGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshLightSphere.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshLightSphere.vertexStride;
-        triangles.VertexCount = mMeshLightSphere.vertexCount;
-        triangles.IndexBuffer = mMeshLightSphere.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshLightSphere.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &lightSphereGeomDesc;
-    auto lightSphereASB = mDevice->CreateAccelerationStructure(asDesc);
-    lightSphereASB.ASBuffer->SetName(L"LightSphere-BLAS");
-    asDesc.ScratchAccelerationStructureData = lightSphereASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = lightSphereASB.ASBuffer->GetGPUVirtualAddress();
-
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    D3D12_RAYTRACING_GEOMETRY_DESC boxGeomDesc{};
-    boxGeomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    boxGeomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-    {
-        auto& triangles = boxGeomDesc.Triangles;
-        triangles.VertexBuffer.StartAddress = mMeshBox.vertexBuffer->GetGPUVirtualAddress();
-        triangles.VertexBuffer.StrideInBytes = mMeshBox.vertexStride;
-        triangles.VertexCount = mMeshBox.vertexCount;
-        triangles.IndexBuffer = mMeshBox.indexBuffer->GetGPUVirtualAddress();
-        triangles.IndexCount = mMeshBox.indexCount;
-        triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-        triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-    }
-
-    inputs.NumDescs = 1;
-    inputs.pGeometryDescs = &boxGeomDesc;
-    auto boxASB = mDevice->CreateAccelerationStructure(asDesc);
-    boxASB.ASBuffer->SetName(L"Box-BLAS");
-    asDesc.ScratchAccelerationStructureData = boxASB.scratchBuffer->GetGPUVirtualAddress();
-    asDesc.DestAccelerationStructureData = boxASB.ASBuffer->GetGPUVirtualAddress();
-
-    command->BuildRaytracingAccelerationStructure(
-        &asDesc, 0, nullptr);
-
-    std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(planeASB.ASBuffer.Get()));
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(sphereASB.ASBuffer.Get()));
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(boxASB.ASBuffer.Get()));
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(glassASB.ASBuffer.Get()));
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(lightSphereASB.ASBuffer.Get()));
-
-    command->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
-    command->Close();
-
-    mDevice->ExecuteCommandList(command);
-
-    // after exit this function,  local ASBs are destructed, so copy to member variables
-    mMeshStage.blas = planeASB.ASBuffer;
-    mMeshSphere.blas = sphereASB.ASBuffer;
-    mMeshOBJ0.blas = glassASB.ASBuffer;
-    mMeshOBJ1.blas = metalASB.ASBuffer;
-    mMeshLightSphere.blas = lightSphereASB.ASBuffer;
-    mMeshBox.blas = boxASB.ASBuffer;
-
-    // wait, cuz scratchBuffers are destructed after exit this function
-    mDevice->WaitForCompletePipe();
+    mMeshStage.createBLAS(mDevice, L"Plane-BLAS");
+    mMeshSphere.createBLAS(mDevice, L"Sphere-BLAS");
+    mMeshOBJ0.createBLAS(mDevice, L"Glass-BLAS");
+    mMeshOBJ1.createBLAS(mDevice, L"Metal-BLAS");
+    mMeshLightSphere.createBLAS(mDevice, L"LightSphere-BLAS");
+    mMeshBox.createBLAS(mDevice, L"Box-BLAS");
 }
 
 void DxrPhotonMapper::CreateSceneTLAS()

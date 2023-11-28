@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __APPINVOKER_H__
+#define __APPINVOKER_H__
 
 #ifndef WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
@@ -216,3 +217,5 @@ LRESULT CALLBACK AppInvoker::WindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM l
 }
 
 #endif//APP_INVOKER_IMPLEMENTATION
+
+#endif

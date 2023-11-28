@@ -98,6 +98,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
   <ItemGroup>
     <ClCompile Include="..\common\src\Camera.cpp" />
     <ClCompile Include="..\common\src\RenderDeviceDX12.cpp" />
+    <ClCompile Include="..\common\src\utility\OBJ.cpp" />
     <ClCompile Include="..\common\src\utility\Utility.cpp" />
     <ClCompile Include="AccelerationStructure.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
@@ -117,6 +118,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
     <ClInclude Include="..\common\include\AppBase.h" />
     <ClInclude Include="..\common\include\RenderDeviceDX12.h" />
     <ClInclude Include="..\common\include\AppInvoker.h" />
+    <ClInclude Include="..\common\include\utility\OBJ.h" />
     <ClInclude Include="..\common\include\utility\Utility.h" />
     <ClInclude Include="DxrPhotonMapper.h" />
     <ClInclude Include="resource.h" />

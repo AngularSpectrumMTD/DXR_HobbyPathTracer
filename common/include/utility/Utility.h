@@ -1,7 +1,9 @@
-﻿#pragma once
+﻿#ifndef __UTILITY_H__
+#define __UTILITY_H__
 
 #include <memory>
 #include <d3d12.h>
+#include <d3dx12.h>
 #include <wrl.h>
 #include <DirectXMath.h>
 
@@ -96,6 +98,7 @@ namespace utility {
 
     std::vector<char> CompileShaderAtRuntime(const std::filesystem::path& shaderFile);
 
+    utility::TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const std::wstring& fileName);
     HRESULT ReadDataFromFile(LPCWSTR filename, byte** dataPtr, u32* sizePtr);
 
     struct VertexPN {
@@ -165,6 +168,49 @@ namespace utility {
 
             shaderName = shaderName;
         }
+
+        void createBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* namePtr)
+        {
+            auto command = device->CreateCommandList();
+            dx12::AccelerationStructureBuffers ASBuffer;
+
+            D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC asDesc{};
+            D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs = asDesc.Inputs;
+            inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
+            inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
+
+            D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
+            geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
+            geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
+            {
+                auto& triangles = geomDesc.Triangles;
+                triangles.VertexBuffer.StartAddress = vertexBuffer->GetGPUVirtualAddress();
+                triangles.VertexBuffer.StrideInBytes = vertexStride;
+                triangles.VertexCount = vertexCount;
+                triangles.IndexBuffer = indexBuffer->GetGPUVirtualAddress();
+                triangles.IndexCount = indexCount;
+                triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+                triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
+            }
+
+            inputs.NumDescs = 1;
+            inputs.pGeometryDescs = &geomDesc;
+            ASBuffer = device->CreateAccelerationStructure(asDesc);
+            ASBuffer.ASBuffer->SetName(namePtr);
+            asDesc.ScratchAccelerationStructureData = ASBuffer.scratchBuffer->GetGPUVirtualAddress();
+            asDesc.DestAccelerationStructureData = ASBuffer.ASBuffer->GetGPUVirtualAddress();
+            command->BuildRaytracingAccelerationStructure(
+                &asDesc, 0, nullptr);
+
+            std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
+            uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(ASBuffer.ASBuffer.Get()));
+            command->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
+            command->Close();
+            device->ExecuteCommandList(command);
+
+            blas = ASBuffer.ASBuffer;
+            device->WaitForCompletePipe();
+        }
     };
 
     void CreatePlane(std::vector<VertexPN>& vertices, std::vector<u32>& indices, f32 size = 10.f);
@@ -184,3 +230,5 @@ namespace utility {
     void Replace(char searchChar, char replaceChar, char* bufferPtr);
     bool CreateMesh(const char* fileNamePtr, std::vector<VertexPN>& outVertices, std::vector<u32>& indices, XMFLOAT3 scale);
 }
+
+#endif

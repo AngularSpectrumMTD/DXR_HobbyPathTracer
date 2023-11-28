@@ -418,8 +418,8 @@ void DxrPhotonMapper::CreateRegularBuffer()
     CreateLuminanceMomentBuffer();
     CreateLuminanceVarianceBuffer();
     CreatePhotonMappingBuffer();
-    mGroundTex = LoadTextureFromFile(mStageTextureFileName);
-    mCubeMapTex = LoadTextureFromFile(mCubeMapTextureFileName);
+    mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
+    mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 }
 
 void DxrPhotonMapper::CreateConstantBuffer()

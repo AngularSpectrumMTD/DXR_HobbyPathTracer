@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __APPBASE_H__
+#define __APPBASE_H__
 
 #include <exception>
 #include <stdexcept>
@@ -76,5 +77,7 @@ private:
     u32 mHeight;
     std::wstring mTitle;
 };
+
+#endif
 
 
