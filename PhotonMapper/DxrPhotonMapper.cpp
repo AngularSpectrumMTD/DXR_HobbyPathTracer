@@ -48,9 +48,9 @@ void DxrPhotonMapper::Setup()
     mInverseMove = false;
     mIsUseTexture = false;
     mIsTargetGlass = true;
-    mStageTextureFileName = L"tileTex.png";
-    mCubeMapTextureFileName = L"ParisEquirec.png";
-    //mCubeMapTextureFileName = L"ForestEquirec.png";
+    mStageTextureFileName = L"model/tileTex.png";
+    mCubeMapTextureFileName = L"model/ParisEquirec.png";
+    //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
     mStageType = StageType_Plane;
 
@@ -62,21 +62,21 @@ void DxrPhotonMapper::Setup()
     {
     case  ModelType::ModelType_Crab:
     {
-        mOBJ0FileName = L"crab.obj";
+        mOBJ0FileName = L"model/crab.obj";
         mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
-        mOBJ0FileName = L"twistCube.obj";
+        mOBJ0FileName = L"model/twistCube.obj";
         mGlassObjYOfsset = -10;
         mGlassObjScale = XMFLOAT3(15, 15, 15);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
-        mOBJ0FileName = L"teapot.obj";
+        mOBJ0FileName = L"model/teapot.obj";
         mCausticsBoost *= 0.5;
         mGlassObjYOfsset = -15;
         mGlassObjScale = XMFLOAT3(8, 8, 8);
@@ -84,7 +84,7 @@ void DxrPhotonMapper::Setup()
     break;
     case  ModelType::ModelType_LikeWater:
     {
-        mOBJ0FileName = L"likeWater.obj";
+        mOBJ0FileName = L"model/likeWater.obj";
         mCausticsBoost *= 3;
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(4, 4, 4);
@@ -94,7 +94,7 @@ void DxrPhotonMapper::Setup()
     {
         mStageType = StageType_Box;
         mGlassRotateRange *= 2;
-        mOBJ0FileName = L"ocean.obj";
+        mOBJ0FileName = L"model/ocean.obj";
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
@@ -103,42 +103,42 @@ void DxrPhotonMapper::Setup()
     {
         mStageType = StageType_Box;
         mGlassRotateRange *= 2;
-        mOBJ0FileName = L"ocean2.obj";
+        mOBJ0FileName = L"model/ocean2.obj";
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
-        mOBJ0FileName = L"diamond.obj";
+        mOBJ0FileName = L"model/diamond.obj";
         mGlassObjYOfsset = -10;
         mGlassObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
-        mOBJ0FileName = L"skull.obj";
+        mOBJ0FileName = L"model/skull.obj";
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
-        mOBJ0FileName = L"crab.obj";
+        mOBJ0FileName = L"model/crab.obj";
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case  ModelType::ModelType_HorseStatue:
     {
-        mOBJ0FileName = L"horse_statue_Tri.obj";
+        mOBJ0FileName = L"model/horse_statue_Tri.obj";
         mGlassObjYOfsset = -10;
         mGlassObjScale = XMFLOAT3(350, 350, 350);
     }
     break;
     case  ModelType::ModelType_Dragon:
     {
-        mOBJ0FileName = L"dragon.obj";
+        mOBJ0FileName = L"model/dragon.obj";
         //mOBJ0FileName = L"san-miguel-low-poly.obj";
         mGlassObjYOfsset = -10;
         mGlassObjScale = XMFLOAT3(80, 80, 80);
@@ -146,7 +146,7 @@ void DxrPhotonMapper::Setup()
     break;
     case  ModelType::ModelType_Sponza:
     {
-        mOBJ0FileName = L"triangulateSponza.obj";
+        mOBJ0FileName = L"model/triangulateSponza.obj";
         mGlassObjYOfsset = 0;
         mGlassObjScale = XMFLOAT3(5, 5, 5);
     }
@@ -157,28 +157,28 @@ void DxrPhotonMapper::Setup()
     {
     case  ModelType::ModelType_Crab:
     {
-        mOBJ1FileName = L"crab.obj";
+        mOBJ1FileName = L"model/crab.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
-        mOBJ1FileName = L"twistCube.obj";
+        mOBJ1FileName = L"model/twistCube.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
-        mOBJ1FileName = L"teapot.obj";
+        mOBJ1FileName = L"model/teapot.obj";
         mMetalObjYOfsset = -40;
         mMetalObjScale = XMFLOAT3(10, 10, 10);
     }
     break;
     case  ModelType::ModelType_LikeWater:
     {
-        mOBJ1FileName = L"likeWater.obj";
+        mOBJ1FileName = L"model/likeWater.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(2, 4, 4);
     }
@@ -186,7 +186,7 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_Ocean:
     {
         mStageType = StageType_Box;
-        mOBJ1FileName = L"ocean.obj";
+        mOBJ1FileName = L"model/ocean.obj";
         mMetalObjYOfsset = 20;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
@@ -194,28 +194,28 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_Ocean2:
     {
         mStageType = StageType_Box;
-        mOBJ1FileName = L"ocean2.obj";
+        mOBJ1FileName = L"model/ocean2.obj";
         mMetalObjYOfsset = 20;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
-        mOBJ1FileName = L"diamond.obj";
+        mOBJ1FileName = L"model/diamond.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
-        mOBJ1FileName = L"skull.obj";
+        mOBJ1FileName = L"model/skull.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
-        mOBJ1FileName = L"crab.obj";
+        mOBJ1FileName = L"model/crab.obj";
         mMetalObjYOfsset = 10;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }

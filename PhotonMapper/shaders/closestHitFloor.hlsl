@@ -9,7 +9,7 @@ struct VertexPNT {
 
 StructuredBuffer<uint>   indexBuffer : register(t0, space1);
 StructuredBuffer<VertexPNT> vertexBuffer: register(t1, space1);
-Texture2D<float4> diffuse : register(t2, space1);
+Texture2D<float4> diffuseTex : register(t2, space1);
 
 VertexPNT GetVertex(TriangleIntersectionAttributes attrib)
 {
@@ -42,11 +42,11 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
     VertexPNT vtx = GetVertex(attrib);
     depthPositionNormalStore(payload, vtx.Normal);
 
-    float4 diffuseColor = diffuse.SampleLevel(gSampler, vtx.UV, 0.0);
+    float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
 
     if(!isUseTextureForStage())
     {
-        diffuseColor = float4(1, 1, 1 , 1);
+        diffuseTexColor = float4(1, 1, 1, 1);
     }
 
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -55,7 +55,7 @@ void floorClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
     const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
     float3 curEnergy = payload.energy;
     
-    payload.color += diffuseColor.xyz * curEnergy * photonIrradiance + diffuseColor.xyz * float3(0.1f, 0.1f, 0.1f);
+    payload.color += diffuseTexColor.xyz * curEnergy * photonIrradiance + diffuseTexColor.xyz * float3(0.1f, 0.1f, 0.1f);
 }
 
 [shader("closesthit")]

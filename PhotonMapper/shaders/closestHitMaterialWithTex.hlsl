@@ -1,40 +1,55 @@
 ﻿#include "photonGathering.hlsli"
 
-struct VertexPN {
+struct VertexPNT
+{
     float3 Position;
     float3 Normal;
+    float2 UV;
 };
 
 ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint>   indexBuffer : register(t0,space1);
-StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);
+StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
+Texture2D<float4> diffuseTex : register(t2, space1);
 
-VertexPN GetVertex(TriangleIntersectionAttributes attrib)
+VertexPNT GetVertex(TriangleIntersectionAttributes attrib)
 {
-    VertexPN v = (VertexPN)0;
-    uint start = PrimitiveIndex() * 3;
-    
+    VertexPNT v = (VertexPNT) 0;
+    uint start = PrimitiveIndex() * 3; // Triangle List.
+
     float3 positionTbl[3], normalTbl[3];
-    for (int i = 0; i < 3; ++i) {
+    float2 texcoordTbl[3];
+    for (int i = 0; i < 3; ++i)
+    {
         uint index = indexBuffer[start + i];
         positionTbl[i] = vertexBuffer[index].Position;
         normalTbl[i] = vertexBuffer[index].Normal;
+        texcoordTbl[i] = vertexBuffer[index].UV;
     }
-
     v.Position = ComputeInterpolatedAttributeF3(positionTbl, attrib.barys);
-    v.Normal = normalize(ComputeInterpolatedAttributeF3(normalTbl, attrib.barys));
+    v.Normal = ComputeInterpolatedAttributeF3(normalTbl, attrib.barys);
+    v.UV = ComputeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
+
+    v.Normal = normalize(v.Normal);
     return v;
 }
 
 [shader("closesthit")]
-void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
+void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
     if (isReachedRecursiveLimitPayload(payload)) {
         return;
     }
-    VertexPN vtx = GetVertex(attrib);
-
-    depthPositionNormalStore(payload, vtx.Normal);
+    VertexPNT vtx = GetVertex(attrib);
+    
+    float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+    
+    const bool isIgnoreHit = diffuseTexColor.a < 0.5;
+    
+    if (!isIgnoreHit)
+    {
+        depthPositionNormalStore(payload, vtx.Normal);
+    }
 
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -47,8 +62,13 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
         
     const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
-    payload.color += shading * curEnergy * photonIrradiance;
-    payload.energy = curEnergy;
+
+    if (!isIgnoreHit)
+    {
+        payload.color += (diffuseTexColor.rgb + shading) * curEnergy * photonIrradiance;
+        payload.energy = curEnergy;
+    }
+
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
     TraceRay(
@@ -63,13 +83,17 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 }
 
 [shader("closesthit")]
-void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
+void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersectionAttributes attrib)
 {
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
 
-    VertexPN vtx = GetVertex(attrib);
+    VertexPNT vtx = GetVertex(attrib);
+
+    float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+
+    const bool isIgnoreHit = diffuseTexColor.a < 0.5;
 
     uint instanceID = InstanceID();
 
@@ -82,8 +106,13 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     nextRay.Direction = 0.xxx;
     float3 curEnergy = payload.throughput;
     float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
-    payload.throughput = shading * curEnergy;
-    if (isPhotonStoreRequired(currentMaterial))
+
+    if (!isIgnoreHit)
+    {
+        payload.throughput = shading * curEnergy;
+    }
+        
+    if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
     {
         storePhoton(payload);
     }

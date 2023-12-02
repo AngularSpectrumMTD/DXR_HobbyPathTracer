@@ -66,9 +66,9 @@ void DxrPhotonMapper::CreateSphereLocalRootSignature()
         const u32 regSpace = 1;
         utility::RootSignatureCreater rsCreater;
         rsCreater.Clear();
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
-        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         mRsDefault = rsCreater.Create(mDevice, true, L"lrsDefault");
     }
 }

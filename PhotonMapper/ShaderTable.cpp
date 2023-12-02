@@ -109,11 +109,12 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    //The order here depends not on the shader but on the RootSignature created.
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -132,11 +133,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -156,11 +157,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -180,11 +181,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -332,11 +333,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -355,11 +356,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -379,11 +380,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;
@@ -403,11 +404,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
+                    recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
                     memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
                     recordStartPtr += sizeof(UINT64);
 
                     cbAddress += cbStride;

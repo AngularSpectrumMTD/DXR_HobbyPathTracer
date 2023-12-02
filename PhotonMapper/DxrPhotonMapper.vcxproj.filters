@@ -202,6 +202,9 @@
     <FxCompile Include="shaders\miss.hlsl">
       <Filter>ソース ファイル\shaders\Miss</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\closestHitMaterialWithTex.hlsl">
+      <Filter>ソース ファイル\shaders\ClosestHit</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxrPhotonMapper.rc">

@@ -147,7 +147,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
-    mOBJModel.OBJ_Load(mDevice, "triangulateSponza.obj", L"Sponza");
+    mOBJModel.OBJ_Load(mDevice, "model/triangulateSponza.obj", L"Sponza");
     mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
 
     s32 count = 0;

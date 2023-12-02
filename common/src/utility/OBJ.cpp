@@ -213,8 +213,10 @@ namespace utility {
 					{
 						mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 					}
-
-					mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+					wchar_t nameTex[60];
+					swprintf(nameTex, 60, L"model/%ls", StringToWString(mtl.TextureName).c_str());
+					//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+					mtl.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex);
 					//generate tex by this name
 				}
 			}
@@ -314,10 +316,10 @@ namespace utility {
 		for (auto& m : Material)
 		{
 			wchar_t nameVB[60];
-			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName));
+			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
 
 			wchar_t nameIB[60];
-			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName));
+			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
 
 			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 		}
@@ -371,7 +373,7 @@ namespace utility {
 		for (auto& m : Material)
 		{
 			wchar_t nameBLAS[60];
-			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName));
+			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName).c_str());
 
 			CreateBLAS(device, m, nameBLAS);
 		}
