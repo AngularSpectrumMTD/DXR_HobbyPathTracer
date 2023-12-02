@@ -100,7 +100,7 @@ void DxrPhotonMapper::CreateShaderTable()
          
             {
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
                 for (auto& instances : mSpheresNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
@@ -124,7 +124,7 @@ void DxrPhotonMapper::CreateShaderTable()
        
             {
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
                 for (auto& instances : mBoxesNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
@@ -147,7 +147,7 @@ void DxrPhotonMapper::CreateShaderTable()
          
             {
                 auto cbAddress = mOBJ0MaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
 
                 for (auto& instances : mOBJ0MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj0);
@@ -171,7 +171,7 @@ void DxrPhotonMapper::CreateShaderTable()
 
             {
                 auto cbAddress = mOBJ1MaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
 
                 for (auto& instances : mOBJ1MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj1);
@@ -324,7 +324,7 @@ void DxrPhotonMapper::CreateShaderTable()
           
             {
                 auto cbAddress = mNormalSphereMaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
                 for (auto& instances : mSpheresNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialSphere);
                     if (idPtr == nullptr) {
@@ -347,7 +347,7 @@ void DxrPhotonMapper::CreateShaderTable()
          
             {
                 auto cbAddress = mNormalBoxMaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
                 for (auto& instances : mBoxesNormalTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::DefaultMaterialBox);
                     if (idPtr == nullptr) {
@@ -370,7 +370,7 @@ void DxrPhotonMapper::CreateShaderTable()
           
             {
                 auto cbAddress = mOBJ0MaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
 
                 for (auto& instances : mOBJ0MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj0);
@@ -394,7 +394,7 @@ void DxrPhotonMapper::CreateShaderTable()
 
             {
                 auto cbAddress = mOBJ1MaterialCB->GetGPUVirtualAddress();
-                auto cbStride = sizeof(MaterialParam);
+                auto cbStride = sizeof(utility::MaterialParam);
 
                 for (auto& instances : mOBJ1MaterialTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Obj1);

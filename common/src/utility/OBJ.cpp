@@ -4,11 +4,11 @@
 namespace utility {
 	OBJ_MODEL::OBJ_MODEL() {
 	}
-	OBJ_MODEL::OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName, const wchar_t* modelNamePtr) {
-		OBJ_Load(device, FileName, modelNamePtr);
+	OBJ_MODEL::OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
+		OBJ_Load(device, folderPath, FileName, modelNamePtr);
 	}
 
-	bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName, const wchar_t* modelNamePtr) {
+	bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
 		vec4i Face[3];
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
@@ -17,8 +17,11 @@ namespace utility {
 		s32 matID = 0;
 		char key[255] = { 0 };
 
+		char fileName[60];
+		sprintf_s(fileName, "%s/%s", folderPath, FileName);
+
 		FILE* fp = NULL;
-		fopen_s(&fp, FileName, "rt");
+		fopen_s(&fp, fileName, "rt");
 
 		fseek(fp, SEEK_SET, 0);
 
@@ -33,7 +36,7 @@ namespace utility {
 
 			if (strcmp(key, "mtllib") == 0) {
 				fscanf_s(fp, "%s ", key, sizeof(key));
-				LoadMaterialFromFile(device, key);
+				LoadMaterialFromFile(device, folderPath, key);
 			}
 			if (strcmp(key, "v") == 0) {
 				fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
@@ -134,9 +137,11 @@ namespace utility {
 		return wstr;
 	}
 
-	bool OBJ_MODEL::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName) {
+	bool OBJ_MODEL::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName) {
 		FILE* fp = NULL;
-		fopen_s(&fp, FileName, "rt");
+		char fileName[60];
+		sprintf_s(fileName, "%s/%s", folderPath, FileName);
+		fopen_s(&fp, fileName, "rt");
 		char key[255] = { 0 };
 		bool flag = false;
 		bool flag2 = false;
@@ -214,7 +219,7 @@ namespace utility {
 						mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 					}
 					wchar_t nameTex[60];
-					swprintf(nameTex, 60, L"model/%ls", StringToWString(mtl.TextureName).c_str());
+					swprintf(nameTex, 60, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mtl.TextureName).c_str());
 					//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
 					mtl.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex);
 					//generate tex by this name
@@ -230,6 +235,85 @@ namespace utility {
 
 		return true;
 	}
+
+	void OBJ_MODEL::CreateMeshBuffers(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* modelNamePtr)
+	{
+		for (auto& m : Material)
+		{
+			wchar_t nameVB[60];
+			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
+
+			wchar_t nameIB[60];
+			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
+
+			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
+
+			MaterialParam mparams;
+			mparams.albedo = XMVectorSet(m.Reflection4Color.diffuse.x, m.Reflection4Color.diffuse.y, m.Reflection4Color.diffuse.z, m.Reflection4Color.diffuse.w);
+			mparams.metallic = 0;// m.Shininess;
+			mparams.roughness = 1 - mparams.metallic;
+			mparams.transRatio = 0;
+			mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+			mparams.specular = max(max(max(m.Reflection4Color.specular.x, m.Reflection4Color.specular.y), m.Reflection4Color.specular.z), m.Reflection4Color.specular.w);
+			m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
+			device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
+		}
+	}
+
+	void OBJ_MODEL::CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr)
+	{
+		auto command = device->CreateCommandList();
+		dx12::AccelerationStructureBuffers ASBuffer;
+
+		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC asDesc{};
+		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs = asDesc.Inputs;
+		inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
+		inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
+
+		D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
+		geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
+		geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
+		{
+			auto& triangles = geomDesc.Triangles;
+			triangles.VertexBuffer.StartAddress = mat.TriangleVertexBuffer->GetGPUVirtualAddress();
+			triangles.VertexBuffer.StrideInBytes = mat.TriangleVertexStride;
+			triangles.VertexCount = mat.TriangleVertexCount;
+			triangles.IndexBuffer = mat.TriangleIndexBuffer->GetGPUVirtualAddress();
+			triangles.IndexCount = mat.TriangleIndexCount;
+			triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
+		}
+
+		inputs.NumDescs = 1;
+		inputs.pGeometryDescs = &geomDesc;
+		ASBuffer = device->CreateAccelerationStructure(asDesc);
+		ASBuffer.ASBuffer->SetName(blaslNamePtr);
+		asDesc.ScratchAccelerationStructureData = ASBuffer.scratchBuffer->GetGPUVirtualAddress();
+		asDesc.DestAccelerationStructureData = ASBuffer.ASBuffer->GetGPUVirtualAddress();
+		command->BuildRaytracingAccelerationStructure(
+			&asDesc, 0, nullptr);
+
+		std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
+		uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(ASBuffer.ASBuffer.Get()));
+		command->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
+		command->Close();
+		device->ExecuteCommandList(command);
+
+		mat.blas = ASBuffer.ASBuffer;
+		device->WaitForCompletePipe();
+	}
+
+	void OBJ_MODEL::CreateBLASs(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	{
+		for (auto& m : Material)
+		{
+			wchar_t nameBLAS[60];
+			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName).c_str());
+
+			CreateBLAS(device, m, nameBLAS);
+		}
+	}
+
 
 	u32 OBJ_MODEL::getTriangleVertexTblCount()
 	{
@@ -309,73 +393,5 @@ namespace utility {
 			count += m.QuadrangleUVIDTbl.size();
 		}
 		return count;
-	}
-
-	void OBJ_MODEL::CreateMeshBuffers(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* modelNamePtr)
-	{
-		for (auto& m : Material)
-		{
-			wchar_t nameVB[60];
-			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
-
-			wchar_t nameIB[60];
-			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
-
-			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
-		}
-	}
-
-	void OBJ_MODEL::CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr)
-	{
-		auto command = device->CreateCommandList();
-		dx12::AccelerationStructureBuffers ASBuffer;
-
-		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC asDesc{};
-		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs = asDesc.Inputs;
-		inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
-		inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
-
-		D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
-		geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-		geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
-		{
-			auto& triangles = geomDesc.Triangles;
-			triangles.VertexBuffer.StartAddress = mat.TriangleVertexBuffer->GetGPUVirtualAddress();
-			triangles.VertexBuffer.StrideInBytes = mat.TriangleVertexStride;
-			triangles.VertexCount = mat.TriangleVertexCount;
-			triangles.IndexBuffer = mat.TriangleIndexBuffer->GetGPUVirtualAddress();
-			triangles.IndexCount = mat.TriangleIndexCount;
-			triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-			triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
-		}
-
-		inputs.NumDescs = 1;
-		inputs.pGeometryDescs = &geomDesc;
-		ASBuffer = device->CreateAccelerationStructure(asDesc);
-		ASBuffer.ASBuffer->SetName(blaslNamePtr);
-		asDesc.ScratchAccelerationStructureData = ASBuffer.scratchBuffer->GetGPUVirtualAddress();
-		asDesc.DestAccelerationStructureData = ASBuffer.ASBuffer->GetGPUVirtualAddress();
-		command->BuildRaytracingAccelerationStructure(
-			&asDesc, 0, nullptr);
-
-		std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
-		uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(ASBuffer.ASBuffer.Get()));
-		command->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
-		command->Close();
-		device->ExecuteCommandList(command);
-
-		mat.blas = ASBuffer.ASBuffer;
-		device->WaitForCompletePipe();
-	}
-
-	void OBJ_MODEL::CreateBLASs(std::unique_ptr<dx12::RenderDeviceDX12>& device)
-	{
-		for (auto& m : Material)
-		{
-			wchar_t nameBLAS[60];
-			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName).c_str());
-
-			CreateBLAS(device, m, nameBLAS);
-		}
 	}
 }

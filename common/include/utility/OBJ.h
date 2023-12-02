@@ -15,6 +15,17 @@ namespace utility {
 		DirectX::XMFLOAT4 specular;
 	};
 
+	struct MaterialParam
+	{
+		DirectX::XMVECTOR albedo;
+		f32 metallic;
+		f32 roughness;
+		f32 specular;
+		f32 transRatio;
+		DirectX::XMVECTOR transColor;
+		DirectX::XMVECTOR emission;
+	};
+
 	struct UV {
 		f32 u;
 		f32 v;
@@ -55,11 +66,12 @@ namespace utility {
 		dx12::Descriptor descriptorTriangleIB;
 		std::wstring shaderName;
 		ComPtr<ID3D12Resource> blas;
+		ComPtr<ID3D12Resource> materialCB;
 	};
 
 	class OBJ_MODEL {
 	protected:
-		bool LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName);
+		bool LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName);
 		vector <MATERIAL> Material;
 		void CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName)
 		{
@@ -100,8 +112,8 @@ namespace utility {
 		void CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr);
 	public:
 		OBJ_MODEL();
-		OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName, const wchar_t* modelNamePtr);
-		bool OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* FileName, const wchar_t* modelNamePtr);
+		OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
+		bool OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
 		u32 getTriangleVertexTblCount();
 		u32 getQuadrangleVertexTblCount();
 		u32 getTriangleVertexIDTblCount();

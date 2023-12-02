@@ -147,7 +147,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
-    mOBJModel.OBJ_Load(mDevice, "model/triangulateSponza.obj", L"Sponza");
+    mOBJModel.OBJ_Load(mDevice, "model", "triangulateSponza.obj", L"Sponza");
     mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
 
     s32 count = 0;
@@ -228,7 +228,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         XMVectorSet(0.5f, 0.5f, 0.4f, 0.0f),
     };
 
-    MaterialParam defaultMaterial{};
+    utility::MaterialParam defaultMaterial{};
     defaultMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     defaultMaterial.metallic = 0;//blend diffuse specular at specTrans == 0
     defaultMaterial.roughness = 0;
@@ -289,19 +289,19 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         mMaterialParam0 = material;
     }
 
-    auto bufferSize = sizeof(MaterialParam) * mNormalSphereMaterialTbl.size();
+    auto bufferSize = sizeof(utility::MaterialParam) * mNormalSphereMaterialTbl.size();
     mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalSphereMaterialCB.Get(), mNormalSphereMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mNormalBoxMaterialTbl.size();
+    bufferSize = sizeof(utility::MaterialParam) * mNormalBoxMaterialTbl.size();
     mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mOBJ1MaterialTbl.size();
+    bufferSize = sizeof(utility::MaterialParam) * mOBJ1MaterialTbl.size();
     mOBJ1MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mOBJ1MaterialCB.Get(), mOBJ1MaterialTbl.data(), bufferSize);
 
-    bufferSize = sizeof(MaterialParam) * mOBJ0MaterialTbl.size();
+    bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
     mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mOBJ0MaterialCB.Get(), mOBJ0MaterialTbl.data(), bufferSize);
 }
