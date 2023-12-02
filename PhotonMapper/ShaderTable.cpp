@@ -7,14 +7,15 @@ void DxrPhotonMapper::CreateShaderTable()
         const auto ShaderRecordAlignment = D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT;
         u32 raygenRecordSize = 0;
         raygenRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-        raygenRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//RWTexture2D<float4> gOutput: register(u0);
+        //raygenRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//RWTexture2D<float4> gOutput: register(u0);
         raygenRecordSize = utility::RoundUp(raygenRecordSize, ShaderRecordAlignment);
 
         u32 hitgroupRecordSize = 0;
         hitgroupRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//constant buffer
-        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//StructuredBuffer<u32>   indexBuffer : register(t0, space1);
-        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);//StructuredBuffer<VertexPNT> vertexBuffer: register(t1, space1);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize = utility::RoundUp(hitgroupRecordSize, ShaderRecordAlignment);
 
         u32 missRecordSize = 0;
@@ -229,13 +230,15 @@ void DxrPhotonMapper::CreateShaderTable()
 
     //Photon
     {
-        const auto ShaderRecordAlignment = D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT;\
+        const auto ShaderRecordAlignment = D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT;
         u32 raygenRecordSize = 0;
-        raygenRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;\
+        raygenRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
         raygenRecordSize = utility::RoundUp(raygenRecordSize, ShaderRecordAlignment);
         
         u32 hitgroupRecordSize = 0;
         hitgroupRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize = utility::RoundUp(hitgroupRecordSize, ShaderRecordAlignment);

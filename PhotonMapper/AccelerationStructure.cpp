@@ -147,6 +147,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
+    mOBJModel.OBJ_Load(mDevice, "triangulateSponza.obj", L"Sponza");
+    mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
+
     s32 count = 0;
     std::mt19937 mt;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION;
@@ -305,12 +308,13 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
 void DxrPhotonMapper::CreateSceneBLAS()
 {
-    mMeshStage.createBLAS(mDevice, L"Plane-BLAS");
-    mMeshSphere.createBLAS(mDevice, L"Sphere-BLAS");
-    mMeshOBJ0.createBLAS(mDevice, L"Glass-BLAS");
-    mMeshOBJ1.createBLAS(mDevice, L"Metal-BLAS");
-    mMeshLightSphere.createBLAS(mDevice, L"LightSphere-BLAS");
-    mMeshBox.createBLAS(mDevice, L"Box-BLAS");
+    mMeshStage.CreateBLAS(mDevice, L"Plane-BLAS");
+    mMeshSphere.CreateBLAS(mDevice, L"Sphere-BLAS");
+    mMeshOBJ0.CreateBLAS(mDevice, L"Glass-BLAS");
+    mMeshOBJ1.CreateBLAS(mDevice, L"Metal-BLAS");
+    mMeshLightSphere.CreateBLAS(mDevice, L"LightSphere-BLAS");
+    mMeshBox.CreateBLAS(mDevice, L"Box-BLAS");
+    mOBJModel.CreateBLASs(mDevice);
 }
 
 void DxrPhotonMapper::CreateSceneTLAS()
@@ -318,7 +322,6 @@ void DxrPhotonMapper::CreateSceneTLAS()
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
     SetupMeshInfo(instanceDescs);
 
-    ComPtr<ID3D12Resource> instanceDescBuffer;
     size_t sizeOfInstanceDescs = instanceDescs.size() * sizeof(D3D12_RAYTRACING_INSTANCE_DESC);
 
     mInstanceDescsBuffer = mDevice->CreateBuffer(sizeOfInstanceDescs, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_HEAP_TYPE_UPLOAD, nullptr, L"InstanceDescsBuffer");
@@ -363,7 +366,6 @@ void DxrPhotonMapper::UpdateSceneTLAS()
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
     SetupMeshInfo(instanceDescs);
 
-    ComPtr<ID3D12Resource> instanceDescBuffer;
     size_t sizeOfInstanceDescs = instanceDescs.size() * sizeof(D3D12_RAYTRACING_INSTANCE_DESC);
     mDevice->ImmediateBufferUpdateHostVisible(mInstanceDescsBuffer.Get(), instanceDescs.data(), sizeOfInstanceDescs);
 

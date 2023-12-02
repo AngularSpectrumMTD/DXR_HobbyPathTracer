@@ -275,6 +275,7 @@ private:
 
     void InitializeCamera();
 
+    void Setup();
     void SetupMeshMaterialAndPos();
     void CreateSceneBLAS();
     void CreateSceneTLAS();
@@ -337,7 +338,7 @@ private:
     std::wstring mStageTextureFileName;
     std::wstring mCubeMapTextureFileName;
 
-    OBJ_MODEL mOBJModel;
+    utility::OBJ_MODEL mOBJModel;
 
     //ObjectAttributes of TLAS
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;

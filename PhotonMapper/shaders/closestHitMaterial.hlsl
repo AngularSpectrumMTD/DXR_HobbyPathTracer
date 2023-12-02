@@ -5,9 +5,9 @@ struct VertexPN {
     float3 Normal;
 };
 
-ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint>   indexBuffer : register(t0,space1);
-StructuredBuffer<VertexPN>  vertexBuffer : register(t1,space1);
+StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);
+ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 
 VertexPN GetVertex(TriangleIntersectionAttributes attrib)
 {

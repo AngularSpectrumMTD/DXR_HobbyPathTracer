@@ -20,6 +20,10 @@ DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height,
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
 mNormalSphereMaterialTbl()
 {
+}
+
+void DxrPhotonMapper::Setup()
+{
     mIntenceBoost = 10000;
     mGatherRadius = 0.25f;
     mGatherBlockRange = 1;
@@ -27,7 +31,7 @@ mNormalSphereMaterialTbl()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f;mLightPosY = 120;mLightPosZ = -14;
+    mLightPosX = -5.f; mLightPosY = 120; mLightPosZ = -14;
     mLightRange = 0.03f;
     mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
     mPhi = 459; mTheta = 276;
@@ -50,103 +54,103 @@ mNormalSphereMaterialTbl()
 
     mStageType = StageType_Plane;
 
-   mGlassModelType = ModelType::ModelType_Dragon;
-   //mGlassModelType = ModelType::ModelType_Sponza;
-   mMetalModelType = ModelType::ModelType_Teapot;
+    mGlassModelType = ModelType::ModelType_Dragon;
+    //mGlassModelType = ModelType::ModelType_Sponza;
+    mMetalModelType = ModelType::ModelType_Teapot;
 
     switch (mGlassModelType)
     {
-        case  ModelType::ModelType_Crab:
-        {
-            mOBJ0FileName = L"crab.obj";
-            mGlassObjYOfsset = 5;
-            mGlassObjScale = XMFLOAT3(12, 12, 12);
-        }
-        break;
-        case ModelType::ModelType_TwistCube:
-        {
-            mOBJ0FileName = L"twistCube.obj";
-            mGlassObjYOfsset = -10;
-            mGlassObjScale = XMFLOAT3(15, 15, 15);
-        }
-        break;
-        case ModelType::ModelType_Teapot:
-        {
-            mOBJ0FileName = L"teapot.obj";
-            mCausticsBoost *= 0.5;
-            mGlassObjYOfsset = -15;
-            mGlassObjScale = XMFLOAT3(8, 8, 8);
-        }
-        break;
-        case  ModelType::ModelType_LikeWater:
-        {
-            mOBJ0FileName = L"likeWater.obj";
-            mCausticsBoost *= 3;
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(4, 4, 4);
-        }
-        break;
-        case  ModelType::ModelType_Ocean:
-        {
-            mStageType = StageType_Box;
-            mGlassRotateRange *= 2;
-            mOBJ0FileName = L"ocean.obj";
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
-        }
-        break;
-        case  ModelType::ModelType_Ocean2:
-        {
-            mStageType = StageType_Box;
-            mGlassRotateRange *= 2;
-            mOBJ0FileName = L"ocean2.obj";
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
-        }
-        break;
-        case ModelType::ModelType_Diamond:
-        {
-            mOBJ0FileName = L"diamond.obj";
-            mGlassObjYOfsset = -10;
-            mGlassObjScale = XMFLOAT3(20, 20, 20);
-        }
-        break;
-        case ModelType::ModelType_Skull:
-        {
-            mOBJ0FileName = L"skull.obj";
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(30, 30, 30);
-        }
-        break;
-        default:
-        {
-            mOBJ0FileName = L"crab.obj";
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(12, 12, 12);
-        }
-        break;
-        case  ModelType::ModelType_HorseStatue:
-        {
-            mOBJ0FileName = L"horse_statue_Tri.obj";
-            mGlassObjYOfsset = -10;
-            mGlassObjScale = XMFLOAT3(350, 350, 350);
-        }
-        break;
-        case  ModelType::ModelType_Dragon:
-        {
-            mOBJ0FileName = L"dragon.obj";
-            //mOBJ0FileName = L"san-miguel-low-poly.obj";
-            mGlassObjYOfsset = -10;
-            mGlassObjScale = XMFLOAT3(80, 80, 80);
-        }
-        break;
-        case  ModelType::ModelType_Sponza:
-        {
-            mOBJ0FileName = L"triangulateSponza.obj";
-            mGlassObjYOfsset = 0;
-            mGlassObjScale = XMFLOAT3(5, 5, 5);
-        }
-        break;
+    case  ModelType::ModelType_Crab:
+    {
+        mOBJ0FileName = L"crab.obj";
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(12, 12, 12);
+    }
+    break;
+    case ModelType::ModelType_TwistCube:
+    {
+        mOBJ0FileName = L"twistCube.obj";
+        mGlassObjYOfsset = -10;
+        mGlassObjScale = XMFLOAT3(15, 15, 15);
+    }
+    break;
+    case ModelType::ModelType_Teapot:
+    {
+        mOBJ0FileName = L"teapot.obj";
+        mCausticsBoost *= 0.5;
+        mGlassObjYOfsset = -15;
+        mGlassObjScale = XMFLOAT3(8, 8, 8);
+    }
+    break;
+    case  ModelType::ModelType_LikeWater:
+    {
+        mOBJ0FileName = L"likeWater.obj";
+        mCausticsBoost *= 3;
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(4, 4, 4);
+    }
+    break;
+    case  ModelType::ModelType_Ocean:
+    {
+        mStageType = StageType_Box;
+        mGlassRotateRange *= 2;
+        mOBJ0FileName = L"ocean.obj";
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+    }
+    break;
+    case  ModelType::ModelType_Ocean2:
+    {
+        mStageType = StageType_Box;
+        mGlassRotateRange *= 2;
+        mOBJ0FileName = L"ocean2.obj";
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+    }
+    break;
+    case ModelType::ModelType_Diamond:
+    {
+        mOBJ0FileName = L"diamond.obj";
+        mGlassObjYOfsset = -10;
+        mGlassObjScale = XMFLOAT3(20, 20, 20);
+    }
+    break;
+    case ModelType::ModelType_Skull:
+    {
+        mOBJ0FileName = L"skull.obj";
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(30, 30, 30);
+    }
+    break;
+    default:
+    {
+        mOBJ0FileName = L"crab.obj";
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(12, 12, 12);
+    }
+    break;
+    case  ModelType::ModelType_HorseStatue:
+    {
+        mOBJ0FileName = L"horse_statue_Tri.obj";
+        mGlassObjYOfsset = -10;
+        mGlassObjScale = XMFLOAT3(350, 350, 350);
+    }
+    break;
+    case  ModelType::ModelType_Dragon:
+    {
+        mOBJ0FileName = L"dragon.obj";
+        //mOBJ0FileName = L"san-miguel-low-poly.obj";
+        mGlassObjYOfsset = -10;
+        mGlassObjScale = XMFLOAT3(80, 80, 80);
+    }
+    break;
+    case  ModelType::ModelType_Sponza:
+    {
+        mOBJ0FileName = L"triangulateSponza.obj";
+        mGlassObjYOfsset = 0;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
+    }
+    break;
     }
 
     switch (mMetalModelType)
@@ -218,9 +222,9 @@ mNormalSphereMaterialTbl()
     break;
     }
 
-   WCHAR assetsPath[512];
-   GetAssetsPath(assetsPath, _countof(assetsPath));
-   mAssetPath = assetsPath;
+    WCHAR assetsPath[512];
+    GetAssetsPath(assetsPath, _countof(assetsPath));
+    mAssetPath = assetsPath;
 }
 
 void DxrPhotonMapper::Initialize()
@@ -233,8 +237,7 @@ void DxrPhotonMapper::Initialize()
 
     if ((hr == S_OK) || (hr == S_FALSE))
     {
-        //mOBJModel.OBJ_Load(mDevice, "triangulateSponza.obj");
-
+        Setup();
         CreateRegularBuffer();
         CreateConstantBuffer();
         CreateAccelerationStructure();

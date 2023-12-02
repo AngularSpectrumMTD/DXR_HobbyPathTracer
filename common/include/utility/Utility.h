@@ -169,7 +169,7 @@ namespace utility {
             shaderName = shaderName;
         }
 
-        void createBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* namePtr)
+        void CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* namePtr)
         {
             auto command = device->CreateCommandList();
             dx12::AccelerationStructureBuffers ASBuffer;
