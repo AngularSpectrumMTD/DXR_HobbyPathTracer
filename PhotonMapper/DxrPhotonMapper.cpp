@@ -41,7 +41,8 @@ void DxrPhotonMapper::Setup()
     mGlassRotateRange = 4;
     mCausticsBoost = 7;
     mIsMoveModel = false;
-    mIsApplyCaustics = true;
+    //mIsApplyCaustics = true;
+    mIsApplyCaustics = false;
     mIsUseDenoise = true;
     mIsDebug = false;
     mVisualizeLightRange = true;

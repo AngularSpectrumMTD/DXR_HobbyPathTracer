@@ -52,8 +52,8 @@ namespace utility {
 			}
 			if (strcmp(key, "usemtl") == 0) {
 				fscanf_s(fp, "%s ", key, sizeof(key));
-				for (s32 i = 0; i < (signed)Material.size(); i++) {
-					if (strcmp(key, Material[i].MaterialName.c_str()) == 0)
+				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
+					if (strcmp(key, MaterialTbl[i].MaterialName.c_str()) == 0)
 					{
 						matID = i;
 					}
@@ -71,70 +71,85 @@ namespace utility {
 					&Face[0].w, &Face[1].w, &Face[2].w);
 				//Triangle
 				if ((Face[0].w == -1) && (Face[1].w == -1) && (Face[2].w == -1)) {
-					Material[matID].TriangleVertexIDTbl.push_back(Face[0].x - 1);
-					Material[matID].TriangleVertexIDTbl.push_back(Face[0].y - 1);
-					Material[matID].TriangleVertexIDTbl.push_back(Face[0].z - 1);
-					Material[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
-					Material[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
-					Material[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
-					Material[matID].TriangleNormalIDTbl.push_back(Face[2].x - 1);
-					Material[matID].TriangleNormalIDTbl.push_back(Face[2].y - 1);
-					Material[matID].TriangleNormalIDTbl.push_back(Face[2].z - 1);
+					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].x - 1);
+					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].y - 1);
+					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].z - 1);
+					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
+					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
+					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
+					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].x - 1);
+					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].y - 1);
+					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].z - 1);
 				}
 				else {//Rectangle
-					Material[matID].QuadrangleVertexIDTbl.push_back(Face[0].x - 1);
-					Material[matID].QuadrangleVertexIDTbl.push_back(Face[0].y - 1);
-					Material[matID].QuadrangleVertexIDTbl.push_back(Face[0].z - 1);
-					Material[matID].QuadrangleVertexIDTbl.push_back(Face[0].w - 1);
-					Material[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
-					Material[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
-					Material[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
-					Material[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
-					Material[matID].QuadrangleNormalIDTbl.push_back(Face[2].x - 1);
-					Material[matID].QuadrangleNormalIDTbl.push_back(Face[2].y - 1);
-					Material[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
-					Material[matID].QuadrangleNormalIDTbl.push_back(Face[2].w - 1);
+					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].x - 1);
+					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].y - 1);
+					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].z - 1);
+					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].w - 1);
+					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
+					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
+					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
+					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
+					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].x - 1);
+					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].y - 1);
+					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
+					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].w - 1);
 				}
 			}
 		}
-		for (s32 j = 0; j < (signed)Material.size(); j++) {
-			for (s32 i = 0; i < (signed)Material[j].TriangleVertexIDTbl.size(); i++) {
+
+		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
 				utility::VertexPNT Tri;
-				Tri.Position = Vertex[Material[j].TriangleVertexIDTbl[i]];
-				Tri.Normal = Normal[Material[j].TriangleNormalIDTbl[i]];
-				Tri.UV = uv[Material[j].TriangleUVIDTbl[i]];
-				Material[j].TriangleVertexTbl.push_back(Tri);
+				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
+				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
+				Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
+				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
 			}
-			for (s32 i = 0; i < (signed)Material[j].QuadrangleVertexIDTbl.size(); i++) {
+			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
 				utility::VertexPNT Quad;
-				Quad.Position = Vertex[Material[j].QuadrangleVertexIDTbl[i]];
-				Quad.Normal = Normal[Material[j].QuadrangleNormalIDTbl[i]];
-				Quad.UV = uv[Material[j].QuadrangleUVIDTbl[i]];
-				Material[j].QuadrangleVertexTbl.push_back(Quad);
+				Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
+				Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
+				Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
 			}
-			/*Material[j].TriangleVertexIDTbl.clear();
-			Material[j].TriangleNormalIDTbl.clear();
-			Material[j].TriangleUVIDTbl.clear();
-			Material[j].QuadrangleVertexIDTbl.clear();
-			Material[j].QuadrangleNormalIDTbl.clear();
-			Material[j].QuadrangleUVIDTbl.clear();*/
 		}
+
+		//No Indexing
+		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+			MaterialTbl[j].TriangleVertexIDTbl.clear();
+			MaterialTbl[j].TriangleNormalIDTbl.clear();
+			MaterialTbl[j].TriangleUVIDTbl.clear();
+
+			MaterialTbl[j].QuadrangleVertexIDTbl.clear();
+			MaterialTbl[j].QuadrangleNormalIDTbl.clear();
+			MaterialTbl[j].QuadrangleUVIDTbl.clear();
+
+			u32 count = 0;
+			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {
+				MaterialTbl[j].TriangleVertexIDTbl.push_back(count);
+				MaterialTbl[j].TriangleNormalIDTbl.push_back(count);
+				MaterialTbl[j].TriangleUVIDTbl.push_back(count);
+				count++;
+			}
+			count = 0;
+			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexTbl.size(); i++) {
+				MaterialTbl[j].QuadrangleVertexIDTbl.push_back(count);
+				MaterialTbl[j].QuadrangleNormalIDTbl.push_back(count);
+				MaterialTbl[j].QuadrangleUVIDTbl.push_back(count);
+				count++;
+			}
+		}
+
 		Vertex.clear();
 		Normal.clear();
 		uv.clear();
 		return true;
 	}
 
-	std::wstring StringToWString(std::string str)
+	vector<MATERIAL> OBJ_MODEL::getMaterialList() const
 	{
-		const int bufSize = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, (wchar_t*)NULL, 0);
-		wchar_t* WCSPtr = new wchar_t[bufSize];
-
-		MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, WCSPtr, bufSize);
-
-		std::wstring wstr(WCSPtr, WCSPtr + bufSize - 1);
-		delete[] WCSPtr;
-		return wstr;
+		return MaterialTbl;
 	}
 
 	bool OBJ_MODEL::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName) {
@@ -168,7 +183,7 @@ namespace utility {
 			fscanf_s(fp, "%s ", key, sizeof(key));
 			if (strcmp(key, "newmtl") == 0)
 			{
-				if (flag) { Material.push_back(mtl); mtl.TexID = 0; }
+				if (flag) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
 				flag = true;
 				fscanf_s(fp, "%s ", key, sizeof(key));
 				mtl.MaterialName = key;
@@ -197,14 +212,14 @@ namespace utility {
 			if (strcmp(key, "map_Kd") == 0)//only use map_Kd
 			{
 				fscanf_s(fp, "%s ", key, sizeof(key));
-				for (s32 i = 0; i < (signed)Material.size(); i++) {
-					if (strcmp(key, Material[i].TextureName.c_str()) == 0) {
+				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
+					if (strcmp(key, MaterialTbl[i].TextureName.c_str()) == 0) {
 						flag2 = true;
-						mtl.TexID = Material[i].TexID;
+						mtl.TexID = MaterialTbl[i].TexID;
 						break;
 					}
 				}
-				if (flag2) {
+				if (false) {
 				}
 				else {
 					mtl.TextureName = key;
@@ -230,15 +245,57 @@ namespace utility {
 
 		if (flag)
 		{
-			Material.push_back(mtl);
+			MaterialTbl.push_back(mtl);
 		}
 
 		return true;
 	}
 
+	void OBJ_MODEL::CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName)
+	{
+		u32 ibStride = u32(sizeof(u32)), vbStride = u32(sizeof(utility::VertexPNT));
+		const auto flags = D3D12_RESOURCE_FLAG_NONE;
+		const auto heapType = D3D12_HEAP_TYPE_DEFAULT;
+
+		auto vbsize = vbStride * mat.TriangleVertexTbl.size();
+		auto ibsize = ibStride * mat.TriangleVertexIDTbl.size();
+		mat.TriangleVertexBuffer = device->CreateBuffer(vbsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexTbl.data(), vbName);
+		mat.TriangleIndexBuffer = device->CreateBuffer(ibsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexIDTbl.data(), ibName);
+		mat.TriangleVertexCount = u32(mat.TriangleVertexTbl.size());
+		mat.TriangleIndexCount = u32(mat.TriangleVertexIDTbl.size());
+		mat.TriangleVertexStride = vbStride;
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDescVB{};
+		srvDescVB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDescVB.Format = DXGI_FORMAT_UNKNOWN;
+		srvDescVB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDescVB.Buffer.NumElements = mat.TriangleVertexCount;
+		srvDescVB.Buffer.FirstElement = 0;
+		srvDescVB.Buffer.StructureByteStride = vbStride;
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDescIB{};
+		srvDescIB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDescIB.Format = DXGI_FORMAT_UNKNOWN;
+		srvDescIB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDescIB.Buffer.NumElements = mat.TriangleIndexCount;
+		srvDescIB.Buffer.FirstElement = 0;
+		srvDescIB.Buffer.StructureByteStride = ibStride;
+
+		mat.descriptorTriangleVB = device->CreateShaderResourceView(mat.TriangleVertexBuffer.Get(), &srvDescVB);
+		mat.descriptorTriangleIB = device->CreateShaderResourceView(mat.TriangleIndexBuffer.Get(), &srvDescIB);
+
+		mat.shaderName = shaderName;
+	}
+
 	void OBJ_MODEL::CreateMeshBuffers(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* modelNamePtr)
 	{
-		for (auto& m : Material)
+		u32 count = 0;
+		//for (auto& m : MaterialTbl)
+		//{
+		//	m = MaterialTbl[0];//debug
+		//}
+
+		for (auto& m : MaterialTbl)
 		{
 			wchar_t nameVB[60];
 			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
@@ -246,6 +303,21 @@ namespace utility {
 			wchar_t nameIB[60];
 			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
 
+			u32 idMax = 0;
+			for (auto& v : m.TriangleVertexIDTbl)
+			{
+				idMax = max(idMax, v);
+			}
+			wchar_t str[256];
+			swprintf_s(str, L"vertexSize %d idMax %d\n", m.TriangleVertexTbl.size(), idMax);
+
+			OutputDebugString(str);
+
+			//if (count != 0)
+			//{
+			//	CreateOpenedCube(m.TriangleVertexTbl, m.TriangleVertexIDTbl, 100 * (count + 1));//debug
+			//}
+			
 			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 
 			MaterialParam mparams;
@@ -257,6 +329,8 @@ namespace utility {
 			mparams.specular = max(max(max(m.Reflection4Color.specular.x, m.Reflection4Color.specular.y), m.Reflection4Color.specular.z), m.Reflection4Color.specular.w);
 			m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 			device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
+
+			count++;
 		}
 	}
 
@@ -305,7 +379,7 @@ namespace utility {
 
 	void OBJ_MODEL::CreateBLASs(std::unique_ptr<dx12::RenderDeviceDX12>& device)
 	{
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			wchar_t nameBLAS[60];
 			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName).c_str());
@@ -318,7 +392,7 @@ namespace utility {
 	u32 OBJ_MODEL::getTriangleVertexTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.TriangleVertexTbl.size();
 		}
@@ -328,7 +402,7 @@ namespace utility {
 	u32 OBJ_MODEL::getQuadrangleVertexTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.QuadrangleVertexTbl.size();
 		}
@@ -338,7 +412,7 @@ namespace utility {
 	u32 OBJ_MODEL::getTriangleVertexIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.TriangleVertexIDTbl.size();
 		}
@@ -348,7 +422,7 @@ namespace utility {
 	u32 OBJ_MODEL::getTriangleNormalIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.TriangleNormalIDTbl.size();
 		}
@@ -358,7 +432,7 @@ namespace utility {
 	u32 OBJ_MODEL::getTriangleUVIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.TriangleUVIDTbl.size();
 		}
@@ -368,7 +442,7 @@ namespace utility {
 	u32 OBJ_MODEL::getQuadrangleVertexIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.QuadrangleVertexIDTbl.size();
 		}
@@ -378,7 +452,7 @@ namespace utility {
 	u32 OBJ_MODEL::getQuadrangleNormalIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.QuadrangleNormalIDTbl.size();
 		}
@@ -388,7 +462,7 @@ namespace utility {
 	u32 OBJ_MODEL::getQuadrangleUVIDTblCount()
 	{
 		u32 count = 0;
-		for (auto& m : Material)
+		for (auto& m : MaterialTbl)
 		{
 			count += m.QuadrangleUVIDTbl.size();
 		}

@@ -52,6 +52,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     }
 
     MaterialParams currentMaterial = constantBuffer;
+    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
@@ -65,7 +66,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
-        payload.color += (diffuseTexColor.rgb + shading) * curEnergy * photonIrradiance;
+        payload.color +=  shading * curEnergy * photonIrradiance;
         payload.energy = curEnergy;
     }
 
@@ -98,6 +99,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     uint instanceID = InstanceID();
 
     MaterialParams currentMaterial = constantBuffer;
+    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 

@@ -86,6 +86,20 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
+    for (const auto& instances : mOBJModel.getMaterialList())
+    {
+        entryOffset++;
+        D3D12_RAYTRACING_INSTANCE_DESC desc{};
+        XMStoreFloat3x4(
+            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), mOBJModelTRS);
+        desc.InstanceID = InstanceType::Default;
+        desc.InstanceMask = 0xFF;
+        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+        desc.AccelerationStructure = instances.blas->GetGPUVirtualAddress();
+        instanceDescs.push_back(desc);
+    }
+
     for (const auto& instances : mLightTbl)
     {
         entryOffset++;
@@ -148,6 +162,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
     mOBJModel.OBJ_Load(mDevice, "model", "triangulateSponza.obj", L"Sponza");
+    //mOBJModel.OBJ_Load(mDevice, "model", "dragon.obj", L"Sponza");
     mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
 
     s32 count = 0;
@@ -215,6 +230,8 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         trs = XMMatrixMultiply(XMMatrixScaling(scale, scale, scale), XMMatrixTranslation(x, y, z));
         count++;
     }
+
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(4.5, 4.5, 4.5), XMMatrixTranslation(0, 0, 0));
 
     XMVECTOR colorTbl[] = {
         XMVectorSet(1.0f, 0.2f, 1.0f, 0.0f),

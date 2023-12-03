@@ -8,6 +8,7 @@ void DxrPhotonMapper::CreateStateObject()
         RayTracingDxlibs::Miss,
         RayTracingDxlibs::FloorClosestHit,
         RayTracingDxlibs::DefaultMaterialClosestHit,
+        RayTracingDxlibs::DefaultMaterialWithTexClosestHit,
         RayTracingDxlibs::LightClosestHit };
 
     for (auto& filename : shaderFiles) {
@@ -50,6 +51,10 @@ void DxrPhotonMapper::CreateStateObject()
             auto dxilChsMaterial = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsMaterial->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialClosestHit]);
             dxilChsMaterial->DefineExport(RayTracingEntryPoints::ClosestHitMaterial);
+
+            auto dxilChsMaterialWithTex = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+            dxilChsMaterialWithTex->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialWithTexClosestHit]);
+            dxilChsMaterialWithTex->DefineExport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
 
             auto dxilChsLight = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsLight->SetDXILLibrary(&shaders[RayTracingDxlibs::LightClosestHit]);
@@ -97,6 +102,16 @@ void DxrPhotonMapper::CreateStateObject()
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitFloor);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
+
+            for (const auto& instances : mOBJModel.getMaterialList())
+            {
+                wchar_t nameHitGroup[60];
+                swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
+                auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                hitgroupLight->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
+                hitgroupLight->SetHitGroupExport(nameHitGroup);
+            }
         }
 
         //Set Global Root Signature
@@ -144,6 +159,20 @@ void DxrPhotonMapper::CreateStateObject()
                 auto lrsAssocMetal = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
                 lrsAssocMetal->AddExport(HitGroups::Obj1);
                 lrsAssocMetal->SetSubobjectToAssociate(*bindLocalRootSig);
+            }
+            //MaterialWithTex
+            {
+                auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+                bindLocalRootSig->SetRootSignature(mLocalRootSigMaterialWithTex.Get());
+
+                for (const auto& instances : mOBJModel.getMaterialList())
+                {
+                    wchar_t nameHitGroup[60];
+                    swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
+                    auto lrsAssoc = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+                    lrsAssoc->AddExport(nameHitGroup);
+                    lrsAssoc->SetSubobjectToAssociate(*bindLocalRootSig);
+                }
             }
         }
 
@@ -195,6 +224,10 @@ void DxrPhotonMapper::CreateStateObject()
             auto dxilChsMaterial = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsMaterial->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialClosestHit]);
             dxilChsMaterial->DefineExport(RayTracingEntryPoints::ClosestHitMaterialPhoton);
+
+            auto dxilChsMaterialWithTex = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+            dxilChsMaterialWithTex->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialWithTexClosestHit]);
+            dxilChsMaterialWithTex->DefineExport(RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
         }
 
         //Hit Group
@@ -233,6 +266,16 @@ void DxrPhotonMapper::CreateStateObject()
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitFloorPhoton);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
+
+            for (const auto& instances : mOBJModel.getMaterialList())
+            {
+                wchar_t nameHitGroup[60];
+                swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
+                auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                hitgroupLight->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
+                hitgroupLight->SetHitGroupExport(nameHitGroup);
+            }
         }
 
         //Set Global Root Signature
@@ -279,6 +322,20 @@ void DxrPhotonMapper::CreateStateObject()
                 auto lrsAssocGlass = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
                 lrsAssocGlass->AddExport(HitGroups::Obj0);
                 lrsAssocGlass->SetSubobjectToAssociate(*bindLocalRootSig);
+            }
+            //MaterialWithTex
+            {
+                auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+                bindLocalRootSig->SetRootSignature(mLocalRootSigMaterialWithTex.Get());
+
+                for (const auto& instances : mOBJModel.getMaterialList())
+                {
+                    wchar_t nameHitGroup[60];
+                    swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
+                    auto lrsAssoc = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+                    lrsAssoc->AddExport(nameHitGroup);
+                    lrsAssoc->SetSubobjectToAssociate(*bindLocalRootSig);
+                }
             }
         }
 

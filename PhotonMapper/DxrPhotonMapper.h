@@ -63,7 +63,7 @@ namespace RayTracingEntryPoints {
     static const wchar_t* MissPhoton = L"photonMiss";
     static const wchar_t* ClosestHitFloorPhoton = L"floorStorePhotonClosestHit";
     static const wchar_t* ClosestHitMaterialPhoton = L"materialStorePhotonClosestHit";
-    static const wchar_t* ClosestHitMaterialWithTexPhoton = L"materiaWithTexStorePhotonClosestHit";
+    static const wchar_t* ClosestHitMaterialWithTexPhoton = L"materialWithTexStorePhotonClosestHit";
 }
 
 namespace ComputeShaders {
@@ -338,6 +338,8 @@ private:
     std::array<XMMATRIX, NormalOBJ0s> mOBJ0sNormalTbl;
     std::array<XMMATRIX, NormalOBJ1s> mOBJ1sNormalTbl;
     std::array<XMMATRIX, NormalLight> mLightTbl;
+
+    XMMATRIX mOBJModelTRS;
 
     //Materials
     std::array<utility::MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;

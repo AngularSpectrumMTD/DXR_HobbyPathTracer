@@ -72,45 +72,12 @@ namespace utility {
 	class OBJ_MODEL {
 	protected:
 		bool LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName);
-		vector <MATERIAL> Material;
-		void CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName)
-		{
-			u32 ibStride = u32(sizeof(u32)), vbStride = u32(sizeof(utility::VertexPNT));
-			const auto flags = D3D12_RESOURCE_FLAG_NONE;
-			const auto heapType = D3D12_HEAP_TYPE_DEFAULT;
-
-			auto vbsize = vbStride * mat.TriangleVertexTbl.size();
-			auto ibsize = ibStride * mat.TriangleVertexIDTbl.size();
-			mat.TriangleVertexBuffer = device->CreateBuffer(vbsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexTbl.data(), vbName);
-			mat.TriangleIndexBuffer = device->CreateBuffer(ibsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexIDTbl.data(), ibName);
-			mat.TriangleVertexCount = u32(mat.TriangleVertexTbl.size());
-			mat.TriangleIndexCount = u32(mat.TriangleVertexIDTbl.size());
-			mat.TriangleVertexStride = vbStride;
-
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDescVB{};
-			srvDescVB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-			srvDescVB.Format = DXGI_FORMAT_UNKNOWN;
-			srvDescVB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDescVB.Buffer.NumElements = mat.TriangleVertexCount;
-			srvDescVB.Buffer.FirstElement = 0;
-			srvDescVB.Buffer.StructureByteStride = vbStride;
-
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDescIB{};
-			srvDescIB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-			srvDescIB.Format = DXGI_FORMAT_UNKNOWN;
-			srvDescIB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDescIB.Buffer.NumElements = mat.TriangleIndexCount;
-			srvDescIB.Buffer.FirstElement = 0;
-			srvDescIB.Buffer.StructureByteStride = ibStride;
-
-			mat.descriptorTriangleVB = device->CreateShaderResourceView(mat.TriangleVertexBuffer.Get(), &srvDescVB);
-			mat.descriptorTriangleIB = device->CreateShaderResourceView(mat.TriangleIndexBuffer.Get(), &srvDescIB);
-
-			mat.shaderName = shaderName;
-		}
+		vector <MATERIAL> MaterialTbl;
+		void CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName);
 
 		void CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr);
 	public:
+		vector<MATERIAL> getMaterialList() const;
 		OBJ_MODEL();
 		OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
 		bool OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);

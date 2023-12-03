@@ -31,6 +31,18 @@ namespace utility {
         return ret;
     }
 
+    inline std::wstring StringToWString(std::string str)
+    {
+        const int bufSize = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, (wchar_t*)NULL, 0);
+        wchar_t* WCSPtr = new wchar_t[bufSize];
+
+        MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, WCSPtr, bufSize);
+
+        std::wstring wstr(WCSPtr, WCSPtr + bufSize - 1);
+        delete[] WCSPtr;
+        return wstr;
+    }
+
     inline u32 RoundUp(size_t size, u32 align) {
         return u32(size + align - 1) & ~(align-1);
     }
