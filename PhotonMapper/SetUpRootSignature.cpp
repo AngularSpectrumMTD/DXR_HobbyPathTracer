@@ -29,7 +29,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.PushStaticSampler(0);
-        mGrs = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
+        mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
     }
 
     //PhotonMapping
@@ -50,17 +50,11 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.PushStaticSampler(0);
-        mGrsPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
+        mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
     }
 }
 
 void DxrPhotonMapper::CreateRootSignatureLocal()
-{
-    CreateSphereLocalRootSignature();
-    CreateFloorLocalRootSignature();
-}
-
-void DxrPhotonMapper::CreateSphereLocalRootSignature()
 {
     {
         const u32 regSpace = 1;
@@ -69,18 +63,24 @@ void DxrPhotonMapper::CreateSphereLocalRootSignature()
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
-        mRsDefault = rsCreater.Create(mDevice, true, L"lrsDefault");
+        mLocalRootSigMaterial = rsCreater.Create(mDevice, true, L"lrsMaterial");
     }
-}
-
-void DxrPhotonMapper::CreateFloorLocalRootSignature()
-{
+    {
+        const u32 regSpace = 1;
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Clear();
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2, regSpace);
+        mLocalRootSigMaterialWithTex = rsCreater.Create(mDevice, true, L"lrsMaterialWithTex");
+    }
     {
         const u32 regSpace = 1;
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2, regSpace);
-        mRsFloor = rsCreater.Create(mDevice, true, L"lrsFloor");
+        mLocalRootSigFloor = rsCreater.Create(mDevice, true, L"lrsFloor");
     }
 }

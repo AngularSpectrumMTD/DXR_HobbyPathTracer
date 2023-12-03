@@ -529,7 +529,7 @@ void DxrPhotonMapper::Draw()
     if (mIsApplyCaustics)
     {
         //PhotonMapping
-        mCommandList->SetComputeRootSignature(mGrsPhoton.Get());
+        mCommandList->SetComputeRootSignature(mGlobalRootSigPhoton.Get());
         mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
         mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
         mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
@@ -554,7 +554,7 @@ void DxrPhotonMapper::Draw()
     }
 
     //RayTracing
-    mCommandList->SetComputeRootSignature(mGrs.Get());
+    mCommandList->SetComputeRootSignature(mGlobalRootSig.Get());
     mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
     mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
     mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);

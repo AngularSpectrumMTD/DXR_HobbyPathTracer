@@ -284,8 +284,6 @@ private:
     void CreateNormalBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
-    void CreateSphereLocalRootSignature();
-    void CreateFloorLocalRootSignature();
     void CreateShaderTable();
     void CreateComputeRootSignatureAndPSO();
     void CreateBitonicSortCBs();
@@ -422,14 +420,15 @@ private:
     ComPtr<ID3D12StateObject> mRTPSO;
     ComPtr<ID3D12Resource> mShaderTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
-    ComPtr<ID3D12RootSignature> mGrs;
-    ComPtr<ID3D12RootSignature> mRsFloor;
-    ComPtr<ID3D12RootSignature> mRsDefault;
+    ComPtr<ID3D12RootSignature> mGlobalRootSig;
+    ComPtr<ID3D12RootSignature> mLocalRootSigFloor;
+    ComPtr<ID3D12RootSignature> mLocalRootSigMaterial;
+    ComPtr<ID3D12RootSignature> mLocalRootSigMaterialWithTex;
 
     ComPtr<ID3D12StateObject> mRTPSOPhoton;
     ComPtr<ID3D12Resource> mShaderPhotonTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
-    ComPtr<ID3D12RootSignature> mGrsPhoton;
+    ComPtr<ID3D12RootSignature> mGlobalRootSigPhoton;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortLDS;
     ComPtr<ID3D12RootSignature> mRsTranspose;
