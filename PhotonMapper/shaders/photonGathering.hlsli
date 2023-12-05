@@ -79,15 +79,15 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     float3 normEYE = normalize(eyeDir);
     bool isEyeFlag = dot(normEYE, normWN) > 0;
 
-    if (abs(dot(worldNormal, AxisX)) > 0.9)
+    if (abs(dot(normWN, AxisX)) > 0.9)
     {
         rangeX = 0;
     }
-    if (abs(dot(worldNormal, AxisY)) > 0.9)
+    if (abs(dot(normWN, AxisY)) > 0.9)
     {
         rangeY = 0;
     }
-    if (abs(dot(worldNormal, AxisZ)) > 0.9)
+    if (abs(dot(normWN, AxisZ)) > 0.9)
     {
         rangeZ = 0;
     }
@@ -113,7 +113,8 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                         for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                         {
                             PhotonInfo comparePhoton = gPhotonMap[G];
-                            bool isVisiblePhotonPrimary = ((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
+                            bool isVisiblePhotonPrimary = true;
+                            //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
                         
                             float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
                             if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
