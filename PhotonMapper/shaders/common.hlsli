@@ -314,8 +314,8 @@ float3 getUniformSample(in uint2 id, float3 direction, float coneAngle)
 ////////////////////////////////////
 float compute01Depth(float3 wPos)
 {
-    matrix mtxViewProj = mul(gSceneParam.mtxView, gSceneParam.mtxProj);
-    float4 svPosition = mul(mtxViewProj, float4(wPos, 1));
+    matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
+    float4 svPosition = mul(float4(wPos, 1), mtxViewProj);
     float depth = (svPosition.z - getNearPlaneDistance())
      / (getFarPlaneDistance() - getNearPlaneDistance());
     float zeroOneDepth = 0.5 * (depth + 1); //near 1 to far 0
