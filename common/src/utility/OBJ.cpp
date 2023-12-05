@@ -290,10 +290,6 @@ namespace utility {
 	void OBJ_MODEL::CreateMeshBuffers(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* modelNamePtr)
 	{
 		u32 count = 0;
-		//for (auto& m : MaterialTbl)
-		//{
-		//	m = MaterialTbl[0];//debug
-		//}
 
 		for (auto& m : MaterialTbl)
 		{
@@ -312,11 +308,6 @@ namespace utility {
 			swprintf_s(str, L"vertexSize %d idMax %d\n", m.TriangleVertexTbl.size(), idMax);
 
 			OutputDebugString(str);
-
-			//if (count != 0)
-			//{
-			//	CreateOpenedCube(m.TriangleVertexTbl, m.TriangleVertexIDTbl, 100 * (count + 1));//debug
-			//}
 			
 			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 
@@ -325,7 +316,8 @@ namespace utility {
 			mparams.metallic = 0;// m.Shininess;
 			mparams.roughness = 1 - mparams.metallic;
 			mparams.transRatio = 0;
-			mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+			//mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+			mparams.emission = XMVectorSet(1, 1, 1, 1);
 			mparams.specular = max(max(max(m.Reflection4Color.specular.x, m.Reflection4Color.specular.y), m.Reflection4Color.specular.z), m.Reflection4Color.specular.w);
 			m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 			device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));

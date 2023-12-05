@@ -57,6 +57,8 @@ void rayGen() {
     randGenState = uint(pcgHash(seed));
     rseed = LightSeed.x;
 
+    const float energyBoost = 3.0f;
+
     for(int i = 0; i < SPP ; i++)
     {
         float2 IJ = int2(i / (SPP / 2.f), i % (SPP / 2.f)) - 0.5.xx;
@@ -72,7 +74,7 @@ void rayGen() {
         rayDesc.TMax = 100000;
 
         Payload payload;
-        payload.energy = float3(1, 1, 1);
+        payload.energy = energyBoost * float3(1, 1, 1);
         payload.color = float3(0, 0, 0);
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;

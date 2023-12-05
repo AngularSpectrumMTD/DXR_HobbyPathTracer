@@ -54,7 +54,7 @@ float poly6Kernel2D(float distance, float maxd)
     return alpha * tmp;
 }
 
-float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal)
+float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
 {
     float gatherRadius = getGatherRadius();
     float sharp = getGatherSharpness();
@@ -79,15 +79,15 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     float3 normEYE = normalize(eyeDir);
     bool isEyeFlag = dot(normEYE, normWN) > 0;
 
-    if (abs(dot(worldNormal, AxisX)) > 0.98)
+    if (abs(dot(worldNormal, AxisX)) > 0.9)
     {
         rangeX = 0;
     }
-    if (abs(dot(worldNormal, AxisY)) > 0.98)
+    if (abs(dot(worldNormal, AxisY)) > 0.9)
     {
         rangeY = 0;
     }
-    if (abs(dot(worldNormal, AxisZ)) > 0.98)
+    if (abs(dot(worldNormal, AxisZ)) > 0.9)
     {
         rangeZ = 0;
     }
@@ -124,7 +124,7 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                         }
                     }
 
-                    if (isVisualizePhotonDebugDraw())
+                    if (isDebug)
                     {
                         float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
                         accumulateXYZ += float3(db, db, 0); //debug
@@ -136,13 +136,12 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     uint photonMapWidth = 1;
     uint photonStride = 1;
     gPhotonMap.GetDimensions(photonMapWidth, photonStride);
-
     return boost * mul(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
 }
 
-float3 photonGather(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal)
+float3 photonGather(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
 {
-    return photonGatheringWithSortedHashGridCells(gatherCenterPos, eyeDir, worldNormal);
+    return photonGatheringWithSortedHashGridCells(gatherCenterPos, eyeDir, worldNormal, isDebug);
 }
 
 #endif//__PHOTONGATHERING_HLSLI__

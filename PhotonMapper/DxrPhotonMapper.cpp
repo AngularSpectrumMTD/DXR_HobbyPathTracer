@@ -26,7 +26,7 @@ void DxrPhotonMapper::Setup()
 {
     mIntenceBoost = 10000;
     mGatherRadius = 0.25f;
-    mGatherBlockRange = 1;
+    mGatherBlockRange = 0;
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
@@ -41,9 +41,8 @@ void DxrPhotonMapper::Setup()
     mGlassRotateRange = 4;
     mCausticsBoost = 7;
     mIsMoveModel = false;
-    //mIsApplyCaustics = true;
-    mIsApplyCaustics = false;
-    mIsUseDenoise = true;
+    mIsApplyCaustics = true;
+    mIsUseDenoise = false;
     mIsDebug = false;
     mVisualizeLightRange = true;
     mInverseMove = false;
@@ -141,8 +140,8 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/dragon.obj";
         //mOBJ0FileName = L"san-miguel-low-poly.obj";
-        mGlassObjYOfsset = -10;
-        mGlassObjScale = XMFLOAT3(80, 80, 80);
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case  ModelType::ModelType_Sponza:

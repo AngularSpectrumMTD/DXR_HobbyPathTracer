@@ -161,7 +161,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
 
-    mOBJModel.OBJ_Load(mDevice, "model", "triangulateSponza.obj", L"Sponza");
+    //mOBJModel.OBJ_Load(mDevice, "model/sponza", "triangulateSponza.obj", L"Sponza");
+    //mOBJModel.OBJ_Load(mDevice, "model/crytecSponza", "sponza.obj", L"Sponza");
+    mOBJModel.OBJ_Load(mDevice, "model/crytecSponza", "crytecSponza.obj", L"Sponza");
     //mOBJModel.OBJ_Load(mDevice, "model", "dragon.obj", L"Sponza");
     mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
 
@@ -231,7 +233,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         count++;
     }
 
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(4.5, 4.5, 4.5), XMMatrixTranslation(0, 0, 0));
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
     XMVECTOR colorTbl[] = {
         XMVectorSet(1.0f, 0.2f, 1.0f, 0.0f),

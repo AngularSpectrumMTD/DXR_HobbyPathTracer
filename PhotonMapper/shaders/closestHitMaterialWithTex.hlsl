@@ -44,7 +44,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     
     float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
     
-    const bool isIgnoreHit = diffuseTexColor.a < 0.5;
+    const bool isIgnoreHit = (diffuseTexColor.a == 0);
     
     if (!isIgnoreHit)
     {
@@ -55,19 +55,24 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
-
+    
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
-    nextRay.Direction = 0.xxx;
-    float3 curEnergy = payload.energy;
-    float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
-        
-    const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
 
     if (!isIgnoreHit)
     {
-        payload.color +=  shading * curEnergy * photonIrradiance;
+        nextRay.Direction = 0.xxx;
+        float3 curEnergy = payload.energy;
+        float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
+        const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
+        payload.color += shading * curEnergy * photonIrradiance;
         payload.energy = curEnergy;
+    }
+    else
+    {
+        nextRay.TMin = 0.001;
+        nextRay.TMax = 10000;
+        nextRay.Direction = WorldRayDirection();
     }
 
     RAY_FLAG flags = RAY_FLAG_NONE;
@@ -94,7 +99,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
 
     float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
 
-    const bool isIgnoreHit = diffuseTexColor.a < 0.5;
+    const bool isIgnoreHit = (diffuseTexColor.a == 0);
 
     uint instanceID = InstanceID();
 
@@ -105,15 +110,18 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
-    nextRay.Direction = 0.xxx;
-    float3 curEnergy = payload.throughput;
-    float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
-
+   
+    nextRay.TMin = 0.001;
+    nextRay.TMax = 10000;
+    nextRay.Direction = WorldRayDirection();
     if (!isIgnoreHit)
     {
+        nextRay.Direction = 0.xxx;
+        float3 curEnergy = payload.throughput;
+        float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
         payload.throughput = shading * curEnergy;
     }
-        
+
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
     {
         storePhoton(payload);
