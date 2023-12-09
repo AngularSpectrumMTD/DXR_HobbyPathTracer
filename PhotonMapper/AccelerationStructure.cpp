@@ -148,11 +148,21 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     strValue.assign(mOBJ0FileName.begin(), mOBJ0FileName.end());
     const char* charValue = strValue.c_str();
     bool isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale);
+    if (!isLoaded)
+    {
+        OutputDebugString(L"OBJ Load was Failed\n");
+        throw std::runtime_error("OBJ Load was Failed");
+    }
     mMeshOBJ0.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
 
     strValue.assign(mOBJ1FileName.begin(), mOBJ1FileName.end());
     charValue = strValue.c_str();
     isLoaded = utility::CreateMesh(charValue, verticesPN, indices, mMetalObjScale);
+    if (!isLoaded)
+    {
+        OutputDebugString(L"OBJ Load was Failed\n");
+        throw std::runtime_error("OBJ Load was Failed");
+    }
     mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
 
     utility::CreateSphere(verticesPN, indices, 1.f, 30, 30);
@@ -161,7 +171,11 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
     
-    mOBJModel.OBJ_Load(mDevice, mOBJFolderName.c_str(), mOBJFileName.c_str(), L"");
+    if (!mOBJModel.OBJ_Load(mDevice, mOBJFolderName.c_str(), mOBJFileName.c_str(), L""))
+    {
+        OutputDebugString(L"OBJ Load was Failed\n");
+        throw std::runtime_error("OBJ Load was Failed");
+    }
     mOBJModel.CreateMeshBuffers(mDevice, L"");
 
     s32 count = 0;

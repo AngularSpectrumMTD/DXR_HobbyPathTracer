@@ -21,7 +21,24 @@ namespace utility {
 		sprintf_s(fileName, "%s/%s", folderPath, FileName);
 
 		FILE* fp = NULL;
-		fopen_s(&fp, fileName, "rt");
+		errno_t err;
+		err = fopen_s(&fp, fileName, "rt");
+		if (err == 0)
+		{
+			OutputDebugString(L"File Open Succeeded\n");
+		}
+		else if (err > 0)
+		{
+			wchar_t debugStr[256];
+			swprintf_s(debugStr, L"File Open ERROR : code %d\n", err);
+			OutputDebugString(debugStr);
+			return false;
+		}
+		else
+		{
+			OutputDebugString(L"File Open ERROR\n");
+			return false;
+		}
 
 		fseek(fp, SEEK_SET, 0);
 
@@ -61,9 +78,11 @@ namespace utility {
 			}
 			//face id0=vertex 1=UV 2=normal
 			if (strcmp(key, "f") == 0) {
-				Face[0].w = -1;
-				Face[1].w = -1;
-				Face[2].w = -1;
+				Face[0].x = -1; Face[0].y = -1; Face[0].z = -1; Face[0].w = -1;//VertexID
+				Face[1].x = -1; Face[1].y = -1; Face[1].z = -1; Face[1].w = -1;//UVID
+				Face[2].x = -1; Face[2].y = -1; Face[2].z = -1; Face[2].w = -1;//NormalID
+				//vertexID/uvID/NormalID vertexID/uvID/NormalID vertexID/uvID/NormalID vertexID/uvID/NormalID 
+				//if the value is not exist, coreesponded Face element is not setted.
 				fscanf_s(fp, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&Face[0].x, &Face[1].x, &Face[2].x,
 					&Face[0].y, &Face[1].y, &Face[2].y,
@@ -74,9 +93,12 @@ namespace utility {
 					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].x - 1);
 					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].y - 1);
 					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].z - 1);
-					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
-					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
-					MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
+					if (Face[1].x != -1)//no uv
+					{
+						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
+						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
+						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
+					}
 					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].x - 1);
 					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].y - 1);
 					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].z - 1);
@@ -86,10 +108,13 @@ namespace utility {
 					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].y - 1);
 					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].z - 1);
 					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].w - 1);
-					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
-					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
-					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
-					MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
+					if (Face[1].x != -1)// no uv
+					{
+						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
+						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
+						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
+						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
+					}
 					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].x - 1);
 					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].y - 1);
 					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
@@ -156,7 +181,25 @@ namespace utility {
 		FILE* fp = NULL;
 		char fileName[60];
 		sprintf_s(fileName, "%s/%s", folderPath, FileName);
-		fopen_s(&fp, fileName, "rt");
+		errno_t err;
+		err = fopen_s(&fp, fileName, "rt");
+		if (err == 0)
+		{
+			OutputDebugString(L"File Open Succeeded\n");
+		}
+		else if (err > 0)
+		{
+			wchar_t debugStr[256];
+			swprintf_s(debugStr, L"File Open ERROR : code %d\n", err);
+			OutputDebugString(debugStr);
+			return false;
+		}
+		else
+		{
+			OutputDebugString(L"File Open ERROR\n");
+			return false;
+		}
+
 		char key[255] = { 0 };
 		bool flag = false;
 		bool flag2 = false;
@@ -299,15 +342,15 @@ namespace utility {
 			wchar_t nameIB[60];
 			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
 
-			u32 idMax = 0;
-			for (auto& v : m.TriangleVertexIDTbl)
-			{
-				idMax = max(idMax, v);
-			}
-			wchar_t str[256];
-			swprintf_s(str, L"vertexSize %d idMax %d\n", m.TriangleVertexTbl.size(), idMax);
+			//u32 idMax = 0;
+			//for (auto& v : m.TriangleVertexIDTbl)
+			//{
+			//	idMax = max(idMax, v);
+			//}
+			//wchar_t str[256];
+			//swprintf_s(str, L"vertexSize %d idMax %d\n", m.TriangleVertexTbl.size(), idMax);
 
-			OutputDebugString(str);
+			//OutputDebugString(str);
 			
 			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 

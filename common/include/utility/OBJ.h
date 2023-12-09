@@ -38,7 +38,6 @@ namespace utility {
 		s32 w;
 	};
 
-	//共通のマテリアルを持つ頂点
 	struct MATERIAL {
 		//cpu
 		string MaterialName;

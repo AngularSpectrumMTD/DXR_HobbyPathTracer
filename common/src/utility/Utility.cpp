@@ -115,6 +115,7 @@ namespace utility {
         const std::wstring extJPG(L"jpg");
         const std::wstring extLJPG(L"JPG");
         if (fileName.length() < 3) {
+            OutputDebugString(L"Texture Filename is Invalid.\n");
             throw std::runtime_error("Texture Filename is Invalid.");
         }
 
@@ -130,6 +131,7 @@ namespace utility {
 
         if (hr == E_FAIL)
         {
+            OutputDebugString(L"Texture Load Missed.\n");
             throw std::runtime_error("Texture Load Missed.");
         }
 
@@ -195,17 +197,20 @@ namespace utility {
         Wrappers::FileHandle file(CreateFile2(filename, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING, &extendedParams));
         if (file.Get() == INVALID_HANDLE_VALUE)
         {
+            OutputDebugString(L"file not found\n");
             throw std::runtime_error("file not found");
         }
 
         FILE_STANDARD_INFO fileInfo = {};
         if (!GetFileInformationByHandleEx(file.Get(), FileStandardInfo, &fileInfo, sizeof(fileInfo)))
         {
+            OutputDebugString(L"file not found\n");
             throw std::runtime_error("file not found");
         }
 
         if (fileInfo.EndOfFile.HighPart != 0)
         {
+            OutputDebugString(L"file not found\n");
             throw std::runtime_error("file not found");
         }
 
@@ -225,6 +230,7 @@ namespace utility {
         HRESULT hr;
         std::ifstream infile(shaderFile, std::ifstream::binary);
         if (!infile) {
+            OutputDebugString(L"Runtime Shader Compile Failed.\n");
             throw std::runtime_error("Runtime Shader Compile Failed.");
         }
 
@@ -258,6 +264,7 @@ namespace utility {
             DXCIncludeHandler.Get(), &DXCResult);
 
         if (FAILED(hr)) {
+            OutputDebugString(L"Runtime Shader Compile Failed.\n");
             throw std::runtime_error("Runtime Shader Compile Failed.");
         }
 
@@ -271,6 +278,7 @@ namespace utility {
             memcpy(errLog.data(), errBlob->GetBufferPointer(), size);
             errLog.back() = 0;
             OutputDebugStringA(errLog.data());
+            OutputDebugString(L"Runtime Shader Compile Failed.\n");
             throw std::runtime_error("Runtime Shader Compile Failed.");
         }
 
@@ -284,7 +292,7 @@ namespace utility {
             memcpy(result.data(), blob->GetBufferPointer(), size);
             return result;
         }
-
+        OutputDebugString(L"Runtime Shader Compile Failed.\n");
         throw std::runtime_error("Runtime Shader Compile Failed.");
     }
 }
