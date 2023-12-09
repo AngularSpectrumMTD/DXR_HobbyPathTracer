@@ -25,18 +25,18 @@ namespace utility {
 		err = fopen_s(&fp, fileName, "rt");
 		if (err == 0)
 		{
-			OutputDebugString(L"File Open Succeeded\n");
+			OutputDebugString(L"OBJ_Load() File Open Succeeded\n");
 		}
 		else if (err > 0)
 		{
 			wchar_t debugStr[256];
-			swprintf_s(debugStr, L"File Open ERROR : code %d\n", err);
+			swprintf_s(debugStr, L"OBJ_Load() File Open ERROR : code %d\n", err);
 			OutputDebugString(debugStr);
 			return false;
 		}
 		else
 		{
-			OutputDebugString(L"File Open ERROR\n");
+			OutputDebugString(L"OBJ_Load() File Open ERROR\n");
 			return false;
 		}
 
@@ -185,18 +185,18 @@ namespace utility {
 		err = fopen_s(&fp, fileName, "rt");
 		if (err == 0)
 		{
-			OutputDebugString(L"File Open Succeeded\n");
+			OutputDebugString(L"LoadMaterialFromFile() File Open Succeeded\n");
 		}
 		else if (err > 0)
 		{
 			wchar_t debugStr[256];
-			swprintf_s(debugStr, L"File Open ERROR : code %d\n", err);
+			swprintf_s(debugStr, L"LoadMaterialFromFile() File Open ERROR : code %d\n", err);
 			OutputDebugString(debugStr);
 			return false;
 		}
 		else
 		{
-			OutputDebugString(L"File Open ERROR\n");
+			OutputDebugString(L"LoadMaterialFromFile() File Open ERROR\n");
 			return false;
 		}
 
