@@ -12,19 +12,25 @@ StructuredBuffer<uint>   indexBuffer : register(t0,space1);
 StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
 
-VertexPNT GetVertex(TriangleIntersectionAttributes attrib)
+VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTexture)
 {
     VertexPNT v = (VertexPNT) 0;
     uint start = PrimitiveIndex() * 3; // Triangle List.
 
     float3 positionTbl[3], normalTbl[3];
     float2 texcoordTbl[3];
+    
+    isNoTexture = false;
     for (int i = 0; i < 3; ++i)
     {
         uint index = indexBuffer[start + i];
         positionTbl[i] = vertexBuffer[index].Position;
         normalTbl[i] = vertexBuffer[index].Normal;
         texcoordTbl[i] = vertexBuffer[index].UV;
+        if (texcoordTbl[i].x < -10)
+        {
+            isNoTexture = true;
+        }
     }
     v.Position = ComputeInterpolatedAttributeF3(positionTbl, attrib.barys);
     v.Normal = ComputeInterpolatedAttributeF3(normalTbl, attrib.barys);
@@ -40,9 +46,14 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (isReachedRecursiveLimitPayload(payload)) {
         return;
     }
-    VertexPNT vtx = GetVertex(attrib);
+    bool isNoTexture = false;
+    VertexPNT vtx = GetVertex(attrib, isNoTexture);
     
-    float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+    float4 diffuseTexColor = 1.xxxx;
+    if (!isNoTexture)
+    {
+        diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+    }
     
     const bool isIgnoreHit = (diffuseTexColor.a == 0);
     
@@ -94,10 +105,14 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
+    bool isNoTexture = false;
+    VertexPNT vtx = GetVertex(attrib, isNoTexture);
 
-    VertexPNT vtx = GetVertex(attrib);
-
-    float4 diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+    float4 diffuseTexColor = 1.xxxx;
+    if (!isNoTexture)
+    {
+        diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+    }
 
     const bool isIgnoreHit = (diffuseTexColor.a == 0);
 

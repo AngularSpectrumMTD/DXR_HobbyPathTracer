@@ -45,6 +45,7 @@ namespace utility {
 		DirectX::XMFLOAT3 vec3d;
 		DirectX::XMFLOAT2 vec2d;
 
+		//File Read Start
 		while (!feof(fp))
 		{
 			//key mtlib / v / vn etc...
@@ -120,22 +121,38 @@ namespace utility {
 					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
 					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].w - 1);
 				}
+
 			}
 		}
+		//File Read End
 
 		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
 			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
 				utility::VertexPNT Tri;
 				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
 				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
-				Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
+				if (uv.size() > 0)
+				{
+					Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
+				}
+				else
+				{
+					Tri.UV = XMFLOAT2(-100, 0);
+				}
 				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
 			}
 			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
 				utility::VertexPNT Quad;
 				Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
 				Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
-				Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+				if (uv.size() > 0)
+				{
+					Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+				}
+				else
+				{
+					Quad.UV = XMFLOAT2(-100, 0);
+				}
 				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
 			}
 		}
@@ -201,8 +218,8 @@ namespace utility {
 		}
 
 		char key[255] = { 0 };
-		bool flag = false;
-		bool flag2 = false;
+		bool isMaterialIncluded = false;
+		bool isTextureIncluded = false;
 		DirectX::XMFLOAT4 vec4d;
 		vec4d.x = 0.0f;
 		vec4d.y = 0.0f;
@@ -226,11 +243,11 @@ namespace utility {
 			fscanf_s(fp, "%s ", key, sizeof(key));
 			if (strcmp(key, "newmtl") == 0)
 			{
-				if (flag) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
-				flag = true;
+				if (isMaterialIncluded) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
+				isMaterialIncluded = true;
 				fscanf_s(fp, "%s ", key, sizeof(key));
 				mtl.MaterialName = key;
-				flag2 = false;
+				isTextureIncluded = false;
 			}
 			if (strcmp(key, "Ka") == 0)
 			{
@@ -257,7 +274,7 @@ namespace utility {
 				fscanf_s(fp, "%s ", key, sizeof(key));
 				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
 					if (strcmp(key, MaterialTbl[i].TextureName.c_str()) == 0) {
-						flag2 = true;
+						isTextureIncluded = true;
 						mtl.TexID = MaterialTbl[i].TexID;
 						break;
 					}
@@ -286,8 +303,32 @@ namespace utility {
 		}
 		fclose(fp);
 
-		if (flag)
+		if (isMaterialIncluded)
 		{
+			MaterialTbl.push_back(mtl);
+		}
+		else
+		{
+			mtl.MaterialName = "dummyMTL";
+			mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			mtl.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			mtl.Reflection4Color.emission = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			mtl.TextureName = "dummyNullWhite";
+			mtl.DiffuseTexture.res = device->CreateTexture2D(
+				1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+				D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+				D3D12_HEAP_TYPE_DEFAULT,
+				StringToWString(mtl.TextureName).c_str()
+			);
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MipLevels = 1;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			srvDesc.Texture2D.ResourceMinLODClamp = 0;
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			mtl.DiffuseTexture.srv = device->CreateShaderResourceView(mtl.DiffuseTexture.res.Get(), &srvDesc);
 			MaterialTbl.push_back(mtl);
 		}
 
