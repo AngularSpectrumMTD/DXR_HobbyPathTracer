@@ -31,15 +31,15 @@ void DxrPhotonMapper::Setup()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = -5.f; mLightPosY = 120; mLightPosZ = -14;
+    mLightPosX = 21.f; mLightPosY = 31; mLightPosZ = -5;
     mLightRange = 0.03f;
-    mStandardPhotonNum = mPhotonMapSize1D * 0.1f;
-    mPhi = 459; mTheta = 276;
-    mTmpAccumuRatio = 0.05f;
+    mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
+    mPhi = 396; mTheta = 276;
+    mTmpAccumuRatio = 0.03f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 7;
+    mCausticsBoost = 1;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -52,11 +52,17 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
+    mOBJFileName = "crytecSponza.obj";
+    mOBJFolderName = "model/crytecSponza";
+
+    //mOBJFileName = "model";
+    //mOBJFolderName = "diamond.obj";
+
     mStageType = StageType_Plane;
 
     mGlassModelType = ModelType::ModelType_Dragon;
     //mGlassModelType = ModelType::ModelType_Sponza;
-    mMetalModelType = ModelType::ModelType_Teapot;
+    mMetalModelType = ModelType::ModelType_TwistCube;
 
     switch (mGlassModelType)
     {
@@ -70,15 +76,15 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ0FileName = L"model/twistCube.obj";
-        mGlassObjYOfsset = -10;
-        mGlassObjScale = XMFLOAT3(15, 15, 15);
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
         mOBJ0FileName = L"model/teapot.obj";
         mCausticsBoost *= 0.5;
-        mGlassObjYOfsset = -15;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(8, 8, 8);
     }
     break;
@@ -86,7 +92,7 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/likeWater.obj";
         mCausticsBoost *= 3;
-        mGlassObjYOfsset = 0;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(4, 4, 4);
     }
     break;
@@ -95,7 +101,7 @@ void DxrPhotonMapper::Setup()
         mStageType = StageType_Box;
         mGlassRotateRange *= 2;
         mOBJ0FileName = L"model/ocean.obj";
-        mGlassObjYOfsset = 0;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
@@ -104,35 +110,35 @@ void DxrPhotonMapper::Setup()
         mStageType = StageType_Box;
         mGlassRotateRange *= 2;
         mOBJ0FileName = L"model/ocean2.obj";
-        mGlassObjYOfsset = 0;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
         mOBJ0FileName = L"model/diamond.obj";
-        mGlassObjYOfsset = -10;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
         mOBJ0FileName = L"model/skull.obj";
-        mGlassObjYOfsset = 0;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
         mOBJ0FileName = L"model/crab.obj";
-        mGlassObjYOfsset = 0;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case  ModelType::ModelType_HorseStatue:
     {
         mOBJ0FileName = L"model/horse_statue_Tri.obj";
-        mGlassObjYOfsset = -10;
+        mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(350, 350, 350);
     }
     break;
@@ -158,28 +164,28 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_Crab:
     {
         mOBJ1FileName = L"model/crab.obj";
-        mMetalObjYOfsset = 10;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 10;
-        mMetalObjScale = XMFLOAT3(10, 10, 10);
+        mMetalObjYOfsset = 15;
+        mMetalObjScale = XMFLOAT3(3, 3, 3);
     }
     break;
     case ModelType::ModelType_Teapot:
     {
         mOBJ1FileName = L"model/teapot.obj";
-        mMetalObjYOfsset = -40;
-        mMetalObjScale = XMFLOAT3(10, 10, 10);
+        mMetalObjYOfsset = 15;
+        mMetalObjScale = XMFLOAT3(2, 2, 2);
     }
     break;
     case  ModelType::ModelType_LikeWater:
     {
         mOBJ1FileName = L"model/likeWater.obj";
-        mMetalObjYOfsset = 10;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(2, 4, 4);
     }
     break;
@@ -187,7 +193,7 @@ void DxrPhotonMapper::Setup()
     {
         mStageType = StageType_Box;
         mOBJ1FileName = L"model/ocean.obj";
-        mMetalObjYOfsset = 20;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
@@ -195,28 +201,28 @@ void DxrPhotonMapper::Setup()
     {
         mStageType = StageType_Box;
         mOBJ1FileName = L"model/ocean2.obj";
-        mMetalObjYOfsset = 20;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
         mOBJ1FileName = L"model/diamond.obj";
-        mMetalObjYOfsset = 10;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(20, 20, 20);
     }
     break;
     case ModelType::ModelType_Skull:
     {
         mOBJ1FileName = L"model/skull.obj";
-        mMetalObjYOfsset = 10;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
     default:
     {
         mOBJ1FileName = L"model/crab.obj";
-        mMetalObjYOfsset = 10;
+        mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
@@ -258,7 +264,7 @@ void DxrPhotonMapper::Initialize()
 
 void DxrPhotonMapper::InitializeCamera()
 {
-    XMFLOAT3 eyePos(0, 50.0f, 280.0f);
+    XMFLOAT3 eyePos(-65, 8, 0);
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
     mCamera.SetLookAt(eyePos, target);
 
@@ -322,6 +328,8 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
+    mSceneParam.directionalLightDirection = XMVector4Normalize(XMVectorSet(1.0f, -2.0f, 1.0f, 0.0f));
+    mSceneParam.directionalLightColor = XMVectorSet(1.0f, 0.5f, 0.1f, 0.0f);
 
     mRenderFrame++;
 

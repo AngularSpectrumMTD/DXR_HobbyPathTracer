@@ -18,6 +18,8 @@ struct SceneCB
     float4 gatherParams2;
     float4 spotLightParams;
     float4 viewVec;
+    float4 directionalLightDirection;
+    float4 directionalLightColor;
 };
 
 struct Payload

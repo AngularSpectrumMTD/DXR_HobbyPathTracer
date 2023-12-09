@@ -14,7 +14,7 @@ struct PhotonInfo
 {
     float3 throughput;
     float3 position;
-    float3 inDir;
+    //float3 inDir;
 };
 
 #define GRID_SORT_THREAD_NUM 1024

@@ -123,7 +123,7 @@ void photonEmitting()
     PhotonInfo photon;
     photon.throughput = float3(0,0,0);
     photon.position = float3(0,0,0);
-    photon.inDir = float3(0,0,0);
+    //photon.inDir = float3(0,0,0);
 
     int serialIndex = SerialRaysIndex(launchIndex, dispatchDimensions);
     const int COLOR_ID = serialIndex % getLightLambdaNum();

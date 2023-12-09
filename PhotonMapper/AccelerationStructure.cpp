@@ -160,12 +160,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
-
-    //mOBJModel.OBJ_Load(mDevice, "model/sponza", "triangulateSponza.obj", L"Sponza");
-    //mOBJModel.OBJ_Load(mDevice, "model/crytecSponza", "sponza.obj", L"Sponza");
-    mOBJModel.OBJ_Load(mDevice, "model/crytecSponza", "crytecSponza.obj", L"Sponza");
-    //mOBJModel.OBJ_Load(mDevice, "model", "dragon.obj", L"Sponza");
-    mOBJModel.CreateMeshBuffers(mDevice, L"Sponza_BLAS");
+    
+    mOBJModel.OBJ_Load(mDevice, mOBJFolderName.c_str(), mOBJFileName.c_str(), L"");
+    mOBJModel.CreateMeshBuffers(mDevice, L"");
 
     s32 count = 0;
     std::mt19937 mt;
@@ -188,6 +185,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         }
         count++;
     }
+    count = 0;
     for (auto& trs : mOBJ1sNormalTbl)
     {
         f32 y = mMetalObjYOfsset;
@@ -197,7 +195,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         if (count == 0 && NormalOBJ1s == 1)
         {
-            trs = XMMatrixTranslation(PLANE_SIZE * 0.5f, y, PLANE_SIZE * 0.5f);
+            trs = XMMatrixTranslation(-PLANE_SIZE * 0.02f, y, -PLANE_SIZE * 0.02f);
         }
         else
         {
@@ -282,11 +280,11 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
     for (auto& material : mOBJ1MaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-        material.metallic = rndF(mt);
-        material.roughness = rndF(mt);
-        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
-        material.transRatio = rndF(mt);
+        material.albedo = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[albedoIndex % _countof(colorTbl)];
+        material.metallic = 0;// rndF(mt);
+        material.roughness = 0;// rndF(mt);
+        material.transColor = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[transIndex % _countof(colorTbl)];
+        material.transRatio = 1;// rndF(mt);
         albedoIndex++;
         transIndex++;
 
@@ -294,12 +292,12 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
     for (auto& material : mOBJ0MaterialTbl) {
         material = defaultMaterial;
-        material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
+        material.albedo = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[albedoIndex % _countof(colorTbl)];
         //material.metallic = rndF(mt);
         material.metallic = 0;
         //material.roughness = 0.1;// rndF(mt);
         material.roughness = 1.0;// rndF(mt);
-        material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+        material.transColor = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[transIndex % _countof(colorTbl)];
         //material.transRatio = 0.6;// rndF(mt);
         material.transRatio = 0;// rndF(mt);
         albedoIndex++;

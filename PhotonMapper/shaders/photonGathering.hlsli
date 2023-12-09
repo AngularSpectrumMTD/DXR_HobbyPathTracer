@@ -22,7 +22,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         PhotonInfo photon;
         photon.throughput = float3(0, 0, 0);
         photon.position = float3(0, 0, 0);
-        photon.inDir = WorldRayDirection();
+        //photon.inDir = WorldRayDirection();
         gPhotonMap[payload.storeIndex] = photon;
         payload.stored = 1;
     }
@@ -31,7 +31,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         PhotonInfo photon;
         photon.throughput = (payload.recursive <= 1) ? payload.throughput : getCausticsBoost() * payload.throughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
-        photon.inDir = WorldRayDirection();
+        //photon.inDir = WorldRayDirection();
         gPhotonMap[payload.storeIndex] = photon;
         payload.stored = 1;
     }
@@ -108,7 +108,7 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                     if (photonIDstardEnd.y == UINT32_MAX)
                         continue; //avoid infinite loop
                 
-                    if (count < getPhotonUnitNum())
+                    if (true)
                     {
                         for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                         {
@@ -123,6 +123,10 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                                 accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                             }
                         }
+                    }
+                    else
+                    {
+                        break;
                     }
 
                     if (isDebug)

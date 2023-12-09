@@ -192,13 +192,15 @@ private:
         XMVECTOR gatherParams2;
         XMVECTOR spotLightParams;
         XMVECTOR viewVec;
+        XMVECTOR directionalLightDirection;
+        XMVECTOR directionalLightColor;
     };
 
     struct PhotonInfo
     {
         XMFLOAT3 throughput;
         XMFLOAT3 position;
-        XMFLOAT3 inDir;
+        //XMFLOAT3 inDir;
     };
 
     struct BitonicSortCB
@@ -329,6 +331,9 @@ private:
     std::wstring mOBJ1FileName;
     std::wstring mStageTextureFileName;
     std::wstring mCubeMapTextureFileName;
+
+    std::string mOBJFileName;
+    std::string mOBJFolderName;
 
     utility::OBJ_MODEL mOBJModel;
 

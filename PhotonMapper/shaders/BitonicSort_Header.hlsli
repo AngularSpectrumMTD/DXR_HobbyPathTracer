@@ -1,13 +1,6 @@
 #ifndef __BITONICSORT_HEADER_HLSLI__
 #define __BITONICSORT_HEADER_HLSLI__
 
-struct GridCB
-{
-    int numPhotons;
-    float3 gridDimensions;
-    float gridH;
-};
-
 #define BITONIC_BLOCK_SIZE 1024
 #define TRANSPOSE_BLOCK_SIZE 16
 
