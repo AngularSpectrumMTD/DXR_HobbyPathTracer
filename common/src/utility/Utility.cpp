@@ -104,7 +104,7 @@ namespace utility {
 
 
 namespace utility {
-    TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& rdevice, const std::wstring& fileName)
+    TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& rdevice, const std::wstring& fileName, bool isNoExeption)
     {
         DirectX::TexMetadata metadata;
         DirectX::ScratchImage image;
@@ -132,7 +132,15 @@ namespace utility {
         if (hr == E_FAIL)
         {
             OutputDebugString(L"Texture Load Missed.\n");
-            throw std::runtime_error("Texture Load Missed.");
+            if (!isNoExeption)
+            {
+                throw std::runtime_error("Texture Load Missed.");
+            }
+            else
+            {
+                utility::TextureResource nullRes;
+                return nullRes;
+            }
         }
 
         ComPtr<ID3D12Resource> texRes;

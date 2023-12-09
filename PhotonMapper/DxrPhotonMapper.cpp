@@ -55,7 +55,11 @@ void DxrPhotonMapper::Setup()
     mOBJFileName = "crytecSponza.obj";
     mOBJFolderName = "model/crytecSponza";
 
+    //mOBJFileName = "teapot.obj";
     //mOBJFileName = "diamond.obj";
+    //mOBJFileName = "horse_statue_Tri.obj";
+    //mOBJFileName = "ocean.obj";
+    //mOBJFileName = "crab.obj";//ok
     //mOBJFolderName = "model";
 
     mStageType = StageType_Plane;

@@ -110,7 +110,7 @@ namespace utility {
 
     std::vector<char> CompileShaderAtRuntime(const std::filesystem::path& shaderFile);
 
-    utility::TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const std::wstring& fileName);
+    utility::TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const std::wstring& fileName, bool isNoExeption = false);
     HRESULT ReadDataFromFile(LPCWSTR filename, byte** dataPtr, u32* sizePtr);
 
     struct VertexPN {

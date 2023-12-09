@@ -82,45 +82,129 @@ namespace utility {
 				Face[0].x = -1; Face[0].y = -1; Face[0].z = -1; Face[0].w = -1;//VertexID
 				Face[1].x = -1; Face[1].y = -1; Face[1].z = -1; Face[1].w = -1;//UVID
 				Face[2].x = -1; Face[2].y = -1; Face[2].z = -1; Face[2].w = -1;//NormalID
+
+				////new
+				const s32 LineBufferLength = 1024;
+				char buffer[LineBufferLength];
+
+				if (fgets(buffer, LineBufferLength, fp) != nullptr)
+				{
+					char* parsePoint = strchr(buffer, ' ');
+					std::vector<std::string> spaceSplit;
+					Split(' ', &buffer[0], spaceSplit);
+					s32 vtx_uv_nrmID[3] =
+					{
+						-1, -1, -1,
+					};
+
+					if (spaceSplit.size() == 3)//Triangle
+					{
+						for (s32 i = 0; i < 3; i++)
+						{
+							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+							//vertexID uvID normalID
+							for (s32 i = 0; i < 3; i++)
+							{
+								s32 currID = vtx_uv_nrmID[i];
+
+								if (currID == -1)
+								{
+									continue;
+								}
+
+								switch (i)
+								{
+									case 0:
+										MaterialTbl[matID].TriangleVertexIDTbl.push_back(currID );
+										break;
+									case 1:
+										MaterialTbl[matID].TriangleUVIDTbl.push_back(currID);
+										break;
+									case 2:
+										MaterialTbl[matID].TriangleNormalIDTbl.push_back(currID);
+										break;
+								}
+							}
+						}
+					}
+					else if (spaceSplit.size() == 4)//Rectangle
+					{
+						for (s32 i = 0; i < 4; i++)
+						{
+							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+							//vertexID uvID normalID
+							for (s32 i = 0; i < 3; i++)
+							{
+								s32 currID = vtx_uv_nrmID[i];
+
+								if (currID == -1)
+								{
+									continue;
+								}
+
+								switch (i)
+								{
+								case 0:
+									MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
+									break;
+								case 1:
+									MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
+									break;
+								case 2:
+									MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
+									break;
+								}
+							}
+						}
+					}
+					else
+					{
+						OutputDebugString(L"Invalid Vertex");
+					}
+				}
+				////new
+
+				///old
 				//vertexID/uvID/NormalID vertexID/uvID/NormalID vertexID/uvID/NormalID vertexID/uvID/NormalID 
 				//if the value is not exist, coreesponded Face element is not setted.
-				fscanf_s(fp, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
-					&Face[0].x, &Face[1].x, &Face[2].x,
-					&Face[0].y, &Face[1].y, &Face[2].y,
-					&Face[0].z, &Face[1].z, &Face[2].z,
-					&Face[0].w, &Face[1].w, &Face[2].w);
-				//Triangle
-				if ((Face[0].w == -1) && (Face[1].w == -1) && (Face[2].w == -1)) {
-					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].x - 1);
-					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].y - 1);
-					MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].z - 1);
-					if (Face[1].x != -1)//no uv
-					{
-						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
-						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
-						MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
-					}
-					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].x - 1);
-					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].y - 1);
-					MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].z - 1);
-				}
-				else {//Rectangle
-					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].x - 1);
-					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].y - 1);
-					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].z - 1);
-					MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].w - 1);
-					if (Face[1].x != -1)// no uv
-					{
-						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
-						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
-						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
-						MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
-					}
-					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].x - 1);
-					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].y - 1);
-					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
-					MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].w - 1);
-				}
+				//fscanf_s(fp, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
+				//	&Face[0].x, &Face[1].x, &Face[2].x,
+				//	&Face[0].y, &Face[1].y, &Face[2].y,
+				//	&Face[0].z, &Face[1].z, &Face[2].z,
+				//	&Face[0].w, &Face[1].w, &Face[2].w);
+				////Triangle
+				//if ((Face[0].w == -1) && (Face[1].w == -1) && (Face[2].w == -1)) {
+				//	MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].x - 1);
+				//	MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].y - 1);
+				//	MaterialTbl[matID].TriangleVertexIDTbl.push_back(Face[0].z - 1);
+				//	if (Face[1].x != -1)//no uv
+				//	{
+				//		MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].x - 1);
+				//		MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].y - 1);
+				//		MaterialTbl[matID].TriangleUVIDTbl.push_back(Face[1].z - 1);
+				//	}
+				//	MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].x - 1);
+				//	MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].y - 1);
+				//	MaterialTbl[matID].TriangleNormalIDTbl.push_back(Face[2].z - 1);
+				//}
+				//else {//Rectangle
+				//	MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].x - 1);
+				//	MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].y - 1);
+				//	MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].z - 1);
+				//	MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(Face[0].w - 1);
+				//	if (Face[1].x != -1)// no uv
+				//	{
+				//		MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].x - 1);
+				//		MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].y - 1);
+				//		MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].z - 1);
+				//		MaterialTbl[matID].QuadrangleUVIDTbl.push_back(Face[1].w - 1);
+				//	}
+				//	MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].x - 1);
+				//	MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].y - 1);
+				//	MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].z - 1);
+				//	MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(Face[2].w - 1);
+				//}
+				//old
 
 			}
 		}
@@ -200,21 +284,22 @@ namespace utility {
 		sprintf_s(fileName, "%s/%s", folderPath, FileName);
 		errno_t err;
 		err = fopen_s(&fp, fileName, "rt");
+
+		bool isFileValid = false;
 		if (err == 0)
 		{
 			OutputDebugString(L"LoadMaterialFromFile() File Open Succeeded\n");
+			isFileValid = true;
 		}
 		else if (err > 0)
 		{
 			wchar_t debugStr[256];
 			swprintf_s(debugStr, L"LoadMaterialFromFile() File Open ERROR : code %d\n", err);
 			OutputDebugString(debugStr);
-			return false;
 		}
 		else
 		{
 			OutputDebugString(L"LoadMaterialFromFile() File Open ERROR\n");
-			return false;
 		}
 
 		char key[255] = { 0 };
@@ -235,73 +320,95 @@ namespace utility {
 		mtl.Shininess = 0.0f;
 		mtl.TexID = 0;
 
-		fseek(fp, SEEK_SET, 0);
-
-		while (!feof(fp))
+		if (isFileValid)
 		{
-			//key newmtl / Ka / Kd etc...
-			fscanf_s(fp, "%s ", key, sizeof(key));
-			if (strcmp(key, "newmtl") == 0)
-			{
-				if (isMaterialIncluded) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
-				isMaterialIncluded = true;
-				fscanf_s(fp, "%s ", key, sizeof(key));
-				mtl.MaterialName = key;
-				isTextureIncluded = false;
-			}
-			if (strcmp(key, "Ka") == 0)
-			{
-				fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-				mtl.Reflection4Color.ambient = vec4d;
-			}
-			if (strcmp(key, "Kd") == 0)
-			{
-				fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-				mtl.Reflection4Color.diffuse = vec4d;
-			}
-			if (strcmp(key, "Ks") == 0)
-			{
-				fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-				mtl.Reflection4Color.specular = vec4d;
-			}
-			if (strcmp(key, "Ns") == 0)
-			{
-				fscanf_s(fp, "%f", &vec4d.x);
-				mtl.Shininess = vec4d.x;
-			}
-			if (strcmp(key, "map_Kd") == 0)//only use map_Kd
-			{
-				fscanf_s(fp, "%s ", key, sizeof(key));
-				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
-					if (strcmp(key, MaterialTbl[i].TextureName.c_str()) == 0) {
-						isTextureIncluded = true;
-						mtl.TexID = MaterialTbl[i].TexID;
-						break;
-					}
-				}
-				if (false) {
-				}
-				else {
-					mtl.TextureName = key;
+			fseek(fp, SEEK_SET, 0);
 
-					if (
-						mtl.Reflection4Color.diffuse.x == 0 &&
-						mtl.Reflection4Color.diffuse.y == 0 &&
-						mtl.Reflection4Color.diffuse.z == 0 &&
-						mtl.Reflection4Color.diffuse.w == 0
-						)
-					{
-						mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			while (!feof(fp))
+			{
+				//key newmtl / Ka / Kd etc...
+				fscanf_s(fp, "%s ", key, sizeof(key));
+				if (strcmp(key, "newmtl") == 0)
+				{
+					if (isMaterialIncluded) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
+					isMaterialIncluded = true;
+					fscanf_s(fp, "%s ", key, sizeof(key));
+					mtl.MaterialName = key;
+					isTextureIncluded = false;
+				}
+				if (strcmp(key, "Ka") == 0)
+				{
+					fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
+					mtl.Reflection4Color.ambient = vec4d;
+				}
+				if (strcmp(key, "Kd") == 0)
+				{
+					fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
+					mtl.Reflection4Color.diffuse = vec4d;
+				}
+				if (strcmp(key, "Ks") == 0)
+				{
+					fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
+					mtl.Reflection4Color.specular = vec4d;
+				}
+				if (strcmp(key, "Ns") == 0)
+				{
+					fscanf_s(fp, "%f", &vec4d.x);
+					mtl.Shininess = vec4d.x;
+				}
+				if (strcmp(key, "map_Kd") == 0)//only use map_Kd
+				{
+					fscanf_s(fp, "%s ", key, sizeof(key));
+					for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
+						if (strcmp(key, MaterialTbl[i].TextureName.c_str()) == 0) {
+							isTextureIncluded = true;
+							mtl.TexID = MaterialTbl[i].TexID;
+							break;
+						}
 					}
-					wchar_t nameTex[60];
-					swprintf(nameTex, 60, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mtl.TextureName).c_str());
-					//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
-					mtl.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex);
-					//generate tex by this name
+					if (false) {
+					}
+					else {
+						mtl.TextureName = key;
+
+						if (
+							mtl.Reflection4Color.diffuse.x == 0 &&
+							mtl.Reflection4Color.diffuse.y == 0 &&
+							mtl.Reflection4Color.diffuse.z == 0 &&
+							mtl.Reflection4Color.diffuse.w == 0
+							)
+						{
+							mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+						}
+						wchar_t nameTex[60];
+						swprintf(nameTex, 60, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mtl.TextureName).c_str());
+						//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+						mtl.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
+						if (mtl.DiffuseTexture.res == nullptr)
+						{
+							mtl.TextureName = "dummyNullWhite";
+							mtl.DiffuseTexture.res = device->CreateTexture2D(
+								1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+								D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+								D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+								D3D12_HEAP_TYPE_DEFAULT,
+								StringToWString(mtl.TextureName).c_str()
+							);
+							D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+							srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+							srvDesc.Texture2D.MipLevels = 1;
+							srvDesc.Texture2D.MostDetailedMip = 0;
+							srvDesc.Texture2D.ResourceMinLODClamp = 0;
+							srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+							mtl.DiffuseTexture.srv = device->CreateShaderResourceView(mtl.DiffuseTexture.res.Get(), &srvDesc);
+						}
+						//generate tex by this name
+					}
 				}
 			}
+
+			fclose(fp);
 		}
-		fclose(fp);
 
 		if (isMaterialIncluded)
 		{

@@ -50,7 +50,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
-    if (!isNoTexture)
+
+    float2 diffTexSize = 0.xx;
+    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
+    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
+    if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
     }
@@ -109,7 +113,10 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
 
     float4 diffuseTexColor = 1.xxxx;
-    if (!isNoTexture)
+    float2 diffTexSize = 0.xx;
+    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
+    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
+    if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
     }
