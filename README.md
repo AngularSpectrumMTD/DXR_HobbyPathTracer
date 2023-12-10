@@ -21,7 +21,12 @@ Shading : GGX
 ### How To Use
 1.Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
-![setting](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/207261ca-41ed-4a5f-a64d-8a2e989270b2)
+
+
+    mOBJFileName = "crytekSponza.obj";
+    mOBJFolderName = "model/crytekSponza";
+
+
 
 2.Build and Execute
 

@@ -52,8 +52,8 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //mOBJFileName = "crytecSponza.obj";
-    //mOBJFolderName = "model/crytecSponza";
+    //mOBJFileName = "crytekSponza.obj";
+    //mOBJFolderName = "model/crytekSponza";
 
     mOBJFileName = "diamond.obj";
     mOBJFolderName = "model";
