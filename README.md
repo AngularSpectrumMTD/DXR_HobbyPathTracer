@@ -25,6 +25,8 @@ Shading : GGX
 
 2.Build and Execute
 
+**NOTE : This program can only handle triangular polygons**
+
 ### Graphics API
 DirectX12
 
