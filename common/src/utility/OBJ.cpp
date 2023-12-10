@@ -159,7 +159,8 @@ namespace utility {
 					}
 					else
 					{
-						OutputDebugString(L"Invalid Vertex");
+						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+						return false;
 					}
 				}
 				////new

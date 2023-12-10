@@ -1,0 +1,24 @@
+# Blender 3.4.1 MTL File: 'horse_statue_Tri.blend'
+# www.blender.org
+
+newmtl horse_statue_01
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_diff_4k.jpg
+map_Ns E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_rough_4k.jpg
+map_Bump -bm 1.000000 E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_nor_gl_4k.exr
+
+newmtl horse_statue_01_base
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_diff_4k.jpg
+map_Ns E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_rough_4k.jpg
+map_Bump -bm 1.000000 E:/3Dmodels/horse_statue_01_4k.blend/textures/horse_statue_01_nor_gl_4k.exr

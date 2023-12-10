@@ -52,15 +52,11 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    mOBJFileName = "crytecSponza.obj";
-    mOBJFolderName = "model/crytecSponza";
+    //mOBJFileName = "crytecSponza.obj";
+    //mOBJFolderName = "model/crytecSponza";
 
-    //mOBJFileName = "teapot.obj";
-    //mOBJFileName = "diamond.obj";
-    //mOBJFileName = "horse_statue_Tri.obj";
-    //mOBJFileName = "ocean.obj";
-    //mOBJFileName = "crab.obj";//ok
-    //mOBJFolderName = "model";
+    mOBJFileName = "diamond.obj";
+    mOBJFolderName = "model";
 
     mStageType = StageType_Plane;
 
