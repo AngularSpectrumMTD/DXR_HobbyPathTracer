@@ -27,7 +27,7 @@ VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
         positionTbl[i] = vertexBuffer[index].Position;
         normalTbl[i] = vertexBuffer[index].Normal;
         texcoordTbl[i] = vertexBuffer[index].UV;
-        if (texcoordTbl[i].x < -10)
+        if (texcoordTbl[i].x == 0xff && texcoordTbl[i].y == 0xff)
         {
             isNoTexture = true;
         }

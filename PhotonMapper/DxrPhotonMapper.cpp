@@ -53,13 +53,13 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //mOBJFileName = "crytekSponza.obj";
-    //mOBJFolderName = "model/crytekSponza";
-    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    mOBJFileName = "crytekSponza.obj";
+    mOBJFolderName = "model/crytekSponza";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
-    mOBJFileName = "skull.obj";
-    mOBJFolderName = "model";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, -15, 0));
+    //mOBJFileName = "skull.obj";
+    //mOBJFolderName = "model";
+    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, -15, 0));
 
     mStageType = StageType_Plane;
 

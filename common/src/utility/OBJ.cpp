@@ -230,7 +230,7 @@ namespace utility {
 				}
 				else
 				{
-					Tri.UV = XMFLOAT2(-100, 0);
+					Tri.UV = XMFLOAT2(0xff, 0xff);
 				}
 				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
 			}
@@ -244,7 +244,7 @@ namespace utility {
 				}
 				else
 				{
-					Quad.UV = XMFLOAT2(-100, 0);
+					Quad.UV = XMFLOAT2(0xff, 0xff);
 				}
 				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
 			}
