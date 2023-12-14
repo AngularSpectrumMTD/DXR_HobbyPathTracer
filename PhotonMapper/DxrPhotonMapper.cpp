@@ -35,6 +35,7 @@ void DxrPhotonMapper::Setup()
     mLightRange = 0.03f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
     mPhi = 396; mTheta = 276;
+    mPhiDirectional = 396; mThetaDirectional = 276;
     mTmpAccumuRatio = 0.03f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
@@ -55,8 +56,9 @@ void DxrPhotonMapper::Setup()
     //mOBJFileName = "crytekSponza.obj";
     //mOBJFolderName = "model/crytekSponza";
 
-    mOBJFileName = "diamond.obj";
+    mOBJFileName = "skull.obj";
     mOBJFolderName = "model";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, -15, 0));
 
     mStageType = StageType_Plane;
 
@@ -328,7 +330,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
-    mSceneParam.directionalLightDirection = XMVector4Normalize(XMVectorSet(1.0f, -2.0f, 1.0f, 0.0f));
+    mSceneParam.directionalLightDirection = XMVectorSet(sin(mThetaDirectional * OneRadian) * cos(mPhiDirectional * OneRadian), sin(mThetaDirectional * OneRadian) * sin(mPhiDirectional * OneRadian), cos(mThetaDirectional * OneRadian), 0.0f);
     mSceneParam.directionalLightColor = XMVectorSet(1.0f, 0.5f, 0.1f, 0.0f);
 
     mRenderFrame++;
@@ -377,6 +379,12 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'P':
         mPhi += mInverseMove ? -1 : 1;
+        break;
+    case 'A':
+        mThetaDirectional += mInverseMove ? -1 : 1;
+        break;
+    case 'F':
+        mPhiDirectional += mInverseMove ? -1 : 1;
         break;
     case 'K':
         mIntenceBoost = Clamp(100, 100000, mIntenceBoost + (mInverseMove ? -100 : 100));

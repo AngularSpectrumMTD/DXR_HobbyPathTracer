@@ -1,6 +1,8 @@
 #include "utility/OBJ.h"
 #include <codecvt>
 
+#define PREPARE_ELEMENTS 10000
+
 namespace utility {
 	OBJ_MODEL::OBJ_MODEL() {
 	}
@@ -13,6 +15,10 @@ namespace utility {
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
 		vector <DirectX::XMFLOAT2> uv;
+
+		Vertex.reserve(PREPARE_ELEMENTS);
+		Normal.reserve(PREPARE_ELEMENTS);
+		uv.reserve(PREPARE_ELEMENTS);
 
 		s32 matID = 0;
 		char key[255] = { 0 };
@@ -244,13 +250,26 @@ namespace utility {
 
 		//No Indexing
 		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
-			MaterialTbl[j].TriangleVertexIDTbl.clear();
-			MaterialTbl[j].TriangleNormalIDTbl.clear();
-			MaterialTbl[j].TriangleUVIDTbl.clear();
 
-			MaterialTbl[j].QuadrangleVertexIDTbl.clear();
-			MaterialTbl[j].QuadrangleNormalIDTbl.clear();
-			MaterialTbl[j].QuadrangleUVIDTbl.clear();
+			if (MaterialTbl[j].TriangleVertexIDTbl.size() > 0)
+			{
+				MaterialTbl[j].TriangleVertexIDTbl.clear();
+				MaterialTbl[j].TriangleVertexIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size()); 
+				MaterialTbl[j].TriangleNormalIDTbl.clear();
+				MaterialTbl[j].TriangleNormalIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
+				MaterialTbl[j].TriangleUVIDTbl.clear();
+				MaterialTbl[j].TriangleUVIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
+			}
+
+			if (MaterialTbl[j].QuadrangleVertexIDTbl.size() > 0)
+			{
+				MaterialTbl[j].QuadrangleVertexIDTbl.clear();
+				MaterialTbl[j].QuadrangleVertexIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+				MaterialTbl[j].QuadrangleNormalIDTbl.clear();
+				MaterialTbl[j].QuadrangleNormalIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+				MaterialTbl[j].QuadrangleUVIDTbl.clear();
+				MaterialTbl[j].QuadrangleUVIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+			}
 
 			u32 count = 0;
 			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {

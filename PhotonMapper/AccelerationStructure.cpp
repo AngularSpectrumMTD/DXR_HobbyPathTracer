@@ -245,8 +245,6 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         count++;
     }
 
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-
     XMVECTOR colorTbl[] = {
         XMVectorSet(1.0f, 0.2f, 1.0f, 0.0f),
         XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),

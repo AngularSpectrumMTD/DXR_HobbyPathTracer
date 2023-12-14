@@ -484,6 +484,8 @@ private:
 
     f32 mPhi;
     f32 mTheta;
+    f32 mPhiDirectional;
+    f32 mThetaDirectional;
 
     f32 mCausticsBoost;
 
