@@ -55,6 +55,7 @@ void DxrPhotonMapper::Setup()
 
     //mOBJFileName = "crytekSponza.obj";
     //mOBJFolderName = "model/crytekSponza";
+    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
     mOBJFileName = "skull.obj";
     mOBJFolderName = "model";
