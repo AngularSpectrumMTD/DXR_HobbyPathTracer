@@ -43,12 +43,10 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
-    float3 curEnergy = payload.energy;
-    float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
-        
-    const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
-    payload.color += shading * curEnergy * photonIrradiance;
-    payload.energy = curEnergy;
+    
+    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+    payload.color += payload.energy * (currentMaterial.emission.xyz  + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
+
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
     TraceRay(
@@ -80,9 +78,8 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
-    float3 curEnergy = payload.throughput;
-    float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
-    payload.throughput = shading * curEnergy;
+
+    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput);
     if (isPhotonStoreRequired(currentMaterial))
     {
         storePhoton(payload);

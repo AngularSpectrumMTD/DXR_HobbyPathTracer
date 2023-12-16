@@ -19,6 +19,7 @@ void miss(inout Payload payload) {
     directionalLightEnergy *= (payload.recursive == 0) ? 0 : 1;
     float3 curEnergy = payload.energy + directionalLightEnergy;
     payload.color += curEnergy * cubemap.rgb;
+    payload.energy = 0.xxx;
     //payload.color = directionalLightEnergy;
 }
 

@@ -31,10 +31,10 @@ void DxrPhotonMapper::Setup()
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 21.f; mLightPosY = 31; mLightPosZ = -5;
-    mLightRange = 0.03f;
+    mLightPosX = 4.f; mLightPosY = 31; mLightPosZ = -5;
+    mLightRange = 0.065f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhi = 396; mTheta = 276;
+    mPhi = 441; mTheta = 276;
     mPhiDirectional = 396; mThetaDirectional = 276;
     mTmpAccumuRatio = 0.03f;
     mSpectrumMode = Spectrum_D65;
@@ -53,13 +53,13 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    mOBJFileName = "crytekSponza.obj";
-    mOBJFolderName = "model/crytekSponza";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //mOBJFileName = "crytekSponza.obj";
+    //mOBJFolderName = "model/crytekSponza";
+    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
-    //mOBJFileName = "skull.obj";
-    //mOBJFolderName = "model";
-    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, -15, 0));
+    mOBJFileName = "horse_statue_Tri.obj";
+    mOBJFolderName = "model";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
 
     mStageType = StageType_Plane;
 

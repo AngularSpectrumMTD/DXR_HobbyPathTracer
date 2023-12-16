@@ -441,8 +441,8 @@ namespace utility {
 			mtl.MaterialName = "dummyMTL";
 			mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 			mtl.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-			mtl.Reflection4Color.emission = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+			mtl.Reflection4Color.emission = DirectX::XMFLOAT4(0.0, 0.0, 0.0, 0.0);
+			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
 			mtl.TextureName = "dummyNullWhite";
 			mtl.DiffuseTexture.res = device->CreateTexture2D(
 				1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -511,27 +511,16 @@ namespace utility {
 
 			wchar_t nameIB[60];
 			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
-
-			//u32 idMax = 0;
-			//for (auto& v : m.TriangleVertexIDTbl)
-			//{
-			//	idMax = max(idMax, v);
-			//}
-			//wchar_t str[256];
-			//swprintf_s(str, L"vertexSize %d idMax %d\n", m.TriangleVertexTbl.size(), idMax);
-
-			//OutputDebugString(str);
 			
 			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 
 			MaterialParam mparams;
 			mparams.albedo = XMVectorSet(m.Reflection4Color.diffuse.x, m.Reflection4Color.diffuse.y, m.Reflection4Color.diffuse.z, m.Reflection4Color.diffuse.w);
-			mparams.metallic = 0;// m.Shininess;
+			mparams.specular = (m.Reflection4Color.specular.x + m.Reflection4Color.specular.y + m.Reflection4Color.specular.z + m.Reflection4Color.specular.w) / 4.0f;
+			mparams.metallic = mparams.specular;
 			mparams.roughness = 1 - mparams.metallic;
 			mparams.transRatio = 0;
-			//mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
-			mparams.emission = XMVectorSet(1, 1, 1, 1);
-			mparams.specular = max(max(max(m.Reflection4Color.specular.x, m.Reflection4Color.specular.y), m.Reflection4Color.specular.z), m.Reflection4Color.specular.w);
+			mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
 			m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 			device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
 

@@ -222,7 +222,7 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
 }
 
 //Shading
-float3 SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
+void SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
 {
     nextRay.TMin = 0.001;
     nextRay.TMax = 10000;
@@ -354,8 +354,6 @@ float3 SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nex
             throughput *= sumBRDF / sumPDF;
         }
     }
-    
-    return material.emission.rgb;
 }
 
 //Spectral Rendering Helper

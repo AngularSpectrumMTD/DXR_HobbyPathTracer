@@ -77,11 +77,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        float3 curEnergy = payload.energy;
-        float3 shading = SurafceShading(currentMaterial, vtx.Normal, nextRay, curEnergy);
-        const float3 photonIrradiance = photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal);
-        payload.color += shading * curEnergy * photonIrradiance;
-        payload.energy = curEnergy;
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+        payload.color += payload.energy * (currentMaterial.emission.xyz + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
     }
     else
     {
@@ -139,9 +136,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        float3 curEnergy = payload.throughput;
-        float3 shading = SurafceShading(currentMaterial, bestHitWorldNormal, nextRay, curEnergy, payload.lambdaNM);
-        payload.throughput = shading * curEnergy;
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput);
     }
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))

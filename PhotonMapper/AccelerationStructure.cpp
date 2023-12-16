@@ -264,7 +264,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     defaultMaterial.specular = 0;//spec power
     defaultMaterial.transRatio = 1;//0:diffuse  1:trans
     defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    defaultMaterial.emission = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 
     std::uniform_int_distribution rndID(0, 4);
     std::uniform_real_distribution rndF(0.f, 1.f);
