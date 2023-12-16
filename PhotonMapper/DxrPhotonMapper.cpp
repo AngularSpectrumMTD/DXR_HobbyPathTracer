@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 void DxrPhotonMapper::Setup()
 {
     mIntenceBoost = 10000;
-    mGatherRadius = 0.25f;
+    mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 0;
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
@@ -361,7 +361,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsMoveModel = !mIsMoveModel;
         break;
     case 'G':
-        mGatherRadius = Clamp(0.01f, 2, mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
+        mGatherRadius = Clamp(0.01f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
         break;
     case 'X':
         mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
