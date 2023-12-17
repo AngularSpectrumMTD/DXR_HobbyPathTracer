@@ -27,10 +27,10 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
     //variance
     {
         mCommandList->SetComputeRootSignature(mRsComputeVariance.Get());
-        mCommandList->SetComputeRootDescriptorTable(0, mDepthBufferDescriptorSRVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(1, mNormalBufferDescriptorSRV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(2, mLuminanceMomentBufferDescriptorSRVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(3, mLuminanceVarianceBufferDescriptorUAVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["depthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["normalBuffer"], mNormalBufferDescriptorSRV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["luminanceMomentBuffer"], mLuminanceMomentBufferDescriptorSRVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["varianceBuffer"], mLuminanceVarianceBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetPipelineState(mComputeVariancePSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "ComputeVariance");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -55,13 +55,13 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
             mDevice->ImmediateBufferUpdateHostVisible(denoiseCB, &cb, sizeof(cb));
 
             mCommandList->SetComputeRootSignature(mRsA_TrousWaveletFilter.Get());
-            mCommandList->SetComputeRootConstantBufferView(0, denoiseCB->GetGPUVirtualAddress());
-            mCommandList->SetComputeRootDescriptorTable(1, (i % 2 == 0) ? mMainOutputDescriptorSRV.hGpu : mDenoisedColorBufferDescriptorSRV.hGpu);
-            mCommandList->SetComputeRootDescriptorTable(2, mDepthBufferDescriptorSRVTbl[dst].hGpu);
-            mCommandList->SetComputeRootDescriptorTable(3, mNormalBufferDescriptorSRV.hGpu);
-            mCommandList->SetComputeRootDescriptorTable(4, mLuminanceVarianceBufferDescriptorSRVTbl[(i % 2 == 0) ? dst : src].hGpu);
-            mCommandList->SetComputeRootDescriptorTable(5, (i % 2 == 1) ? mMainOutputDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
-            mCommandList->SetComputeRootDescriptorTable(6, mLuminanceVarianceBufferDescriptorUAVTbl[(i % 2 == 0) ? src : dst].hGpu);
+            mCommandList->SetComputeRootConstantBufferView(mRegisterMapA_TrousWaveletFilter["gWaveletParam"], denoiseCB->GetGPUVirtualAddress());
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferSrc"], (i % 2 == 0) ? mMainOutputDescriptorSRV.hGpu : mDenoisedColorBufferDescriptorSRV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["depthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["normalBuffer"], mNormalBufferDescriptorSRV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferSrc"], mLuminanceVarianceBufferDescriptorSRVTbl[(i % 2 == 0) ? dst : src].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferDst"], (i % 2 == 1) ? mMainOutputDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferDst"], mLuminanceVarianceBufferDescriptorUAVTbl[(i % 2 == 0) ? src : dst].hGpu);
             mCommandList->SetPipelineState(mA_TrousWaveletFilterPSO.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "A_TrousWaveletFiltering");
             mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);

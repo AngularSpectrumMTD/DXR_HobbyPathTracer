@@ -25,8 +25,8 @@ void DxrPhotonMapper::BitonicSortLDS()
         mDevice->ImmediateBufferUpdateHostVisible(bitonicCB0, &bitonicCBStruct0, sizeof(bitonicCBStruct0));
 
         mCommandList->SetComputeRootSignature(mRsBitonicSortLDS.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, bitonicCB0->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapBitonicSortLDS["gBitonicParam"], bitonicCB0->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapBitonicSortLDS["gOutput"], mPhotonGridDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mBitonicSortLDSPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort");
         mCommandList->Dispatch((s32)(NUM_ELEMENTS / BITONIC_BLOCK_SIZE), 1, 1);
@@ -50,9 +50,9 @@ void DxrPhotonMapper::BitonicSortLDS()
         mCommandList->ResourceBarrier(u32(photonGridTmpUavBarrier.size()), photonGridTmpUavBarrier.data());
 
         mCommandList->SetComputeRootSignature(mRsTranspose.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, bitonicCB1->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(2, mPhotonGridTmpDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapTranspose["gBitonicParam"], bitonicCB1->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTranspose["gInput"], mPhotonGridDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTranspose["gOutput"], mPhotonGridTmpDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mTransposePSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort_Transpose");
         mCommandList->Dispatch((s32)(MATRIX_WIDTH / TRANSPOSE_BLOCK_SIZE), (s32)(MATRIX_HEIGHT / TRANSPOSE_BLOCK_SIZE), 1);
@@ -62,8 +62,8 @@ void DxrPhotonMapper::BitonicSortLDS()
         mCommandList->ResourceBarrier(u32(photonGridTmpUavBarrier.size()), photonGridTmpUavBarrier.data());
 
         mCommandList->SetComputeRootSignature(mRsBitonicSortLDS.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, bitonicCB1->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridTmpDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapBitonicSortLDS["gBitonicParam"], bitonicCB1->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapBitonicSortLDS["gOutput"], mPhotonGridTmpDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mBitonicSortLDSPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort");
         mCommandList->Dispatch((s32)(NUM_ELEMENTS / BITONIC_BLOCK_SIZE), 1, 1);
@@ -78,9 +78,9 @@ void DxrPhotonMapper::BitonicSortLDS()
         mDevice->ImmediateBufferUpdateHostVisible(bitonicCB2, &bitonicCBStruct2, sizeof(bitonicCBStruct2));
 
         mCommandList->SetComputeRootSignature(mRsTranspose.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, bitonicCB2->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridTmpDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(2, mPhotonGridDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapTranspose["gBitonicParam"], bitonicCB2->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTranspose["gInput"], mPhotonGridTmpDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTranspose["gOutput"], mPhotonGridDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mTransposePSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort_Transpose");
         mCommandList->Dispatch((s32)(MATRIX_HEIGHT / TRANSPOSE_BLOCK_SIZE), (s32)(MATRIX_WIDTH / TRANSPOSE_BLOCK_SIZE), 1);
@@ -90,8 +90,8 @@ void DxrPhotonMapper::BitonicSortLDS()
         mCommandList->ResourceBarrier(u32(photonGridTmpUavBarrier.size()), photonGridTmpUavBarrier.data());
 
         mCommandList->SetComputeRootSignature(mRsBitonicSortLDS.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, bitonicCB2->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapBitonicSortLDS["gBitonicParam"], bitonicCB2->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapBitonicSortLDS["gOutput"], mPhotonGridDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mBitonicSortLDSPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort");
         mCommandList->Dispatch((s32)(NUM_ELEMENTS / BITONIC_BLOCK_SIZE), 1, 1);
@@ -132,8 +132,8 @@ void DxrPhotonMapper::BitonicSortSimple()
             mDevice->ImmediateBufferUpdateHostVisible(bitonicSimpleCB, &cb, sizeof(cb));
 
             mCommandList->SetComputeRootSignature(mRsBitonicSortSimple.Get());
-            mCommandList->SetComputeRootConstantBufferView(0, bitonicSimpleCB->GetGPUVirtualAddress());
-            mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootConstantBufferView(mRegisterMapBitonicSortSimple["gBitonicParam"], bitonicSimpleCB->GetGPUVirtualAddress());
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapBitonicSortSimple["data"], mPhotonGridDescriptorUAV.hGpu);
             mCommandList->SetPipelineState(mBitonicSortSimplePSO.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "BitonicSort");
             mCommandList->Dispatch(n / 2 / BITONIC2_THREAD_NUM, 1, 1);
@@ -176,9 +176,9 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->ResourceBarrier(u32(uavBarriersGrid.size()), uavBarriersGrid.data());
 
     mCommandList->SetComputeRootSignature(mRsBuildGrid.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mPhotonMapDescriptorUAV.hGpu);//Src PhotonMap
-    mCommandList->SetComputeRootDescriptorTable(2, mPhotonGridDescriptorUAV.hGpu);//Record Photon Hash & Serial Index
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapBuildGrid["gGridParam"], gridCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapBuildGrid["gPhotonMapRead"], mPhotonMapDescriptorUAV.hGpu);//Src PhotonMap
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapBuildGrid["gPhotonGridBufferWrite"], mPhotonGridDescriptorUAV.hGpu);//Record Photon Hash & Serial Index
     mCommandList->SetPipelineState(mBuildGridPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "BuildGrid");
     mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);
@@ -191,8 +191,8 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->ResourceBarrier(u32(uavBarriersGridId.size()), uavBarriersGridId.data());
 
     mCommandList->SetComputeRootSignature(mRsClearGridIndices.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridIdDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapClearGridIndices["gGridParam"], gridCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearGridIndices["gPhotonGridIdBufferWrite"], mPhotonGridIdDescriptorUAV.hGpu);
     mCommandList->SetPipelineState(mClearGridIndicesPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "ClearGrid");
     mCommandList->Dispatch((s32)(gridNum / GRID_SORT_THREAD_NUM), 1, 1);
@@ -202,9 +202,9 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->ResourceBarrier(u32(uavBarriersGrid.size()), uavBarriersGrid.data());
 
     mCommandList->SetComputeRootSignature(mRsBuildGridIndices.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mPhotonGridDescriptorUAV.hGpu);//Sorted ID
-    mCommandList->SetComputeRootDescriptorTable(2, mPhotonGridIdDescriptorUAV.hGpu);//Record Serial Range(Photon Hash)
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapBuildGridIndices["gGridParam"], gridCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapBuildGridIndices["gPhotonGridBufferRead"], mPhotonGridDescriptorUAV.hGpu);//Sorted ID
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapBuildGridIndices["gPhotonGridBufferWrite"], mPhotonGridIdDescriptorUAV.hGpu);//Record Serial Range(Photon Hash)
     mCommandList->SetPipelineState(mBuildGridIndicesPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "BuildGridIndices");
     mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);
@@ -216,10 +216,10 @@ void DxrPhotonMapper::Grid3DSort()
     mCommandList->ResourceBarrier(u32(uavBarriersPhotonMapSorted.size()), uavBarriersPhotonMapSorted.data());
 
     mCommandList->SetComputeRootSignature(mRsRearrangePhoton.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mPhotonMapDescriptorUAV.hGpu);//Src Photon Map
-    mCommandList->SetComputeRootDescriptorTable(2, mPhotonMapSortedDescriptorUAV.hGpu);//Sorted Photon Map According to Serial Range
-    mCommandList->SetComputeRootDescriptorTable(3, mPhotonGridDescriptorUAV.hGpu);//Sorted ID
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapRearrangePhoton["gGridParam"], gridCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapRearrangePhoton["gPhotonMapRead"], mPhotonMapDescriptorUAV.hGpu);//Src Photon Map
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapRearrangePhoton["gPhotonMapWrite"], mPhotonMapSortedDescriptorUAV.hGpu);//Sorted Photon Map According to Serial Range
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapRearrangePhoton["gPhotonGridBufferRead"], mPhotonGridDescriptorUAV.hGpu);//Sorted ID
     mCommandList->SetPipelineState(mRearrangePhotonPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "RearrangePhoton");
     mCommandList->Dispatch((s32)(photonNum / GRID_SORT_THREAD_NUM), 1, 1);

@@ -89,12 +89,11 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto recordTmpPtr = recordStartPtr;
                 memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                 recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+
+                auto registerStartPtr = recordStartPtr;
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
@@ -110,13 +109,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    //The order here depends not on the shader but on the RootSignature created.
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -134,12 +131,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -158,12 +154,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -182,12 +177,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -210,14 +204,12 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -348,12 +340,11 @@ void DxrPhotonMapper::CreateShaderTable()
                 auto recordTmpPtr = recordStartPtr;
                 memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                 recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(recordStartPtr, &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
-                memcpy(recordStartPtr, &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
-                recordStartPtr += sizeof(UINT64);
+
+                auto registerStartPtr = recordStartPtr;
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
@@ -369,12 +360,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshSphere.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshSphere.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -392,12 +382,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshBox.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshBox.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -416,12 +405,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -440,12 +428,11 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -468,14 +455,12 @@ void DxrPhotonMapper::CreateShaderTable()
                     auto recordTmpPtr = recordStartPtr;
                     memcpy(recordStartPtr, idPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                     recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                    memcpy(recordStartPtr, &cbAddress, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
-                    memcpy(recordStartPtr, &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
-                    recordStartPtr += sizeof(UINT64);
+
+                    auto registerStartPtr = recordStartPtr;
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"], &cbAddress, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;

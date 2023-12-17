@@ -52,13 +52,13 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //mOBJFileName = "crytekSponza.obj";
-    //mOBJFolderName = "model/crytekSponza";
-    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    mOBJFileName = "crytekSponza.obj";
+    mOBJFolderName = "model/crytekSponza";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
-    mOBJFileName = "horse_statue_Tri.obj";
-    mOBJFolderName = "model";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
+    //mOBJFileName = "horse_statue_Tri.obj";
+    //mOBJFolderName = "model";
+    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
@@ -545,21 +545,21 @@ void DxrPhotonMapper::Draw()
     {
         //PhotonMapping
         mCommandList->SetComputeRootSignature(mGlobalRootSigPhoton.Get());
-        mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(3, mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
-        mCommandList->SetComputeRootConstantBufferView(4, sceneCB->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(5, mPhotonMapDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(6, mDepthBufferDescriptorUAVTbl[src].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(7, mDepthBufferDescriptorUAVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(8, mPhotonGridIdDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(9, mPositionBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(10, mNormalBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(11, mMainOutputDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(14, mAccumulationCountBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigPhoton["gGridParam"], gridCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gRtScene"], mTLASDescriptor.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gEquiRecEnvMap"], mCubeMapTex.srv.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigPhoton["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonMap"], mPhotonMapDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevDepthBuffer"], mDepthBufferDescriptorUAVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gOutput"], mMainOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gOutput1"], mOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -571,21 +571,21 @@ void DxrPhotonMapper::Draw()
 
     //RayTracing
     mCommandList->SetComputeRootSignature(mGlobalRootSig.Get());
-    mCommandList->SetComputeRootConstantBufferView(0, gridCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(1, mTLASDescriptor.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(2, mCubeMapTex.srv.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(3, mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
-    mCommandList->SetComputeRootConstantBufferView(4, sceneCB->GetGPUVirtualAddress());
-    mCommandList->SetComputeRootDescriptorTable(5, mPhotonMapSortedDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(6, mDepthBufferDescriptorUAVTbl[src].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(7, mDepthBufferDescriptorUAVTbl[dst].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(8, mPhotonGridIdDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(9, mPositionBufferDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(10, mNormalBufferDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(11, mMainOutputDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(14, mAccumulationCountBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSig["gGridParam"], gridCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gRtScene"], mTLASDescriptor.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gEquiRecEnvMap"], mCubeMapTex.srv.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
+    mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSig["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonMap"], mPhotonMapSortedDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevDepthBuffer"], mDepthBufferDescriptorUAVTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gOutput"], mMainOutputDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gOutput1"], mOutputDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);

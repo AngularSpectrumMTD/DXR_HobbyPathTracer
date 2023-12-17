@@ -432,28 +432,41 @@ private:
     ComPtr<ID3D12Resource> mShaderTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
     ComPtr<ID3D12RootSignature> mGlobalRootSig;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSig;
     ComPtr<ID3D12RootSignature> mLocalRootSigFloor;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigFloor;
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterial;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterial;
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterialWithTex;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterialWithTex;
 
     ComPtr<ID3D12StateObject> mRTPSOPhoton;
     ComPtr<ID3D12Resource> mShaderPhotonTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
     ComPtr<ID3D12RootSignature> mGlobalRootSigPhoton;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigPhoton;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortLDS;
+    std::unordered_map < std::string, u32> mRegisterMapBitonicSortLDS;
     ComPtr<ID3D12RootSignature> mRsTranspose;
+    std::unordered_map < std::string, u32> mRegisterMapTranspose;
     ComPtr<ID3D12PipelineState> mBitonicSortLDSPSO;
     ComPtr<ID3D12PipelineState> mTransposePSO;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortSimple;
+    std::unordered_map < std::string, u32> mRegisterMapBitonicSortSimple;
     ComPtr<ID3D12PipelineState> mBitonicSortSimplePSO;
 
     ComPtr<ID3D12RootSignature> mRsBuildGrid;
+    std::unordered_map < std::string, u32> mRegisterMapBuildGrid;
     ComPtr<ID3D12RootSignature> mRsBuildGridIndices;
+    std::unordered_map < std::string, u32> mRegisterMapBuildGridIndices;
     ComPtr<ID3D12RootSignature> mRsCopy;
+    std::unordered_map < std::string, u32> mRegisterMapCopy;
     ComPtr<ID3D12RootSignature> mRsClearGridIndices;
+    std::unordered_map < std::string, u32> mRegisterMapClearGridIndices;
     ComPtr<ID3D12RootSignature> mRsRearrangePhoton;
+    std::unordered_map < std::string, u32> mRegisterMapRearrangePhoton;
     ComPtr<ID3D12PipelineState> mBuildGridPSO;
     ComPtr<ID3D12PipelineState> mBuildGridIndicesPSO;
     ComPtr<ID3D12PipelineState> mCopyPSO;
@@ -461,9 +474,11 @@ private:
     ComPtr<ID3D12PipelineState> mRearrangePhotonPSO;
 
     ComPtr<ID3D12RootSignature> mRsComputeVariance;
+    std::unordered_map < std::string, u32> mRegisterMapComputeVariance;
     ComPtr<ID3D12PipelineState> mComputeVariancePSO;
 
     ComPtr<ID3D12RootSignature> mRsA_TrousWaveletFilter;
+    std::unordered_map < std::string, u32> mRegisterMapA_TrousWaveletFilter;
     ComPtr<ID3D12PipelineState> mA_TrousWaveletFilterPSO;
 
     u32 mRenderFrame = 0;
