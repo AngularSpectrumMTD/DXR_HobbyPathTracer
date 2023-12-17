@@ -284,6 +284,7 @@ private:
     void CreateDenoisedColorBuffer();
     void CreatePositionBuffer();
     void CreateNormalBuffer();
+    void CreateAccumulationCountBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
     void CreateShaderTable();
@@ -405,6 +406,9 @@ private:
     ComPtr<ID3D12Resource> mNormalBuffer;
     dx12::Descriptor mNormalBufferDescriptorSRV;
     dx12::Descriptor mNormalBufferDescriptorUAV;
+    ComPtr<ID3D12Resource> mAccumulationCountBuffer;
+    dx12::Descriptor mAccumulationCountBufferDescriptorSRV;
+    dx12::Descriptor mAccumulationCountBufferDescriptorUAV;
 
     std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;
@@ -490,8 +494,6 @@ private:
     f32 mCausticsBoost;
 
     f32 mGlassRotateRange;
-
-    f32 mTmpAccumuRatio;
 
     ModelType mGlassModelType;
     ModelType mMetalModelType;

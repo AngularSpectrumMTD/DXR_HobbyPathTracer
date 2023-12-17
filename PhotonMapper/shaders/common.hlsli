@@ -67,6 +67,7 @@ RWTexture2D<float4> gNormalBuffer : register(u5);
 RWTexture2D<float4> gOutput : register(u6);
 RWTexture2D<float4> gOutput1 : register(u7);
 RWTexture2D<float2> gLuminanceMomentBufferDst : register(u8);
+RWTexture2D<uint> gAccumulationCountBuffer : register(u9);
 
 ////////////////////////////////////
 //Interpret Scene Param
@@ -94,11 +95,6 @@ bool isVisualizeLightRange()
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;
-}
-
-float getTempAccumuRatio()
-{
-    return gSceneParam.photonParams.y;
 }
 
 float getSpectrumMode()

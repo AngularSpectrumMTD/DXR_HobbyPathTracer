@@ -36,7 +36,6 @@ void DxrPhotonMapper::Setup()
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
     mPhi = 441; mTheta = 276;
     mPhiDirectional = 396; mThetaDirectional = 276;
-    mTmpAccumuRatio = 0.03f;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
@@ -60,6 +59,9 @@ void DxrPhotonMapper::Setup()
     mOBJFileName = "horse_statue_Tri.obj";
     mOBJFolderName = "model";
     mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
+
+    mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
+    mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
     mStageType = StageType_Plane;
 
@@ -327,7 +329,6 @@ void DxrPhotonMapper::Update()
     mSceneParam.flags.y = mIsUseTexture;//Box Material 0: Texture 1:One Color
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
     mSceneParam.flags.w = mVisualizeLightRange ? 1 : 0;//1: Visualize Light Range By Photon Intensity
-    mSceneParam.photonParams.y = mTmpAccumuRatio;
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
@@ -392,9 +393,6 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'B':
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
-        break;
-    case 'C':
-        mTmpAccumuRatio = Clamp(0.01f, 1, mTmpAccumuRatio + (mInverseMove ? -0.01f : 0.01f));
         break;
     case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
@@ -561,6 +559,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(11, mMainOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(14, mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -586,6 +585,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(11, mMainOutputDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(12, mOutputDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(13, mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(14, mAccumulationCountBufferDescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);

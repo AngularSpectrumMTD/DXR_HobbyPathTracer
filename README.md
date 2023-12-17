@@ -1,15 +1,11 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![image](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/556ac106-11a9-4d35-97de-539c1a91dfe2)
+Pure Image
+![image](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/157a309e-52b0-485e-9287-ad5ff19f9c52)
 
-![Beautiful](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4e7c237a-4c42-4098-b627-ff0582b509b3)
-
-![caustics](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/80c8eb25-4e5a-47ab-8071-e4a96004cfb7)
-
-![SVGF](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/afbf735e-1958-4975-9843-abd79c8d8288)
-
-![models](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5e011057-4728-4d4d-979d-1e8f254361ed)
+SVGF
+![svgf](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9cbd093e-028e-4895-b3b3-4b013da78ef3)
 
 ### Algorithm
 Photon Mapping : Hashed Grid
@@ -45,7 +41,6 @@ DirectX12
 - T / P : light emission angle(theta / phi)
 - K : increase / decrease light intensity
 - B : increase / decrease photon gathering block num
-- C : increase / decrease temporal accumulation factor(EMA)
 - V : visualize DI emission element
 - N : visualize caustics
 - D : enable / disable SVGF
