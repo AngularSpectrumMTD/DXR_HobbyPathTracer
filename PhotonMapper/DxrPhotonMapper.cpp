@@ -273,7 +273,7 @@ void DxrPhotonMapper::InitializeCamera()
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
     mCamera.SetLookAt(eyePos, target);
 
-    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, MAX_RECURSION_DEPTH / 2, 0);
+    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, MAX_RECURSION_DEPTH, 0);
     mCamera.SetPerspective(
         XM_PIDIV4, GetAspect(), 0.1f, 100.0f
     );

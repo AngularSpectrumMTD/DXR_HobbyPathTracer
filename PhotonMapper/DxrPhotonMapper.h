@@ -30,7 +30,7 @@
 
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
-#define MAX_RECURSION_DEPTH 31//0---31
+#define MAX_RECURSION_DEPTH 6//0---31
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
