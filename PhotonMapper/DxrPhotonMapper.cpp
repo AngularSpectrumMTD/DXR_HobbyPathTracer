@@ -27,8 +27,8 @@ void DxrPhotonMapper::Setup()
     mIntenceBoost = 10000;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 0;
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightPosX = 4.f; mLightPosY = 31; mLightPosZ = -5;
@@ -52,13 +52,13 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    mOBJFileName = "crytekSponza.obj";
-    mOBJFolderName = "model/crytekSponza";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //mOBJFileName = "crytekSponza.obj";
+    //mOBJFolderName = "model/crytekSponza";
+    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
-    //mOBJFileName = "horse_statue_Tri.obj";
-    //mOBJFolderName = "model";
-    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
+    mOBJFileName = "horse_statue_Tri.obj";
+    mOBJFolderName = "model";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
@@ -273,7 +273,7 @@ void DxrPhotonMapper::InitializeCamera()
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
     mCamera.SetLookAt(eyePos, target);
 
-    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, MAX_RECURSION_DEPTH, 0);
+    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, REAL_MAX_RECURSION_DEPTH, 0);
     mCamera.SetPerspective(
         XM_PIDIV4, GetAspect(), 0.1f, 100.0f
     );
