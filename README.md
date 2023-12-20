@@ -1,15 +1,24 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![caustics](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ddd771ab-dca4-4942-9351-3dcb00787afd)
+![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ca13c9ef-96a1-4f03-a4a9-f6e287287318)
 
-Pure Image
-![image](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/157a309e-52b0-485e-9287-ad5ff19f9c52)
+![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/55e4d168-997c-442b-9853-659e279422ba)
 
-![image2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/a9a84923-af8e-4cc0-916c-bcb69c579e6e)
+![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/23849bb3-1823-4f71-b8e6-ca381ff7f607)
 
-SVGF
-![svgf](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9cbd093e-028e-4895-b3b3-4b013da78ef3)
+
+### Directional Light / Cube Map
+
+| Directional Light | Cube Map |
+| ---- | ---- |
+| ![Directional](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8c98d66e-e775-4309-8bba-dd7546e8e1ce) | ![CubeMap](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b409dca9-96b2-4b8e-8d74-a04daf6c38da) |
+
+### SVGF
+
+| OFF | ON |
+| ---- | ---- |
+| ![image](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/157a309e-52b0-485e-9287-ad5ff19f9c52) | ![svgf](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9cbd093e-028e-4895-b3b3-4b013da78ef3) |
 
 ### Algorithm
 Photon Mapping : Hashed Grid
@@ -40,6 +49,7 @@ DirectX12
 - A : enable / disable temporal accumulation
 - I : determine other button meaning (+ / -)
 - J : start / stop model
+- H : enable / disable Directional Light
 - G : increase / decrease photon gather radius
 - X / Y / Z : light position
 - L : increase / decrease light emission range

@@ -49,6 +49,7 @@ void DxrPhotonMapper::Setup()
     mIsUseTexture = false;
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
+    mIsUseDirectionalLight = true;
     mStageTextureFileName = L"model/tileTex.png";
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
@@ -64,6 +65,7 @@ void DxrPhotonMapper::Setup()
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
+    //mStageType = StageType_Box;
     mStageType = StageType_Plane;
 
     mGlassModelType = ModelType::ModelType_Afrodyta;
@@ -324,7 +326,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.backgroundColor = XMVectorSet(0.3f, 0.45f, 0.45f, 1.0f);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, mIntenceBoost, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
-    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
+    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, mIsUseDirectionalLight ? 1 : 0, 0);
     mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
     mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * OneRadian) * cos(mPhi * OneRadian), sin(mTheta * OneRadian) * sin(mPhi * OneRadian), cos(mTheta * OneRadian), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
@@ -362,6 +364,9 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
+        break;
+    case 'H':
+        mIsUseDirectionalLight = !mIsUseDirectionalLight;
         break;
     case 'G':
         mGatherRadius = Clamp(0.01f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));

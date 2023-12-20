@@ -17,7 +17,7 @@ void miss(inout Payload payload) {
     float3 directionalLightDir = normalize(gSceneParam.directionalLightDirection.xyz);
     float3 directionalLightEnergy = (dot(directionalLightDir, WorldRayDirection()) <0) ? gSceneParam.directionalLightColor.xyz : float3(0, 0, 0);
     directionalLightEnergy *= (payload.recursive == 0) ? 0 : 1;
-    float3 curEnergy = payload.energy + directionalLightEnergy;
+    float3 curEnergy = payload.energy + (isEnableDirectionalLight() ? directionalLightEnergy : float3(0, 0, 0));
     payload.color += curEnergy * cubemap.rgb;
     payload.energy = 0.xxx;
     //payload.color = directionalLightEnergy;

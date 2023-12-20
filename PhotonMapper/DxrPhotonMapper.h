@@ -539,6 +539,7 @@ private:
     bool mIsTargetGlass;
 
     bool mIsUseAccumulation;
+    bool mIsUseDirectionalLight;
 };
 
 #endif

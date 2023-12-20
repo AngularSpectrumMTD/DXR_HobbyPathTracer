@@ -152,6 +152,11 @@ bool isAccumulationApply()
     return (gSceneParam.gatherParams2.y == 1);
 }
 
+bool isEnableDirectionalLight()
+{
+    return (gSceneParam.gatherParams2.z == 1);
+}
+
 float getLightRange()
 {
     return gSceneParam.spotLightParams.x;
