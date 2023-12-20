@@ -1,24 +1,33 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ca13c9ef-96a1-4f03-a4a9-f6e287287318)
+![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3a8e2fed-b438-49db-98c4-921845b53b9e)
 
-![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/55e4d168-997c-442b-9853-659e279422ba)
+![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5c848d8f-9e5b-4509-9636-d344f1608595)
 
-![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/23849bb3-1823-4f71-b8e6-ca381ff7f607)
-
+![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b1d28d38-900a-46e1-8411-29594e7a887d)
 
 ### Directional Light / Cube Map
 
 | Directional Light | Cube Map |
 | ---- | ---- |
-| ![Directional](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8c98d66e-e775-4309-8bba-dd7546e8e1ce) | ![CubeMap](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b409dca9-96b2-4b8e-8d74-a04daf6c38da) |
+| ![directional](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f79b543c-3cb1-4fa0-ab90-2298759cb7d1) | ![cubemap](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0ab775c7-04ee-46c7-8eb7-024662984328) |
+
+### Caustics
+
+| Reflected Ray | Refracted Ray |
+| ---- | ---- |
+| ![caustics_reflectedRay](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6d3c87d1-36fd-43e4-acb2-a056928092e4) | ![caustics_refractedRay](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/824763a0-cd0a-497e-9345-a10cb7809055) |
+
+Caustics are rendered by spectral rendering
+
+![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/73d3736b-fb17-4b0b-a05e-329a3c5fb193)
 
 ### SVGF
 
 | OFF | ON |
 | ---- | ---- |
-| ![image](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/157a309e-52b0-485e-9287-ad5ff19f9c52) | ![svgf](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9cbd093e-028e-4895-b3b3-4b013da78ef3) |
+| ![nodenoise](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/765e0837-9594-42aa-9025-0656e9ba448d) | ![denoise](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c333b130-b252-4511-bfdd-b4e586f8809a) |
 
 ### Algorithm
 Photon Mapping : Hashed Grid

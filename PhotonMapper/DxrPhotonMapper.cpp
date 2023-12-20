@@ -68,6 +68,7 @@ void DxrPhotonMapper::Setup()
     //mStageType = StageType_Box;
     mStageType = StageType_Plane;
 
+    //mGlassModelType = ModelType::ModelType_Diamond;
     mGlassModelType = ModelType::ModelType_Afrodyta;
     //mGlassModelType = ModelType::ModelType_Dragon;
     //mGlassModelType = ModelType::ModelType_Sponza;
@@ -127,7 +128,7 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/diamond.obj";
         mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(20, 20, 20);
+        mGlassObjScale = XMFLOAT3(2, 2, 2);
     }
     break;
     case ModelType::ModelType_Skull:
@@ -217,7 +218,7 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ1FileName = L"model/diamond.obj";
         mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(20, 20, 20);
+        mMetalObjScale = XMFLOAT3(2, 2, 2);
     }
     break;
     case ModelType::ModelType_Skull:

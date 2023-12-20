@@ -136,7 +136,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput);
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
     }
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
