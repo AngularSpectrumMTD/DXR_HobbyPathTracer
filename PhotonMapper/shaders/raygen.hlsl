@@ -29,7 +29,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     float luminance = luminanceFromRGB(current);
     float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
     
-    if (isAccept)
+    if (isAccept && isAccumulationApply())
     {
         accCount++;
     }

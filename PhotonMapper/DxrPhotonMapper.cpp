@@ -26,15 +26,15 @@ void DxrPhotonMapper::Setup()
 {
     mIntenceBoost = 10000;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
-    mGatherBlockRange = 0;
+    mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightPosX = 4.f; mLightPosY = 31; mLightPosZ = -5;
-    mLightRange = 0.065f;
+    mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhi = 441; mTheta = 276;
+    mPhi = 433; mTheta = 282;
     mPhiDirectional = 396; mThetaDirectional = 276;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
@@ -48,6 +48,7 @@ void DxrPhotonMapper::Setup()
     mInverseMove = false;
     mIsUseTexture = false;
     mIsTargetGlass = true;
+    mIsUseAccumulation = false;
     mStageTextureFileName = L"model/tileTex.png";
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
@@ -58,14 +59,15 @@ void DxrPhotonMapper::Setup()
 
     mOBJFileName = "horse_statue_Tri.obj";
     mOBJFolderName = "model";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(0, -15, 0));
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(-15, -15, 0));
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
     mStageType = StageType_Plane;
 
-    mGlassModelType = ModelType::ModelType_Dragon;
+    mGlassModelType = ModelType::ModelType_Afrodyta;
+    //mGlassModelType = ModelType::ModelType_Dragon;
     //mGlassModelType = ModelType::ModelType_Sponza;
     mMetalModelType = ModelType::ModelType_TwistCube;
 
@@ -150,16 +152,15 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_Dragon:
     {
         mOBJ0FileName = L"model/dragon.obj";
-        //mOBJ0FileName = L"san-miguel-low-poly.obj";
         mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
-    case  ModelType::ModelType_Sponza:
+    case  ModelType::ModelType_Afrodyta:
     {
-        mOBJ0FileName = L"model/triangulateSponza.obj";
-        mGlassObjYOfsset = 0;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJ0FileName = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
+        mGlassObjYOfsset = 8;
+        mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);
     }
     break;
     }
@@ -176,7 +177,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 15;
+        mMetalObjYOfsset = 25;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
     }
     break;
@@ -289,6 +290,7 @@ void DxrPhotonMapper::UpdateWindowText()
     std::wstringstream windowText;
     windowText.str(L"");
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
+        << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
         << L"    Photon : " << mPhotonMapSize1D * mPhotonMapSize1D << L"    " << getFrameRate() << L"[ms]";
 
@@ -322,7 +324,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.backgroundColor = XMVectorSet(0.3f, 0.45f, 0.45f, 1.0f);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, mIntenceBoost, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
-    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, 0, 0, 0);
+    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
     mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
     mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * OneRadian) * cos(mPhi * OneRadian), sin(mTheta * OneRadian) * sin(mPhi * OneRadian), cos(mTheta * OneRadian), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
@@ -383,10 +385,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mPhi += mInverseMove ? -1 : 1;
         break;
     case 'A':
-        mThetaDirectional += mInverseMove ? -1 : 1;
-        break;
-    case 'F':
-        mPhiDirectional += mInverseMove ? -1 : 1;
+        mIsUseAccumulation = !mIsUseAccumulation;
         break;
     case 'K':
         mIntenceBoost = Clamp(100, 100000, mIntenceBoost + (mInverseMove ? -100 : 100));

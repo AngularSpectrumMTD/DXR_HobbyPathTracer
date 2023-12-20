@@ -31,7 +31,7 @@
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
 #define MAX_RECURSION_DEPTH 31//0---31
-#define REAL_MAX_RECURSION_DEPTH 4//0---31
+#define REAL_MAX_RECURSION_DEPTH 6//0---31
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -251,7 +251,7 @@ private:
         ModelType_Skull,
         ModelType_HorseStatue,
         ModelType_Dragon,
-        ModelType_Sponza,
+        ModelType_Afrodyta,
     };
 
     enum Spectrum
@@ -537,6 +537,8 @@ private:
     utility::MaterialParam mMaterialParam1;
 
     bool mIsTargetGlass;
+
+    bool mIsUseAccumulation;
 };
 
 #endif

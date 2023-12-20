@@ -147,6 +147,11 @@ uint getPhotonUnitNum()
     return gSceneParam.gatherParams2.x;
 }
 
+bool isAccumulationApply()
+{
+    return (gSceneParam.gatherParams2.y == 1);
+}
+
 float getLightRange()
 {
     return gSceneParam.spotLightParams.x;
