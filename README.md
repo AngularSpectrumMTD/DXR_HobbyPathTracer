@@ -47,11 +47,11 @@ Shading : GGX
 
 ![Exp2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/317aa562-2fbb-4605-badc-c04a505ff24d)
 
-3.Export 3D model as obj file
+3.Export 3D model as obj file(Name the file "sponza.obj")
 
 ![Exp3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/211b09be-de71-4165-b8bb-a9a78914ebd8)
 
-4.Create a new folder in "DXRPhotonMapper\PhotonMapper\model" and copy the "textures" folder and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
+4.Create a new folder (ex. "sponza") in "DXRPhotonMapper\PhotonMapper\model" and copy the "textures" folder and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
 
 5.Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
