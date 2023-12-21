@@ -1,11 +1,12 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3a8e2fed-b438-49db-98c4-921845b53b9e)
+![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7ec60056-ac8f-4bbd-b8fe-45d7fca8152e)
 
-![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5c848d8f-9e5b-4509-9636-d344f1608595)
+![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/28c568a8-f44a-427c-ba14-5bbadadeb8ce)
 
-![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b1d28d38-900a-46e1-8411-29594e7a887d)
+![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/84050c16-426a-4929-8ce9-bcbe8331d384)
+
 
 ### Directional Light / Cube Map
 
@@ -43,11 +44,11 @@ Shading : GGX
 
 ![Exp1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0b4f954b-4875-4a5f-816b-26174ce90bea)
 
-2.Open sponza.obj on blender, and do these actions.
+2. Open sponza.obj on blender, and do these actions.
 
 ![Exp2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/317aa562-2fbb-4605-badc-c04a505ff24d)
 
-3.Export 3D model as obj file(Name the file "sponza.obj")
+3. Export 3D model as obj file(Name the file "sponza.obj")
 
 ![Exp3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/211b09be-de71-4165-b8bb-a9a78914ebd8)
 

@@ -31,10 +31,10 @@ void DxrPhotonMapper::Setup()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 4.f; mLightPosY = 31; mLightPosZ = -5;
+    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhi = 433; mTheta = 282;
+    mPhi = 391; mTheta = 269;
     mPhiDirectional = 396; mThetaDirectional = 276;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
