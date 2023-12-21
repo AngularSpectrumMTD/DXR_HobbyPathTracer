@@ -37,18 +37,28 @@ Denoiser : SVGF
 Shading : GGX
 
 ### How To Use
-1.Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
-
-
-
-    mOBJFileName = "crytekSponza.obj";
-    mOBJFolderName = "model/crytekSponza";
-
-
-
-2.Build and Execute
-
 **NOTE : This program can only handle triangular polygons**
+
+1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
+
+![Exp1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0b4f954b-4875-4a5f-816b-26174ce90bea)
+
+2.Open sponza.obj on blender, and do these actions.
+
+![Exp2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/317aa562-2fbb-4605-badc-c04a505ff24d)
+
+3.Export 3D model as obj file
+
+![Exp3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/211b09be-de71-4165-b8bb-a9a78914ebd8)
+
+4.Create a new folder in "DXRPhotonMapper\PhotonMapper\model" and copy the "textures" folder and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
+
+5.Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
+
+    mOBJFileName = "sponza.obj";
+    mOBJFolderName = "model/sponza";
+
+6.Build and Execute
 
 ### Graphics API
 DirectX12

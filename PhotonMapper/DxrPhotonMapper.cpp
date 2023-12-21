@@ -54,13 +54,9 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //mOBJFileName = "crytekSponza.obj";
-    //mOBJFolderName = "model/crytekSponza";
-    //mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-
-    mOBJFileName = "horse_statue_Tri.obj";
-    mOBJFolderName = "model";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(55, 55, 55), XMMatrixTranslation(-15, -15, 0));
+    mOBJFileName = "sponza.obj";
+    mOBJFolderName = "model/sponza";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
