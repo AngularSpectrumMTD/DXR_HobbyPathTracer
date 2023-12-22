@@ -39,7 +39,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 1;
+    mCausticsBoost = 3;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;

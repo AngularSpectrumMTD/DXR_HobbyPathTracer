@@ -320,7 +320,15 @@ void SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextR
         else
         {
             float eta = isFromOutside ? etaIN / etaOUT : etaOUT / etaIN;
-            L = normalize(refract(currentRayDir, H, eta));
+            float3 refractVec = refract(currentRayDir, H, eta);
+            if (length(refractVec) < 0.00001f)
+            {
+                L = reflect(currentRayDir, H);//handle as total reflection
+            }
+            else
+            {
+                L = normalize(refractVec);
+            }
             nextRay.Direction = L;
             nextRay.Origin = currentRayOrigin - N * eps;
             if (!isFromOutside)
