@@ -318,6 +318,14 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         mMaterialParam0 = material;
     }
 
+    mStageMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    mStageMaterial.metallic = 0;
+    mStageMaterial.roughness = 1;
+    mStageMaterial.specular = 0;
+    mStageMaterial.transRatio = 0;
+    mStageMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    mStageMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+
     auto bufferSize = sizeof(utility::MaterialParam) * mNormalSphereMaterialTbl.size();
     mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mNormalSphereMaterialCB.Get(), mNormalSphereMaterialTbl.data(), bufferSize);
@@ -333,6 +341,10 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
     mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
     mDevice->ImmediateBufferUpdateHostVisible(mOBJ0MaterialCB.Get(), mOBJ0MaterialTbl.data(), bufferSize);
+
+    bufferSize = sizeof(utility::MaterialParam);
+    mStageMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    mDevice->ImmediateBufferUpdateHostVisible(mStageMaterialCB.Get(), &mStageMaterial, bufferSize);
 }
 
 void DxrPhotonMapper::CreateSceneBLAS()

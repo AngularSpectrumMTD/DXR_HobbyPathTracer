@@ -32,6 +32,12 @@ Shading : GGX
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
+#### Without Sponza
+1.Build and Execute
+
+![sample](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6ab59527-27d9-4606-9d9f-465ba5dd9673)
+
+#### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
 
 ![Exp1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0b4f954b-4875-4a5f-816b-26174ce90bea)

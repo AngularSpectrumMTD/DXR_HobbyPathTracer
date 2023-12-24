@@ -31,10 +31,10 @@ void DxrPhotonMapper::Setup()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
+    mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhi = 391; mTheta = 269;
+    mPhi = 439; mTheta = 269;
     mPhiDirectional = 396; mThetaDirectional = 276;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
@@ -54,9 +54,21 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    mOBJFileName = "sponza.obj";
-    mOBJFolderName = "model/sponza";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //{
+    //    mOBJFileName = "sponza.obj";
+    //    mOBJFolderName = "model/sponza";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
+    //    mPhi = 391; mTheta = 269;
+    //}
+
+    {
+        mOBJFileName = "skull.obj";
+        mOBJFolderName = "model";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
+        mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
+        mPhi = 439; mTheta = 269;
+    }
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);

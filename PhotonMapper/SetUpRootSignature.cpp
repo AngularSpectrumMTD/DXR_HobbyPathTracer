@@ -114,15 +114,4 @@ void DxrPhotonMapper::CreateRootSignatureLocal()
         mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"] = 2;
         mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"] = 3;
     }
-    {
-        const u32 regSpace = 1;
-        utility::RootSignatureCreater rsCreater;
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2, regSpace);
-        mLocalRootSigFloor = rsCreater.Create(mDevice, true, L"lrsFloor");
-        mRegisterMapGlobalLocalRootSigFloor["indexBuffer"] = 0;
-        mRegisterMapGlobalLocalRootSigFloor["vertexBuffer"] = 1;
-        mRegisterMapGlobalLocalRootSigFloor["diffuseTex"] = 2;
-    }
 }

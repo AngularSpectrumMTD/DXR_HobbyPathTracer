@@ -6,7 +6,6 @@ void DxrPhotonMapper::CreateStateObject()
     const auto shaderFiles = {
         RayTracingDxlibs::RayGen,
         RayTracingDxlibs::Miss,
-        RayTracingDxlibs::FloorClosestHit,
         RayTracingDxlibs::DefaultMaterialClosestHit,
         RayTracingDxlibs::DefaultMaterialWithTexClosestHit,
         RayTracingDxlibs::LightClosestHit };
@@ -44,10 +43,6 @@ void DxrPhotonMapper::CreateStateObject()
 
         //Closest Hit
         {
-            auto dxilChsFloor = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-            dxilChsFloor->SetDXILLibrary(&shaders[RayTracingDxlibs::FloorClosestHit]);
-            dxilChsFloor->DefineExport(RayTracingEntryPoints::ClosestHitFloor);
-
             auto dxilChsMaterial = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsMaterial->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialClosestHit]);
             dxilChsMaterial->DefineExport(RayTracingEntryPoints::ClosestHitMaterial);
@@ -100,7 +95,7 @@ void DxrPhotonMapper::CreateStateObject()
 
             auto hitgroupFloor = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitFloor);
+            hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
 
             for (const auto& instances : mOBJModel.getMaterialList())
@@ -122,15 +117,6 @@ void DxrPhotonMapper::CreateStateObject()
 
         //Bind Local Root Signature For Shader
         {
-            //Floor
-            {
-                auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-                bindLocalRootSig->SetRootSignature(mLocalRootSigFloor.Get());
-
-                auto lrsAssocFloor = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-                lrsAssocFloor->AddExport(HitGroups::Floor);
-                lrsAssocFloor->SetSubobjectToAssociate(*bindLocalRootSig);
-            }
             //Material
             {
                 auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
@@ -164,6 +150,10 @@ void DxrPhotonMapper::CreateStateObject()
             {
                 auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
                 bindLocalRootSig->SetRootSignature(mLocalRootSigMaterialWithTex.Get());
+
+                auto lrsAssocFloor = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+                lrsAssocFloor->AddExport(HitGroups::Floor);
+                lrsAssocFloor->SetSubobjectToAssociate(*bindLocalRootSig);
 
                 for (const auto& instances : mOBJModel.getMaterialList())
                 {
@@ -217,10 +207,6 @@ void DxrPhotonMapper::CreateStateObject()
 
         //Closest Hit
         {
-            auto dxilChsFloor = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-            dxilChsFloor->SetDXILLibrary(&shaders[RayTracingDxlibs::FloorClosestHit]);
-            dxilChsFloor->DefineExport(RayTracingEntryPoints::ClosestHitFloorPhoton);
-
             auto dxilChsMaterial = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
             dxilChsMaterial->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialClosestHit]);
             dxilChsMaterial->DefineExport(RayTracingEntryPoints::ClosestHitMaterialPhoton);
@@ -264,7 +250,7 @@ void DxrPhotonMapper::CreateStateObject()
 
             auto hitgroupFloor = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-            hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitFloorPhoton);
+            hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
 
             for (const auto& instances : mOBJModel.getMaterialList())
@@ -286,14 +272,6 @@ void DxrPhotonMapper::CreateStateObject()
 
         //Bind Local Root Signature For Shader
         {
-            //Floor
-            {
-                auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-                bindLocalRootSig->SetRootSignature(mLocalRootSigFloor.Get());
-                auto lrsAssocFloor = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-                lrsAssocFloor->AddExport(HitGroups::Floor);
-                lrsAssocFloor->SetSubobjectToAssociate(*bindLocalRootSig);
-            }
             //Material
             {
                 auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
@@ -327,6 +305,10 @@ void DxrPhotonMapper::CreateStateObject()
             {
                 auto bindLocalRootSig = subobjects.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
                 bindLocalRootSig->SetRootSignature(mLocalRootSigMaterialWithTex.Get());
+
+                auto lrsAssocFloor = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+                lrsAssocFloor->AddExport(HitGroups::Floor);
+                lrsAssocFloor->SetSubobjectToAssociate(*bindLocalRootSig);
 
                 for (const auto& instances : mOBJModel.getMaterialList())
                 {

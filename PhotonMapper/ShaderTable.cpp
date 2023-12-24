@@ -80,8 +80,8 @@ void DxrPhotonMapper::CreateShaderTable()
         auto hitgroupStart = startPtr + raygenRegion + missRegion;
         {
             auto recordStartPtr = hitgroupStart;
-
             {
+                auto cbAddress = mStageMaterialCB->GetGPUVirtualAddress();
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Floor);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -91,9 +91,10 @@ void DxrPhotonMapper::CreateShaderTable()
                 recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 
                 auto registerStartPtr = recordStartPtr;
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"], &cbAddress, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
@@ -331,8 +332,8 @@ void DxrPhotonMapper::CreateShaderTable()
         auto hitgroustartPtr = startPtr + raygenRegion + missRegion;
         {
             auto recordStartPtr = hitgroustartPtr;
-
             {
+                auto cbAddress = mStageMaterialCB->GetGPUVirtualAddress();
                 auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Floor);
                 if (idPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
@@ -342,9 +343,10 @@ void DxrPhotonMapper::CreateShaderTable()
                 recordStartPtr += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 
                 auto registerStartPtr = recordStartPtr;
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigFloor["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"], &cbAddress, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }

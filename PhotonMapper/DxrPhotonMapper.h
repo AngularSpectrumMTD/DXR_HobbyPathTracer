@@ -47,7 +47,6 @@ namespace HitGroups {
 namespace RayTracingDxlibs {
     static const wchar_t* RayGen = L"raygen.dxlib";
     static const wchar_t* Miss = L"miss.dxlib";
-    static const wchar_t* FloorClosestHit = L"closestHitFloor.dxlib";
     static const wchar_t* DefaultMaterialClosestHit = L"closestHitMaterial.dxlib";
     static const wchar_t* DefaultMaterialWithTexClosestHit = L"closestHitMaterialWithTex.dxlib";
     static const wchar_t* LightClosestHit = L"closestHitLight.dxlib";
@@ -56,13 +55,11 @@ namespace RayTracingDxlibs {
 namespace RayTracingEntryPoints {
     static const wchar_t* RayGen = L"rayGen";
     static const wchar_t* Miss = L"miss";
-    static const wchar_t* ClosestHitFloor = L"floorClosestHit";
     static const wchar_t* ClosestHitMaterial = L"materialClosestHit";
     static const wchar_t* ClosestHitMaterialWithTex = L"materialWithTexClosestHit";
     static const wchar_t* ClosestHitLight = L"lightClosestHit";    
     static const wchar_t* RayGenPhoton = L"photonEmitting";
     static const wchar_t* MissPhoton = L"photonMiss";
-    static const wchar_t* ClosestHitFloorPhoton = L"floorStorePhotonClosestHit";
     static const wchar_t* ClosestHitMaterialPhoton = L"materialStorePhotonClosestHit";
     static const wchar_t* ClosestHitMaterialWithTexPhoton = L"materialWithTexStorePhotonClosestHit";
 }
@@ -353,6 +350,7 @@ private:
     std::array<utility::MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
     std::array<utility::MaterialParam, NormalOBJ0s> mOBJ0MaterialTbl;
     std::array<utility::MaterialParam, NormalOBJ1s> mOBJ1MaterialTbl;
+    utility::MaterialParam mStageMaterial;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
     ComPtr<ID3D12Resource> mNormalBoxMaterialCB;
     ComPtr<ID3D12Resource> mReflectSphereMaterialCB;
@@ -361,6 +359,7 @@ private:
     ComPtr<ID3D12Resource> mRefractBoxMaterialCB;
     ComPtr<ID3D12Resource> mOBJ0MaterialCB;
     ComPtr<ID3D12Resource> mOBJ1MaterialCB;
+    ComPtr<ID3D12Resource> mStageMaterialCB;
 
     SceneParam mSceneParam;
     utility::TextureResource mGroundTex;
@@ -434,8 +433,6 @@ private:
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
     ComPtr<ID3D12RootSignature> mGlobalRootSig;
     std::unordered_map < std::string, u32> mRegisterMapGlobalRootSig;
-    ComPtr<ID3D12RootSignature> mLocalRootSigFloor;
-    std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigFloor;
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterial;
     std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterial;
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterialWithTex;
