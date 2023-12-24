@@ -64,7 +64,6 @@ DirectX12
 
 ### Action
 
-- A : enable / disable temporal accumulation
 - I : determine other button meaning (+ / -)
 - J : start / stop model
 - H : enable / disable Directional Light

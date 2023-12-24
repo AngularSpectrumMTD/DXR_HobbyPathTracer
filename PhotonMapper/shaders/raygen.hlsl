@@ -21,11 +21,6 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     float prevDepth = gPrevDepthBuffer[ID];
     uint accCount = gAccumulationCountBuffer[ID];
 
-    bool isNearColor = false;//abs(dot(normalize(prev), normalize(current))) > 0.95;
-    bool isNearDepth = abs(currentDepth - prevDepth) < 0.0005;
-    float depthWeight = 1 + 10 * saturate(abs(currentDepth - prevDepth) / 0.0005);
-    bool isAccept = isNearDepth;
-
     float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[ID];
     float luminance = luminanceFromRGB(current);
     float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
@@ -38,7 +33,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
         return;
     }
     
-    if (isAccept && isAccumulationApply())
+    if (isAccumulationApply())
     {
         accCount++;
     }
@@ -48,7 +43,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     }
     accCount = min(accCount, 3000);
     gAccumulationCountBuffer[ID] = accCount;
-    const float tmpAccmuRatio = (accCount < 10) ? 0.04 * depthWeight : 1.f / accCount;
+    const float tmpAccmuRatio = 1.f / accCount;
     current = lerp(prev, current, tmpAccmuRatio);
     curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
     curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);

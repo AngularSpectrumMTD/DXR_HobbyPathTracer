@@ -39,7 +39,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 3;
+    mCausticsBoost = 2;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -54,21 +54,21 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/ParisEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //{
-    //    mOBJFileName = "sponza.obj";
-    //    mOBJFolderName = "model/sponza";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-    //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
-    //    mPhi = 391; mTheta = 269;
-    //}
-
     {
-        mOBJFileName = "skull.obj";
-        mOBJFolderName = "model";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
-        mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
-        mPhi = 439; mTheta = 269;
+        mOBJFileName = "sponza.obj";
+        mOBJFolderName = "model/sponza";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+        mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
+        mPhi = 391; mTheta = 269;
     }
+
+    //{
+    //    mOBJFileName = "skull.obj";
+    //    mOBJFolderName = "model";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
+    //    mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
+    //    mPhi = 439; mTheta = 269;
+    //}
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
@@ -360,6 +360,7 @@ void DxrPhotonMapper::Update()
     }
 
     UpdateWindowText();
+    mIsUseAccumulation = true;
 }
 
 void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
@@ -373,76 +374,107 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
+        mIsUseAccumulation = false;
         break;
     case 'H':
         mIsUseDirectionalLight = !mIsUseDirectionalLight;
+        mIsUseAccumulation = false;
         break;
     case 'G':
         mGatherRadius = Clamp(0.01f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
+        mIsUseAccumulation = false;
         break;
     case 'X':
         mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mIsUseAccumulation = false;
         break;
     case 'Y':
         mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mIsUseAccumulation = false;
         break;
     case 'Z':
         mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mIsUseAccumulation = false;
         break;
     case 'L':
         mLightRange = Clamp(0.01f, 0.4f, mLightRange + (mInverseMove ? -0.002f : 0.002f));
+        mIsUseAccumulation = false;
         break;
     case 'T':
         mTheta += mInverseMove ? -1 : 1;
+        mIsUseAccumulation = false;
         break;
     case 'P':
         mPhi += mInverseMove ? -1 : 1;
-        break;
-    case 'A':
-        mIsUseAccumulation = !mIsUseAccumulation;
+        mIsUseAccumulation = false;
         break;
     case 'K':
         mIntenceBoost = Clamp(100, 100000, mIntenceBoost + (mInverseMove ? -100 : 100));
+        mIsUseAccumulation = false;
         break;
     case 'B':
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
+        mIsUseAccumulation = false;
         break;
     case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
+        mIsUseAccumulation = false;
         break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
+        mIsUseAccumulation = false;
         break;
     case 'N':
         mIsApplyCaustics = !mIsApplyCaustics;
+        mIsUseAccumulation = false;
         break;
     case 'D':
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
         mCausticsBoost = Clamp(1, 50, mCausticsBoost + (mInverseMove ? -0.5 : 0.5));
+        mIsUseAccumulation = false;
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;
+        mIsUseAccumulation = false;
         break;
         //material start
     case 'R':
-        if(mIsTargetGlass)
-        mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mInverseMove ? -0.1 : 0.1));
+        if (mIsTargetGlass)
+        {
+            mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         else
+        {
             mMaterialParam1.roughness = Clamp(0.1, 1, mMaterialParam1.roughness + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         break;
     case 'S':
         if (mIsTargetGlass)
-        mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1 : 0.1));
+        {
+            mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         else
+        {
             mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         break;
     case 'M':
         if (mIsTargetGlass)
-        mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1 : 0.1));
+        {
+            mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         else
+        {
             mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mInverseMove ? -0.1 : 0.1));
+            mIsUseAccumulation = false;
+        }
         break;
     case VK_SPACE:
         mIsTargetGlass = !mIsTargetGlass;
@@ -455,6 +487,7 @@ void DxrPhotonMapper::OnMouseDown(MouseButton button, s32 x, s32 y)
     f32 fdx = f32(x) / GetWidth();
     f32 fdy = f32(y) / GetHeight();
     mCamera.OnMouseButtonDown(s32(button), fdx, fdy);
+    mIsUseAccumulation = false;
 }
 
 void DxrPhotonMapper::OnMouseUp(MouseButton button, s32 x, s32 y)
@@ -467,6 +500,7 @@ void DxrPhotonMapper::OnMouseMove(s32 dx, s32 dy)
     f32 fdx = f32(dx) / GetWidth();
     f32 fdy = f32(dy) / GetHeight();
     mCamera.OnMouseMove(-fdx, fdy);
+    mIsUseAccumulation = false;
 }
 
 void DxrPhotonMapper::OnMouseWheel(s32 rotate)
@@ -481,6 +515,7 @@ void DxrPhotonMapper::OnMouseWheel(s32 rotate)
         rotate = 120;
     }
     mCamera.OnMouseWheel(rotate / 8000.f);
+    mIsUseAccumulation = false;
 }
 
 f32 DxrPhotonMapper::Clamp(f32 min, f32 max, f32 src)
