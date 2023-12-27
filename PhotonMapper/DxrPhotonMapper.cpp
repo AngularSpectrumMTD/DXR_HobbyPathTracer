@@ -39,7 +39,7 @@ void DxrPhotonMapper::Setup()
     mGlassRotateRange = 4;
     mCausticsBoost = 2;
     mIsMoveModel = false;
-    mIsApplyCaustics = false;
+    mIsApplyCaustics = true;
     mIsUseDenoise = false;
     mIsDebug = false;
     mVisualizeLightRange = true;
@@ -53,6 +53,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
+    //For SPONZA
     //{
     //    mOBJFileName = "sponza.obj";
     //    mOBJFolderName = "model/sponza";
@@ -60,15 +61,17 @@ void DxrPhotonMapper::Setup()
     //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
     //    mPhi = 391; mTheta = 269;
     //    mInitEyePos = XMFLOAT3(65, 8, 0);
+    //    mLightRange = 0.054f;
     //}
 
+    //For BISTRO EXTERIOR
     {
-        mOBJFileName = "bistroExtEdited.obj";
-        mOBJFolderName = "model/bistro";
+        mOBJFileName = "exterior.obj";
+        mOBJFolderName = "model/bistro/Exterior";
         mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
         mLightPosX = 33.f; mLightPosY = 65; mLightPosZ = 1;
         mPhi = 415; mTheta = 269;
-        mInitEyePos = XMFLOAT3(-15, 18, -5);
+        mInitEyePos = XMFLOAT3(-15, 40, -15);
     }
 
     //{
@@ -197,7 +200,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 25;
+        mMetalObjYOfsset = 40;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
     }
     break;

@@ -1,9 +1,13 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
+![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0623fbda-9352-4a96-bd36-fa35a7e1937a)
+
 ![reflacted](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d52618b2-4474-4ae5-bd3e-ecab16ec214d)
 
 ![reflected](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/299ce763-56ab-441d-8026-97616b8cd88d)
+
+![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8ec084cb-3e2d-45fd-b1e8-5e71aa516776)
 
 ![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4858ab5c-ba06-4526-b9fb-b1dddeac4742)
 
@@ -32,7 +36,7 @@ Shading : GGX
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
-#### Without Sponza
+#### Normal
 1.Build and Execute
 
 ![sample](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6ab59527-27d9-4606-9d9f-465ba5dd9673)
@@ -42,22 +46,40 @@ Shading : GGX
 
 ![Exp1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0b4f954b-4875-4a5f-816b-26174ce90bea)
 
-2. Open sponza.obj on blender, and do these actions.
-
-![Exp2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/317aa562-2fbb-4605-badc-c04a505ff24d)
+2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.
 
 3. Export 3D model as obj file(Name the file "sponza.obj")
 
-![Exp3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/211b09be-de71-4165-b8bb-a9a78914ebd8)
+4. Create a new folder (ex. "sponza") in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
 
-4.Create a new folder (ex. "sponza") in "DXRPhotonMapper\PhotonMapper\model" and copy the "textures" folder and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
+5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
-5.Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
-
+```
     mOBJFileName = "sponza.obj";
     mOBJFolderName = "model/sponza";
+```
 
-6.Build and Execute
+6. Build and Execute
+
+#### With Bistro
+1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
+
+![Bis](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/274017c1-d198-4dc1-81b2-2fc23efd323f)
+
+2. Open sponza.obj on blender. Set the size to 0.05 -> Execute Triangulation.
+
+3. Export 3D model as obj file(Name the file "exterior.obj")
+
+4. Create a new folder (e.g. "bistro") in "DXRPhotonMapperPhotonMappermodel". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj file in the "Exterior".
+
+5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
+
+```
+    mOBJFileName = "exterior.obj";
+    mOBJFolderName = "model/bistro/Exterior";
+```
+
+6. Build and Execute
 
 ### Graphics API
 DirectX12
