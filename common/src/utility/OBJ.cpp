@@ -300,9 +300,28 @@ namespace utility {
 		return MaterialTbl;
 	}
 
+	void MATERIAL::setDummyTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	{
+		TextureName = "DUMMY";
+		DiffuseTexture.res = device->CreateTexture2D(
+			1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			D3D12_HEAP_TYPE_DEFAULT,
+			StringToWString(TextureName).c_str()
+		);
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.ResourceMinLODClamp = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		DiffuseTexture.srv = device->CreateShaderResourceView(DiffuseTexture.res.Get(), &srvDesc);
+	}
+
 	bool OBJ_MODEL::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName) {
 		FILE* fp = NULL;
-		char fileName[60];
+		char fileName[256];
 		sprintf_s(fileName, "%s/%s", folderPath, FileName);
 		errno_t err;
 		err = fopen_s(&fp, fileName, "rt");
@@ -324,7 +343,7 @@ namespace utility {
 			OutputDebugString(L"LoadMaterialFromFile() File Open ERROR\n");
 		}
 
-		char key[255] = { 0 };
+		char key[512] = { 0 };
 		bool isMaterialIncluded = false;
 		bool isTextureIncluded = false;
 		DirectX::XMFLOAT4 vec4d;
@@ -352,11 +371,16 @@ namespace utility {
 				fscanf_s(fp, "%s ", key, sizeof(key));
 				if (strcmp(key, "newmtl") == 0)
 				{
-					if (isMaterialIncluded) { MaterialTbl.push_back(mtl); mtl.TexID = 0; }
+					if (isMaterialIncluded) 
+					{ 
+						MaterialTbl.push_back(mtl); 
+						mtl.TexID = 0; 
+					}
 					isMaterialIncluded = true;
 					fscanf_s(fp, "%s ", key, sizeof(key));
 					mtl.MaterialName = key;
 					isTextureIncluded = false;
+					mtl.TextureName = "";
 				}
 				if (strcmp(key, "Ka") == 0)
 				{
@@ -380,52 +404,15 @@ namespace utility {
 				}
 				if (strcmp(key, "map_Kd") == 0)//only use map_Kd
 				{
-					fscanf_s(fp, "%s ", key, sizeof(key));
-					for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
-						if (strcmp(key, MaterialTbl[i].TextureName.c_str()) == 0) {
-							isTextureIncluded = true;
-							mtl.TexID = MaterialTbl[i].TexID;
-							break;
-						}
+					//fscanf_s(fp, "%s ", key, sizeof(key));
+					fgets(key, 512, fp);
+					char* p;
+					p = strchr(key, '\n');
+					if (p)
+					{
+						*p = '\0';
 					}
-					if (false) {
-					}
-					else {
-						mtl.TextureName = key;
-
-						if (
-							mtl.Reflection4Color.diffuse.x == 0 &&
-							mtl.Reflection4Color.diffuse.y == 0 &&
-							mtl.Reflection4Color.diffuse.z == 0 &&
-							mtl.Reflection4Color.diffuse.w == 0
-							)
-						{
-							mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-						}
-						wchar_t nameTex[60];
-						swprintf(nameTex, 60, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mtl.TextureName).c_str());
-						//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
-						mtl.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
-						if (mtl.DiffuseTexture.res == nullptr)
-						{
-							mtl.TextureName = "dummyNullWhite";
-							mtl.DiffuseTexture.res = device->CreateTexture2D(
-								1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-								D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-								D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-								D3D12_HEAP_TYPE_DEFAULT,
-								StringToWString(mtl.TextureName).c_str()
-							);
-							D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-							srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-							srvDesc.Texture2D.MipLevels = 1;
-							srvDesc.Texture2D.MostDetailedMip = 0;
-							srvDesc.Texture2D.ResourceMinLODClamp = 0;
-							srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-							mtl.DiffuseTexture.srv = device->CreateShaderResourceView(mtl.DiffuseTexture.res.Get(), &srvDesc);
-						}
-						//generate tex by this name
-					}
+					mtl.TextureName = key;
 				}
 			}
 
@@ -443,22 +430,40 @@ namespace utility {
 			mtl.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 			mtl.Reflection4Color.emission = DirectX::XMFLOAT4(0.0, 0.0, 0.0, 0.0);
 			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
-			mtl.TextureName = "dummyNullWhite";
-			mtl.DiffuseTexture.res = device->CreateTexture2D(
-				1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-				D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-				D3D12_HEAP_TYPE_DEFAULT,
-				StringToWString(mtl.TextureName).c_str()
-			);
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = 1;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-			srvDesc.Texture2D.ResourceMinLODClamp = 0;
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			mtl.DiffuseTexture.srv = device->CreateShaderResourceView(mtl.DiffuseTexture.res.Get(), &srvDesc);
+			mtl.setDummyTexture(device);
 			MaterialTbl.push_back(mtl);
+		}
+
+		int count = 0;
+		for (auto & mat : MaterialTbl)
+		{
+			if (strcmp(mat.TextureName.c_str(), "") == 0)
+			{
+				mat.setDummyTexture(device);
+			}
+			else
+			{
+				if (
+					mat.Reflection4Color.diffuse.x == 0 &&
+					mat.Reflection4Color.diffuse.y == 0 &&
+					mat.Reflection4Color.diffuse.z == 0 &&
+					mat.Reflection4Color.diffuse.w == 0
+					)
+				{
+					mat.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+				}
+				wchar_t nameTex[512];
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mat.TextureName).c_str());
+				//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+				mat.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
+
+				if (mat.DiffuseTexture.res == nullptr)
+				{
+					mat.setDummyTexture(device);
+				}
+			}
+
+			count++;
 		}
 
 		return true;

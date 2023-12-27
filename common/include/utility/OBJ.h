@@ -66,6 +66,8 @@ namespace utility {
 		std::wstring shaderName;
 		ComPtr<ID3D12Resource> blas;
 		ComPtr<ID3D12Resource> materialCB;
+
+		void setDummyTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 	};
 
 	class OBJ_MODEL {

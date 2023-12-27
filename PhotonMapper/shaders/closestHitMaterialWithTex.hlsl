@@ -57,9 +57,13 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
+        {
+            diffuseTexColor.rgb = diffuseTexColor.rrr;
+        }
     }
     
-    const bool isIgnoreHit = (diffuseTexColor.a == 0);
+    const bool isIgnoreHit = (diffuseTexColor.a < 1);
     
     if (!isIgnoreHit)
     {
@@ -116,9 +120,13 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
+        {
+            diffuseTexColor.rgb = diffuseTexColor.rrr;
+        }
     }
 
-    const bool isIgnoreHit = (diffuseTexColor.a == 0);
+    const bool isIgnoreHit = (diffuseTexColor.a < 1);
 
     uint instanceID = InstanceID();
 

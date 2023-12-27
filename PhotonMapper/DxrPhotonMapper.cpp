@@ -31,17 +31,15 @@ void DxrPhotonMapper::Setup()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhi = 439; mTheta = 269;
     mPhiDirectional = 396; mThetaDirectional = 276;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
     mCausticsBoost = 2;
     mIsMoveModel = false;
-    mIsApplyCaustics = true;
+    mIsApplyCaustics = false;
     mIsUseDenoise = false;
     mIsDebug = false;
     mVisualizeLightRange = true;
@@ -49,17 +47,28 @@ void DxrPhotonMapper::Setup()
     mIsUseTexture = false;
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
-    mIsUseDirectionalLight = true;
+    mIsUseDirectionalLight = false;
     mStageTextureFileName = L"model/tileTex.png";
-    mCubeMapTextureFileName = L"model/ParisEquirec.png";
+    //mCubeMapTextureFileName = L"model/ParisEquirec.png";
+    mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
+    //{
+    //    mOBJFileName = "sponza.obj";
+    //    mOBJFolderName = "model/sponza";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
+    //    mPhi = 391; mTheta = 269;
+    //    mInitEyePos = XMFLOAT3(65, 8, 0);
+    //}
+
     {
-        mOBJFileName = "sponza.obj";
-        mOBJFolderName = "model/sponza";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-        mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
-        mPhi = 391; mTheta = 269;
+        mOBJFileName = "bistroExtEdited.obj";
+        mOBJFolderName = "model/bistro";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+        mLightPosX = 33.f; mLightPosY = 65; mLightPosZ = 1;
+        mPhi = 415; mTheta = 269;
+        mInitEyePos = XMFLOAT3(-15, 18, -5);
     }
 
     //{
@@ -281,9 +290,8 @@ void DxrPhotonMapper::Initialize()
 
 void DxrPhotonMapper::InitializeCamera()
 {
-    XMFLOAT3 eyePos(-65, 8, 0);
     XMFLOAT3 target(0.0f, 0.0f, 0.0f);
-    mCamera.SetLookAt(eyePos, target);
+    mCamera.SetLookAt(mInitEyePos, target);
 
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, REAL_MAX_RECURSION_DEPTH, 0);
     mCamera.SetPerspective(
