@@ -1,15 +1,17 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/31deaf64-3a08-4e4e-9d15-8facf6009270)
+![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/af3e8875-d16a-4441-8788-958ebc26207b)
+
+![bistro3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/43eba796-c99a-46f6-9995-a2e5dc7db0e9)
 
 ![reflacted](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d52618b2-4474-4ae5-bd3e-ecab16ec214d)
 
 ![reflected](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/299ce763-56ab-441d-8026-97616b8cd88d)
 
-![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b2fbdbbe-d9dc-4fc3-ac7c-01b1cb3d58dd)
+![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9d761a02-2759-45a7-b8d7-1afbc6f881a8)
 
-![bistro3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5121233f-313f-4432-a60f-5dde6d742c84)
+![bistro4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d55e44d9-bed3-4db7-aea0-3fce61744901)
 
 ![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4858ab5c-ba06-4526-b9fb-b1dddeac4742)
 
