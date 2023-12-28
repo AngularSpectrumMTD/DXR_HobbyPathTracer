@@ -1,13 +1,15 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0623fbda-9352-4a96-bd36-fa35a7e1937a)
+![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/31deaf64-3a08-4e4e-9d15-8facf6009270)
 
 ![reflacted](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d52618b2-4474-4ae5-bd3e-ecab16ec214d)
 
 ![reflected](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/299ce763-56ab-441d-8026-97616b8cd88d)
 
-![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8ec084cb-3e2d-45fd-b1e8-5e71aa516776)
+![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b2fbdbbe-d9dc-4fc3-ac7c-01b1cb3d58dd)
+
+![bistro3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5121233f-313f-4432-a60f-5dde6d742c84)
 
 ![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4858ab5c-ba06-4526-b9fb-b1dddeac4742)
 

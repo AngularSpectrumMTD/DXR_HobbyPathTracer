@@ -364,6 +364,7 @@ private:
     SceneParam mSceneParam;
     utility::TextureResource mGroundTex;
     utility::TextureResource mCubeMapTex;
+    utility::TextureResource mDummyAlphaMask;
 
     Camera mCamera;
 

@@ -43,8 +43,10 @@ namespace utility {
 		string MaterialName;
 		Reflection4 Reflection4Color;
 		f32 Shininess;
-		string TextureName;
+		string DiffuseTextureName;
+		string AlphaMaskName;
 		utility::TextureResource DiffuseTexture;
+		utility::TextureResource AlphaMask;
 		s32 TexID;
 		vector <utility::VertexPNT> TriangleVertexTbl;
 		vector <utility::VertexPNT> QuadrangleVertexTbl;
@@ -67,7 +69,8 @@ namespace utility {
 		ComPtr<ID3D12Resource> blas;
 		ComPtr<ID3D12Resource> materialCB;
 
-		void setDummyTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyDiffuseTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 	};
 
 	class OBJ_MODEL {

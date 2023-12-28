@@ -16,6 +16,7 @@ void DxrPhotonMapper::CreateShaderTable()
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize = utility::RoundUp(hitgroupRecordSize, ShaderRecordAlignment);
 
         u32 missRecordSize = 0;
@@ -95,6 +96,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"], &mDummyAlphaMask.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
@@ -211,6 +213,7 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"], &instances.AlphaMask.srv.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
@@ -266,6 +269,7 @@ void DxrPhotonMapper::CreateShaderTable()
         
         u32 hitgroupRecordSize = 0;
         hitgroupRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+        hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
         hitgroupRecordSize += sizeof(D3D12_GPU_DESCRIPTOR_HANDLE);
@@ -347,6 +351,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &mMeshStage.descriptorIB.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &mMeshStage.descriptorVB.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &mGroundTex.srv.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"], &mDummyAlphaMask.srv.hGpu.ptr, sizeof(UINT64));
 
                 recordStartPtr = recordTmpPtr + hitgroupRecordSize;
             }
@@ -463,6 +468,7 @@ void DxrPhotonMapper::CreateShaderTable()
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"], &instances.descriptorTriangleIB.hGpu.ptr, sizeof(UINT64));
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
                     memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
+                    memcpy(registerStartPtr + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"], &instances.AlphaMask.srv.hGpu.ptr, sizeof(UINT64));
 
                     cbAddress += cbStride;
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;

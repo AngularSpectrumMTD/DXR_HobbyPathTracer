@@ -11,6 +11,7 @@ ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint>   indexBuffer : register(t0,space1);
 StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
+Texture2D<float> alphaMask: register(t3, space1);
 
 VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTexture)
 {
@@ -43,27 +44,34 @@ VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
-    if (isReachedRecursiveLimitPayload(payload)) {
+    if (isReachedRecursiveLimitPayload(payload))
+    {
         return;
     }
+
     bool isNoTexture = false;
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
-
+    float alpMask = 1;
     float2 diffTexSize = 0.xx;
     diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
+    float2 alphaMaskSize = 0.xx;
+    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
+    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
     bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
+
     if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+        alpMask = alphaMask.SampleLevel(gSampler, vtx.UV, 0.0);
         if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
         {
             diffuseTexColor.rgb = diffuseTexColor.rrr;
         }
     }
     
-    const bool isIgnoreHit = (diffuseTexColor.a < 1);
+    const bool isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
     
     if (!isIgnoreHit)
     {
@@ -114,19 +122,25 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
 
     float4 diffuseTexColor = 1.xxxx;
+    float alpMask = 1;
     float2 diffTexSize = 0.xx;
     diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
+    float2 alphaMaskSize = 0.xx;
+    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
+    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
     bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
+
     if (!isNoTexture && !isTexInvalid)
     {
         diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
+        alpMask = alphaMask.SampleLevel(gSampler, vtx.UV, 0.0);
         if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
         {
             diffuseTexColor.rgb = diffuseTexColor.rrr;
         }
     }
 
-    const bool isIgnoreHit = (diffuseTexColor.a < 1);
+    const bool isIgnoreHit = (diffuseTexColor.a < 1) ||  (!isAlphaMaskInvalid && alpMask < 1);
 
     uint instanceID = InstanceID();
 

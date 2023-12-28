@@ -60,7 +60,7 @@ void DxrPhotonMapper::Setup()
     //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
     //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
     //    mPhi = 391; mTheta = 269;
-    //    mInitEyePos = XMFLOAT3(65, 8, 0);
+    //    mInitEyePos = XMFLOAT3(45, 8, 0);
     //    mLightRange = 0.054f;
     //}
 
@@ -260,6 +260,20 @@ void DxrPhotonMapper::Setup()
     WCHAR assetsPath[512];
     GetAssetsPath(assetsPath, _countof(assetsPath));
     mAssetPath = assetsPath;
+
+    mDummyAlphaMask.res = mDevice->CreateTexture2D(
+        1, 1, DXGI_FORMAT_R16_FLOAT,
+        D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        D3D12_HEAP_TYPE_DEFAULT
+    );
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mDummyAlphaMask.srv = mDevice->CreateShaderResourceView(mDummyAlphaMask.res.Get(), &srvDesc);
 }
 
 void DxrPhotonMapper::Initialize()

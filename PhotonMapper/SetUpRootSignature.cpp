@@ -108,10 +108,12 @@ void DxrPhotonMapper::CreateRootSignatureLocal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3, regSpace);
         mLocalRootSigMaterialWithTex = rsCreater.Create(mDevice, true, L"lrsMaterialWithTex");
         mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"] = 0;
         mRegisterMapGlobalLocalRootSigMaterialWithTex["indexBuffer"] = 1;
         mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"] = 2;
         mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"] = 3;
+        mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"] = 4;
     }
 }
