@@ -26,7 +26,7 @@
 
 #define GRID_SORT_THREAD_NUM 1024
 #define GRID_DIMENSION 256//if increase this param, grid lines are occured in caustics. (Cause : Photon Accumuration)
-#define PLANE_SIZE 100
+#define PLANE_SIZE 200
 
 #define PHOTON_NUM_1D 1024
 #define DENOISE_ITE 2
