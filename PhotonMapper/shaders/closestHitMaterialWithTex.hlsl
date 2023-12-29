@@ -41,6 +41,30 @@ VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
     return v;
 }
 
+void getTexColor(out float4 diffuseTexColor, out float alpMask, out bool isIgnoreHit, in bool isNoTexture, in float2 UV)
+{
+    diffuseTexColor = 0.xxxx;
+    alpMask = 1;
+    float2 diffTexSize = 0.xx;
+    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
+    float2 alphaMaskSize = 0.xx;
+    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
+    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
+    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
+
+    if (!isNoTexture && !isTexInvalid)
+    {
+        diffuseTexColor = diffuseTex.SampleLevel(gSampler, UV, 0.0);
+        alpMask = alphaMask.SampleLevel(gSampler, UV, 0.0);
+        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
+        {
+            diffuseTexColor.rgb = diffuseTexColor.rrr;
+        }
+    }
+    
+    isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
+}
+
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
@@ -54,24 +78,9 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     
     float4 diffuseTexColor = 1.xxxx;
     float alpMask = 1;
-    float2 diffTexSize = 0.xx;
-    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
-    float2 alphaMaskSize = 0.xx;
-    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
-    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
-    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
 
-    if (!isNoTexture && !isTexInvalid)
-    {
-        diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
-        alpMask = alphaMask.SampleLevel(gSampler, vtx.UV, 0.0);
-        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
-        {
-            diffuseTexColor.rgb = diffuseTexColor.rrr;
-        }
-    }
-    
-    const bool isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
+    bool isIgnoreHit = false;
+    getTexColor(diffuseTexColor, alpMask, isIgnoreHit, isNoTexture, vtx.UV);
     
     if (!isIgnoreHit)
     {
@@ -118,29 +127,15 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
+
     bool isNoTexture = false;
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
-
+    
     float4 diffuseTexColor = 1.xxxx;
     float alpMask = 1;
-    float2 diffTexSize = 0.xx;
-    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
-    float2 alphaMaskSize = 0.xx;
-    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
-    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
-    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
 
-    if (!isNoTexture && !isTexInvalid)
-    {
-        diffuseTexColor = diffuseTex.SampleLevel(gSampler, vtx.UV, 0.0);
-        alpMask = alphaMask.SampleLevel(gSampler, vtx.UV, 0.0);
-        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
-        {
-            diffuseTexColor.rgb = diffuseTexColor.rrr;
-        }
-    }
-
-    const bool isIgnoreHit = (diffuseTexColor.a < 1) ||  (!isAlphaMaskInvalid && alpMask < 1);
+    bool isIgnoreHit = false;
+    getTexColor(diffuseTexColor, alpMask, isIgnoreHit, isNoTexture, vtx.UV);
 
     uint instanceID = InstanceID();
 
