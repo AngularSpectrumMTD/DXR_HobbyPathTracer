@@ -52,6 +52,37 @@ void Camera::OnMouseWheel(f32 rotate)
     SwingRightLeft(rotate);
 }
 
+bool Camera::OnKeyDown(UINT8  wparam)
+{
+    bool flag = false;
+    XMVECTOR tmp = mEye - mTarget;
+    switch (wparam)
+    {
+    case VK_UP:
+        mEye += XMVector3Normalize(mUp);
+        mTarget += XMVector3Normalize(mUp);
+        flag =  true;
+        break;
+    case VK_DOWN:
+        mEye -= XMVector3Normalize(mUp);
+        mTarget -= XMVector3Normalize(mUp);
+        flag = true;
+        break;
+    case VK_RIGHT:
+        mEye -= XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget -= XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        flag = true;
+        break;
+    case VK_LEFT:
+        mEye += XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget += XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        flag = true;
+        break;
+    }
+    mMtxView = XMMatrixLookAtRH(mEye, mTarget, mUp);
+    return flag;
+}
+
 void Camera::TrackingRotation(f32 dx, f32 dy)
 {
     auto EyeVec = mEye - mTarget;
@@ -92,6 +123,6 @@ void Camera::ForwardBackward(f32 d)
 
 void Camera::SwingRightLeft(f32 rotate)
 {
-    mTarget += rotate * XMVector3Cross(mEye - mTarget, mUp);
-    TrackingRotation(0, 0);
+    //mTarget += rotate * XMVector3Cross(mEye - mTarget, mUp);
+    //TrackingRotation(0, 0);
 }

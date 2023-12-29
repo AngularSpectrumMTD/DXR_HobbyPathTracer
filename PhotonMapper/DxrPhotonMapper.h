@@ -2,7 +2,6 @@
 #define __DXRPHOTONMAPPER_H__
 
 #include "AppBase.h"
-#include "Camera.h"
 #include "utility/Utility.h"
 #include "utility/OBJ.h"
 #include <DirectXMath.h>
@@ -15,6 +14,7 @@
 
 #include "d3dx12.h"
 #include <pix3.h>
+#include "Camera.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

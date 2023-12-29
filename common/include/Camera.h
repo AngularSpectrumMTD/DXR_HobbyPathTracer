@@ -2,6 +2,7 @@
 #define __CAMERA_H__
 
 #include <DirectXMath.h>
+#include <wrl.h>
 
 typedef float f32;
 typedef int s32;
@@ -29,6 +30,7 @@ public:
     XMVECTOR GetTarget() const { return mTarget; }
 
     void OnMouseButtonDown(s32 buttonType, f32 dx, f32 dy);
+    bool OnKeyDown(UINT8 wparam);
     void OnMouseMove(f32 dx, f32 dy);
     void OnMouseButtonUp();
     void OnMouseWheel(f32 rotate);

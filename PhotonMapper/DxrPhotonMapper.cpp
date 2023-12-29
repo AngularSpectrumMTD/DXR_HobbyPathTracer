@@ -392,6 +392,11 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
 {
     const f32 clampRange = (mStageType == StageType_Plane) ? 1.5 * PLANE_SIZE : 0.9 * PLANE_SIZE;
 
+    if (mCamera.OnKeyDown(wparam))
+    {
+        mIsUseAccumulation = false;
+    }
+
     switch (wparam)
     {
     case 'I':

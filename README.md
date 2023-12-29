@@ -107,3 +107,6 @@ DirectX12
 - R : increase / decrease roughness
 - S : increase / decrease translucency
 - M : increase / decrease metallic
+- MOUSE_RIGHT : rotate the camera around the gazing point
+- MOUSE_LEFT : move the camera back and forth
+- ↑↓→← : move the camera up, down, left, or right
