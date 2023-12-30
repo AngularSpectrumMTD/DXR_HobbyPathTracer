@@ -15,9 +15,10 @@ void miss(inout Payload payload) {
     //payload.color = 0;
     
     float3 directionalLightDir = normalize(gSceneParam.directionalLightDirection.xyz);
-    float3 directionalLightEnergy = (dot(directionalLightDir, WorldRayDirection()) <0) ? gSceneParam.directionalLightColor.xyz : float3(0, 0, 0);
-    directionalLightEnergy *= (payload.recursive == 0) ? 0 : 1;
-    float3 curEnergy = payload.energy + (isEnableDirectionalLight() ? directionalLightEnergy : float3(0, 0, 0));
+    const bool isRecursionDepthZero = (payload.recursive == 0);
+    const bool isDirectionalLightReceived = isRecursionDepthZero ? true : (dot(directionalLightDir, WorldRayDirection()) < 0);
+    float3 directionalLightEnergy = (isDirectionalLightReceived) ? gSceneParam.directionalLightColor.xyz : float3(0, 0, 0);
+    float3 curEnergy = isDirectionalLightReceived ? (payload.energy + (isEnableDirectionalLight() ? directionalLightEnergy : float3(0, 0, 0))) : float3(0, 0, 0);
     payload.color += curEnergy * cubemap.rgb;
     payload.energy = 0.xxx;
     //payload.color = directionalLightEnergy;
