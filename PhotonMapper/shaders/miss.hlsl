@@ -8,18 +8,19 @@ float2 equirecFetchUV(float3 dir)
 
 [shader("miss")]
 void miss(inout Payload payload) {
+    if (payload.isShadowRay == 1)
+    {
+        payload.isShadowMiss = 1;
+        return;
+    }
+
     depthPositionNormalStore(payload, gSceneParam.backgroundColor.rgb);
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, equirecFetchUV(WorldRayDirection()), 0.0);
 
     //payload.color += 0.1.xxx;
     //payload.color = 0;
     
-    float3 directionalLightDir = normalize(gSceneParam.directionalLightDirection.xyz);
-    const bool isRecursionDepthZero = (payload.recursive == 0);
-    const bool isDirectionalLightReceived = isRecursionDepthZero ? true : (dot(directionalLightDir, WorldRayDirection()) < 0);
-    float3 directionalLightEnergy = (isDirectionalLightReceived) ? gSceneParam.directionalLightColor.xyz : float3(0, 0, 0);
-    float3 curEnergy = isDirectionalLightReceived ? (payload.energy + (isEnableDirectionalLight() ? directionalLightEnergy : float3(0, 0, 0))) : float3(0, 0, 0);
-    payload.color += curEnergy * cubemap.rgb;
+    payload.color += payload.energy * cubemap.rgb;
     payload.energy = 0.xxx;
     //payload.color = directionalLightEnergy;
 }

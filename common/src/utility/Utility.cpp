@@ -345,6 +345,13 @@ namespace utility {
         indices = { 0, 1, 2, 2, 1, 3 };
     }
 
+    void ONB(const XMFLOAT3 normal, XMFLOAT3& tangent, XMFLOAT3& bitangent)
+    {
+        XMFLOAT3 up = abs(normal.z) < 0.999 ? XMFLOAT3(0.0, 0.0, 1.0) : XMFLOAT3(1.0, 0.0, 0.0);
+        XMStoreFloat3(&tangent, XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&up), XMLoadFloat3(&normal))));
+        XMStoreFloat3(&bitangent, XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&normal), XMLoadFloat3(&tangent))));
+    }
+
     void CreatePlane(std::vector<VertexPNT>& vertices, std::vector<u32>& indices, f32 size)
     {
         vertices = {

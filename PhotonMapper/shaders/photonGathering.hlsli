@@ -107,26 +107,19 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
                         continue; //avoid infinite loop
                     if (photonIDstardEnd.y == UINT32_MAX)
                         continue; //avoid infinite loop
-                
-                    if (true)
+
+                    for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                     {
-                        for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
-                        {
-                            PhotonInfo comparePhoton = gPhotonMap[G];
-                            bool isVisiblePhotonPrimary = true;
-                            //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
+                        PhotonInfo comparePhoton = gPhotonMap[G];
+                        bool isVisiblePhotonPrimary = true;
+                        //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
                         
-                            float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
-                            if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
-                            {
-                                count++;
-                                accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
-                            }
+                        float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
+                        if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
+                        {
+                            count++;
+                            accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                         }
-                    }
-                    else
-                    {
-                        break;
                     }
 
                     if (isDebug)

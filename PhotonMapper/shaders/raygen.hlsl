@@ -92,6 +92,8 @@ void rayGen() {
         payload.storeIndexXY = launchIndex;
         payload.stored = 0;//empty
         payload.eyeDir = rayDesc.Direction;
+        payload.isShadowRay = 0;
+        payload.isShadowMiss = 0;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 

@@ -1,30 +1,18 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistro1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/28d60b62-47e2-4d28-b6fa-a720b66c5c0e)
+![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6f0b3a6d-7fac-4bef-9d06-c560a9b3eeb4)
 
-![bistro2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f6ff4f52-4e9f-4341-95ed-518159c9caf0)
+![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2d40f189-c253-4852-aca3-d076a5e4b8d4)
 
-![bistro3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2929e0e5-255c-495e-8d4d-db103bd23164)
+![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/48296386-5fe9-4bac-a653-9e8641ff8e34)
 
-![bistro4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/5bb2f5e1-921c-4904-be38-b38e26cd8c00)
+![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6a5d5985-862f-4a6b-b554-0753c6d67295)
 
-![transparent](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4858ab5c-ba06-4526-b9fb-b1dddeac4742)
-
-![metallic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3f97fb0c-5980-477d-8e73-8ab642776e72)
-
-![rough](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8a75a7b8-14b1-4805-93d5-54ecb47f6938)
-
-### Directional Light / Cube Map
-
-| Directional Light | Cube Map |
-| ---- | ---- |
-| ![Directional](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/85d5195e-f664-4037-824f-36c812d78b3d) | ![CubeMap](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/19fc8f4f-9e6a-425c-8542-239c02c7ebc7) |
+![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f044e219-b584-457b-b661-8d03ba090a64)
 
 ### Caustics
 Caustics are rendered by spectral rendering
-
-![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d7580bab-4ba6-4408-8c1a-788c410f7536)
 
 ### Algorithm
 Photon Mapping : Hashed Grid
@@ -38,8 +26,6 @@ Shading : GGX
 
 #### Normal
 1.Build and Execute
-
-![sample](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6ab59527-27d9-4606-9d9f-465ba5dd9673)
 
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -88,14 +74,12 @@ DirectX12
 
 - I : determine other button meaning (+ / -)
 - J : start / stop model
-- H : enable / disable Directional Light
 - G : increase / decrease photon gather radius
 - X / Y / Z : light position
 - L : increase / decrease light emission range
 - T / P : light emission angle(theta / phi)
 - K : increase / decrease light intensity
 - B : increase / decrease photon gathering block num
-- V : visualize DI emission element
 - N : visualize caustics
 - D : enable / disable SVGF(A-Trous wavelet filtering)
 - Q : increase / decrease caustics boost

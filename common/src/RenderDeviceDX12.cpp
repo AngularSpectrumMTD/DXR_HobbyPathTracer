@@ -597,6 +597,15 @@ namespace dx12
             staging->Unmap(0, &range);
         }
 
+        if (resource.Get() == nullptr)
+        {
+            return;
+        }
+        if (staging.Get() == nullptr)
+        {
+            return;
+        }
+
         auto command = CreateCommandList();
         ComPtr<ID3D12Fence> fence = CreateFence();
         command->CopyResource(resource.Get(), staging.Get());

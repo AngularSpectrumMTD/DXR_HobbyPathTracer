@@ -225,6 +225,8 @@ namespace utility {
         }
     };
 
+    void ONB(const XMFLOAT3 normal, XMFLOAT3& tangent, XMFLOAT3& bitangent);
+
     void CreatePlane(std::vector<VertexPN>& vertices, std::vector<u32>& indices, f32 size = 10.f);
     void CreatePlane(std::vector<VertexPNC>& vertices, std::vector<u32>& indices, f32 size = 10.f);
     void CreatePlane(std::vector<VertexPNT>& vertices, std::vector<u32>& indices, f32 size = 10.f);

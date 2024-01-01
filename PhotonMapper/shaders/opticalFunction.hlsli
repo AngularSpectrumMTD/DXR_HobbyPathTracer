@@ -76,12 +76,19 @@ bool isPhotonStoreRequired(in MaterialParams params)
     return rand() < params.roughness;
 }
 
+void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
+{
+    float3 up = abs(normal.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
+    tangent = normalize(cross(up, normal));
+    bitangent = cross(normal, tangent);
+}
+
 //Sampling
 float3 tangentToWorld(float3 normal, float3 tangentSpaceVec)
 {
-    float3 up = abs(normal.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
-    float3 tangent = normalize(cross(up, normal));
-    float3 bitangent = cross(normal, tangent);
+    float3 tangent;
+    float3 bitangent;
+    ONB(normal, tangent, bitangent);
 
     return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + normal * tangentSpaceVec.z);
 }
@@ -219,6 +226,144 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
     float3 XYZ = etaOUT * etaOUT * (1 - F) * G * D;
     float B = (etaIN * dotVH + etaOUT * dotLH) * (etaIN * dotVH + etaOUT * dotLH) + eps;
     return A * XYZ / B;
+}
+
+//Lighting
+struct LightSample
+{
+    float3 direction;
+    float3 normal;
+    float3 emission;
+    //float3 sufacePosition;
+    float distance;
+    float pdf;
+};
+
+void SampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+{
+    const float eps = 0.001f;
+    float3 vectorToScatterPosition = scatterPosition - lightGen.position;
+    float distToScatterPosition = length(vectorToScatterPosition);
+    
+    float3 sampledDir = HemisphereORCosineSampling(normalize(vectorToScatterPosition), true);
+    float3 lightSurfacePos = lightGen.position + sampledDir * lightGen.sphereRadius;
+    
+    //lightSample.sufacePosition = lightSurfacePos;
+    lightSample.direction = lightSurfacePos - scatterPosition;
+    lightSample.distance = length(lightSample.direction);
+    const float distanceSq = lightSample.distance * lightSample.distance + eps;
+
+    lightSample.direction /= lightSample.distance;
+    lightSample.normal = normalize(lightSurfacePos - lightGen.position);
+    lightSample.emission = lightGen.emission * getLightNum();
+    lightSample.pdf = distanceSq / (lightGen.influenceDistance * 0.5 * abs(dot(lightSample.normal, lightSample.direction)));
+}
+
+void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+{
+    const float eps = 0.001f;
+    float rnd0 = (rand() * 0.5 - 1) * 2;//-1 to 1
+    float rnd1 = (rand() * 0.5 - 1) * 2; //-1 to 1
+
+    float3 lightSurfacePos = lightGen.position + rnd0 * lightGen.U + rnd1 * lightGen.V;
+    
+    //lightSample.sufacePosition = lightSurfacePos;
+    lightSample.direction = lightSurfacePos - scatterPosition;
+    lightSample.distance = length(lightSample.direction);
+    const float distanceSq = lightSample.distance * lightSample.distance + eps;
+
+    lightSample.direction /= lightSample.distance;
+    lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
+    lightSample.emission = lightGen.emission * getLightNum();
+    lightSample.pdf = distanceSq / (lightGen.influenceDistance * abs(dot(lightSample.normal, lightSample.direction)));
+}
+
+void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+{
+    const float eps = 0.001f;
+    float rnd0 = rand(); //0 to 1
+    float rnd1 = rand(); //0 to 1
+    float r = lengthSqr(lightGen.U) * sqrt(rnd0);
+    float p = 2 * PI * rnd1;
+
+    float3 localXYZ = float3(r * cos(p), lengthSqr(lightGen.V) / lengthSqr(lightGen.U) * r * sin(p), 0);
+    float3 worldXYZ = lightGen.U * localXYZ.x + lightGen.V * localXYZ.y;
+
+    float3 lightSurfacePos = lightGen.position + worldXYZ;
+
+    //lightSample.sufacePosition = lightSurfacePos;
+    lightSample.direction = lightSurfacePos - scatterPosition;
+    lightSample.distance = length(lightSample.direction);
+    const float distanceSq = lightSample.distance * lightSample.distance + eps;
+
+    lightSample.direction /= lightSample.distance;
+    lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
+    lightSample.emission = lightGen.emission * getLightNum();
+    lightSample.pdf = distanceSq / (lightGen.influenceDistance * abs(dot(lightSample.normal, lightSample.direction)));
+}
+
+void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+{
+    //lightSample.sufacePosition = 0.xxx;
+    lightSample.direction = normalize(-lightGen.position);//pos as dir
+    lightSample.normal = normalize(lightGen.position);
+    lightSample.emission = lightGen.emission * getLightNum();
+    lightSample.distance = 10000000;
+    lightSample.pdf = 1.0;
+}
+
+void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
+{
+    const uint sampleID = (uint) (getLightRandomSeed()) % getLightNum();
+    LightGenerateParam param = gLightGenerateParams[sampleID];
+    
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        SampleSphereLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_RECT)
+    {
+        SampleRectLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_SPOT)
+    {
+        SampleSpotLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        SampleDirectionalLight(param, scatterPosition, lightSample);
+    }
+}
+
+bool isShadow(in float3 scatterPosition, in LightSample lightSample)
+{
+    Payload shadowPayload;
+    shadowPayload.isShadowRay = 1;
+    shadowPayload.isShadowMiss = 0;
+
+    const float eps = 0.001;
+    RayDesc shadowRay;
+    shadowRay.TMin = eps;
+    shadowRay.TMax = lightSample.distance;
+
+    shadowRay.Direction = lightSample.direction;
+    shadowRay.Origin = scatterPosition;
+
+    RAY_FLAG flags = RAY_FLAG_NONE;
+
+    uint rayMask = ~(LIGHT_INSTANCE_MASK);
+
+    TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            shadowRay,
+            shadowPayload);
+
+    return shadowPayload.isShadowMiss == 0;
 }
 
 //Shading

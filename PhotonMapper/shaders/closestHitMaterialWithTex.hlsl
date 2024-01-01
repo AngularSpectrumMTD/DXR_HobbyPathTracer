@@ -68,6 +68,12 @@ void getTexColor(out float4 diffuseTexColor, out float alpMask, out bool isIgnor
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
+    if (payload.isShadowRay == 1)
+    {
+        payload.isShadowMiss = 0;
+        return;
+    }
+
     if (isReachedRecursiveLimitPayload(payload))
     {
         return;
@@ -99,7 +105,12 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         nextRay.Direction = 0.xxx;
         SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
-        payload.color += payload.energy * (currentMaterial.emission.xyz + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
+        LightSample lightSample;
+        SampleLight(bestFitWorldPosition, lightSample);
+        const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
+        const bool isShadowUse = (payload.recursive < 8);
+        const float shadowCoef = isShadowUse ? (isShadow(bestFitWorldPosition, lightSample) ? 0 : 1) : 1;
+        payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
     }
     else
     {

@@ -130,6 +130,8 @@ private:
         uint2 storeIndexXY;
         float3 eyeDir;
         s32 stored;
+        u32 isShadowRay;//1 : shadow ray
+        u32 isShadowMiss; //1 : shadow miss
     };
 
     struct PhotonPayload
@@ -192,6 +194,7 @@ private:
         XMVECTOR viewVec;
         XMVECTOR directionalLightDirection;
         XMVECTOR directionalLightColor;
+        XMUINT4 additional;//x light num
     };
 
     struct PhotonInfo
@@ -236,6 +239,70 @@ private:
         u32 stepScale;
     };
 
+    enum LightType
+    {
+        LightType_Sphere = 0,
+        LightType_Rect = 1,
+        LightType_Spot = 2,
+        LightType_Directional = 3
+    };
+
+    struct LightGenerateParam
+    {
+        XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+        XMFLOAT3 emission = XMFLOAT3(0, 0, 0);
+        XMFLOAT3 U = XMFLOAT3(0, 0, 0); //u vector for rectangle or spot light
+        XMFLOAT3 V = XMFLOAT3(0, 0, 0); //v vector for rectangle or spot light
+        f32 sphereRadius = 0; //radius for sphere light
+        f32 influenceDistance = 0;
+        u32 type = 0; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
+
+        void setParamAsSphereLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const f32 radius, const f32 influence)
+        {
+            type = LightType_Sphere;
+            position = pos;
+            emission = emi;
+            sphereRadius = radius;
+            influenceDistance = influence;
+        }
+
+        void setParamAsRectLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v, const f32 influence)
+        {
+            type = LightType_Rect;
+            position = pos;
+            emission = emi;
+            U = u;
+            V = v;
+            influenceDistance = influence;
+        }
+
+        void setParamAsSpotLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v, const f32 influence)
+        {
+            type = LightType_Spot;
+            position = pos;
+            emission = emi;
+            U = u;
+            V = v;
+            influenceDistance = influence;
+        }
+
+        void setParamAsDirectionalLight(const XMFLOAT3 pos, const XMFLOAT3 emi)
+        {
+            type = LightType_Directional;
+            position = pos;
+            emission = emi;
+        }
+    };
+
+    enum LightCount
+    {
+        LightCount_Sphere = 0,
+        LightCount_Rect = 0,
+        LightCount_Spot = 1,
+        LightCount_Directional = 1,
+        LightCount_ALL = LightCount_Sphere + LightCount_Rect + LightCount_Spot + LightCount_Directional
+    };
+
     enum ModelType
     {
         ModelType_Crab,
@@ -277,6 +344,7 @@ private:
     void CreateResultBuffer();
     void CreatePhotonMappingBuffer();
     void CreateDepthBuffer();
+    void CreateLightGenerateBuffer();
     void CreateLuminanceMomentBuffer();
     void CreateLuminanceVarianceBuffer();
     void CreateDenoisedColorBuffer();
@@ -300,6 +368,8 @@ private:
     void UpdateSceneTLAS();
     void UpdateSceneParams();
     void UpdateMaterialParams();
+    void UpdateLightGenerateParams();
+    void InitializeLightGenerateParams();
     void UpdateWindowText();
 
     void GetAssetsPath(_Out_writes_(pathSize) WCHAR* path, u32 pathSize);
@@ -360,6 +430,11 @@ private:
     ComPtr<ID3D12Resource> mOBJ0MaterialCB;
     ComPtr<ID3D12Resource> mOBJ1MaterialCB;
     ComPtr<ID3D12Resource> mStageMaterialCB;
+
+    //Lights
+    std::array<LightGenerateParam, LightCount_ALL> mLightGenerationParamTbl;
+    ComPtr <ID3D12Resource> mLightGenerationParamBuffer;
+    dx12::Descriptor mLightGenerationParamSRV;
 
     SceneParam mSceneParam;
     utility::TextureResource mGroundTex;
@@ -537,7 +612,7 @@ private:
     bool mIsTargetGlass;
 
     bool mIsUseAccumulation;
-    bool mIsUseDirectionalLight;
+    //bool mIsUseDirectionalLight;
 
     XMFLOAT3 mInitEyePos;
 };

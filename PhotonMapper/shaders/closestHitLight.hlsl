@@ -3,7 +3,7 @@
 [shader("closesthit")]
 void lightClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
-    if (isReachedRecursiveLimitPayload(payload))
+    if (payload.recursive > 0 || isReachedRecursiveLimitPayload(payload))
     {
         return;
     }

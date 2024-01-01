@@ -42,12 +42,11 @@ void DxrPhotonMapper::Setup()
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
     mIsDebug = false;
-    mVisualizeLightRange = true;
+    mVisualizeLightRange = false;
     mInverseMove = false;
     mIsUseTexture = false;
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
-    mIsUseDirectionalLight = false;
     mStageTextureFileName = L"model/tileTex.png";
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
@@ -274,6 +273,8 @@ void DxrPhotonMapper::Setup()
     srvDesc.Texture2D.ResourceMinLODClamp = 0;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     mDummyAlphaMask.srv = mDevice->CreateShaderResourceView(mDummyAlphaMask.res.Get(), &srvDesc);
+
+    InitializeLightGenerateParams();
 }
 
 void DxrPhotonMapper::Initialize()
@@ -360,7 +361,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.backgroundColor = XMVectorSet(0.3f, 0.45f, 0.45f, 1.0f);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, mIntenceBoost, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
-    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, mIsUseDirectionalLight ? 1 : 0, 0);
+    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
     mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
     mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * OneRadian) * cos(mPhi * OneRadian), sin(mTheta * OneRadian) * sin(mPhi * OneRadian), cos(mTheta * OneRadian), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
@@ -372,6 +373,10 @@ void DxrPhotonMapper::Update()
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
     mSceneParam.directionalLightDirection = XMVectorSet(sin(mThetaDirectional * OneRadian) * cos(mPhiDirectional * OneRadian), sin(mThetaDirectional * OneRadian) * sin(mPhiDirectional * OneRadian), cos(mThetaDirectional * OneRadian), 0.0f);
     mSceneParam.directionalLightColor = XMVectorSet(1.0f, 0.5f, 0.1f, 0.0f);
+    mSceneParam.additional.x = LightCount_ALL;
+    mSceneParam.additional.y = 0;
+    mSceneParam.additional.z = 0;
+    mSceneParam.additional.w = 0;
 
     mRenderFrame++;
 
@@ -404,10 +409,6 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
-        mIsUseAccumulation = false;
-        break;
-    case 'H':
-        mIsUseDirectionalLight = !mIsUseDirectionalLight;
         mIsUseAccumulation = false;
         break;
     case 'G':
@@ -446,10 +447,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
-    case 'V':
+ /*   case 'V':
         mVisualizeLightRange = !mVisualizeLightRange;
         mIsUseAccumulation = false;
-        break;
+        break;*/
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
@@ -545,7 +546,7 @@ void DxrPhotonMapper::OnMouseWheel(s32 rotate)
         rotate = 120;
     }
     mCamera.OnMouseWheel(rotate / 8000.f);
-    mIsUseAccumulation = false;
+    //mIsUseAccumulation = false;
 }
 
 f32 DxrPhotonMapper::Clamp(f32 min, f32 max, f32 src)
@@ -568,6 +569,113 @@ void DxrPhotonMapper::UpdateMaterialParams()
     mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer1, &mMaterialParam1, sizeof(mMaterialParam1));
 }
 
+void DxrPhotonMapper::InitializeLightGenerateParams()
+{
+    u32 count = 0;
+    for (u32 i = 0; i < LightCount_Sphere; i++)
+    {
+        LightGenerateParam param;
+        param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Rect; i++)
+    {
+        LightGenerateParam param;
+        param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Spot; i++)
+    {
+        LightGenerateParam param;
+        param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Directional; i++)
+    {
+        LightGenerateParam param;
+        param.setParamAsDirectionalLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1));
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+}
+
+void DxrPhotonMapper::UpdateLightGenerateParams()
+{
+    u32 count = 0;
+
+    const f32 scale = mLightRange;
+    for (u32 i = 0; i < LightCount_Sphere; i++)
+    {
+        LightGenerateParam param;
+        param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), scale, 150);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Rect; i++)
+    {
+        LightGenerateParam param;
+        XMFLOAT3 tangent;
+        XMFLOAT3 bitangent;
+        XMFLOAT3 normal;
+        XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+        utility::ONB(normal, tangent, bitangent);
+        tangent.x *= scale;
+        tangent.y *= scale;
+        tangent.z *= scale;
+        bitangent.x *= scale;
+        bitangent.y *= scale;
+        bitangent.z *= scale;
+        param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), tangent, bitangent, 150);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Spot; i++)
+    {
+        LightGenerateParam param;
+        XMFLOAT3 tangent;
+        XMFLOAT3 bitangent;
+        XMFLOAT3 normal;
+        XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+        utility::ONB(normal, tangent, bitangent);
+        tangent.x *= scale;
+        tangent.y *= scale;
+        tangent.z *= scale;
+        bitangent.x *= scale;
+        bitangent.y *= scale;
+        bitangent.z *= scale;
+        param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), tangent, bitangent, 150);
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+    for (u32 i = 0; i < LightCount_Directional; i++)
+    {
+        LightGenerateParam param;
+        XMFLOAT3 direction;
+        XMStoreFloat3(&direction, mSceneParam.directionalLightDirection);
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(0.5, 0.5, 0.5));
+        mLightGenerationParamTbl[count] = param;
+        count++;
+    }
+
+    auto buf = mLightGenerationParamBuffer.Get();
+    
+    D3D12_RESOURCE_BARRIER srvTodst[] = {
+        CD3DX12_RESOURCE_BARRIER::Transition(buf,D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST)
+    };
+
+    D3D12_RESOURCE_BARRIER dstTosrv[] = {
+    CD3DX12_RESOURCE_BARRIER::Transition(buf,D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    };
+
+    //mCommandList->ResourceBarrier(_countof(srvTodst), srvTodst);
+    mDevice->ImmediateBufferUpdateHostVisible(buf, mLightGenerationParamTbl.data(), sizeof(LightGenerateParam) * mLightGenerationParamTbl.size());
+    //mDevice->ImmediateBufferUpdateStagingCopy(buf, mLightGenerationParamTbl.data(), sizeof(LightGenerateParam) * mLightGenerationParamTbl.size());
+    //mCommandList->ResourceBarrier(_countof(dstTosrv), dstTosrv);
+}
+
 void DxrPhotonMapper::Draw()
 {
     QueryPerformanceFrequency(&mCpuFreq);
@@ -577,8 +685,6 @@ void DxrPhotonMapper::Draw()
     allocator->Reset();
     mCommandList->Reset(allocator.Get(), nullptr);
     auto frameIndex = mDevice->GetCurrentFrameIndex();
-
-    UpdateSceneParams();
 
     const u32 src = mRenderFrame % 2;
     const u32 dst = (mRenderFrame + 1) % 2;
@@ -613,8 +719,10 @@ void DxrPhotonMapper::Draw()
     mCommandList->ResourceBarrier(_countof(barriersSRVToUAV), barriersSRVToUAV);
     mCommandList->ResourceBarrier(_countof(meanBarriers), meanBarriers);
 
+    UpdateSceneParams();
     UpdateSceneTLAS();
     UpdateMaterialParams();
+    UpdateLightGenerateParams();
 
     auto gridCB = mGridSortCB.Get();
     auto sceneCB = mSceneCB.Get();
@@ -638,6 +746,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gOutput1"], mOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -664,6 +773,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gOutput1"], mOutputDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);

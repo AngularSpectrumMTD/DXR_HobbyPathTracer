@@ -20,6 +20,7 @@ struct SceneCB
     float4 viewVec;
     float4 directionalLightDirection;
     float4 directionalLightColor;
+    uint4 additional;//x light num
 };
 
 struct Payload
@@ -30,6 +31,8 @@ struct Payload
     int2 storeIndexXY;
     float3 eyeDir;
     int stored;
+    uint isShadowRay;//1 : shadow ray
+    uint isShadowMiss; //1 : shadow miss
 };
 
 struct PhotonPayload
@@ -46,6 +49,22 @@ struct TriangleIntersectionAttributes
     float2 barys;
 };
 
+struct LightGenerateParam
+{
+    float3 position;
+    float3 emission;
+    float3 U; //u vector for rectangle or spot light
+    float3 V; //v vector for rectangle or spot light
+    float sphereRadius; //radius for sphere light
+    float influenceDistance;
+    uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
+};
+
+#define LIGHT_TYPE_SPHERE 0
+#define LIGHT_TYPE_RECT 1
+#define LIGHT_TYPE_SPOT 2
+#define LIGHT_TYPE_DIRECTIONAL 3
+
 #define PI 3.1415926535
 #define LIGHT_INSTANCE_MASK 0x08
 
@@ -55,6 +74,7 @@ struct TriangleIntersectionAttributes
 RaytracingAccelerationStructure gRtScene : register(t0);
 Texture2D<float4> gEquiRecEnvMap : register(t1);
 Texture2D<float2> gLuminanceMomentBufferSrc : register(t2);
+StructuredBuffer<LightGenerateParam> gLightGenerateParams : register(t3);
 ConstantBuffer<SceneCB> gSceneParam : register(b1);
 SamplerState gSampler : register(s0);
 
@@ -90,6 +110,11 @@ bool isVisualizePhotonDebugDraw()
 bool isVisualizeLightRange()
 {
     return gSceneParam.flags.w == 1;
+}
+
+uint getLightNum()
+{
+    return gSceneParam.additional.x;
 }
 
 bool isApplyCaustics()
@@ -150,11 +175,6 @@ uint getPhotonUnitNum()
 bool isAccumulationApply()
 {
     return (gSceneParam.gatherParams2.y == 1);
-}
-
-bool isEnableDirectionalLight()
-{
-    return (gSceneParam.gatherParams2.z == 1);
 }
 
 float getLightRange()
