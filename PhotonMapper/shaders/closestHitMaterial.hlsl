@@ -50,7 +50,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
     
-    SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.energy);
+    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
     LightSample lightSample;
     SampleLight(bestFitWorldPosition, lightSample);
     const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
@@ -79,8 +79,6 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
 
     VertexPN vtx = GetVertex(attrib);
 
-    uint instanceID = InstanceID();
-
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
@@ -89,7 +87,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
 
-    SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.throughput, payload.lambdaNM);
+    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
     if (isPhotonStoreRequired(currentMaterial))
     {
         storePhoton(payload);

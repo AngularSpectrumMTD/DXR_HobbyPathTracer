@@ -41,10 +41,10 @@ VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
     return v;
 }
 
-void getTexColor(out float4 diffuseTexColor, out float alpMask, out bool isIgnoreHit, in bool isNoTexture, in float2 UV)
+void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoTexture, in float2 UV)
 {
     diffuseTexColor = 0.xxxx;
-    alpMask = 1;
+    float alpMask = 1;
     float2 diffTexSize = 0.xx;
     diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
     float2 alphaMaskSize = 0.xx;
@@ -60,6 +60,13 @@ void getTexColor(out float4 diffuseTexColor, out float alpMask, out bool isIgnor
         {
             diffuseTexColor.rgb = diffuseTexColor.rrr;
         }
+    }
+    else
+    {
+        diffuseTexColor = 1.xxxx;
+        alpMask = 1;
+        isIgnoreHit = false;
+        return;
     }
     
     isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
@@ -83,10 +90,9 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
-    float alpMask = 1;
 
     bool isIgnoreHit = false;
-    getTexColor(diffuseTexColor, alpMask, isIgnoreHit, isNoTexture, vtx.UV);
+    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
     
     if (!isIgnoreHit)
     {
@@ -104,7 +110,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.energy);
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
         LightSample lightSample;
         SampleLight(bestFitWorldPosition, lightSample);
         const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
@@ -142,12 +148,9 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     VertexPNT vtx = GetVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
-    float alpMask = 1;
 
     bool isIgnoreHit = false;
-    getTexColor(diffuseTexColor, alpMask, isIgnoreHit, isNoTexture, vtx.UV);
-
-    uint instanceID = InstanceID();
+    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
 
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
@@ -163,7 +166,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.throughput, payload.lambdaNM);
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
     }
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))

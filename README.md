@@ -25,7 +25,13 @@ Shading : GGX
 **NOTE : This program can only handle triangular polygons**
 
 #### Normal
-1.Build and Execute
+1. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
+
+<img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e69367eb-6044-46dd-ae79-4cb7c294d18f" width="50%">
+
+2. Build and Execute
+
+![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9b87a3e7-5f84-4cb5-be00-c0c1881d6b94)
 
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -34,18 +40,17 @@ Shading : GGX
 
 2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.
 
-3. Export 3D model as obj file(Name the file "sponza.obj")
+4. Export 3D model as obj file(Name the file "sponza.obj")
 
-4. Create a new folder (ex. "sponza") in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
+5. Create a new folder (ex. "sponza") in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
 
-5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
+6. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
-```
-    mOBJFileName = "sponza.obj";
-    mOBJFolderName = "model/sponza";
-```
+<img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3e48b1be-90f6-4663-86c0-228fb3d42e87" width="50%">
 
-6. Build and Execute
+7. Build and Execute
+
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1ea012fb-a0de-4490-a8fd-cc04fef3beb5)
 
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -60,12 +65,11 @@ Shading : GGX
 
 5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
-```
-    mOBJFileName = "exterior.obj";
-    mOBJFolderName = "model/bistro/Exterior";
-```
+<img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2e1afbf9-3e0c-41f0-8cc0-9bc62251a8cf" width="50%">
 
 6. Build and Execute
+
+![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/43e6d054-20fb-42bf-9f07-16c80b7d8d5c)
 
 ### Graphics API
 DirectX12

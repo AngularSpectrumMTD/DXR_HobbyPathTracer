@@ -52,33 +52,35 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
-    //For SPONZA
+    //SPONZA
     //{
     //    mOBJFileName = "sponza.obj";
     //    mOBJFolderName = "model/sponza";
     //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
     //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
     //    mPhi = 391; mTheta = 269;
-    //    mInitEyePos = XMFLOAT3(45, 8, 0);
+    //    mInitEyePos = XMFLOAT3(63, 14, 0);
     //    mLightRange = 0.054f;
     //}
 
-    //For BISTRO EXTERIOR
+    //BISTRO EXTERIOR
     {
         mOBJFileName = "exterior.obj";
         mOBJFolderName = "model/bistro/Exterior";
         mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
         mLightPosX = 33.f; mLightPosY = 65; mLightPosZ = 1;
         mPhi = 415; mTheta = 269;
-        mInitEyePos = XMFLOAT3(-15, 40, -15);
+        mInitEyePos = XMFLOAT3(-32, 18, -29);
     }
 
+    //Normal
     //{
     //    mOBJFileName = "skull.obj";
     //    mOBJFolderName = "model";
     //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
-    //    mLightPosX = 4.f; mLightPosY = 59; mLightPosZ = 4;
-    //    mPhi = 439; mTheta = 269;
+    //    mLightPosX = -3.f; mLightPosY = 55; mLightPosZ = -5;
+    //    mPhi = 460; mTheta = 269;
+    //    mInitEyePos = XMFLOAT3(397, 129, -343);
     //}
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
@@ -447,10 +449,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
- /*   case 'V':
-        mVisualizeLightRange = !mVisualizeLightRange;
-        mIsUseAccumulation = false;
-        break;*/
+    //case 'V':
+    //    mVisualizeLightRange = !mVisualizeLightRange;
+    //    mIsUseAccumulation = false;
+    //    break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
