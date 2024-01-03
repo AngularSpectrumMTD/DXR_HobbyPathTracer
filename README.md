@@ -56,7 +56,7 @@ Shading : GGX
 
 3. Export 3D model as obj file(Name the file "exterior.obj")
 
-4. Create a new folder (e.g. "bistro") in "DXRPhotonMapperPhotonMappermodel". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj file in the "Exterior".
+4. Create a new folder (e.g. "bistro") in "DXRPhotonMapper/PhotonMapper/model". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj file in the "Exterior".
 
 5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
