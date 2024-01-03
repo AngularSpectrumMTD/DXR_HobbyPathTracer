@@ -44,19 +44,18 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
     
-    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+    SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.energy);
     LightSample lightSample;
     SampleLight(bestFitWorldPosition, lightSample);
     const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
-    const bool isShadowUse = (payload.recursive < 8);
-    const float shadowCoef = isShadowUse ? (isShadow(bestFitWorldPosition, lightSample) ? 0 : 1) : 1;
-    payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
+    const float shadowCoef = isShadow(bestFitWorldPosition, lightSample) ? 0 : 1;
+    payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
@@ -84,13 +83,13 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
 
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
 
-    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+    SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.throughput, payload.lambdaNM);
     if (isPhotonStoreRequired(currentMaterial))
     {
         storePhoton(payload);

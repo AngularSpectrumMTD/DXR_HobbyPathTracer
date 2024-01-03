@@ -96,7 +96,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
@@ -104,13 +104,12 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+        SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.energy);
         LightSample lightSample;
         SampleLight(bestFitWorldPosition, lightSample);
         const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
-        const bool isShadowUse = (payload.recursive < 8);
-        const float shadowCoef = isShadowUse ? (isShadow(bestFitWorldPosition, lightSample) ? 0 : 1) : 1;
-        payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestHitWorldNormal));
+        const float shadowCoef = isShadow(bestFitWorldPosition, lightSample) ? 0 : 1;
+        payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
     }
     else
     {
@@ -153,7 +152,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestHitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
@@ -164,7 +163,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+        SurafceShading(currentMaterial, bestFitWorldNormal, nextRay, payload.throughput, payload.lambdaNM);
     }
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
