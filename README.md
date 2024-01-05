@@ -69,7 +69,7 @@ Shading : GGX
 
 6. Build and Execute
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/43e6d054-20fb-42bf-9f07-16c80b7d8d5c)
+![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/a0bf1bf1-720e-47c5-8001-513594bf3c8e)
 
 ### Graphics API
 DirectX12

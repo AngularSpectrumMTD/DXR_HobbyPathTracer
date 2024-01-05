@@ -68,7 +68,7 @@ void DxrPhotonMapper::Setup()
         mOBJFileName = "exterior.obj";
         mOBJFolderName = "model/bistro/Exterior";
         mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-        mLightPosX = 33.f; mLightPosY = 65; mLightPosZ = 1;
+        mLightPosX = 33.f; mLightPosY = 45; mLightPosZ = 1;
         mPhi = 415; mTheta = 269;
         mInitEyePos = XMFLOAT3(-32, 18, -29);
     }
