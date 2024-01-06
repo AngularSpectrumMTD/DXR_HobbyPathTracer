@@ -407,6 +407,7 @@ void SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextR
 
         float3 F0 = 0.08.xxx;
         F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+        //F0 = lerp(F0 * material.specular, 1.xxx, (material.metallic).xxx);//No Albedo
         
         const float NDF = GGX_Distribution(N, H, material.roughness);
         const float G = GGX_Geometry_Smith(N, V, L, material.roughness);
@@ -418,6 +419,7 @@ void SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextR
         const float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
         const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
         const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+        //const float3 diffBRDF = DiffuseBRDF(1.xxx); //No Albedo
         const float diffPDF = CosineSamplingPDF(dotNL);
         const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
         const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;

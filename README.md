@@ -1,15 +1,13 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6f0b3a6d-7fac-4bef-9d06-c560a9b3eeb4)
+![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1f0d89c7-7df6-4b1c-921f-3bae93bde4d2)
 
-![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2d40f189-c253-4852-aca3-d076a5e4b8d4)
+![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/42298d2c-b18d-4689-8897-bdb85b66a55b)
 
-![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/48296386-5fe9-4bac-a653-9e8641ff8e34)
+![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9182cbad-51b2-46cb-8c27-534e976bffcf)
 
-![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6a5d5985-862f-4a6b-b554-0753c6d67295)
-
-![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f044e219-b584-457b-b661-8d03ba090a64)
+![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d957f59e-bed4-4eee-b2ec-99434508c757)
 
 ### Caustics
 Caustics are rendered by spectral rendering
@@ -50,7 +48,7 @@ Shading : GGX
 
 7. Build and Execute
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1ea012fb-a0de-4490-a8fd-cc04fef3beb5)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/efa9e347-1ef1-4ac4-b144-ff4e1ded7f73)
 
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -69,7 +67,7 @@ Shading : GGX
 
 6. Build and Execute
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/a0bf1bf1-720e-47c5-8001-513594bf3c8e)
+![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1099a01c-64cd-4d96-a5f5-2473f3e62b26)
 
 ### Graphics API
 DirectX12
