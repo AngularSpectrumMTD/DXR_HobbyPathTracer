@@ -13,6 +13,7 @@
 #include <sstream>
 
 using namespace DirectX;
+#define ONE_RADIAN XM_PI / 180.f
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -53,25 +54,25 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
     //SPONZA
-    //{
-    //    mOBJFileName = "sponza.obj";
-    //    mOBJFolderName = "model/sponza";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-    //    mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
-    //    mPhi = 391; mTheta = 269;
-    //    mInitEyePos = XMFLOAT3(63, 14, 0);
-    //    mLightRange = 0.054f;
-    //}
+    {
+        mOBJFileName = "sponza.obj";
+        mOBJFolderName = "model/sponza";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+        mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
+        mPhi = 391; mTheta = 269;
+        mInitEyePos = XMFLOAT3(63, 14, 0);
+        mLightRange = 0.054f;
+    }
 
     //BISTRO EXTERIOR
-    {
-        mOBJFileName = "exterior.obj";
-        mOBJFolderName = "model/bistro/Exterior";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-        mLightPosX = 33.f; mLightPosY = 45; mLightPosZ = 1;
-        mPhi = 415; mTheta = 269;
-        mInitEyePos = XMFLOAT3(-32, 18, -29);
-    }
+    //{
+    //    mOBJFileName = "exterior.obj";
+    //    mOBJFolderName = "model/bistro/Exterior";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+    //    mLightPosX = 33.f; mLightPosY = 45; mLightPosZ = 1;
+    //    mPhi = 415; mTheta = 269;
+    //    mInitEyePos = XMFLOAT3(-32, 18, -29);
+    //}
 
     //Normal
     //{
@@ -339,8 +340,6 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Update()
 {
-    const f32 OneRadian = XM_PI / 180.f;
-
     for (auto& pos : mLightTbl)
     {
         pos = XMMatrixTranslation(mLightPosX, mLightPosY, mLightPosZ);
@@ -351,7 +350,7 @@ void DxrPhotonMapper::Update()
         mMoveFrame++;
         for (auto& pos : mOBJ0sNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * OneRadian), 0);
+            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * ONE_RADIAN), 0);
         }
     }
 
@@ -365,7 +364,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
     mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
     mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
-    mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * OneRadian) * cos(mPhi * OneRadian), sin(mTheta * OneRadian) * sin(mPhi * OneRadian), cos(mTheta * OneRadian), 0.0f);
+    mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
     mSceneParam.flags.y = mIsUseTexture;//Box Material 0: Texture 1:One Color
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
@@ -373,8 +372,6 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
-    mSceneParam.directionalLightDirection = XMVectorSet(sin(mThetaDirectional * OneRadian) * cos(mPhiDirectional * OneRadian), sin(mThetaDirectional * OneRadian) * sin(mPhiDirectional * OneRadian), cos(mThetaDirectional * OneRadian), 0.0f);
-    mSceneParam.directionalLightColor = XMVectorSet(1.0f, 0.5f, 0.1f, 0.0f);
     mSceneParam.additional.x = LightCount_ALL;
     mSceneParam.additional.y = 0;
     mSceneParam.additional.z = 0;
@@ -656,7 +653,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     {
         LightGenerateParam param;
         XMFLOAT3 direction;
-        XMStoreFloat3(&direction, mSceneParam.directionalLightDirection);
+        XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
         param.setParamAsDirectionalLight(direction, XMFLOAT3(0.5, 0.5, 0.5));
         mLightGenerationParamTbl[count] = param;
         count++;

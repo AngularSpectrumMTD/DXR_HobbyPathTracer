@@ -192,8 +192,6 @@ private:
         XMVECTOR gatherParams2;
         XMVECTOR spotLightParams;
         XMVECTOR viewVec;
-        XMVECTOR directionalLightDirection;
-        XMVECTOR directionalLightColor;
         XMUINT4 additional;//x light num
     };
 
