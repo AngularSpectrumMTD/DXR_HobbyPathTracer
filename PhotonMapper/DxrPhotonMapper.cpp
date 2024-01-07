@@ -448,10 +448,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
-    case 'V':
-        mVisualizeLightRange = !mVisualizeLightRange;
-        mIsUseAccumulation = false;
-        break;
+    //case 'V':
+    //    mVisualizeLightRange = !mVisualizeLightRange;
+    //    mIsUseAccumulation = false;
+    //    break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
