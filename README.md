@@ -1,13 +1,16 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1f0d89c7-7df6-4b1c-921f-3bae93bde4d2)
+![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/937b31f4-41f0-4d50-aebc-a66e57b5984a)
 
-![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/42298d2c-b18d-4689-8897-bdb85b66a55b)
+![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3c9e0fe5-8890-498c-9cc4-7fe949091e37)
 
-![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9182cbad-51b2-46cb-8c27-534e976bffcf)
+![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7d5fcea6-9f4f-4921-968c-43df17c09627)
 
-![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d957f59e-bed4-4eee-b2ec-99434508c757)
+![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/29ce2c23-dbee-4800-b523-2161f22f3348)
+
+![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/feb34846-984e-4c6b-96c9-9b42ac95936b)
+
 
 ### Caustics
 Caustics are rendered by spectral rendering
@@ -29,7 +32,7 @@ Shading : GGX
 
 2. Build and Execute
 
-![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9b87a3e7-5f84-4cb5-be00-c0c1881d6b94)
+![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/61e83c9a-c0f0-41c1-810b-0c3747417374)
 
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -48,7 +51,7 @@ Shading : GGX
 
 7. Build and Execute
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/efa9e347-1ef1-4ac4-b144-ff4e1ded7f73)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e61fbf1c-a0ca-4e9a-88b6-ca6ba308943f)
 
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -67,7 +70,7 @@ Shading : GGX
 
 6. Build and Execute
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1099a01c-64cd-4d96-a5f5-2473f3e62b26)
+![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ee5b29c4-5281-4991-b599-85346c5d22b9)
 
 ### Graphics API
 DirectX12

@@ -93,11 +93,6 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     bool isIgnoreHit = false;
     getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
-    
-    if (!isIgnoreHit)
-    {
-        depthPositionNormalStore(payload, vtx.Normal);
-    }
 
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
@@ -109,6 +104,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
+        depthPositionNormalStore(payload, vtx.Normal);
         nextRay.Direction = 0.xxx;
         SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
         LightSample lightSample;

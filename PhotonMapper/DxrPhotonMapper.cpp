@@ -38,7 +38,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 2;
+    mCausticsBoost = 1;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -54,25 +54,26 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
     //SPONZA
-    {
-        mOBJFileName = "sponza.obj";
-        mOBJFolderName = "model/sponza";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-        mLightPosX = 33.f; mLightPosY = 31; mLightPosZ = 1;
-        mPhi = 391; mTheta = 269;
-        mInitEyePos = XMFLOAT3(63, 14, 0);
-        mLightRange = 0.054f;
-    }
+    //{
+    //    mOBJFileName = "sponza.obj";
+    //    mOBJFolderName = "model/sponza";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //    mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
+    //    mPhi = 507; mTheta = 258;
+    //    mInitEyePos = XMFLOAT3(63, 14, 0);
+    //    mLightRange = 0.0002f;
+    //}
 
     //BISTRO EXTERIOR
-    //{
-    //    mOBJFileName = "exterior.obj";
-    //    mOBJFolderName = "model/bistro/Exterior";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-    //    mLightPosX = 33.f; mLightPosY = 45; mLightPosZ = 1;
-    //    mPhi = 415; mTheta = 269;
-    //    mInitEyePos = XMFLOAT3(-32, 18, -29);
-    //}
+    {
+        mOBJFileName = "exterior.obj";
+        mOBJFolderName = "model/bistro/Exterior";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+        mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+        mPhi = 412; mTheta = 262;
+        mInitEyePos = XMFLOAT3(-40, 22, -36);
+        mLightRange = 0.0002f;
+    }
 
     //Normal
     //{
@@ -82,6 +83,7 @@ void DxrPhotonMapper::Setup()
     //    mLightPosX = -3.f; mLightPosY = 55; mLightPosZ = -5;
     //    mPhi = 460; mTheta = 269;
     //    mInitEyePos = XMFLOAT3(397, 129, -343);
+    //    mLightRange = 0.0005f;
     //}
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
@@ -427,7 +429,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'L':
-        mLightRange = Clamp(0.01f, 0.4f, mLightRange + (mInverseMove ? -0.002f : 0.002f));
+        mLightRange = Clamp(0.0001f, 0.4f, mLightRange + (mInverseMove ? -0.00001f : 0.00001f));
         mIsUseAccumulation = false;
         break;
     case 'T':
@@ -446,10 +448,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
-    //case 'V':
-    //    mVisualizeLightRange = !mVisualizeLightRange;
-    //    mIsUseAccumulation = false;
-    //    break;
+    case 'V':
+        mVisualizeLightRange = !mVisualizeLightRange;
+        mIsUseAccumulation = false;
+        break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
@@ -645,7 +647,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         bitangent.x *= scale;
         bitangent.y *= scale;
         bitangent.z *= scale;
-        param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), tangent, bitangent, 150);
+        param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
         mLightGenerationParamTbl[count] = param;
         count++;
     }
