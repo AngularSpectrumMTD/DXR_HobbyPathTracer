@@ -53,6 +53,9 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
+    mLightCount = LightCount_ALL - 1;
+    mIsSpotLightPhotonMapper = true;
+
     //SPONZA
     {
         mOBJFileName = "sponza.obj";
@@ -374,7 +377,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
-    mSceneParam.additional.x = LightCount_ALL;
+    mSceneParam.additional.x = mLightCount;
     mSceneParam.additional.y = 0;
     mSceneParam.additional.z = 0;
     mSceneParam.additional.w = 0;
@@ -446,6 +449,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'B':
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
+        mIsUseAccumulation = false;
+        break;
+    case 'C':
+        mIsSpotLightPhotonMapper = !mIsSpotLightPhotonMapper;
         mIsUseAccumulation = false;
         break;
     //case 'V':
@@ -582,17 +589,23 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
     }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
-        LightGenerateParam param;
-        param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        if (i == 0 && !mIsSpotLightPhotonMapper)
+        {
+            LightGenerateParam param;
+            param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+            mLightGenerationParamTbl[count] = param;
+            count++;
+        }
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
-        LightGenerateParam param;
-        param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        if (i == 0 && mIsSpotLightPhotonMapper)
+        {
+            LightGenerateParam param;
+            param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+            mLightGenerationParamTbl[count] = param;
+            count++;
+        }
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
@@ -617,39 +630,45 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
-        LightGenerateParam param;
-        XMFLOAT3 tangent;
-        XMFLOAT3 bitangent;
-        XMFLOAT3 normal;
-        XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
-        utility::ONB(normal, tangent, bitangent);
-        tangent.x *= scale;
-        tangent.y *= scale;
-        tangent.z *= scale;
-        bitangent.x *= scale;
-        bitangent.y *= scale;
-        bitangent.z *= scale;
-        param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        if (i == 0 && !mIsSpotLightPhotonMapper)
+        {
+            LightGenerateParam param;
+            XMFLOAT3 tangent;
+            XMFLOAT3 bitangent;
+            XMFLOAT3 normal;
+            XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+            utility::ONB(normal, tangent, bitangent);
+            tangent.x *= scale;
+            tangent.y *= scale;
+            tangent.z *= scale;
+            bitangent.x *= scale;
+            bitangent.y *= scale;
+            bitangent.z *= scale;
+            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
+            mLightGenerationParamTbl[count] = param;
+            count++;
+        }
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
-        LightGenerateParam param;
-        XMFLOAT3 tangent;
-        XMFLOAT3 bitangent;
-        XMFLOAT3 normal;
-        XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
-        utility::ONB(normal, tangent, bitangent);
-        tangent.x *= scale;
-        tangent.y *= scale;
-        tangent.z *= scale;
-        bitangent.x *= scale;
-        bitangent.y *= scale;
-        bitangent.z *= scale;
-        param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        if (i == 0 && mIsSpotLightPhotonMapper)
+        {
+            LightGenerateParam param;
+            XMFLOAT3 tangent;
+            XMFLOAT3 bitangent;
+            XMFLOAT3 normal;
+            XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+            utility::ONB(normal, tangent, bitangent);
+            tangent.x *= scale;
+            tangent.y *= scale;
+            tangent.z *= scale;
+            bitangent.x *= scale;
+            bitangent.y *= scale;
+            bitangent.z *= scale;
+            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
+            mLightGenerationParamTbl[count] = param;
+            count++;
+        }
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {

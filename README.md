@@ -15,6 +15,15 @@ Photon Mapper By Use Of DirectX Raytracing
 ### Caustics
 Caustics are rendered by spectral rendering
 
+![ChromaticAberration](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f31c398d-45a2-49a5-95da-fc78ecf6af16)
+
+### Light Type
+Photon emitters emit photons from a spotlight or rectangular light
+
+| Spot Light | Rectangular Light |
+| ---- | ---- |
+| <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4540c81d-fbf7-402f-b237-68cd8bc8c2d7" width="500"> | <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8974e050-9dd5-4ea7-bd76-b7c0e6585c06" width="500"> |
+
 ### Algorithm
 Photon Mapping : Hashed Grid
 
@@ -92,6 +101,7 @@ DirectX12
 - R : increase / decrease roughness
 - S : increase / decrease translucency
 - M : increase / decrease metallic
+- C : change photon emitter type (spot light/rectangular light)
 - MOUSE_RIGHT : rotate the camera around the gazing point
 - MOUSE_LEFT : move the camera back and forth
 - ↑↓→← : move the camera up, down, left, or right

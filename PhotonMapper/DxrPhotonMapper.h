@@ -296,7 +296,7 @@ private:
     {
         LightCount_Sphere = 0,
         LightCount_Rect = 1,
-        LightCount_Spot = 0,
+        LightCount_Spot = 1,
         LightCount_Directional = 1,
         LightCount_ALL = LightCount_Sphere + LightCount_Rect + LightCount_Spot + LightCount_Directional
     };
@@ -577,6 +577,9 @@ private:
     f32 mTheta;
     f32 mPhiDirectional;
     f32 mThetaDirectional;
+
+    u32 mLightCount;
+    bool mIsSpotLightPhotonMapper;
 
     f32 mCausticsBoost;
 

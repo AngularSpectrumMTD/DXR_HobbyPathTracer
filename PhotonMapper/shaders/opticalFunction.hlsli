@@ -357,8 +357,13 @@ void SampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
 
 void SampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
+    float rnd0 = (pcgHashState() - 0.5) * 2; //-1 to 1
+    float rnd1 = (pcgHashState() - 0.5) * 2; //-1 to 1
     emitDir = normalize(lightGen.position); //pos as dir
-    position = 1000 * -emitDir;
+    float3 tangent;
+    float3 bitangent;
+    ONB(emitDir, tangent, bitangent);
+    position = 1000 * -emitDir + tangent * 1000 * rnd0 + bitangent * 1000 * rnd1;
 }
 
 void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
