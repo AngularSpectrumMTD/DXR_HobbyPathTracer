@@ -248,15 +248,15 @@ void SampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     float3 sampledDir = HemisphereORCosineSampling(normalize(vectorToScatterPosition), true);
     float3 lightSurfacePos = lightGen.position + sampledDir * lightGen.sphereRadius;
     
-    //lightSample.sufacePosition = lightSurfacePos;
     lightSample.direction = lightSurfacePos - scatterPosition;
     lightSample.distance = length(lightSample.direction);
     const float distanceSq = lightSample.distance * lightSample.distance + eps;
 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(lightSurfacePos - lightGen.position);
-    lightSample.emission = lightGen.emission * getLightNum();
-    lightSample.pdf = distanceSq / (lightGen.influenceDistance * 0.5 * abs(dot(lightSample.normal, lightSample.direction)));
+    const float coef = 0.5 * abs(dot(lightSample.normal, lightSample.direction));
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    lightSample.pdf = 1.0f / getLightNum();
 }
 
 void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
@@ -267,15 +267,15 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
 
     float3 lightSurfacePos = lightGen.position + rnd0 * lightGen.U + rnd1 * lightGen.V;
     
-    //lightSample.sufacePosition = lightSurfacePos;
     lightSample.direction = lightSurfacePos - scatterPosition;
     lightSample.distance = length(lightSample.direction);
     const float distanceSq = lightSample.distance * lightSample.distance + eps;
 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
-    lightSample.emission = lightGen.emission * getLightNum();
-    lightSample.pdf = distanceSq / (lightGen.influenceDistance * abs(dot(lightSample.normal, lightSample.direction)));
+    const float coef = abs(dot(lightSample.normal, lightSample.direction));
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    lightSample.pdf = 1.0f / getLightNum();
 }
 
 void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
@@ -289,12 +289,11 @@ void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float3 localXYZ = float3(r * cos(p), lengthSqr(lightGen.V) / lengthSqr(lightGen.U) * r * sin(p), 0);
     float3 worldXYZ = lightGen.U * localXYZ.x + lightGen.V * localXYZ.y;
     
-    float pointToSpot = 0.001f;
-    float spotLightHalfAngle = atan2(length(lightGen.U), pointToSpot);
-    float saturatedCosLight = saturate(cos(spotLightHalfAngle));
-    float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
-    float saturatedCosScatter = saturate(dot(dominantDir, normalize(scatterPosition - lightGen.position)));
-    float coef = saturate(saturatedCosScatter - saturatedCosLight) / (1 - saturatedCosLight);
+    const float spotLightHalfAngle = atan2(length(lightGen.U), POINT_TO_SPOT);
+    const float saturatedCosLight = saturate(cos(spotLightHalfAngle));
+    const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
+    const float saturatedCosScatter = saturate(dot(dominantDir, normalize(scatterPosition - lightGen.position)));
+    const float coef = saturate(saturatedCosScatter - saturatedCosLight) / (1 - saturatedCosLight);
 
     float3 lightSurfacePos = lightGen.position + worldXYZ;
     lightSample.direction = lightSurfacePos - scatterPosition;
@@ -303,18 +302,17 @@ void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = dominantDir;
-    lightSample.emission = isVisualizeLightRange() ? 0.xxx : lightGen.emission * getLightNum() * coef;
-    lightSample.pdf = distanceSq / (lightGen.influenceDistance);
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    lightSample.pdf = 1.0f / getLightNum();
 }
 
 void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
-    //lightSample.sufacePosition = 0.xxx;
     lightSample.direction = normalize(-lightGen.position);//pos as dir
     lightSample.normal = normalize(lightGen.position);
-    lightSample.emission = lightGen.emission * getLightNum();
+    lightSample.emission = lightGen.emission;
     lightSample.distance = 10000000;
-    lightSample.pdf = 1.0;
+    lightSample.pdf = 1.0f / getLightNum();
 }
 
 void SampleLight(in float3 scatterPosition, inout LightSample lightSample)

@@ -143,24 +143,10 @@ void photonEmitting()
     const int COLOR_ID = serialIndex % getLightLambdaNum();
 
     gPhotonMap[serialIndex] = photon;//initialize
-    
-    //float rnd0 = rand(); //0 to 1
-    //float rnd1 = rand(); //0 to 1
-    //float r = getLightRange() * sqrt(rnd0);
-    //float p = 2 * PI * rnd1;
-    //float3 localXYZ = float3(r * cos(p), r * sin(p), 0);
-    //float3 up = abs(lightDir.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
-    //float3 tangent = normalize(cross(up, lightDir));
-    //float3 bitangent = cross(lightDir, tangent);
-    //float3 worldXYZ = tangent * localXYZ.x + bitangent * localXYZ.y;
-    //float3 lightSurfacePos = spotLightPosition + worldXYZ;
-    //float3 virtualOrigin = spotLightPosition - 0.001f * lightDir;
-    //float3 photonEmitDir = normalize(lightSurfacePos - virtualOrigin);
 
-    float pointToSpot = 0.001f;
-    float theta = atan2(getLightRange(), pointToSpot);
     float randSeed = 0.5 * (randGenState * rnd01Converter + LightSeed * rnd01Converter);
-    float3 photonEmitDir = getConeSample(randSeed, lightDir, theta);
+    const float spotLightHalfAngle = atan2(getLightRange(), POINT_TO_SPOT);
+    float3 photonEmitDir = getConeSample(randSeed, lightDir, spotLightHalfAngle);
     
     float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
