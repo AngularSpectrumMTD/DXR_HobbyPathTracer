@@ -1,28 +1,31 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/937b31f4-41f0-4d50-aebc-a66e57b5984a)
+![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7532867e-994c-48fc-aa14-a705eb45974e)
 
-![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3c9e0fe5-8890-498c-9cc4-7fe949091e37)
+![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2c982f4c-d22a-46be-bd72-4cf8f0405388)
 
-![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7d5fcea6-9f4f-4921-968c-43df17c09627)
+![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/283cabd3-5e6a-44e0-a9d0-160b973c7804)
 
-![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/29ce2c23-dbee-4800-b523-2161f22f3348)
+![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/17e4c509-8e60-4f4f-8a87-de66af9ee610)
 
-![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/feb34846-984e-4c6b-96c9-9b42ac95936b)
+![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/69bc2c71-85a4-45b2-ab40-34bbda95802d)
 
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c1434100-2b3f-4395-a09a-973456577290)
+
+![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f8ea1100-034a-45c5-9c83-b7b8bada4614)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![ChromaticAberration](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f31c398d-45a2-49a5-95da-fc78ecf6af16)
+![ChromaticAberration](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/dbe3554d-057b-4d7c-ab2d-3154159fe808)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
 
 | Spot Light | Rectangular Light |
 | ---- | ---- |
-| <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4540c81d-fbf7-402f-b237-68cd8bc8c2d7" width="500"> | <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8974e050-9dd5-4ea7-bd76-b7c0e6585c06" width="500"> |
+| <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4070e03e-e94c-4a32-895b-de311779f358" width="500"> | <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1e68f2f4-2c65-4932-bf34-60d59c9c8f84" width="500"> |
 
 ### Algorithm
 Photon Mapping : Hashed Grid
@@ -41,8 +44,6 @@ Shading : GGX
 
 2. Build and Execute
 
-![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/61e83c9a-c0f0-41c1-810b-0c3747417374)
-
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
 
@@ -50,17 +51,15 @@ Shading : GGX
 
 2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.
 
-4. Export 3D model as obj file(Name the file "sponza.obj")
+3. Export 3D model as obj file(Name the file "sponza.obj")
 
-5. Create a new folder (ex. "sponza") in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
+4. Create a new folder (ex. "sponza") in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
 
-6. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
+5. Set ｍOBJFileName and mOBJFolderName at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] like this
 
 <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/3e48b1be-90f6-4663-86c0-228fb3d42e87" width="50%">
 
-7. Build and Execute
-
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e61fbf1c-a0ca-4e9a-88b6-ca6ba308943f)
+6. Build and Execute
 
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
@@ -78,8 +77,6 @@ Shading : GGX
 <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2e1afbf9-3e0c-41f0-8cc0-9bc62251a8cf" width="50%">
 
 6. Build and Execute
-
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ee5b29c4-5281-4991-b599-85346c5d22b9)
 
 ### Graphics API
 DirectX12

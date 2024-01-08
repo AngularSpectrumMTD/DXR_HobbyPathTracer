@@ -255,7 +255,8 @@ void SampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(lightSurfacePos - lightGen.position);
     const float coef = 0.5 * abs(dot(lightSample.normal, lightSample.direction));
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
     lightSample.pdf = 1.0f / getLightNum();
 }
 
@@ -291,7 +292,8 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     const float coef = coefU * coefV;
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
     lightSample.pdf = 1.0f / getLightNum();
 }
 
@@ -319,7 +321,8 @@ void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = dominantDir;
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
+    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
     lightSample.pdf = 1.0f / getLightNum();
 }
 
@@ -327,7 +330,8 @@ void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
 {
     lightSample.direction = normalize(-lightGen.position);//pos as dir
     lightSample.normal = normalize(lightGen.position);
-    lightSample.emission = lightGen.emission;
+    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
+    lightSample.emission = lightGen.emission * valid;
     lightSample.distance = 10000000;
     lightSample.pdf = 1.0f / getLightNum();
 }

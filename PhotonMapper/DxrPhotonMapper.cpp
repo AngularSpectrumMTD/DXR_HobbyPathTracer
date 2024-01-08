@@ -34,7 +34,7 @@ void DxrPhotonMapper::Setup()
     mSceneParam.photonParams.w = 6;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhiDirectional = 396; mThetaDirectional = 276;
+    mPhiDirectional = 480; mThetaDirectional = 280;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
@@ -57,26 +57,26 @@ void DxrPhotonMapper::Setup()
     mIsSpotLightPhotonMapper = true;
 
     //SPONZA
-    {
-        mOBJFileName = "sponza.obj";
-        mOBJFolderName = "model/sponza";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-        mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
-        mPhi = 507; mTheta = 258;
-        mInitEyePos = XMFLOAT3(63, 14, 0);
-        mLightRange = 0.0002f;
-    }
-
-    //BISTRO EXTERIOR
     //{
-    //    mOBJFileName = "exterior.obj";
-    //    mOBJFolderName = "model/bistro/Exterior";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-    //    mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
-    //    mPhi = 412; mTheta = 262;
-    //    mInitEyePos = XMFLOAT3(-40, 22, -36);
+    //    mOBJFileName = "sponza.obj";
+    //    mOBJFolderName = "model/sponza";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+    //    mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
+    //    mPhi = 507; mTheta = 258;
+    //    mInitEyePos = XMFLOAT3(63, 14, 0);
     //    mLightRange = 0.0002f;
     //}
+
+    //BISTRO EXTERIOR
+    {
+        mOBJFileName = "exterior.obj";
+        mOBJFolderName = "model/bistro/Exterior";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+        mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+        mPhi = 412; mTheta = 262;
+        mInitEyePos = XMFLOAT3(-40, 22, -36);
+        mLightRange = 0.0002f;
+    }
 
     //Normal
     //{

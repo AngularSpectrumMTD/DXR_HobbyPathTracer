@@ -53,7 +53,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
     LightSample lightSample;
     SampleLight(bestFitWorldPosition, lightSample);
-    const float3 lightIrr = (dot(lightSample.normal, lightSample.direction) < 0) ? lightSample.emission / lightSample.pdf : float3(0, 0, 0);
+    const float3 lightIrr = lightSample.emission / lightSample.pdf;
     const float shadowCoef = isShadow(bestFitWorldPosition, lightSample) ? 0 : 1;
     payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
 
