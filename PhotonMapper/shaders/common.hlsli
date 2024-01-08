@@ -2,6 +2,7 @@
 #define __COMMON_HLSLI__
 
 #define POINT_TO_SPOT 0.001f
+#define POINT_TO_RECT 0.001f
 
 struct SceneCB
 {

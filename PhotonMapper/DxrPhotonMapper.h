@@ -295,8 +295,8 @@ private:
     enum LightCount
     {
         LightCount_Sphere = 0,
-        LightCount_Rect = 0,
-        LightCount_Spot = 1,
+        LightCount_Rect = 1,
+        LightCount_Spot = 0,
         LightCount_Directional = 1,
         LightCount_ALL = LightCount_Sphere + LightCount_Rect + LightCount_Spot + LightCount_Directional
     };

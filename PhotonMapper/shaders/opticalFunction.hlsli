@@ -271,9 +271,28 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.distance = length(lightSample.direction);
     const float distanceSq = lightSample.distance * lightSample.distance + eps;
 
+    const float3 originToScatterVec = scatterPosition - lightGen.position;
+    const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
+
+    const float rectLightHalfAngleU = atan2(length(lightGen.U), POINT_TO_RECT);
+    const float saturatedCosLightU = saturate(cos(rectLightHalfAngleU));
+    const float rectLightHalfAngleV = atan2(length(lightGen.V), POINT_TO_RECT);
+    const float saturatedCosLightV = saturate(cos(rectLightHalfAngleV));
+
+    const float3 computePlaneCenterVec = saturate(dot(dominantDir, normalize(originToScatterVec))) * length(originToScatterVec) * dominantDir;
+    const float3 vecOnPlane = originToScatterVec - computePlaneCenterVec;
+    float3 originToScatterVecU = normalize(computePlaneCenterVec + dot(vecOnPlane, normalize(lightGen.U)) * normalize(lightGen.U));
+    float3 originToScatterVecV = normalize(computePlaneCenterVec + dot(vecOnPlane, normalize(lightGen.V)) * normalize(lightGen.V));
+    const float saturatedCosScatterU = saturate(dot(dominantDir, originToScatterVecU));
+    const float saturatedCosScatterV = saturate(dot(dominantDir, originToScatterVecV));
+    //const float coefU = (saturatedCosScatterU > saturatedCosLightU) ? 1 : 0;
+    //const float coefV = (saturatedCosScatterV > saturatedCosLightV) ? 1 : 0;
+    const float coefU = saturate(saturatedCosScatterU - saturatedCosLightU) / (1 - saturatedCosLightU);
+    const float coefV = saturate(saturatedCosScatterV - saturatedCosLightV) / (1 - saturatedCosLightV);
+
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
-    const float coef = abs(dot(lightSample.normal, lightSample.direction));
+    const float coef = coefU * coefV;
     lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef / distanceSq;
     lightSample.pdf = 1.0f / getLightNum();
 }

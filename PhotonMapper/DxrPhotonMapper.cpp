@@ -54,26 +54,26 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
     //SPONZA
-    //{
-    //    mOBJFileName = "sponza.obj";
-    //    mOBJFolderName = "model/sponza";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-    //    mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
-    //    mPhi = 507; mTheta = 258;
-    //    mInitEyePos = XMFLOAT3(63, 14, 0);
-    //    mLightRange = 0.0002f;
-    //}
-
-    //BISTRO EXTERIOR
     {
-        mOBJFileName = "exterior.obj";
-        mOBJFolderName = "model/bistro/Exterior";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-        mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
-        mPhi = 412; mTheta = 262;
-        mInitEyePos = XMFLOAT3(-40, 22, -36);
+        mOBJFileName = "sponza.obj";
+        mOBJFolderName = "model/sponza";
+        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+        mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
+        mPhi = 507; mTheta = 258;
+        mInitEyePos = XMFLOAT3(63, 14, 0);
         mLightRange = 0.0002f;
     }
+
+    //BISTRO EXTERIOR
+    //{
+    //    mOBJFileName = "exterior.obj";
+    //    mOBJFolderName = "model/bistro/Exterior";
+    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+    //    mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+    //    mPhi = 412; mTheta = 262;
+    //    mInitEyePos = XMFLOAT3(-40, 22, -36);
+    //    mLightRange = 0.0002f;
+    //}
 
     //Normal
     //{
@@ -629,7 +629,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         bitangent.x *= scale;
         bitangent.y *= scale;
         bitangent.z *= scale;
-        param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), tangent, bitangent, 150);
+        param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
         mLightGenerationParamTbl[count] = param;
         count++;
     }
