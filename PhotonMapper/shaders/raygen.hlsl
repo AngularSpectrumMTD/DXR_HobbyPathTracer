@@ -130,29 +130,26 @@ void photonEmitting()
     float LightSeed = getLightRandomSeed();
     uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint)LightSeed.x) * launchIndex.y);
     randGenState = uint(pcgHash(seed));
-    
-    float3 spotLightPosition = gSceneParam.spotLightPosition.xyz;
-    float3 lightDir = gSceneParam.spotLightDirection.xyz;
 
     PhotonInfo photon;
     photon.throughput = float3(0,0,0);
     photon.position = float3(0,0,0);
-    //photon.inDir = float3(0,0,0);
 
     int serialIndex = SerialRaysIndex(launchIndex, dispatchDimensions);
     const int COLOR_ID = serialIndex % getLightLambdaNum();
 
     gPhotonMap[serialIndex] = photon;//initialize
 
-    float randSeed = 0.5 * (randGenState * rnd01Converter + LightSeed * rnd01Converter);
-    const float spotLightHalfAngle = atan2(getLightRange(), POINT_TO_SPOT);
-    float3 photonEmitDir = getConeSample(randSeed, lightDir, spotLightHalfAngle);
+    float3 emitOrigin = 0.xxx;
+    float3 emitDir = 0.xxx;
+
+    SampleLightEmitDirAndPosition(emitDir, emitOrigin);
     
     float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
     RayDesc rayDesc;
-    rayDesc.Origin = spotLightPosition;
-    rayDesc.Direction = photonEmitDir;
+    rayDesc.Origin = emitOrigin;
+    rayDesc.Direction = emitDir;
     rayDesc.TMin = 0;
     rayDesc.TMax = 100000;
 

@@ -1,8 +1,7 @@
 #ifndef __COMMON_HLSLI__
 #define __COMMON_HLSLI__
 
-#define POINT_TO_SPOT 0.001f
-#define POINT_TO_RECT 0.001f
+#define LIGHT_BASE_LENGTH 0.001f
 
 struct SceneCB
 {
@@ -304,27 +303,8 @@ float3 getConeSample(float randSeed, float3 direction, float coneAngle)
 {
     float cosAngle = cos(coneAngle);
 
-    float z = (pcgHashState() + randSeed) * (1.0f - cosAngle) + cosAngle;
-    float phi = (pcgHashState() + randSeed) * 2.0f * PI;
-
-    float x = sqrt(1.0f - z * z) * cos(phi);
-    float y = sqrt(1.0f - z * z) * sin(phi);
-    float3 north = float3(0.f, 0.f, 1.f);
-
-    float3 axis = normalize(cross(north, normalize(direction)));
-    float angle = acos(dot(normalize(direction), north));
-
-    float3x3 R = RodriguesRoatationFormula(angle, axis);
-
-    return mul(R, float3(x, y, z));
-}
-
-float3 getUniformSample(in uint2 id, float3 direction, float coneAngle)
-{
-    float cosAngle = cos(coneAngle);
-
-    float z = cosAngle;
-    float phi = 0;
+    float z = pcgHashState() * (1.0f - cosAngle) + cosAngle;
+    float phi = pcgHashState() * 2.0f * PI;
 
     float x = sqrt(1.0f - z * z) * cos(phi);
     float y = sqrt(1.0f - z * z) * sin(phi);

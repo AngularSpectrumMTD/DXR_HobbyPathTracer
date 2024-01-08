@@ -274,9 +274,9 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     const float3 originToScatterVec = scatterPosition - lightGen.position;
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
 
-    const float rectLightHalfAngleU = atan2(length(lightGen.U), POINT_TO_RECT);
+    const float rectLightHalfAngleU = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
     const float saturatedCosLightU = saturate(cos(rectLightHalfAngleU));
-    const float rectLightHalfAngleV = atan2(length(lightGen.V), POINT_TO_RECT);
+    const float rectLightHalfAngleV = atan2(length(lightGen.V), LIGHT_BASE_LENGTH);
     const float saturatedCosLightV = saturate(cos(rectLightHalfAngleV));
 
     const float3 computePlaneCenterVec = saturate(dot(dominantDir, normalize(originToScatterVec))) * length(originToScatterVec) * dominantDir;
@@ -285,8 +285,6 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float3 originToScatterVecV = normalize(computePlaneCenterVec + dot(vecOnPlane, normalize(lightGen.V)) * normalize(lightGen.V));
     const float saturatedCosScatterU = saturate(dot(dominantDir, originToScatterVecU));
     const float saturatedCosScatterV = saturate(dot(dominantDir, originToScatterVecV));
-    //const float coefU = (saturatedCosScatterU > saturatedCosLightU) ? 1 : 0;
-    //const float coefV = (saturatedCosScatterV > saturatedCosLightV) ? 1 : 0;
     const float coefU = saturate(saturatedCosScatterU - saturatedCosLightU) / (1 - saturatedCosLightU);
     const float coefV = saturate(saturatedCosScatterV - saturatedCosLightV) / (1 - saturatedCosLightV);
 
@@ -308,7 +306,7 @@ void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float3 localXYZ = float3(r * cos(p), lengthSqr(lightGen.V) / lengthSqr(lightGen.U) * r * sin(p), 0);
     float3 worldXYZ = lightGen.U * localXYZ.x + lightGen.V * localXYZ.y;
     
-    const float spotLightHalfAngle = atan2(length(lightGen.U), POINT_TO_SPOT);
+    const float spotLightHalfAngle = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
     const float saturatedCosLight = saturate(cos(spotLightHalfAngle));
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     const float saturatedCosScatter = saturate(dot(dominantDir, normalize(scatterPosition - lightGen.position)));
@@ -334,6 +332,35 @@ void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.pdf = 1.0f / getLightNum();
 }
 
+void SampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+{
+    emitDir = HemisphereORCosineSampling(float3(1, 0, 0), false);
+    position = lightGen.position;
+}
+
+void SampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+{
+    float rnd0 = (pcgHashState() - 0.5) * 2; //-1 to 1
+    float rnd1 = (pcgHashState() - 0.5) * 2; //-1 to 1
+    const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
+    emitDir = normalize(dominantDir * LIGHT_BASE_LENGTH + rnd0 * lightGen.U + rnd1 * lightGen.V);
+    position = lightGen.position;
+}
+
+void SampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+{
+    const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
+    const float spotLightHalfAngle = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
+    emitDir = getConeSample(pcgHashState(), dominantDir, spotLightHalfAngle);
+    position = lightGen.position;
+}
+
+void SampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+{
+    emitDir = normalize(lightGen.position); //pos as dir
+    position = 1000 * -emitDir;
+}
+
 void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
 {
     const uint sampleID = (uint) (getLightRandomSeed()) % getLightNum();
@@ -354,6 +381,29 @@ void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
         SampleDirectionalLight(param, scatterPosition, lightSample);
+    }
+}
+
+void SampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
+{
+    const uint sampleID = (uint) (getLightRandomSeed()) % getLightNum();
+    LightGenerateParam param = gLightGenerateParams[sampleID];
+
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        SampleSphereLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_RECT)
+    {
+        SampleRectLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_SPOT)
+    {
+        SampleSpotLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        SampleDirectionalLightEmitDirAndPosition(param, dir, position);
     }
 }
 
