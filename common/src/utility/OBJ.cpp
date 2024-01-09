@@ -72,8 +72,7 @@ namespace utility {
 			}
 			if (strcmp(key, "vt") == 0) {
 				fscanf_s(fp, "%f %f", &vec2d.x, &vec2d.y);
-				//vec2d.x = 1 - vec2d.x;
-				vec2d.y = 1 - vec2d.y;
+				vec2d.y *= -1;
 				uv.push_back(vec2d);
 			}
 			if (strcmp(key, "usemtl") == 0) {

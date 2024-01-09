@@ -95,6 +95,10 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
 
     MaterialParams currentMaterial = constantBuffer;
+    if (length(currentMaterial.albedo) == 0 && !isNoTexture)
+    {
+        isIgnoreHit = true;
+    }
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
@@ -111,7 +115,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         SampleLight(bestFitWorldPosition, lightSample);
         const float3 lightIrr = lightSample.emission / lightSample.pdf;
         const float shadowCoef = isShadow(bestFitWorldPosition, lightSample) ? 0 : 1;
-        payload.color += payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        payload.color = payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
     }
     else
     {

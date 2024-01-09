@@ -1,31 +1,31 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7532867e-994c-48fc-aa14-a705eb45974e)
+![1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d1f0f61c-e12a-45e1-bbdb-dfa516ad1b17)
 
-![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2c982f4c-d22a-46be-bd72-4cf8f0405388)
+![2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b2f6f984-a491-46ae-a0be-2334eaa741a0)
 
-![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/283cabd3-5e6a-44e0-a9d0-160b973c7804)
+![3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e6b3bb1a-51ae-4b91-a6ac-c09ee8b8f8bf)
 
-![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/17e4c509-8e60-4f4f-8a87-de66af9ee610)
+![4](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ac4bbe5f-ea75-47d7-8b36-6bcb17f734b8)
 
-![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/69bc2c71-85a4-45b2-ab40-34bbda95802d)
+![5](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c059e765-97ca-4b89-8c7f-7c1fc86e4aff)
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c1434100-2b3f-4395-a09a-973456577290)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c7badef4-6162-4807-bbc4-673647ada3ae)
 
-![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f8ea1100-034a-45c5-9c83-b7b8bada4614)
+![normal](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/dfee727d-d021-4f7f-a381-fc5dc5be24e0)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![ChromaticAberration](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/dbe3554d-057b-4d7c-ab2d-3154159fe808)
+![ChromaticAberration](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e4db77f7-c360-4198-b367-0db220a56bda)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
 
 | Spot Light | Rectangular Light |
 | ---- | ---- |
-| <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4070e03e-e94c-4a32-895b-de311779f358" width="500"> | <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/1e68f2f4-2c65-4932-bf34-60d59c9c8f84" width="500"> |
+| <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/120a1ec4-81ff-40bf-9ba9-95aa95039ba3" width="500"> | <img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8d27e7e7-3109-4d5a-a240-8c1c954d74d0" width="500"> |
 
 ### Algorithm
 Photon Mapping : Hashed Grid
