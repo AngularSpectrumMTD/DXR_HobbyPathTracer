@@ -16,13 +16,8 @@ void miss(inout Payload payload) {
 
     depthPositionNormalStore(payload, gSceneParam.backgroundColor.rgb);
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, equirecFetchUV(WorldRayDirection()), 0.0);
-
-    //payload.color += 0.1.xxx;
-    //payload.color = 0;
-    
     payload.color += payload.energy * cubemap.rgb;
     payload.energy = 0.xxx;
-    //payload.color = directionalLightEnergy;
 }
 
 [shader("miss")]

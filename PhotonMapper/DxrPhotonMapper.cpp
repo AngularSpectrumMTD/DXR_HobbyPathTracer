@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Bistro;
 
     mIntenceBoost = 10000;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);

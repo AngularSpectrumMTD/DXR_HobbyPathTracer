@@ -172,6 +172,7 @@ namespace utility {
 
 			}
 		}
+		fclose(fp);
 		//File Read End
 
 		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {

@@ -113,9 +113,9 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
         LightSample lightSample;
         SampleLight(bestFitWorldPosition, lightSample);
-        const float3 lightIrr = lightSample.emission / lightSample.pdf;
-        const float shadowCoef = isShadow(bestFitWorldPosition, lightSample) ? 0 : 1;
-        payload.color = payload.energy * (currentMaterial.emission.xyz + shadowCoef * lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
+        const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
+        payload.color = payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
     }
     else
     {

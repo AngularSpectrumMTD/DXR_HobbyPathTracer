@@ -63,6 +63,35 @@ struct MaterialParams
     float4 emission;
 };
 
+struct Reservoir
+{
+    uint Y;//index of most important light
+    float W_y;//weight of light
+    float W_sum;//sum of all weight
+    float M; //number of ligts processed for this reservoir
+
+    void initialize()
+    {
+        Y = 0;
+        W_y = 0;
+        W_sum = 0;
+        M = 0;
+    }
+};
+
+bool updateReservoir(inout Reservoir reservoir, in uint X, in float w, in uint c, in float rnd01)
+{
+    reservoir.W_sum += w;
+    reservoir.M += c;
+
+    if (rnd01 < w / reservoir.W_sum)
+    {
+        reservoir.Y = X;
+        return true;
+    }
+    return false;
+}
+
 static uint rseed;
 
 float rand()//0-1
@@ -372,8 +401,8 @@ void SampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 
 void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
 {
-    const uint sampleID = (uint) (getLightRandomSeed()) % getLightNum();
-    LightGenerateParam param = gLightGenerateParams[sampleID];
+    const uint lightID = (uint) (rand() * (getLightNum()));
+    LightGenerateParam param = gLightGenerateParams[lightID];
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
@@ -393,30 +422,29 @@ void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
     }
 }
 
-void SampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
+void SampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
 {
-    const uint sampleID = (uint) (getLightRandomSeed()) % getLightNum();
-    LightGenerateParam param = gLightGenerateParams[sampleID];
-
+    LightGenerateParam param = gLightGenerateParams[ID];
+    
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        SampleSphereLightEmitDirAndPosition(param, dir, position);
+        SampleSphereLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        SampleRectLightEmitDirAndPosition(param, dir, position);
+        SampleRectLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        SampleSpotLightEmitDirAndPosition(param, dir, position);
+        SampleSpotLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        SampleDirectionalLightEmitDirAndPosition(param, dir, position);
+        SampleDirectionalLight(param, scatterPosition, lightSample);
     }
 }
 
-bool isShadow(in float3 scatterPosition, in LightSample lightSample)
+float Visibility(in float3 scatterPosition, in LightSample lightSample)
 {
     Payload shadowPayload;
     shadowPayload.isShadowRay = 1;
@@ -444,7 +472,55 @@ bool isShadow(in float3 scatterPosition, in LightSample lightSample)
             shadowRay,
             shadowPayload);
 
-    return shadowPayload.isShadowMiss == 0;
+    return (shadowPayload.isShadowMiss == 0) ? 0.0f : 1.0f;
+}
+
+float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample finalLightSample)
+{
+    const float pdf = 1.0f / getLightNum();
+    float p_hat = 0;
+    LightSample lightSample;
+
+    Reservoir reservoir;
+    reservoir.initialize();
+
+    for (int i = 0; i < getLightNum(); i++)
+    {
+        const uint lightID = (uint) (rand() * (getLightNum()));
+        SampleLightWithID(scatterPosition, lightID, lightSample);
+        p_hat = length(lightSample.emission);
+        float updateW = p_hat / pdf;
+        updateReservoir(reservoir, lightID, updateW, 1u, rand());
+    }
+
+    SampleLightWithID(scatterPosition, reservoir.Y, finalLightSample);
+    p_hat = length(Visibility(scatterPosition, finalLightSample) * finalLightSample.emission);
+
+    reservoir.W_y = p_hat > 0 ? rcp(p_hat) * reservoir.W_sum / reservoir.M : 0;
+    return reservoir.W_y * finalLightSample.emission;
+}
+
+void SampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
+{
+    const uint lightID = (uint) (rand() * (getLightNum()));
+    LightGenerateParam param = gLightGenerateParams[lightID];
+
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        SampleSphereLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_RECT)
+    {
+        SampleRectLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_SPOT)
+    {
+        SampleSpotLightEmitDirAndPosition(param, dir, position);
+    }
+    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        SampleDirectionalLightEmitDirAndPosition(param, dir, position);
+    }
 }
 
 //Shading
