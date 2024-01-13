@@ -79,15 +79,15 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     float3 normEYE = normalize(eyeDir);
     bool isEyeFlag = dot(normEYE, normWN) > 0;
 
-    if (abs(dot(normWN, AxisX)) > 0.9)
+    if (abs(dot(normWN, AxisX)) < 0.1)
     {
         rangeX = 0;
     }
-    if (abs(dot(normWN, AxisY)) > 0.9)
+    if (abs(dot(normWN, AxisY)) < 0.1)
     {
         rangeY = 0;
     }
-    if (abs(dot(normWN, AxisZ)) > 0.9)
+    if (abs(dot(normWN, AxisZ)) < 0.1)
     {
         rangeZ = 0;
     }

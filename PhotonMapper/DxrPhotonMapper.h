@@ -316,6 +316,13 @@ private:
         ModelType_Afrodyta,
     };
 
+    enum SceneType
+    {
+        SceneType_Simple,
+        SceneType_Sponza,
+        SceneType_Bistro,
+    };
+
     enum Spectrum
     {
         Spectrum_D65,
@@ -453,6 +460,8 @@ private:
     dx12::Descriptor mMainOutputDescriptorSRV;
     ComPtr<ID3D12Resource> mDXROutput;
     dx12::Descriptor mOutputDescriptorUAV;
+    ComPtr<ID3D12Resource> mCausticsMapPingPongTbl[2];
+    dx12::Descriptor mOCausticsMapPingPongUAVTbl[2];
     ComPtr<ID3D12Resource> mPhotonMap;
     dx12::Descriptor mPhotonMapDescriptorSRV;
     dx12::Descriptor mPhotonMapDescriptorUAV;
@@ -606,6 +615,7 @@ private:
     u32 mPhotonMapSize1D;
 
     StageType mStageType;
+    SceneType mSceneType;
 
     utility::MaterialParam mMaterialParam0;
     utility::MaterialParam mMaterialParam1;

@@ -8,4 +8,5 @@ void lightClosestHit(inout Payload payload, TriangleIntersectionAttributes attri
         return;
     }
     payload.color = float3(1, 0.5, 0);
+    payload.energy = 0.xxx;
 }

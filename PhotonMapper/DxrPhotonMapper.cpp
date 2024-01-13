@@ -25,6 +25,8 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
+    mSceneType = SceneType_Simple;
+
     mIntenceBoost = 10000;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
@@ -54,51 +56,54 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
 
     mLightCount = LightCount_ALL - 1;
-    mIsSpotLightPhotonMapper = true;
 
-    //SPONZA
-    //{
-    //    mOBJFileName = "sponza.obj";
-    //    mOBJFolderName = "model/sponza";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-    //    mLightPosX = -27.f; mLightPosY = 21; mLightPosZ = 7;
-    //    mPhi = 507; mTheta = 258;
-    //    mInitEyePos = XMFLOAT3(63, 14, 0);
-    //    mLightRange = 0.0002f;
-    //}
-
-    //BISTRO EXTERIOR
+    switch (mSceneType)
     {
-        mOBJFileName = "exterior.obj";
-        mOBJFolderName = "model/bistro/Exterior";
-        mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-        mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
-        mPhi = 412; mTheta = 262;
-        mInitEyePos = XMFLOAT3(-40, 22, -36);
-        mLightRange = 0.0002f;
+        case SceneType_Simple :
+        {
+            mOBJFileName = "skull.obj";
+            mOBJFolderName = "model";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
+            mLightPosX = -3.f; mLightPosY = 71; mLightPosZ = -5;
+            mPhi = 460; mTheta = 269;
+            mInitEyePos = XMFLOAT3(80, 173, -19);
+            mLightRange = 0.0005f;
+            mGlassModelType = ModelType_Afrodyta;
+            mIsSpotLightPhotonMapper = true;
+            mCausticsBoost *= 8;
+        }
+        break;
+        case SceneType_Sponza:
+        {
+            mOBJFileName = "sponza.obj";
+            mOBJFolderName = "model/sponza";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+            mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+            mPhi = 412; mTheta = 262;
+            mInitEyePos = XMFLOAT3(-63, 14, 0);
+            mLightRange = 0.0002f;
+            mGlassModelType = ModelType_Afrodyta;
+            mIsSpotLightPhotonMapper = false;
+        }
+        break;
+        case SceneType_Bistro:
+        {
+            mOBJFileName = "exterior.obj";
+            mOBJFolderName = "model/bistro/Exterior";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+            mPhi = 412; mTheta = 262;
+            mInitEyePos = XMFLOAT3(-40, 22, -36);
+            mLightRange = 0.0002f;
+            mGlassModelType = ModelType_Afrodyta;
+            mIsSpotLightPhotonMapper = true;
+        }
     }
-
-    //Normal
-    //{
-    //    mOBJFileName = "skull.obj";
-    //    mOBJFolderName = "model";
-    //    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
-    //    mLightPosX = -3.f; mLightPosY = 55; mLightPosZ = -5;
-    //    mPhi = 460; mTheta = 269;
-    //    mInitEyePos = XMFLOAT3(397, 129, -343);
-    //    mLightRange = 0.0005f;
-    //}
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
-    //mStageType = StageType_Box;
     mStageType = StageType_Plane;
-
-    //mGlassModelType = ModelType::ModelType_Diamond;
-    mGlassModelType = ModelType::ModelType_Afrodyta;
-    //mGlassModelType = ModelType::ModelType_Dragon;
-    //mGlassModelType = ModelType::ModelType_Sponza;
     mMetalModelType = ModelType::ModelType_TwistCube;
 
     switch (mGlassModelType)
