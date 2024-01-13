@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Simple;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 10000;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -78,10 +78,10 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-            mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
-            mPhi = 412; mTheta = 262;
-            mInitEyePos = XMFLOAT3(-63, 14, 0);
-            mLightRange = 0.0002f;
+            mLightPosX = 7.f; mLightPosY = 17; mLightPosZ = 5;
+            mPhi = 422; mTheta = 254;
+            mInitEyePos = XMFLOAT3(-45, 42, 5.3);
+            mLightRange = 0.00026f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
         }
