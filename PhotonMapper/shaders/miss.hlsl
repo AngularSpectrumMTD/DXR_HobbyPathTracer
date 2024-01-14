@@ -1,6 +1,6 @@
 #include "common.hlsli"
 
-float2 equirecFetchUV(float3 dir)
+float2 EquirecFetchUV(float3 dir)
 {
     float2 uv = float2(atan2(dir.z , dir.x) / 2.0 / PI + 0.5, acos(dir.y) / PI);
     return uv;
@@ -8,14 +8,14 @@ float2 equirecFetchUV(float3 dir)
 
 [shader("miss")]
 void miss(inout Payload payload) {
-    if (payload.isShadowRay == 1)
+    if (isShadowRay(payload))
     {
-        payload.isShadowMiss = 1;
+        setVisibility(payload, true);
         return;
     }
 
-    depthPositionNormalStore(payload, gSceneParam.backgroundColor.rgb);
-    float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, equirecFetchUV(WorldRayDirection()), 0.0);
+    storeDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb);
+    float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
     payload.color += payload.energy * cubemap.rgb;
     payload.energy = 0.xxx;
 }

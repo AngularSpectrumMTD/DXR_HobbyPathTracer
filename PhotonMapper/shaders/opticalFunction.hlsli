@@ -268,7 +268,7 @@ struct LightSample
     float pdf;
 };
 
-void SampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     const float eps = 0.001f;
     float3 vectorToScatterPosition = scatterPosition - lightGen.position;
@@ -289,7 +289,7 @@ void SampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     lightSample.pdf = 1.0f / getLightNum();
 }
 
-void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     const float eps = 0.001f;
     float rnd0 = (rand() * 0.5 - 1) * 2;//-1 to 1
@@ -326,7 +326,7 @@ void SampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.pdf = 1.0f / getLightNum();
 }
 
-void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     const float eps = 0.001f;
     float rnd0 = rand(); //0 to 1
@@ -355,7 +355,7 @@ void SampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.pdf = 1.0f / getLightNum();
 }
 
-void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     lightSample.direction = normalize(-lightGen.position);//pos as dir
     lightSample.normal = normalize(lightGen.position);
@@ -365,13 +365,13 @@ void SampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.pdf = 1.0f / getLightNum();
 }
 
-void SampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
     emitDir = HemisphereORCosineSampling(float3(1, 0, 0), false);
     position = lightGen.position;
 }
 
-void SampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
     float rnd0 = (pcgHashState() - 0.5) * 2; //-1 to 1
     float rnd1 = (pcgHashState() - 0.5) * 2; //-1 to 1
@@ -380,7 +380,7 @@ void SampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
     position = lightGen.position;
 }
 
-void SampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     const float spotLightHalfAngle = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
@@ -388,7 +388,7 @@ void SampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
     position = lightGen.position;
 }
 
-void SampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
     float rnd0 = (pcgHashState() - 0.5) * 2; //-1 to 1
     float rnd1 = (pcgHashState() - 0.5) * 2; //-1 to 1
@@ -399,52 +399,52 @@ void SampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
     position = 1000 * -emitDir + tangent * 1000 * rnd0 + bitangent * 1000 * rnd1;
 }
 
-void SampleLight(in float3 scatterPosition, inout LightSample lightSample)
+void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
 {
     const uint lightID = (uint) (rand() * (getLightNum()));
     LightGenerateParam param = gLightGenerateParams[lightID];
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        SampleSphereLight(param, scatterPosition, lightSample);
+        sampleSphereLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        SampleRectLight(param, scatterPosition, lightSample);
+        sampleRectLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        SampleSpotLight(param, scatterPosition, lightSample);
+        sampleSpotLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        SampleDirectionalLight(param, scatterPosition, lightSample);
+        sampleDirectionalLight(param, scatterPosition, lightSample);
     }
 }
 
-void SampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
+void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
 {
     LightGenerateParam param = gLightGenerateParams[ID];
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        SampleSphereLight(param, scatterPosition, lightSample);
+        sampleSphereLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        SampleRectLight(param, scatterPosition, lightSample);
+        sampleRectLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        SampleSpotLight(param, scatterPosition, lightSample);
+        sampleSpotLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        SampleDirectionalLight(param, scatterPosition, lightSample);
+        sampleDirectionalLight(param, scatterPosition, lightSample);
     }
 }
 
-float Visibility(in float3 scatterPosition, in LightSample lightSample)
+float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
 {
     Payload shadowPayload;
     shadowPayload.isShadowRay = 1;
@@ -487,44 +487,44 @@ float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample fina
     for (int i = 0; i < getLightNum(); i++)
     {
         const uint lightID = (uint) (rand() * (getLightNum()));
-        SampleLightWithID(scatterPosition, lightID, lightSample);
+        sampleLightWithID(scatterPosition, lightID, lightSample);
         p_hat = length(lightSample.emission);
         float updateW = p_hat / pdf;
         updateReservoir(reservoir, lightID, updateW, 1u, rand());
     }
 
-    SampleLightWithID(scatterPosition, reservoir.Y, finalLightSample);
-    p_hat = length(Visibility(scatterPosition, finalLightSample) * finalLightSample.emission);
+    sampleLightWithID(scatterPosition, reservoir.Y, finalLightSample);
+    p_hat = length(computeVisibility(scatterPosition, finalLightSample) * finalLightSample.emission);
 
     reservoir.W_y = p_hat > 0 ? rcp(p_hat) * reservoir.W_sum / reservoir.M : 0;
     return reservoir.W_y * finalLightSample.emission;
 }
 
-void SampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
+void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 {
     const uint lightID = (uint) (rand() * (getLightNum()));
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        SampleSphereLightEmitDirAndPosition(param, dir, position);
+        sampleSphereLightEmitDirAndPosition(param, dir, position);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        SampleRectLightEmitDirAndPosition(param, dir, position);
+        sampleRectLightEmitDirAndPosition(param, dir, position);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        SampleSpotLightEmitDirAndPosition(param, dir, position);
+        sampleSpotLightEmitDirAndPosition(param, dir, position);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        SampleDirectionalLightEmitDirAndPosition(param, dir, position);
+        sampleDirectionalLightEmitDirAndPosition(param, dir, position);
     }
 }
 
 //Shading
-void SurafceShading(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
+void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
 {
     nextRay.TMin = 0.001;
     nextRay.TMax = 10000;

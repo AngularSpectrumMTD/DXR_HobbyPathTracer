@@ -1,16 +1,16 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b26ddb30-8acf-4b60-afbd-0dd65946056b)
+![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f03491c3-cbe2-4beb-b7ca-36e2469e9b66)
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/31310ef8-d00b-476e-aa89-11c71c9d1e56)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/06c77962-c5ad-4add-8057-efc0f6f909ef)
 
-![simple](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6818d4e9-899d-4b28-aab0-0e71a6d7e8ad)
+![simple](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ddce0ece-c32e-40e5-ae36-49edf80786b7)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![chromatic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9dc9f6b1-1b96-4ea9-a00c-06f5cf2ec91a)
+![chromatic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/c707d2d9-aa02-40e0-9581-20013bbe5f87)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light

@@ -9,7 +9,7 @@ ConstantBuffer<MaterialParams> constantBuffer : register(b0, space1);
 StructuredBuffer<uint>   indexBuffer : register(t0,space1);
 StructuredBuffer<VertexPN> vertexBuffer : register(t1, space1);
 
-VertexPN GetVertex(TriangleIntersectionAttributes attrib)
+VertexPN getVertex(TriangleIntersectionAttributes attrib)
 {
     VertexPN v = (VertexPN)0;
     uint start = PrimitiveIndex() * 3;
@@ -21,26 +21,27 @@ VertexPN GetVertex(TriangleIntersectionAttributes attrib)
         normalTbl[i] = vertexBuffer[index].Normal;
     }
 
-    v.Position = ComputeInterpolatedAttributeF3(positionTbl, attrib.barys);
-    v.Normal = normalize(ComputeInterpolatedAttributeF3(normalTbl, attrib.barys));
+    v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
+    v.Normal = normalize(computeInterpolatedAttributeF3(normalTbl, attrib.barys));
     return v;
 }
 
 [shader("closesthit")]
 void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
-    if (payload.isShadowRay == 1)
+    if (isShadowRay(payload))
     {
-        payload.isShadowMiss = 0;
+        setVisibility(payload, false);
         return;
     }
 
-    if (isReachedRecursiveLimitPayload(payload)) {
+    if (isReachedRecursiveLimitPayload(payload))
+    {
         return;
     }
-    VertexPN vtx = GetVertex(attrib);
+    VertexPN vtx = getVertex(attrib);
 
-    depthPositionNormalStore(payload, vtx.Normal);
+    storeDepthPositionNormal(payload, vtx.Normal);
 
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -51,11 +52,11 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     nextRay.Direction = 0.xxx;
     
     LightSample lightSample;
-    SampleLight(bestFitWorldPosition, lightSample);
+    sampleLight(bestFitWorldPosition, lightSample);
     //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
     const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-    payload.color += payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
-    SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+    payload.color += payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+    shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
@@ -77,7 +78,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
         return;
     }
 
-    VertexPN vtx = GetVertex(attrib);
+    VertexPN vtx = getVertex(attrib);
 
     MaterialParams currentMaterial = constantBuffer;
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -93,7 +94,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     }
     else
     {
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
         TraceRay(

@@ -242,12 +242,12 @@ float pcgHashState()
 ////////////////////////////////////
 // Common Function
 ////////////////////////////////////
-inline int SerialRaysIndex(int3 dispatchRaysIndex, int3 dispatchRaysDimensions)
+inline int serialRaysIndex(int3 dispatchRaysIndex, int3 dispatchRaysDimensions)
 {
     return (dispatchRaysIndex.x + dispatchRaysDimensions.x * dispatchRaysIndex.y) * dispatchRaysDimensions.z + dispatchRaysIndex.z;
 }
 
-inline float2 ComputeInterpolatedAttributeF2(float2 vertexAttributeTbl[3], float2 barycentrics)
+inline float2 computeInterpolatedAttributeF2(float2 vertexAttributeTbl[3], float2 barycentrics)
 {
     float2 ret;
     ret = vertexAttributeTbl[0];
@@ -256,7 +256,7 @@ inline float2 ComputeInterpolatedAttributeF2(float2 vertexAttributeTbl[3], float
     return ret;
 }
 
-float3 ComputeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 barycentrics)
+float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 barycentrics)
 {
     float3 ret;
     ret = vertexAttributeTbl[0];
@@ -268,7 +268,7 @@ float3 ComputeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum())
+    if (payload.recursive >= getMaxBounceNum() || length(payload.energy) < 1e-2)
     {
         payload.color = float3(0, 0, 0);
         return true;
@@ -276,18 +276,28 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
     return false;
 }
 
+inline bool isShadowRay(inout Payload payload)
+{
+    return payload.isShadowRay == 1;
+}
+
+inline void setVisibility(inout Payload payload, in bool visibility)
+{
+    payload.isShadowMiss = visibility;
+}
+
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
-    payload.recursive++;
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
         payload.throughput = float3(0, 0, 0);
         return true;
     }
+    payload.recursive++;
     return false;
 }
 
-float3x3 RodriguesRoatationFormula(float theta, float3 n)
+float3x3 rodriguesRoatationFormula(float theta, float3 n)
 {
     float cosT, sinT;
     sincos(theta, sinT, cosT);
@@ -313,7 +323,7 @@ float3 getConeSample(float randSeed, float3 direction, float coneAngle)
     float3 axis = normalize(cross(north, normalize(direction)));
     float angle = acos(dot(normalize(direction), north));
 
-    float3x3 R = RodriguesRoatationFormula(angle, axis);
+    float3x3 R = rodriguesRoatationFormula(angle, axis);
 
     return mul(R, float3(x, y, z));
 }
@@ -331,7 +341,7 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void depthPositionNormalStore(inout Payload payload, in float3 normal)
+void storeDepthPositionNormal(inout Payload payload, in float3 normal)
 {
     if (payload.stored == 0)
     {

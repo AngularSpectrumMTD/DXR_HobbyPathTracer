@@ -54,7 +54,7 @@ float poly6Kernel2D(float distance, float maxd)
     return alpha * tmp;
 }
 
-float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
+float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
 {
     float gatherRadius = getGatherRadius();
     float sharp = getGatherSharpness();
@@ -93,43 +93,44 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     }
 
     //Search Near Cell
-        for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
+    for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
+    {
+        for (Y = max(GridXYZ.y - rangeY, 0); Y <= min(GridXYZ.y + rangeY, gGridParam.gridDimensions.y - 1); Y++)
         {
-            for (Y = max(GridXYZ.y - rangeY, 0); Y <= min(GridXYZ.y + rangeY, gGridParam.gridDimensions.y - 1); Y++)
+            for (X = max(GridXYZ.x - rangeX, 0); X <= min(GridXYZ.x + rangeX, gGridParam.gridDimensions.x - 1); X++)
             {
-                for (X = max(GridXYZ.x - rangeX, 0); X <= min(GridXYZ.x + rangeX, gGridParam.gridDimensions.x - 1); X++)
+                uint3 XYZ = uint3(X, Y, Z);
+                uint GridID = GridHash(XYZ);
+
+                uint2 photonIDstardEnd = gPhotonGridIdBuffer[GridID];
+                if (photonIDstardEnd.x == UINT32_MAX)
+                    continue; //avoid infinite loop
+
+                if (photonIDstardEnd.y == UINT32_MAX)
+                    continue; //avoid infinite loop
+
+                for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                 {
-                    uint3 XYZ = uint3(X, Y, Z);
-                    uint GridID = GridHash(XYZ);
-
-                    uint2 photonIDstardEnd = gPhotonGridIdBuffer[GridID];
-                    if (photonIDstardEnd.x == UINT32_MAX)
-                        continue; //avoid infinite loop
-                    if (photonIDstardEnd.y == UINT32_MAX)
-                        continue; //avoid infinite loop
-
-                    for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
-                    {
-                        PhotonInfo comparePhoton = gPhotonMap[G];
-                        bool isVisiblePhotonPrimary = true;
-                        //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
+                    PhotonInfo comparePhoton = gPhotonMap[G];
+                    bool isVisiblePhotonPrimary = true;
+                    //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
                         
-                        float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
-                        if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
-                        {
-                            count++;
-                            accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
-                        }
-                    }
-
-                    if (isDebug)
+                    float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
+                    if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
                     {
-                        float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
-                        accumulateXYZ += float3(db, db, 0); //debug
+                        count++;
+                        accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                     }
+                }
+
+                if (isDebug)
+                {
+                    float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
+                    accumulateXYZ += float3(db, db, 0); //debug
                 }
             }
         }
+    }
 
     uint photonMapWidth = 1;
     uint photonStride = 1;
@@ -137,9 +138,9 @@ float3 photonGatheringWithSortedHashGridCells(float3 gatherCenterPos, float3 eye
     return boost * mul(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
 }
 
-float3 photonGather(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
+float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
 {
-    return photonGatheringWithSortedHashGridCells(gatherCenterPos, eyeDir, worldNormal, isDebug);
+    return accumulatePhotonHGC(gatherCenterPos, eyeDir, worldNormal, isDebug);
 }
 
 #endif//__PHOTONGATHERING_HLSLI__

@@ -13,7 +13,7 @@ StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
 Texture2D<float> alphaMask: register(t3, space1);
 
-VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTexture)
+VertexPNT getVertex(TriangleIntersectionAttributes attrib, inout bool isNoTexture)
 {
     VertexPNT v = (VertexPNT) 0;
     uint start = PrimitiveIndex() * 3; // Triangle List.
@@ -33,9 +33,9 @@ VertexPNT GetVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
             isNoTexture = true;
         }
     }
-    v.Position = ComputeInterpolatedAttributeF3(positionTbl, attrib.barys);
-    v.Normal = ComputeInterpolatedAttributeF3(normalTbl, attrib.barys);
-    v.UV = ComputeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
+    v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
+    v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
+    v.UV = computeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
 
     v.Normal = normalize(v.Normal);
     return v;
@@ -75,9 +75,9 @@ void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoT
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
-    if (payload.isShadowRay == 1)
+    if (isShadowRay(payload))
     {
-        payload.isShadowMiss = 0;
+        setVisibility(payload, false);
         return;
     }
 
@@ -87,7 +87,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     }
 
     bool isNoTexture = false;
-    VertexPNT vtx = GetVertex(attrib, isNoTexture);
+    VertexPNT vtx = getVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
 
@@ -108,14 +108,14 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
-        depthPositionNormalStore(payload, vtx.Normal);
+        storeDepthPositionNormal(payload, vtx.Normal);
         nextRay.Direction = 0.xxx;
         LightSample lightSample;
-        SampleLight(bestFitWorldPosition, lightSample);
+        sampleLight(bestFitWorldPosition, lightSample);
         //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
         const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-        payload.color += payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
+        payload.color += payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
     }
     else
     {
@@ -145,7 +145,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     }
 
     bool isNoTexture = false;
-    VertexPNT vtx = GetVertex(attrib, isNoTexture);
+    VertexPNT vtx = getVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
 
@@ -170,7 +170,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     }
     else
     {
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
         TraceRay(

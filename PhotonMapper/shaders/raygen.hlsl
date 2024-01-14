@@ -135,7 +135,7 @@ void photonEmitting()
     photon.throughput = float3(0,0,0);
     photon.position = float3(0,0,0);
 
-    int serialIndex = SerialRaysIndex(launchIndex, dispatchDimensions);
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
     const int COLOR_ID = serialIndex % getLightLambdaNum();
 
     gPhotonMap[serialIndex] = photon;//initialize
@@ -143,7 +143,7 @@ void photonEmitting()
     float3 emitOrigin = 0.xxx;
     float3 emitDir = 0.xxx;
 
-    SampleLightEmitDirAndPosition(emitDir, emitOrigin);
+    sampleLightEmitDirAndPosition(emitDir, emitOrigin);
     
     float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 

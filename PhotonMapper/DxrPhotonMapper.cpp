@@ -63,14 +63,13 @@ void DxrPhotonMapper::Setup()
         {
             mOBJFileName = "skull.obj";
             mOBJFolderName = "model";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, -5, 0));
-            mLightPosX = -3.f; mLightPosY = 71; mLightPosZ = -5;
-            mPhi = 460; mTheta = 269;
-            mInitEyePos = XMFLOAT3(80, 173, -19);
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
+            mLightPosX = -1.f; mLightPosY = -87; mLightPosZ = 3;
+            mPhi = 450; mTheta = 257;
+            mInitEyePos = XMFLOAT3(358, 220, -130);
             mLightRange = 0.0005f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
-            mCausticsBoost *= 15;
         }
         break;
         case SceneType_Sponza:
@@ -78,11 +77,15 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-            mLightPosX = 7.f; mLightPosY = 25; mLightPosZ = 5;//Y = 15(for diamond)
-            mPhi = 428; mTheta = 256;//417, 249(for diamond)
+            mLightPosX = 7.f; mLightPosY = 25; mLightPosZ = 5;
+            //mLightPosX = 7.f; mLightPosY = 15; mLightPosZ = 5;//for diamond
+            mPhi = 428; mTheta = 256;
+            //mPhi = 417; mTheta = 249;//for diamond
             mInitEyePos = XMFLOAT3(-45, 42, 5.3);
-            mLightRange = 0.00026f;//0.00018(for diamond)
+            mLightRange = 0.00026f;
+            //mLightRange = 0.00018f;//for diamond
             mGlassModelType = ModelType_Afrodyta;
+            //mGlassModelType = ModelType_Diamond;
             mIsSpotLightPhotonMapper = false;
         }
         break;
@@ -267,6 +270,18 @@ void DxrPhotonMapper::Setup()
         mMetalObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
+    }
+
+    if (mSceneType == SceneType_Simple)
+    {
+        mMetalObjYOfsset -= 150;
+        mGlassObjYOfsset -= 180;
+        mGlassObjScale.x *= 3;
+        mGlassObjScale.y *= 3;
+        mGlassObjScale.z *= 3;
+        mMetalObjScale.x *= 3;
+        mMetalObjScale.y *= 3;
+        mMetalObjScale.z *= 3;
     }
 
     WCHAR assetsPath[512];
