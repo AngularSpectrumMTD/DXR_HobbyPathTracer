@@ -40,7 +40,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 100;
+    mCausticsBoost = 200;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -64,28 +64,39 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "skull.obj";
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
-            mLightPosX = -1.f; mLightPosY = -87; mLightPosZ = 3;
-            mPhi = 450; mTheta = 257;
-            mInitEyePos = XMFLOAT3(358, 220, -130);
+            mLightPosX = -11.f; mLightPosY = -91; mLightPosZ = -1;
+            mPhi = 480; mTheta = 257;
+            mInitEyePos = XMFLOAT3(228, 270, -260);
             mLightRange = 0.0005f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
+            mCausticsBoost = 400;
         }
         break;
         case SceneType_Sponza:
         {
+            bool isDiamondTest = false;
+
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-            mLightPosX = 5.f; mLightPosY = 11; mLightPosZ = 7;
-            //mLightPosX = 7.f; mLightPosY = 15; mLightPosZ = 5;//for diamond
-            mPhi = 421; mTheta = 232;
-            //mPhi = 417; mTheta = 249;//for diamond
+            
+            if (isDiamondTest)
+            {
+                mLightPosX = 7.f; mLightPosY = 15; mLightPosZ = 5;//for diamond
+                mPhi = 417; mTheta = 249;//for diamond
+                mLightRange = 0.00018f;//for diamond
+                mGlassModelType = ModelType_Diamond;
+            }
+            else
+            {
+                mLightPosX = 5.f; mLightPosY = 11; mLightPosZ = 7;
+                mPhi = 421; mTheta = 232;
+                mLightRange = 0.00026f;
+                mGlassModelType = ModelType_Afrodyta;
+            }
+            
             mInitEyePos = XMFLOAT3(-45, 42, 5.3);
-            mLightRange = 0.00026f;
-            //mLightRange = 0.00018f;//for diamond
-            mGlassModelType = ModelType_Afrodyta;
-            //mGlassModelType = ModelType_Diamond;
             mIsSpotLightPhotonMapper = false;
         }
         break;
@@ -695,7 +706,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         LightGenerateParam param;
         XMFLOAT3 direction;
         XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(0.1, 0.1, 0.1));
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(1, 1, 1));
         mLightGenerationParamTbl[count] = param;
         count++;
     }

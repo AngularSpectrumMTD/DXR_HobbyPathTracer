@@ -314,7 +314,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material.transRatio = 1;// rndF(mt);
         albedoIndex++;
         transIndex++;
-
+        //material.emission = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
         mMaterialParam0 = material;
     }
 
