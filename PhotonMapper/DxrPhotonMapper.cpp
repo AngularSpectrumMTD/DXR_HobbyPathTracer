@@ -25,9 +25,9 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Bistro;
+    mSceneType = SceneType_Sponza;
 
-    mIntenceBoost = 10000;
+    mIntenceBoost = 10;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
@@ -40,7 +40,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
-    mCausticsBoost = 1;
+    mCausticsBoost = 100;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -70,7 +70,7 @@ void DxrPhotonMapper::Setup()
             mLightRange = 0.0005f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
-            mCausticsBoost *= 8;
+            mCausticsBoost *= 15;
         }
         break;
         case SceneType_Sponza:
@@ -78,10 +78,10 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-            mLightPosX = 7.f; mLightPosY = 17; mLightPosZ = 5;
-            mPhi = 422; mTheta = 254;
+            mLightPosX = 7.f; mLightPosY = 25; mLightPosZ = 5;//Y = 15(for diamond)
+            mPhi = 428; mTheta = 256;//417, 249(for diamond)
             mInitEyePos = XMFLOAT3(-45, 42, 5.3);
-            mLightRange = 0.00026f;
+            mLightRange = 0.00026f;//0.00018(for diamond)
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
         }
@@ -476,7 +476,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(1, 50, mCausticsBoost + (mInverseMove ? -0.5 : 0.5));
+        mCausticsBoost = Clamp(1, 500, mCausticsBoost + (mInverseMove ? -0.5 : 0.5));
         mIsUseAccumulation = false;
         break;
     case 'U':
@@ -649,7 +649,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
+            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
             mLightGenerationParamTbl[count] = param;
             count++;
         }
@@ -670,7 +670,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost * 0.01, mIntenceBoost * 0.01, mIntenceBoost * 0.01), tangent, bitangent, 150);
+            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
             mLightGenerationParamTbl[count] = param;
             count++;
         }
@@ -680,7 +680,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         LightGenerateParam param;
         XMFLOAT3 direction;
         XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(0.5, 0.5, 0.5));
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(0.1, 0.1, 0.1));
         mLightGenerationParamTbl[count] = param;
         count++;
     }

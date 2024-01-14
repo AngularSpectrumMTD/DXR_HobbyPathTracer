@@ -69,7 +69,7 @@ void rayGen() {
     randGenState = uint(pcgHash(seed));
     rseed = LightSeed.x;
 
-    const float energyBoost = 1.5f;
+    const float energyBoost = 1.0f;
 
     for(int i = 0; i < SPP ; i++)
     {

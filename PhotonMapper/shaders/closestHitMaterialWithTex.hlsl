@@ -110,12 +110,12 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         depthPositionNormalStore(payload, vtx.Normal);
         nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
         LightSample lightSample;
         SampleLight(bestFitWorldPosition, lightSample);
         //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
         const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-        payload.color = payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        payload.color += payload.energy * (currentMaterial.emission.xyz + lightIrr * currentMaterial.roughness + photonGather(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.energy);
     }
     else
     {
@@ -163,11 +163,6 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = 0.001;
     nextRay.TMax = 10000;
     nextRay.Direction = WorldRayDirection();
-    if (!isIgnoreHit)
-    {
-        nextRay.Direction = 0.xxx;
-        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
-    }
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
     {
@@ -175,6 +170,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     }
     else
     {
+        SurafceShading(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
         TraceRay(
