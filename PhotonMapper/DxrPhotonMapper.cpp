@@ -77,9 +77,9 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-            mLightPosX = 7.f; mLightPosY = 25; mLightPosZ = 5;
+            mLightPosX = 5.f; mLightPosY = 11; mLightPosZ = 7;
             //mLightPosX = 7.f; mLightPosY = 15; mLightPosZ = 5;//for diamond
-            mPhi = 428; mTheta = 256;
+            mPhi = 421; mTheta = 232;
             //mPhi = 417; mTheta = 249;//for diamond
             mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             mLightRange = 0.00026f;
