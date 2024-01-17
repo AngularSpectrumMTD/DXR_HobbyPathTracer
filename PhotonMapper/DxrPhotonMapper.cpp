@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 10;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -121,13 +121,16 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 39.f; mLightPosY = 13; mLightPosZ = -9;
-            mPhi = 501; mTheta = 262;
-            mInitEyePos = XMFLOAT3(39, 10, 1);
-            mInitTargetPos = XMFLOAT3(53, 5, -3.4);
-            mLightRange = 0.0013f;
+            mLightPosX = 34.0f; mLightPosY = 8.6; mLightPosZ = 5.7;
+            mPhi = 402; mTheta = 256;
+            mInitEyePos = XMFLOAT3(24, 8.57, 5.76);
+            mInitTargetPos = XMFLOAT3(40, 5, -0.14);
+            mLightRange = 0.001f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
+            mGatherRadius = 0.021f;
+            mCausticsBoost = 500;
+            mIntenceBoost = 1;
         }
         break;
     }
@@ -468,15 +471,15 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'X':
-        mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
         mIsUseAccumulation = false;
         break;
     case 'Y':
-        mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
         mIsUseAccumulation = false;
         break;
     case 'Z':
-        mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mInverseMove ? -PLANE_SIZE * 0.01f : PLANE_SIZE * 0.01f));
+        mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
         mIsUseAccumulation = false;
         break;
     case 'L':
@@ -492,7 +495,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'K':
-        mIntenceBoost = Clamp(100, 100000, mIntenceBoost + (mInverseMove ? -100 : 100));
+        mIntenceBoost = Clamp(1, 100, mIntenceBoost + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
     case 'B':

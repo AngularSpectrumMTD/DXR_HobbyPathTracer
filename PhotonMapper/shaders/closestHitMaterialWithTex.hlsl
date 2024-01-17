@@ -106,6 +106,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         currentMaterial.transRatio = 1;
         currentMaterial.albedo = 1.xxxx;
     }
+
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
@@ -162,6 +163,17 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
 
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
+
+    //recognize as glass
+    if (length(currentMaterial.albedo) == 0 && !isNoTexture)
+    {
+        currentMaterial.metallic = 0;
+        currentMaterial.roughness = 0;
+        currentMaterial.transColor = 1.xxxx;
+        currentMaterial.transRatio = 1;
+        currentMaterial.albedo = 1.xxxx;
+    }
+
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 

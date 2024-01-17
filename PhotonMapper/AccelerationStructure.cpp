@@ -165,7 +165,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
     mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
 
-    utility::CreateSphere(verticesPN, indices, 1.f, 30, 30);
+    utility::CreateSphere(verticesPN, indices, 0.1f, 30, 30);
     mMeshLightSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereLightVB", L"SphereLightIB", L"");
 
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
