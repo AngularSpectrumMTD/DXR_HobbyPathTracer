@@ -95,11 +95,17 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
 
     MaterialParams currentMaterial = constantBuffer;
+    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
+
+    //recognize as glass
     if (length(currentMaterial.albedo) == 0 && !isNoTexture)
     {
-        isIgnoreHit = true;
+        currentMaterial.metallic = 0;
+        currentMaterial.roughness = 0;
+        currentMaterial.transColor = 1.xxxx;
+        currentMaterial.transRatio = 1;
+        currentMaterial.albedo = 1.xxxx;
     }
-    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
@@ -113,9 +119,10 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         LightSample lightSample;
         sampleLight(bestFitWorldPosition, lightSample);
         //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
-        const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
+        const float3 lightIrr = (isIndirectOnly() && payload.recursive == 1) ? 0.xxx : RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
         const float3 prevEnergy = payload.energy;
         shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
+
         payload.color += prevEnergy * currentMaterial.emission.xyz + payload.energy * (lightIrr * currentMaterial.roughness + accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
     }
     else

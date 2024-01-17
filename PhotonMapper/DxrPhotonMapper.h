@@ -320,7 +320,8 @@ private:
     {
         SceneType_Simple,
         SceneType_Sponza,
-        SceneType_Bistro,
+        SceneType_BistroExterior,
+        SceneType_BistroInterior
     };
 
     enum Spectrum
@@ -605,6 +606,7 @@ private:
     s32 mSpectrumMode;
     bool mIsMoveModel;
     bool mIsUseTexture;
+    bool mIsIndirectOnly;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;
@@ -626,6 +628,7 @@ private:
     //bool mIsUseDirectionalLight;
 
     XMFLOAT3 mInitEyePos;
+    XMFLOAT3 mInitTargetPos;
 };
 
 #endif

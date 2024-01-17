@@ -54,9 +54,10 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     LightSample lightSample;
     sampleLight(bestFitWorldPosition, lightSample);
     //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
-    const float3 lightIrr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
+    const float3 lightIrr = (isIndirectOnly() && payload.recursive == 1) ? 0.xxx : RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
     const float3 prevEnergy = payload.energy;
     shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
+
     payload.color += prevEnergy * currentMaterial.emission.xyz + payload.energy * (lightIrr * currentMaterial.roughness + accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
 
     RAY_FLAG flags = RAY_FLAG_NONE;

@@ -117,6 +117,11 @@ uint getLightNum()
     return gSceneParam.additional.x;
 }
 
+bool isIndirectOnly()
+{
+    return gSceneParam.additional.y == 1;
+}
+
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;

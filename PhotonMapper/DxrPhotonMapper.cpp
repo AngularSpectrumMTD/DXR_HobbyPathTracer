@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
     mIntenceBoost = 10;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -50,10 +50,13 @@ void DxrPhotonMapper::Setup()
     mIsUseTexture = false;
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
+    mIsIndirectOnly = false;
     mStageTextureFileName = L"model/tileTex.png";
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
+
+    mInitTargetPos = XMFLOAT3(0, 0, 0);
 
     mLightCount = LightCount_ALL - 1;
 
@@ -100,7 +103,7 @@ void DxrPhotonMapper::Setup()
             mIsSpotLightPhotonMapper = false;
         }
         break;
-        case SceneType_Bistro:
+        case SceneType_BistroExterior:
         {
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
@@ -112,6 +115,21 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
         }
+        break;
+        case SceneType_BistroInterior:
+        {
+            mOBJFileName = "interior.obj";
+            mOBJFolderName = "model/bistro/Interior";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mLightPosX = 39.f; mLightPosY = 13; mLightPosZ = -9;
+            mPhi = 501; mTheta = 262;
+            mInitEyePos = XMFLOAT3(39, 10, 1);
+            mInitTargetPos = XMFLOAT3(53, 5, -3.4);
+            mLightRange = 0.0013f;
+            mGlassModelType = ModelType_Afrodyta;
+            mIsSpotLightPhotonMapper = true;
+        }
+        break;
     }
 
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
@@ -347,8 +365,7 @@ void DxrPhotonMapper::Initialize()
 
 void DxrPhotonMapper::InitializeCamera()
 {
-    XMFLOAT3 target(0.0f, 0.0f, 0.0f);
-    mCamera.SetLookAt(mInitEyePos, target);
+    mCamera.SetLookAt(mInitEyePos, mInitTargetPos);
 
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, REAL_MAX_RECURSION_DEPTH, 0);
     mCamera.SetPerspective(
@@ -409,7 +426,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
     mSceneParam.additional.x = mLightCount;
-    mSceneParam.additional.y = 0;
+    mSceneParam.additional.y = mIsIndirectOnly;
     mSceneParam.additional.z = 0;
     mSceneParam.additional.w = 0;
 
@@ -447,7 +464,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'G':
-        mGatherRadius = Clamp(0.01f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
+        mGatherRadius = Clamp(0.001f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
         mIsUseAccumulation = false;
         break;
     case 'X':
@@ -490,6 +507,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     //    mVisualizeLightRange = !mVisualizeLightRange;
     //    mIsUseAccumulation = false;
     //    break;
+    case 'A':
+        mIsIndirectOnly = !mIsIndirectOnly;
+        mIsUseAccumulation = false;
+        break;
     case 'W':
         mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;

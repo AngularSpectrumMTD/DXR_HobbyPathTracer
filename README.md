@@ -1,7 +1,9 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/fc3946c2-1fe0-45fa-9584-82437f1fc763)
+![bistroExterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/75b7b246-bfa6-4df1-a501-71d5b5bb4f1b)
+
+![bistroInterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/514d03e3-2c59-4370-8e2b-01c0cc678ae7)
 
 ![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f1ae0be4-af18-467a-aeea-fa8803c2b428)
 
@@ -52,13 +54,13 @@ Shading : GGX
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
 
-2. Open sponza.obj on blender. Set the size to 0.05 -> Execute Triangulation.
+2. Open exterior.obj / interior.obj on blender. Set the size to 0.1 -> Execute Triangulation.
 
-3. Export 3D model as obj file(Name the file "exterior.obj")
+3. Export 3D model as obj file(Name the file "exterior.obj"/"interior.obj")
 
-4. Create a new folder "bistro" in "DXRPhotonMapper/PhotonMapper/model". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj file in the "Exterior".
+4. Create a new folder "bistro" in "DXRPhotonMapper/PhotonMapper/model". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj / interior.obj file in the "Exterior" / "Interior".
 
-5. Set "SceneType_Bistro" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
+5. Set "SceneType_BistroExterior" / "SceneType_BistroInterior" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
 
 6. Build and Execute
 
