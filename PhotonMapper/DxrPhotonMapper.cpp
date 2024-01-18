@@ -25,7 +25,7 @@ mNormalSphereMaterialTbl()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
     mIntenceBoost = 10;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -408,6 +408,11 @@ void DxrPhotonMapper::Update()
         {
             pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * ONE_RADIAN), 0);
         }
+    }
+
+    if (mIsUseAccumulation == false)
+    {
+        mRenderFrame = 0;
     }
 
     mSceneParam.mtxView = mCamera.GetViewMatrix();
