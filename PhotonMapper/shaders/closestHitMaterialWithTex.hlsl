@@ -72,6 +72,24 @@ void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoT
     isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
 }
 
+void editMaterial(inout MaterialParams mat)
+{
+    //I can't decide these params to recognize material as glass
+    if (mat.metallic > 0.3 && mat.roughness > 0.5)
+    {
+        mat.transColor = 1.xxxx;
+        mat.transRatio = 0;
+        mat.albedo = 1.xxxx;
+    }
+    else
+    {
+        mat.roughness = 0;
+        mat.transColor = 1.xxxx;
+        mat.transRatio = 1;
+        mat.albedo = 1.xxxx;
+    }
+}
+
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
@@ -100,11 +118,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     //recognize as glass
     if (length(currentMaterial.albedo) == 0 && !isNoTexture)
     {
-        currentMaterial.metallic = 0;
-        currentMaterial.roughness = 0;
-        currentMaterial.transColor = 1.xxxx;
-        currentMaterial.transRatio = 1;
-        currentMaterial.albedo = 1.xxxx;
+        editMaterial(currentMaterial);
     }
 
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -167,11 +181,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     //recognize as glass
     if (length(currentMaterial.albedo) == 0 && !isNoTexture)
     {
-        currentMaterial.metallic = 0;
-        currentMaterial.roughness = 0;
-        currentMaterial.transColor = 1.xxxx;
-        currentMaterial.transRatio = 1;
-        currentMaterial.albedo = 1.xxxx;
+        editMaterial(currentMaterial);
     }
 
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());

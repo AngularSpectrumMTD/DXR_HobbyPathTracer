@@ -1,15 +1,33 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
-![bistroExterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/75b7b246-bfa6-4df1-a501-71d5b5bb4f1b)
+### Bistro Exterior
 
-![bistroInterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4562d3f4-7c68-4a39-bb39-c09b073ccadc)
+![bistroExterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/021661ba-2057-4000-86d6-07a61353bf32)
+
+![bistroExterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b110b7b1-246d-4dee-a525-58f3d2fa9cc4)
+
+![bistroExterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8b79d35e-c353-4366-b1d3-6debf363fbf8)
+
+### Bistro Interior
+
+![bistroInterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/dc433a6e-96b6-4de2-9e42-a093a76c877e)
+
+![bistroInterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b7376165-3ecb-4b89-8035-24d2c979653a)
+
+![bistroInterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4d151325-2ee7-43c4-b2c1-32a081fb441b)
+
+![bistroInterior3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f1bac168-ff03-433c-ab41-662ff63460ac)
+
+### Sponza
 
 ![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f1ae0be4-af18-467a-aeea-fa8803c2b428)
 
 ![sponzaM](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/362cd500-f714-4d47-a11f-c3f95a0982ab)
 
 ![sponzaR](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d2b3f0c7-2614-46b0-8c2b-7cf72513325f)
+
+### Simple Scene
 
 ![simple](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/521ce159-4530-4986-9a17-8effbd8c0c9e)
 
