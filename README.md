@@ -1,6 +1,16 @@
 # DXRPhotonMapper
 Photon Mapper By Use Of DirectX Raytracing
 
+### Bistro Interior
+
+![bistroInterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/09e3261f-7860-4c18-9f34-5d00754f5009)
+
+![bistroInterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e3d7059e-0fbe-40fe-87b2-7697fa78e7c8)
+
+![bistroInterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7988214f-5823-4d28-a5a2-731bc5b434af)
+
+![bistroInterior3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6f46ea26-61de-4528-9d47-075ead005b79)
+
 ### Bistro Exterior
 
 ![bistroExterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/021661ba-2057-4000-86d6-07a61353bf32)
@@ -8,16 +18,6 @@ Photon Mapper By Use Of DirectX Raytracing
 ![bistroExterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b110b7b1-246d-4dee-a525-58f3d2fa9cc4)
 
 ![bistroExterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8b79d35e-c353-4366-b1d3-6debf363fbf8)
-
-### Bistro Interior
-
-![bistroInterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/dc433a6e-96b6-4de2-9e42-a093a76c877e)
-
-![bistroInterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b7376165-3ecb-4b89-8035-24d2c979653a)
-
-![bistroInterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4d151325-2ee7-43c4-b2c1-32a081fb441b)
-
-![bistroInterior3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f1bac168-ff03-433c-ab41-662ff63460ac)
 
 ### Sponza
 
