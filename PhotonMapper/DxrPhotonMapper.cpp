@@ -36,7 +36,7 @@ void DxrPhotonMapper::Setup()
     mSceneParam.photonParams.w = 6;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhiDirectional = 480; mThetaDirectional = 280;
+    mPhiDirectional = 110; mThetaDirectional = 250;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
@@ -105,6 +105,7 @@ void DxrPhotonMapper::Setup()
         break;
         case SceneType_BistroExterior:
         {
+            mPhiDirectional = 480; mThetaDirectional = 280;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
@@ -118,6 +119,7 @@ void DxrPhotonMapper::Setup()
         break;
         case SceneType_BistroInterior:
         {
+            mPhiDirectional = 150; mThetaDirectional = 250;
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));

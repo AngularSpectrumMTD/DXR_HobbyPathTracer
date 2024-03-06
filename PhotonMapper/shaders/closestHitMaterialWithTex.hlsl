@@ -83,7 +83,7 @@ void editMaterial(inout MaterialParams mat)
     }
     else
     {
-        mat.roughness = 0;
+        mat.roughness = 0.1;
         mat.transColor = 1.xxxx;
         mat.transRatio = 1;
         mat.albedo = 1.xxxx;
@@ -133,12 +133,16 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         nextRay.Direction = 0.xxx;
         LightSample lightSample;
         sampleLight(bestFitWorldPosition, lightSample);
-        //const float3 lightIrr = Visibility(bestFitWorldPosition, lightSample) * lightSample.emission / lightSample.pdf;
-        const float3 lightIrr = (isIndirectOnly() && payload.recursive == 1) ? 0.xxx : RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-        const float3 prevEnergy = payload.energy;
+        float3 irr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
+        irr += accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
+        payload.color += payload.energy * currentMaterial.emission.xyz;
         shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
 
-        payload.color += prevEnergy * currentMaterial.emission.xyz + payload.energy * (lightIrr * currentMaterial.roughness + accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal));
+        //const bool isLightAccept = dot(normalize(lightSample.direction), normalize(nextRay.Direction)) < 0; //lightSample.direction : light sampled pos -> scatter pos
+        //if (isLightAccept)
+        {
+            payload.color += payload.energy * irr;
+        }
     }
     else
     {

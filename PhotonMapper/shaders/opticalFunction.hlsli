@@ -102,7 +102,7 @@ float rand()//0-1
 
 bool isPhotonStoreRequired(in MaterialParams params)
 {
-    return rand() < params.roughness;
+    return 0.3 < params.roughness;
 }
 
 void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
@@ -110,6 +110,91 @@ void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
     float3 up = abs(normal.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
     tangent = normalize(cross(up, normal));
     bitangent = cross(normal, tangent);
+}
+
+//GeometryIntersection
+#define RAY_MAX_T 1000000
+
+float3x3 constructWorldToLocalMatrix(float3 forwardDir, float3 upDir)
+{
+    float3 rightDir = cross(forwardDir, upDir);
+    float3x3 result = { rightDir, upDir, forwardDir };
+    return result;
+}
+
+//ax^2+bx+c = 0 , x = (-b +- sqrt(d)) / 2a
+float2 quadraticFormula(float a, float b, float c)//x : (-b - sqrt(d)) / 2a , y : (-b + sqrt(d)) / 2a
+{
+    float discriminant = b * b - 4 * a * c;
+    if (discriminant >= 0)
+    {
+        float s = sqrt(discriminant);
+    
+        float minDst = (-b - s) / (2 * a);
+        float maxDst = (-b + s) / (2 * a);
+    
+        return float2(minDst, maxDst);
+    }
+    
+    return float2(RAY_MAX_T, RAY_MAX_T);
+}
+
+//u v w: length of axis
+
+//            | v  ªshapeUp                                                                                                | v  ªshapeUp
+//            |                                                                                                                    |
+//---------------------> u (cross(shapeUp, shapeForward))       w(shapeForward) <-----------------------
+//            |                                                                                                                    |
+//            |                                                                                                                    |
+float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
+{
+    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
+    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
+    float3 lD = mul(transMat, lineDir);
+    
+    float U = 1.0 / (u * u);
+    float V = 1.0 / (v * v);
+    float W = 1.0 / (w * w);
+    
+    float a = lD.x * lD.x * U + lD.y * lD.y * V + lD.z * lD.z * W;
+    float b = 2 * (lO.x * lD.x * U + lO.y * lD.y * V + lO.z * lD.z * W);
+    float c = lO.x * lO.x * U + lO.y * lO.y * V + lO.z * lO.z * W - 1;
+    
+    return quadraticFormula(a, b, c);
+} 
+
+//u v : length of axis
+float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v)
+{
+    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
+    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
+    float3 lD = mul(transMat, lineDir);
+    
+    float denom = lD.y;
+    float num = lO.y;
+    
+    const float T = -num / denom;
+    
+    float3 samplePos = lO + lD * T;
+    float judgeValue = samplePos.x * samplePos.x / (u * u) + samplePos.z * samplePos.z / (v * v);
+    bool isInEllipse = (judgeValue <= 1);
+    return isInEllipse ? T : RAY_MAX_T;
+}
+
+float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v)
+{
+    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
+    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
+    float3 lD = mul(transMat, lineDir);
+    
+    float denom = lD.y;
+    float num = lO.y;
+    
+    const float T = -num / denom;
+    
+    float3 samplePos = lO + lD * T;
+    bool isInRectangle = abs(samplePos.x) <= u && abs(samplePos.z) <= v;
+    return isInRectangle ? T : RAY_MAX_T;
 }
 
 //Sampling
@@ -523,9 +608,96 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
     }
 }
 
+float3 specularBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
+{
+    float3 L = wi;
+    float3 V = wo;
+
+    const float diffRatio = 1.0 - material.metallic;
+
+    const float specRatio = 1 - diffRatio;
+    const float3 H = normalize(L + V);
+
+    const float dotNL = abs(dot(N, L));
+    const float dotNH = abs(dot(N, H));
+    const float dotVH = abs(dot(V, H));
+
+    float3 F0 = 0.08.xxx;
+    F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+        
+    const float NDF = GGX_Distribution(N, H, material.roughness);
+    const float G = GGX_Geometry_Smith(N, V, L, material.roughness);
+    const float3 F = FresnelSchlick(max(dot(V, H), 0), F0);
+
+    const float3 kS = F;
+    const float3 kD = (1 - kS) * (1 - material.metallic);
+        
+    const float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+    const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+    const float diffPDF = CosineSamplingPDF(dotNL);
+    const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
+    const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
+
+    if (sumPDF > 0)
+    {
+        return sumBRDF / sumPDF;
+    }
+    else
+    {
+        return 0.xxx;
+    }
+}
+
+float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
+{
+    float3 L = wi;
+    float3 V = wo;
+
+    const float specRatio = FresnelReflectance(-wo, N, etaOUT);
+
+    if (isRefractSampled && !isFromOutside)
+    {
+        float3 tmp = L;
+        L = V;
+        V = tmp;
+        N *= -1;
+        H *= -1;
+    }
+
+    const float dotNL = abs(dot(N, L));
+    const float dotNV = abs(dot(N, V));
+    const float dotNH = abs(dot(N, H));
+    const float dotVH = abs(dot(V, H));
+    const float dotLH = abs(dot(L, H));
+
+    float3 F0 = 0.08.xxx * material.specular;
+    float3 F = FresnelSchlick(max(dot(H, V), 0), F0);
+
+    float NDF = GGX_Distribution(N, H, material.roughness);
+    float G = GGX_Geometry_Smith(N, V, L, material.roughness);
+
+    float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+    float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    float3 refrBTDF = RefractionBTDF(NDF, G, F, V, L, N, H, etaIN, etaOUT);
+    float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
+    const float sumPDF = specRatio * specPDF + (1 - specRatio) * refrPDF;
+
+    if (sumPDF > 0)
+    {
+        return sumBRDF / sumPDF;
+    }
+    else
+    {
+        return 0.xxx;
+    }
+}
+
 //Shading
 void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
 {
+    const bool isPathTrace = (lambda == 0);
     nextRay.TMin = 0.001;
     nextRay.TMax = 10000;
     
@@ -538,59 +710,32 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
 
     if (blending < 1 - material.transRatio)
     {
-        float3 reflectDir = 0.xxx;
+        //sample direction
+        float3 L = 0.xxx;
         
         const float diffRatio = 1.0 - material.metallic;
-        const float specRatio = 1 - diffRatio;
-
         const float3 V = normalize(-currentRayDir);
         
         if (roulette < diffRatio)//diffuse
         {
-            reflectDir = HemisphereORCosineSampling(N, false);
+            L = HemisphereORCosineSampling(N, false);
         }
-        else//specular
+        else //specular
         {
             const float3 halfVec = GGX_ImportanceSampling(N, material.roughness);
-            reflectDir = normalize(2.0f * dot(V, halfVec) * halfVec - V);
+            L = normalize(2.0f * dot(V, halfVec) * halfVec - V);
         }
-        
-        const float3 L = normalize(reflectDir);
-        const float3 H = normalize(L + V);
 
-        const float dotNL = abs(dot(N, L));
-        const float dotNH = abs(dot(N, H));
-        const float dotVH= abs(dot(V, H));
-
-        float3 F0 = 0.08.xxx;
-        F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
-        //F0 = lerp(F0 * material.specular, 1.xxx, (material.metallic).xxx);//No Albedo
-        
-        const float NDF = GGX_Distribution(N, H, material.roughness);
-        const float G = GGX_Geometry_Smith(N, V, L, material.roughness);
-        const float3 F = FresnelSchlick(max(dot(V, H), 0), F0);
-
-        const float3 kS = F;
-        const float3 kD = (1 - kS) * (1 - material.metallic);
-        
-        const float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
-        const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-        const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
-        //const float3 diffBRDF = DiffuseBRDF(1.xxx); //No Albedo
-        const float diffPDF = CosineSamplingPDF(dotNL);
-        const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
-        const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
-        
         nextRay.Origin = currentRayOrigin + N * eps;
-        nextRay.Direction = reflectDir;
-
-        if (sumPDF > 0)
-        {
-            throughput *= sumBRDF / sumPDF;
-        }
+        nextRay.Direction = L;
+        
+        //compute bsdf    V : wo   L : wi(sample)
+        float3 brdfDevPDF = specularBRDFdevidedPDF(material, N, V, L);
+        throughput *= brdfDevPDF;
     }
     else
     {
+        //sample direction
         bool isFromOutside = dot(currentRayDir, N) < 0;
         N *= isFromOutside ? 1 : -1;
         
@@ -604,17 +749,12 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
 
         float3 V = normalize(-currentRayDir);
         float3 H = GGX_ImportanceSampling(N, material.roughness);
-
-        float3 F0 = 0.08.xxx * material.specular;
-        float3 F = FresnelSchlick(max(dot(H, V), 0), F0);
-
-        const float kR = FresnelReflectance(currentRayDir, N, etaOUT);
         
-        const float specRatio = kR;
-        const float refrRatio = 1 - kR;
+        const float specRatio = FresnelReflectance(currentRayDir, N, etaOUT);
 
         float3 L = 0.xxx;
 
+        bool isRefractSampled = false;
         if (roulette <= specRatio)
         {
             nextRay.Origin = currentRayOrigin + N * eps;
@@ -623,9 +763,10 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
         }
         else
         {
+            isRefractSampled = true;
             float eta = isFromOutside ? etaIN / etaOUT : etaOUT / etaIN;
             float3 refractVec = refract(currentRayDir, H, eta);
-            if (length(refractVec) < 0.00001f)
+            if (length(refractVec) < 0.001f)
             {
                 L = reflect(currentRayDir, H);//handle as total reflection
             }
@@ -633,38 +774,13 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
             {
                 L = normalize(refractVec);
             }
-            nextRay.Direction = L;
             nextRay.Origin = currentRayOrigin - N * eps;
-            if (!isFromOutside)
-            {
-                float3 tmp = L;
-                L = V;
-                V = tmp;
-                N *= -1;
-                H *= -1;
-            }
+            nextRay.Direction = L;
         }
 
-        const float dotNL = abs(dot(N, L));
-        const float dotNV = abs(dot(N, V));
-        const float dotNH = abs(dot(N, H));
-        const float dotVH = abs(dot(V, H));
-        const float dotLH = abs(dot(L, H));
-
-        float NDF = GGX_Distribution(N, H, material.roughness);
-        float G = GGX_Geometry_Smith(N, V, L, material.roughness);
-
-        float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
-        float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-        float3 refrBTDF = RefractionBTDF(NDF, G, F, V, L, N, H, etaIN, etaOUT);
-        float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-        const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
-        const float sumPDF = specRatio * specPDF + refrRatio * refrPDF;
-        
-        if (sumPDF > 0)
-        {
-            throughput *= sumBRDF / sumPDF;
-        }
+        //compute bsdf    V : wo   L : wi(sample)
+        float3 brdfDevPDF = transBRDFdevidedPDF(material, N, V, L, H, etaIN, etaOUT, isRefractSampled, isFromOutside);
+        throughput *= brdfDevPDF;
     }
 }
 

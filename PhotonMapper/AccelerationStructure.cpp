@@ -306,12 +306,14 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material = defaultMaterial;
         material.albedo = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[albedoIndex % _countof(colorTbl)];
         //material.metallic = rndF(mt);
-        material.metallic = 0;
+        material.metallic = 0.1;
         //material.roughness = 0.1;// rndF(mt);
-        material.roughness = 0.0;// rndF(mt);
+        //material.roughness = 0.0;// rndF(mt);
+        material.roughness = 1.0;// rndF(mt);
         material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[transIndex % _countof(colorTbl)];
         //material.transRatio = 0.6;// rndF(mt);
-        material.transRatio = 1;// rndF(mt);
+        //material.transRatio = 1;// rndF(mt);
+        material.transRatio = 0;// rndF(mt);
         albedoIndex++;
         transIndex++;
         //material.emission = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
