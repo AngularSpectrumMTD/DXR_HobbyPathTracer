@@ -3,6 +3,10 @@
 
 #define LIGHT_BASE_LENGTH 0.001f
 
+#define DEFAULT_RAY_ID 0
+#define DEFAULT_MISS_ID 0
+#define DEFAULT_GEOM_CONT_MUL 1
+
 struct SceneCB
 {
     matrix mtxView;
@@ -85,7 +89,7 @@ RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u3);
 RWTexture2D<float4> gPositionBuffer : register(u4);
 RWTexture2D<float4> gNormalBuffer : register(u5);
 RWTexture2D<float4> gOutput : register(u6);
-RWTexture2D<float4> gOutput1 : register(u7);
+RWTexture2D<float4> gAccumulationBuffer : register(u7);
 RWTexture2D<float2> gLuminanceMomentBufferDst : register(u8);
 RWTexture2D<uint> gAccumulationCountBuffer : register(u9);
 

@@ -83,10 +83,13 @@ void editMaterial(inout MaterialParams mat)
     }
     else
     {
-        mat.roughness = 0.1;
+        mat.roughness = 0.05;
         mat.transColor = 1.xxxx;
         mat.transRatio = 1;
+        mat.metallic = 0;
         mat.albedo = 1.xxxx;
+
+        //mat.emission = float4(1,1,0,0);//test
     }
 }
 
@@ -121,28 +124,27 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         editMaterial(currentMaterial);
     }
 
+    //ray hitted the emissive material
+    if (length(currentMaterial.emission.xyz) > 0)
+    {
+        payload.color = payload.energy * currentMaterial.emission.xyz;
+        return;
+    }
+
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
 
+    const float3 incidentDirection = WorldRayDirection();
+
     if (!isIgnoreHit)
     {
         storeDepthPositionNormal(payload, vtx.Normal);
         nextRay.Direction = 0.xxx;
-        LightSample lightSample;
-        sampleLight(bestFitWorldPosition, lightSample);
-        float3 irr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-        irr += accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
-        payload.color += payload.energy * currentMaterial.emission.xyz;
-        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
-
-        //const bool isLightAccept = dot(normalize(lightSample.direction), normalize(nextRay.Direction)) < 0; //lightSample.direction : light sampled pos -> scatter pos
-        //if (isLightAccept)
-        {
-            payload.color += payload.energy * irr;
-        }
+        payload.color += payload.energy * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.energy);
     }
     else
     {
@@ -153,15 +155,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
-    TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            nextRay,
-            payload);
+    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
 
 [shader("closesthit")]
@@ -204,18 +198,10 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     }
     else
     {
-        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
-        TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            nextRay,
-            payload);
+        TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
     }
 }
 

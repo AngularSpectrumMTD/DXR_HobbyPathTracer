@@ -3,6 +3,8 @@
 
 #include "common.hlsli"
 
+#define ETA_AIR 1.0f
+
 struct OpticalGlass
 {
     float A0;
@@ -198,23 +200,23 @@ float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, 
 }
 
 //Sampling
-float3 tangentToWorld(float3 normal, float3 tangentSpaceVec)
+float3 tangentToWorld(float3 N, float3 tangentSpaceVec)
 {
     float3 tangent;
     float3 bitangent;
-    ONB(normal, tangent, bitangent);
+    ONB(N, tangent, bitangent);
 
-    return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + normal * tangentSpaceVec.z);
+    return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + N * tangentSpaceVec.z);
 }
 
-float3 HemisphereORCosineSampling(float3 normal, bool isHemi)
+float3 HemisphereORCosineSampling(float3 N, bool isHemi)
 {
     float cosT = isHemi ? rand() : sqrt(rand());
     float sinT = sqrt(1 - cosT * cosT);
     float P = 2 * PI * rand();
     float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
 
-    return tangentToWorld(normal, tangentDir);
+    return tangentToWorld(N, tangentDir);
 }
 
 float3 GGX_ImportanceSampling(float3 N, float roughness)
@@ -345,7 +347,7 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
 //Lighting
 struct LightSample
 {
-    float3 direction;
+    float3 direction; //from scatterPos to lightPos;
     float3 normal;
     float3 emission;
     //float3 sufacePosition;
@@ -369,9 +371,9 @@ void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(lightSurfacePos - lightGen.position);
     const float coef = 0.5 * abs(dot(lightSample.normal, lightSample.direction));
-    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
-    lightSample.pdf = 1.0f / getLightNum();
+    const float cosine = max(0, dot(lightSample.normal, -lightSample.direction));
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * cosine / distanceSq;
+    lightSample.pdf = 1;
 }
 
 void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
@@ -406,9 +408,9 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     const float coef = coefU * coefV;
-    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
-    lightSample.pdf = 1.0f / getLightNum();
+    const float cosine = max(0, dot(lightSample.normal, -lightSample.direction));
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * cosine / distanceSq;
+    lightSample.pdf = 1;
 }
 
 void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
@@ -435,9 +437,9 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
 
     lightSample.direction /= lightSample.distance;
     lightSample.normal = dominantDir;
-    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
-    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * valid / distanceSq;
-    lightSample.pdf = 1.0f / getLightNum();
+    const float cosine = max(0, dot(lightSample.normal, -lightSample.direction));
+    lightSample.emission = lightGen.emission * lightGen.influenceDistance * coef * cosine / distanceSq;
+    lightSample.pdf = 1;
 }
 
 void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
@@ -447,7 +449,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
     lightSample.emission = lightGen.emission * valid;
     lightSample.distance = 10000000;
-    lightSample.pdf = 1.0f / getLightNum();
+    lightSample.pdf = 1;
 }
 
 void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
@@ -505,6 +507,8 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     {
         sampleDirectionalLight(param, scatterPosition, lightSample);
     }
+
+    lightSample.pdf *= 1.0f / getLightNum();
 }
 
 void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
@@ -538,7 +542,7 @@ float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
     const float eps = 0.001;
     RayDesc shadowRay;
     shadowRay.TMin = eps;
-    shadowRay.TMax = lightSample.distance;
+    shadowRay.TMax = lightSample.distance - eps;
 
     shadowRay.Direction = lightSample.direction;
     shadowRay.Origin = scatterPosition;
@@ -547,15 +551,7 @@ float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
 
     uint rayMask = ~(LIGHT_INSTANCE_MASK);
 
-    TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            shadowRay,
-            shadowPayload);
+    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, shadowRay, shadowPayload);
 
     return (shadowPayload.isShadowMiss == 0) ? 0.0f : 1.0f;
 }
@@ -610,29 +606,31 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 
 float3 specularBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
 {
-    float3 L = wi;
-    float3 V = wo;
+    if (dot(N, wi) <= 0)
+    {
+        return 0.xxx;
+    }
 
     const float diffRatio = 1.0 - material.metallic;
 
     const float specRatio = 1 - diffRatio;
-    const float3 H = normalize(L + V);
+    const float3 H = normalize(wi + wo);
 
-    const float dotNL = abs(dot(N, L));
+    const float dotNL = abs(dot(N, wi));
     const float dotNH = abs(dot(N, H));
-    const float dotVH = abs(dot(V, H));
+    const float dotVH = abs(dot(wo, H));
 
     float3 F0 = 0.08.xxx;
     F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
         
     const float NDF = GGX_Distribution(N, H, material.roughness);
-    const float G = GGX_Geometry_Smith(N, V, L, material.roughness);
-    const float3 F = FresnelSchlick(max(dot(V, H), 0), F0);
+    const float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
+    const float3 F = FresnelSchlick(max(dot(wo, H), 0), F0);
 
     const float3 kS = F;
     const float3 kD = (1 - kS) * (1 - material.metallic);
         
-    const float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+    const float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
     const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
     const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
     const float diffPDF = CosineSamplingPDF(dotNL);
@@ -651,35 +649,23 @@ float3 specularBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3
 
 float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
 {
-    float3 L = wi;
-    float3 V = wo;
-
     const float specRatio = FresnelReflectance(-wo, N, etaOUT);
 
-    if (isRefractSampled && !isFromOutside)
-    {
-        float3 tmp = L;
-        L = V;
-        V = tmp;
-        N *= -1;
-        H *= -1;
-    }
-
-    const float dotNL = abs(dot(N, L));
-    const float dotNV = abs(dot(N, V));
+    const float dotNL = abs(dot(N, wi));
+    const float dotNV = abs(dot(N, wo));
     const float dotNH = abs(dot(N, H));
-    const float dotVH = abs(dot(V, H));
-    const float dotLH = abs(dot(L, H));
+    const float dotVH = abs(dot(wo, H));
+    const float dotLH = abs(dot(wi, H));
 
     float3 F0 = 0.08.xxx * material.specular;
-    float3 F = FresnelSchlick(max(dot(H, V), 0), F0);
+    float3 F = FresnelSchlick(max(dot(H, wo), 0), F0);
 
     float NDF = GGX_Distribution(N, H, material.roughness);
-    float G = GGX_Geometry_Smith(N, V, L, material.roughness);
+    float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
 
-    float3 specBRDF = SpecularBRDF(NDF, G, F, V, L, N);
+    float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
     float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-    float3 refrBTDF = RefractionBTDF(NDF, G, F, V, L, N, H, etaIN, etaOUT);
+    float3 refrBTDF = RefractionBTDF(NDF, G, F, wo, wi, N, H, etaIN, etaOUT);
     float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
     const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
     const float sumPDF = specRatio * specPDF + (1 - specRatio) * refrPDF;
@@ -694,10 +680,9 @@ float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo
     }
 }
 
-//Shading
-void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay, inout float3 throughput, float lambda = 0)
+void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
 {
-    const bool isPathTrace = (lambda == 0);
+    const bool isPathTrace = (wavelength == 0);
     nextRay.TMin = 0.001;
     nextRay.TMax = 10000;
     
@@ -710,6 +695,11 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
 
     if (blending < 1 - material.transRatio)
     {
+        if (dot(currentRayDir, N) > 0)
+        {
+            N *= -1;
+        }
+
         //sample direction
         float3 L = 0.xxx;
         
@@ -731,21 +721,21 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
         
         //compute bsdf    V : wo   L : wi(sample)
         float3 brdfDevPDF = specularBRDFdevidedPDF(material, N, V, L);
-        throughput *= brdfDevPDF;
+        const float cosine = max(0, dot(N, nextRay.Direction));
+        throughput *= brdfDevPDF * cosine;
     }
     else
     {
         //sample direction
         bool isFromOutside = dot(currentRayDir, N) < 0;
-        N *= isFromOutside ? 1 : -1;
-        
-        float etaIN = 1;
-        float etaOUT = 1.7;
 
-        if (lambda > 0)
+        //change the normal direction to the incident direction side
+        if (dot(currentRayDir, N) > 0)
         {
-            etaOUT = J_Bak4.computeRefIndex(lambda * 1e-3);
+            N *= -1;
         }
+        
+        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
         float3 V = normalize(-currentRayDir);
         float3 H = GGX_ImportanceSampling(N, material.roughness);
@@ -754,33 +744,28 @@ void shadeSurface(in MaterialParams material, in float3 N, inout RayDesc nextRay
 
         float3 L = 0.xxx;
 
-        bool isRefractSampled = false;
-        if (roulette <= specRatio)
+        bool isRefractSampled = true;
         {
-            nextRay.Origin = currentRayOrigin + N * eps;
-            L = reflect(currentRayDir, H);
-            nextRay.Direction = L;
-        }
-        else
-        {
-            isRefractSampled = true;
-            float eta = isFromOutside ? etaIN / etaOUT : etaOUT / etaIN;
+            float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
             float3 refractVec = refract(currentRayDir, H, eta);
             if (length(refractVec) < 0.001f)
             {
                 L = reflect(currentRayDir, H);//handle as total reflection
+                isRefractSampled = false;
             }
             else
             {
                 L = normalize(refractVec);
+                isRefractSampled = true;
             }
             nextRay.Origin = currentRayOrigin - N * eps;
             nextRay.Direction = L;
         }
 
         //compute bsdf    V : wo   L : wi(sample)
-        float3 brdfDevPDF = transBRDFdevidedPDF(material, N, V, L, H, etaIN, etaOUT, isRefractSampled, isFromOutside);
-        throughput *= brdfDevPDF;
+        float3 brdfDevPDF = transBRDFdevidedPDF(material, N, V, L, H, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+        const float cosine = abs(dot(N, nextRay.Direction));
+        throughput *= brdfDevPDF * cosine;
     }
 }
 

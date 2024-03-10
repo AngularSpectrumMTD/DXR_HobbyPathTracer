@@ -1,7 +1,7 @@
 #include "opticalFunction.hlsli"
 
 #define SPP 1
-#define REINHARD_L 1000
+#define REINHARD_L 100000
 
 float reinhard(float x, float L)
 {
@@ -15,7 +15,7 @@ float3 reinhard3f(float3 v, float L)
 
 void applyTimeDivision(inout float3 current, uint2 ID)
 {
-    float3 prev = gOutput1[ID].rgb;
+    float3 prev = gAccumulationBuffer[ID].rgb;
     
     float currentDepth = gDepthBuffer[ID];
     float prevDepth = gPrevDepthBuffer[ID];
@@ -27,7 +27,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
 
     if (currentDepth == 0 || prevDepth == 0)
     {
-        gOutput1[ID].rgb = current;
+        gAccumulationBuffer[ID].rgb = current;
         gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
         gAccumulationCountBuffer[ID] = 1;
         return;
@@ -48,7 +48,7 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
     curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
 
-    gOutput1[ID].rgb = current;
+    gAccumulationBuffer[ID].rgb = current;
     gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
 }
 
@@ -76,14 +76,14 @@ void rayGen() {
         float2 IJ = int2(i / (SPP / 2.f), i % (SPP / 2.f)) - 0.5.xx;
 
         float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
-        RayDesc rayDesc;
-        rayDesc.Origin = mul(gSceneParam.mtxViewInv, float4(0, 0, 0, 1)).xyz;
+        RayDesc nextRay;
+        nextRay.Origin = mul(gSceneParam.mtxViewInv, float4(0, 0, 0, 1)).xyz;
 
         float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
-        rayDesc.Direction = normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
+        nextRay.Direction = normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
 
-        rayDesc.TMin = 0;
-        rayDesc.TMax = 100000;
+        nextRay.TMin = 0;
+        nextRay.TMax = 100000;
 
         Payload payload;
         payload.energy = energyBoost * float3(1, 1, 1);
@@ -91,7 +91,7 @@ void rayGen() {
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;
         payload.stored = 0;//empty
-        payload.eyeDir = rayDesc.Direction;
+        payload.eyeDir = nextRay.Direction;
         payload.isShadowRay = 0;
         payload.isShadowMiss = 0;
 
@@ -99,20 +99,12 @@ void rayGen() {
 
         uint rayMask = 0xFF;
 
-        TraceRay(
-            gRtScene, 
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            rayDesc,
-            payload);
+        TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 
         accumColor += payload.color;
     }
-    float3 finalCol = accumColor / SPP;
-    //float3 finalCol = reinhard3f((accumColor + accumPhotonColor) / SPP, REINHARD_L);
+    //float3 finalCol = accumColor / SPP;
+    float3 finalCol = reinhard3f(accumColor / SPP, REINHARD_L);
     applyTimeDivision(finalCol, launchIndex);
     gOutput[launchIndex.xy] = float4(finalCol, 1);
 }
@@ -160,11 +152,11 @@ void photonEmitting()
 
     const float LAMBDA_NM = (LightSeed.x < 300) ? reservoir.Y : LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
-    RayDesc rayDesc;
-    rayDesc.Origin = emitOrigin;
-    rayDesc.Direction = emitDir;
-    rayDesc.TMin = 0;
-    rayDesc.TMax = 100000;
+    RayDesc nextRay;
+    nextRay.Origin = emitOrigin;
+    nextRay.Direction = emitDir;
+    nextRay.TMin = 0;
+    nextRay.TMax = 100000;
 
     PhotonPayload payload;
     float emitIntensity = length(gSceneParam.lightColor.xyz);
@@ -178,13 +170,5 @@ void photonEmitting()
 
     uint rayMask = ~(LIGHT_INSTANCE_MASK); //ignore your self!! lightsource model
 
-    TraceRay(
-        gRtScene,
-        flags,
-        rayMask,
-        0, // ray index
-        1, // MultiplierForGeometryContrib
-        0, // miss index
-        rayDesc,
-        payload);
+    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }

@@ -459,8 +459,8 @@ private:
     ComPtr <ID3D12Resource> mDXRMainOutput;
     dx12::Descriptor mMainOutputDescriptorUAV;
     dx12::Descriptor mMainOutputDescriptorSRV;
-    ComPtr<ID3D12Resource> mDXROutput;
-    dx12::Descriptor mOutputDescriptorUAV;
+    ComPtr<ID3D12Resource> mAccumulationBuffer;
+    dx12::Descriptor mAccumulationBufferDescriptorUAV;
     ComPtr<ID3D12Resource> mCausticsMapPingPongTbl[2];
     dx12::Descriptor mOCausticsMapPingPongUAVTbl[2];
     ComPtr<ID3D12Resource> mPhotonMap;

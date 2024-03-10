@@ -45,7 +45,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gPositionBuffer"] = 10;
         mRegisterMapGlobalRootSig["gNormalBuffer"] = 11;
         mRegisterMapGlobalRootSig["gOutput"] = 12;
-        mRegisterMapGlobalRootSig["gOutput1"] = 13;
+        mRegisterMapGlobalRootSig["gAccumulationBuffer"] = 13;
         mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"] = 14;
         mRegisterMapGlobalRootSig["gAccumulationCountBuffer"] = 15;
     }
@@ -84,7 +84,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gPositionBuffer"] = 10;
         mRegisterMapGlobalRootSigPhoton["gNormalBuffer"] = 11;
         mRegisterMapGlobalRootSigPhoton["gOutput"] = 12;
-        mRegisterMapGlobalRootSigPhoton["gOutput1"] = 13;
+        mRegisterMapGlobalRootSigPhoton["gAccumulationBuffer"] = 13;
         mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"] = 14;
         mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"] = 15;
     }

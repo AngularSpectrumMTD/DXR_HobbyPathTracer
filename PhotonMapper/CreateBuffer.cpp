@@ -27,15 +27,15 @@ void DxrPhotonMapper::CreateResultBuffer()
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     mMainOutputDescriptorUAV = mDevice->CreateUnorderedAccessView(mDXRMainOutput.Get(), &uavDesc);
 
-    mDXROutput = mDevice->CreateTexture2D(
+    mAccumulationBuffer = mDevice->CreateTexture2D(
         width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
         D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
         D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
         D3D12_HEAP_TYPE_DEFAULT,
-        L"DXROutputTbl[%d]"
+        L"AccumulationBuffer"
     );
 
-    mOutputDescriptorUAV = mDevice->CreateUnorderedAccessView(mDXROutput.Get(), &uavDesc);
+    mAccumulationBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mAccumulationBuffer.Get(), &uavDesc);
 }
 
 void DxrPhotonMapper::CreateDenoisedColorBuffer()

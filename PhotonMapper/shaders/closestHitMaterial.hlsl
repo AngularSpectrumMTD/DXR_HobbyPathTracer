@@ -44,37 +44,27 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     storeDepthPositionNormal(payload, vtx.Normal);
 
     MaterialParams currentMaterial = constantBuffer;
+    //ray hitted the emissive material
+    if (length(currentMaterial.emission.xyz) > 0)
+    {
+        payload.color = payload.energy * currentMaterial.emission.xyz;
+        return;
+    }
+
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
+
+    const float3 incidentDirection = WorldRayDirection();
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
-    
-    LightSample lightSample;
-    sampleLight(bestFitWorldPosition, lightSample);
-    float3 irr = RIS_WRS_LightIrradiance(bestFitWorldPosition, lightSample);
-    irr += accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
-    payload.color += payload.energy * currentMaterial.emission.xyz;
-    shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.energy);
-
-    //const bool isLightAccept = dot(normalize(lightSample.direction), normalize(nextRay.Direction)) < 0; //lightSample.direction : light sampled pos -> scatter pos
-    //if (isLightAccept)
-    {
-        payload.color += payload.energy * irr;
-    }
+    payload.color += payload.energy * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
+    updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.energy);
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
-    TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            nextRay,
-            payload);
+    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
 
 [shader("closesthit")]
@@ -100,18 +90,10 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     }
     else
     {
-        shadeSurface(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
-        TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            nextRay,
-            payload);
+        TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
     }
 }
 

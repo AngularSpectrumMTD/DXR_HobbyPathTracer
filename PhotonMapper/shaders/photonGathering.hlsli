@@ -143,4 +143,47 @@ float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNorma
     return accumulatePhotonHGC(gatherCenterPos, eyeDir, worldNormal, isDebug);
 }
 
+float3 surfaceLighting(in MaterialParams material, in float3 N, in float3 scatterPosition, in float3 incidentDirection, in float3 eyeDir, in float wavelength = 0)
+{
+    const bool isPathTrace = (wavelength == 0);
+    const float3 photonL = accumulatePhoton(scatterPosition, eyeDir, N);
+
+    LightSample lightSample;
+    sampleLight(scatterPosition, lightSample);
+
+    const float3 L = lightSample.direction;
+    const float3 V = normalize(-incidentDirection);
+
+    const float roulette = rand();
+    const float blending = rand();
+
+    float3 brdfDevPDF = 0.xxx;
+
+    if (blending < 1 - material.transRatio)
+    {
+        //compute bsdf    V : wo   L : wi(sample)
+        brdfDevPDF = specularBRDFdevidedPDF(material, N, V, L);
+    }
+    else
+    {
+        bool isFromOutside = dot(-V, N) < 0;
+        N *= isFromOutside ? 1 : -1;
+        
+        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
+
+        float3 H = GGX_ImportanceSampling(N, material.roughness);
+        
+        const float specRatio = FresnelReflectance(-V, N, etaOUT);
+
+        const bool isRefractSampled = (roulette > specRatio);
+
+        //compute bsdf    V : wo   L : wi(sample)
+        brdfDevPDF = transBRDFdevidedPDF(material, N, V, L, H, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+    }
+
+    const float G_cosine_surfaceN_L = max(0, dot(N, L));
+    
+    return brdfDevPDF * (computeVisibility(scatterPosition, lightSample) * G_cosine_surfaceN_L * lightSample.emission / lightSample.pdf + photonL);
+}
+
 #endif//__PHOTONGATHERING_HLSLI__
