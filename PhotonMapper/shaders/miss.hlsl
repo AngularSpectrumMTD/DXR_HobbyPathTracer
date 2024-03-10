@@ -19,14 +19,14 @@ void miss(inout Payload payload) {
     if (intersectLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
-        payload.energy = 0.xxx;
+        payload.throughput = 0.xxx;
         return;
     }
 
     storeDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb);
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
-    payload.color += payload.energy * cubemap.rgb;
-    payload.energy = 0.xxx;
+    payload.color += payload.throughput * cubemap.rgb;
+    payload.throughput = 0.xxx;
 }
 
 [shader("miss")]

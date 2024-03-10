@@ -29,7 +29,7 @@ struct SceneCB
 
 struct Payload
 {
-    float3 energy;
+    float3 throughput;
     float3 color;
     int recursive;
     int2 storeIndexXY;
@@ -279,7 +279,7 @@ float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum() || length(payload.energy) < 1e-2)
+    if (payload.recursive >= getMaxBounceNum() || length(payload.throughput) < 1e-2)
     {
         payload.color = float3(0, 0, 0);
         return true;

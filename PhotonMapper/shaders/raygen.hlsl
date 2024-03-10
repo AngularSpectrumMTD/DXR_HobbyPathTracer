@@ -108,7 +108,7 @@ void rayGen() {
         nextRay.TMax = 100000;
 
         Payload payload;
-        payload.energy = energyBoost * float3(1, 1, 1);
+        payload.throughput = energyBoost * float3(1, 1, 1);
         payload.color = float3(0, 0, 0);
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;

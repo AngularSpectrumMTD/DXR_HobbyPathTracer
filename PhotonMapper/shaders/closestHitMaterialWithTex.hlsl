@@ -129,14 +129,14 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         storeDepthPositionNormal(payload, vtx.Normal);
         payload.color = hittedEmission;
-        payload.energy = 0.xxx;
+        payload.throughput = 0.xxx;
         return;
     }
 
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)
     {
-        payload.color = payload.energy * currentMaterial.emission.xyz;
+        payload.color = payload.throughput * currentMaterial.emission.xyz;
         return;
     }
 
@@ -152,8 +152,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         storeDepthPositionNormal(payload, vtx.Normal);
         nextRay.Direction = 0.xxx;
-        payload.color += payload.energy * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
-        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.energy);
+        payload.color += payload.throughput * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput);
     }
     else
     {
