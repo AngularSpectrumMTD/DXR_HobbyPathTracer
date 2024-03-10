@@ -1,7 +1,12 @@
 #include "opticalFunction.hlsli"
 
 #define SPP 1
-#define REINHARD_L 100000
+#define REINHARD_L 10
+
+float computeLuminance(const float3 linearRGB)
+{
+    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
+}
 
 float reinhard(float x, float L)
 {
@@ -11,6 +16,21 @@ float reinhard(float x, float L)
 float3 reinhard3f(float3 v, float L)
 {
     return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
+}
+
+float ACESFilmicTonemapping(float x)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return saturate(x * (a * x + b) / (x * (c * x + d) + c));
+}
+
+float3 ACESFilmicTonemapping3f(float3 v)
+{
+    return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
 }
 
 void applyTimeDivision(inout float3 current, uint2 ID)
@@ -103,10 +123,15 @@ void rayGen() {
 
         accumColor += payload.color;
     }
-    //float3 finalCol = accumColor / SPP;
-    float3 finalCol = reinhard3f(accumColor / SPP, REINHARD_L);
+    float3 finalCol = accumColor / SPP;
     applyTimeDivision(finalCol, launchIndex);
-    gOutput[launchIndex.xy] = float4(finalCol, 1);
+
+    float luminance = computeLuminance(finalCol);
+
+    //gOutput[launchIndex.xy] = float4(reinhard3f(finalCol, REINHARD_L), 1);
+    gOutput[launchIndex.xy] = float4(finalCol * reinhard(luminance, REINHARD_L) / luminance, 1);//luminance based tone mapping
+    //gOutput[launchIndex.xy] = float4(ACESFilmicTonemapping3f(finalCol), 1);
+    //gOutput[launchIndex.xy] = float4(finalCol * ACESFilmicTonemapping(luminance) / luminance, 1);
 }
 
 //
