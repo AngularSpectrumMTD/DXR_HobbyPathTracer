@@ -190,9 +190,6 @@
     <FxCompile Include="shaders\raygen.hlsl">
       <Filter>ソース ファイル\shaders\Raygen</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\closestHitLight.hlsl">
-      <Filter>ソース ファイル\shaders\ClosestHit</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\closestHitMaterial.hlsl">
       <Filter>ソース ファイル\shaders\ClosestHit</Filter>
     </FxCompile>

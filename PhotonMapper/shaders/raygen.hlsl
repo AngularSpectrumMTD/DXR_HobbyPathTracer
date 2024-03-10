@@ -61,15 +61,17 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     {
         accCount = 1;
     }
-    accCount = min(accCount, 3000);
     gAccumulationCountBuffer[ID] = accCount;
+
     const float tmpAccmuRatio = 1.f / accCount;
     current = lerp(prev, current, tmpAccmuRatio);
-    curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
-    curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-
-    gAccumulationBuffer[ID].rgb = current;
-    gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
+    if (accCount < MAX_ACCUMULATION_RANGE)
+    {
+        curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
+        curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
+        gAccumulationBuffer[ID].rgb = current;
+        gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
+    }
 }
 
 //

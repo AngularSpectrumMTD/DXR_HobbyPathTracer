@@ -100,7 +100,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& instances : mLightTbl)
+   /* for (const auto& instances : mLightTbl)
     {
         entryOffset++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
@@ -112,7 +112,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshLightSphere.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-    }
+    }*/
 }
 
 void DxrPhotonMapper::SetupMeshMaterialAndPos()
@@ -165,8 +165,8 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
     mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
 
-    utility::CreateSphere(verticesPN, indices, 0.1f, 30, 30);
-    mMeshLightSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereLightVB", L"SphereLightIB", L"");
+    /*utility::CreateSphere(verticesPN, indices, 0.1f, 30, 30);
+    mMeshLightSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereLightVB", L"SphereLightIB", L"");*/
 
     utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
     mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
@@ -355,7 +355,7 @@ void DxrPhotonMapper::CreateSceneBLAS()
     mMeshSphere.CreateBLAS(mDevice, L"Sphere-BLAS");
     mMeshOBJ0.CreateBLAS(mDevice, L"Glass-BLAS");
     mMeshOBJ1.CreateBLAS(mDevice, L"Metal-BLAS");
-    mMeshLightSphere.CreateBLAS(mDevice, L"LightSphere-BLAS");
+    //mMeshLightSphere.CreateBLAS(mDevice, L"LightSphere-BLAS");
     mMeshBox.CreateBLAS(mDevice, L"Box-BLAS");
     mOBJModel.CreateBLASs(mDevice);
 }

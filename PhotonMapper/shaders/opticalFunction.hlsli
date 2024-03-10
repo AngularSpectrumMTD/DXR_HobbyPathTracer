@@ -151,52 +151,52 @@ float2 quadraticFormula(float a, float b, float c)//x : (-b - sqrt(d)) / 2a , y 
 float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
 {
     float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
-    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
-    float3 lD = mul(transMat, lineDir);
+    float3 orig = mul(transMat, lineOrigin - shapeOrigin);
+    float3 dir = mul(transMat, lineDir);
     
     float U = 1.0 / (u * u);
     float V = 1.0 / (v * v);
     float W = 1.0 / (w * w);
     
-    float a = lD.x * lD.x * U + lD.y * lD.y * V + lD.z * lD.z * W;
-    float b = 2 * (lO.x * lD.x * U + lO.y * lD.y * V + lO.z * lD.z * W);
-    float c = lO.x * lO.x * U + lO.y * lO.y * V + lO.z * lO.z * W - 1;
+    float a = dir.x * dir.x * U + dir.y * dir.y * V + dir.z * dir.z * W;
+    float b = 2 * (orig.x * dir.x * U + orig.y * dir.y * V + orig.z * dir.z * W);
+    float c = orig.x * orig.x * U + orig.y * orig.y * V + orig.z * orig.z * W - 1;
     
     return quadraticFormula(a, b, c);
 } 
 
 //u v : length of axis
-float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v)
+float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 vecU, float3 vecV)
 {
-    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
-    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
-    float3 lD = mul(transMat, lineDir);
+    float3x3 transMat = constructWorldToLocalMatrix(vecV, normalize(cross(vecU, vecV)));
+    float3 orig = mul(transMat, lineOrigin - shapeOrigin);
+    float3 dir = mul(transMat, lineDir);
     
-    float denom = lD.y;
-    float num = lO.y;
+    float denom = dir.y;
+    float num = orig.y;
     
     const float T = -num / denom;
-    
-    float3 samplePos = lO + lD * T;
+    const float u = length(vecU);
+    const float v = length(vecV);
+    float3 samplePos = orig + dir * T;
     float judgeValue = samplePos.x * samplePos.x / (u * u) + samplePos.z * samplePos.z / (v * v);
     bool isInEllipse = (judgeValue <= 1);
-    return isInEllipse ? T : RAY_MAX_T;
+    return isInEllipse ? T : -1;
 }
 
-float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v)
+float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 vecU, float3 vecV)
 {
-    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
-    float3 lO = mul(transMat, lineOrigin - shapeOrigin);
-    float3 lD = mul(transMat, lineDir);
+    float3x3 transMat = constructWorldToLocalMatrix(vecV, normalize(cross(vecU, vecV)));
+    float3 orig = mul(transMat, lineOrigin - shapeOrigin);
+    float3 dir = mul(transMat, lineDir);
     
-    float denom = lD.y;
-    float num = lO.y;
+    float denom = dir.y;
+    float num = orig.y;
     
     const float T = -num / denom;
-    
-    float3 samplePos = lO + lD * T;
-    bool isInRectangle = abs(samplePos.x) <= u && abs(samplePos.z) <= v;
-    return isInRectangle ? T : RAY_MAX_T;
+    float3 samplePos = orig + dir * T;
+    bool isInRectangle = (abs(samplePos.x) <= length(vecU) && abs(samplePos.z) <= length(vecV));
+    return isInRectangle ? T : -1;
 }
 
 //Sampling
@@ -509,6 +509,41 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     }
 
     lightSample.pdf *= 1.0f / getLightNum();
+}
+
+bool intersectLightWithCurrentRay(out float3 hittedEmission)
+{
+    const float3 rayOrigin = WorldRayOrigin();
+    const float3 rayDiretion = WorldRayDirection();
+    const float rayT = RayTCurrent();
+
+    const uint lightID = (uint) (rand() * (getLightNum()));
+    LightGenerateParam param = gLightGenerateParams[lightID];
+
+    float t = RAY_MAX_T;
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
+        normalize(param.U), normalize(param.V), 100 * param.sphereRadius, 100 * param.sphereRadius, 100 * param.sphereRadius);
+        t = min(tt.x, tt.y);
+    }
+    else if (param.type == LIGHT_TYPE_RECT)
+    {
+        const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+        t = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+    }
+    else if (param.type == LIGHT_TYPE_SPOT)
+    {
+        const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+        t = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
+    }
+    else
+    {
+        //
+    }
+
+    hittedEmission = param.emission;
+    return t > 0 && t < rayT;
 }
 
 void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)

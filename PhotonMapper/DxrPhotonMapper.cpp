@@ -14,6 +14,7 @@
 
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
+#define MAX_ACCUMULATION_RANGE 1000
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -27,7 +28,7 @@ void DxrPhotonMapper::Setup()
 {
     mSceneType = SceneType_Sponza;
 
-    mIntenceBoost = 4;
+    mIntenceBoost = 8;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
@@ -36,7 +37,7 @@ void DxrPhotonMapper::Setup()
     mSceneParam.photonParams.w = 6;
     mLightRange = 0.054f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
-    mPhiDirectional = 110; mThetaDirectional = 250;
+    mPhiDirectional = 70; mThetaDirectional = 280;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 4;
@@ -78,8 +79,8 @@ void DxrPhotonMapper::Setup()
         break;
         case SceneType_Sponza:
         {
-            const bool isDiamondTest = true;
-
+            const bool isDiamondTest = false;
+            mPhiDirectional = 70; mThetaDirectional = 280;
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
@@ -93,9 +94,9 @@ void DxrPhotonMapper::Setup()
             }
             else
             {
-                mLightPosX = 5.f; mLightPosY = 11; mLightPosZ = 7;
-                mPhi = 421; mTheta = 232;
-                mLightRange = 0.00026f;
+                mLightPosX = 2.1f; mLightPosY = 12; mLightPosZ = 3.3;
+                mPhi = 402; mTheta = 232;
+                mLightRange = 0.00054f;
                 mGlassModelType = ModelType_Afrodyta;
             }
             
@@ -109,9 +110,9 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 27.f; mLightPosY = 45; mLightPosZ = 7;
+            mLightPosX = 15; mLightPosY = 26; mLightPosZ = 7;
             mPhi = 412; mTheta = 262;
-            mInitEyePos = XMFLOAT3(-40, 22, -36);
+            mInitEyePos = XMFLOAT3(19, 44, 32);
             mLightRange = 0.0002f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
@@ -129,7 +130,7 @@ void DxrPhotonMapper::Setup()
             mInitTargetPos = XMFLOAT3(40, 5, -0.14);
             mLightRange = 0.001f;
             mGlassModelType = ModelType_Afrodyta;
-            mIsSpotLightPhotonMapper = true;
+            mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
             mCausticsBoost = 500;
             mIntenceBoost = 1;
@@ -390,7 +391,8 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
-        << L"    Photon : " << mPhotonMapSize1D * mPhotonMapSize1D << L"    " << getFrameRate() << L"[ms]";
+        << L"    Photon : " << mPhotonMapSize1D * mPhotonMapSize1D << L"    " << getFrameRate() << L"[ms]"
+        << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());

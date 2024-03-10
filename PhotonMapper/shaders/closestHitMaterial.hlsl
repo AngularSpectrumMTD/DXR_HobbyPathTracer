@@ -43,6 +43,14 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     storeDepthPositionNormal(payload, vtx.Normal);
 
+    float3 hittedEmission = 0.xxx;
+    if (payload.recursive == 1 && intersectLightWithCurrentRay(hittedEmission))
+    {
+        payload.color = float3(1,1,0);
+        payload.energy = 0.xxx;
+        return;
+    }
+
     MaterialParams currentMaterial = constantBuffer;
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)

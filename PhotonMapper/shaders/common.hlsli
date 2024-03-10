@@ -69,6 +69,8 @@ struct LightGenerateParam
 #define LIGHT_TYPE_SPOT 2
 #define LIGHT_TYPE_DIRECTIONAL 3
 
+#define MAX_ACCUMULATION_RANGE 1000
+
 #define PI 3.1415926535
 #define LIGHT_INSTANCE_MASK 0x08
 

@@ -1,4 +1,5 @@
 #include "common.hlsli"
+#include "opticalFunction.hlsli"
 
 float2 EquirecFetchUV(float3 dir)
 {
@@ -11,6 +12,14 @@ void miss(inout Payload payload) {
     if (isShadowRay(payload))
     {
         setVisibility(payload, true);
+        return;
+    }
+
+    float3 hittedEmission = 0.xxx;
+    if (intersectLightWithCurrentRay(hittedEmission))
+    {
+        payload.color = hittedEmission;
+        payload.energy = 0.xxx;
         return;
     }
 

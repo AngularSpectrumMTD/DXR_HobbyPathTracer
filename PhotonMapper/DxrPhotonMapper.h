@@ -401,7 +401,7 @@ private:
     utility::PolygonMesh mMeshBox;
     utility::PolygonMesh mMeshOBJ0;
     utility::PolygonMesh mMeshOBJ1;
-    utility::PolygonMesh mMeshLightSphere;
+    //utility::PolygonMesh mMeshLightSphere;
     std::wstring mOBJ0FileName;
     std::wstring mOBJ1FileName;
     std::wstring mStageTextureFileName;

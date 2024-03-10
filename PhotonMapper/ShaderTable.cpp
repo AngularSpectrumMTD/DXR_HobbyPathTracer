@@ -25,14 +25,14 @@ void DxrPhotonMapper::CreateShaderTable()
 
         u32 raygenSize = 1 * raygenRecordSize;
         u32 missSize = 1 * missRecordSize;
-        u32 hitgroupCount = 
+        u32 hitgroupCount =
             1 //floor
             + NormalSpheres
             + NormalBoxes
             + NormalOBJ0s
             + NormalOBJ1s
-            + mOBJModel.getMaterialList().size()
-            + 1;//light
+            + mOBJModel.getMaterialList().size();
+            //+ 1;//light
         u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
         auto tableAlign = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
@@ -220,7 +220,7 @@ void DxrPhotonMapper::CreateShaderTable()
                 }
             }
 
-            {
+           /* {
                 for (auto& instances : mLightTbl) {
                     auto idPtr = rtsoProps->GetShaderIdentifier(HitGroups::Light);
                     if (idPtr == nullptr) {
@@ -232,7 +232,7 @@ void DxrPhotonMapper::CreateShaderTable()
 
                     recordStartPtr = recordTmpPtr + hitgroupRecordSize;
                 }
-            }
+            }*/
         }
 
         mShaderTable->Unmap(0, nullptr);

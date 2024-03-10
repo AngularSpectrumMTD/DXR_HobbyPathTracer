@@ -83,7 +83,7 @@ void editMaterial(inout MaterialParams mat)
     }
     else
     {
-        mat.roughness = 0.05;
+        mat.roughness = 0.03;
         mat.transColor = 1.xxxx;
         mat.transRatio = 1;
         mat.metallic = 0;
@@ -122,6 +122,15 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (length(currentMaterial.albedo) == 0 && !isNoTexture)
     {
         editMaterial(currentMaterial);
+    }
+
+    float3 hittedEmission = 0.xxx;
+    if (payload.recursive == 1 && intersectLightWithCurrentRay(hittedEmission))
+    {
+        storeDepthPositionNormal(payload, vtx.Normal);
+        payload.color = hittedEmission;
+        payload.energy = 0.xxx;
+        return;
     }
 
     //ray hitted the emissive material

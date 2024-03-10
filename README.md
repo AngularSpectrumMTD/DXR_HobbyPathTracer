@@ -3,38 +3,20 @@ Photon Mapper By Use Of DirectX Raytracing
 
 ### Bistro Interior
 
-![bistroInterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/09e3261f-7860-4c18-9f34-5d00754f5009)
-
-![bistroInterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/e3d7059e-0fbe-40fe-87b2-7697fa78e7c8)
-
-![bistroInterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7988214f-5823-4d28-a5a2-731bc5b434af)
-
-![bistroInterior3](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/6f46ea26-61de-4528-9d47-075ead005b79)
+![interior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9499ae29-e40b-4640-acfb-c4d25d1c2494)
 
 ### Bistro Exterior
 
-![bistroExterior0](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/021661ba-2057-4000-86d6-07a61353bf32)
-
-![bistroExterior1](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/b110b7b1-246d-4dee-a525-58f3d2fa9cc4)
-
-![bistroExterior2](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/8b79d35e-c353-4366-b1d3-6debf363fbf8)
+![exterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4ef04cf0-eeab-4c2a-9ee9-0567db7ab31a)
 
 ### Sponza
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f1ae0be4-af18-467a-aeea-fa8803c2b428)
-
-![sponzaM](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/362cd500-f714-4d47-a11f-c3f95a0982ab)
-
-![sponzaR](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/d2b3f0c7-2614-46b0-8c2b-7cf72513325f)
-
-### Simple Scene
-
-![simple](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/521ce159-4530-4986-9a17-8effbd8c0c9e)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2aadea51-2961-4462-9e55-cbec51f9e7b5)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![chromatic](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/ff5aaeff-70dd-4401-9aa4-c3f1adf5c3fa)
+![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f0276941-2c15-4fa7-85b3-cf184f071044)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
@@ -49,7 +31,7 @@ Shading : GGX
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
-#### Normal
+#### Simple Scene
 1. Set "SceneType_Simple" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
 
 2. Build and Execute
