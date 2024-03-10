@@ -46,7 +46,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     float3 hittedEmission = 0.xxx;
     if (payload.recursive == 1 && intersectLightWithCurrentRay(hittedEmission))
     {
-        payload.color = float3(1,1,0);
+        payload.color = hittedEmission;
         payload.energy = 0.xxx;
         return;
     }
