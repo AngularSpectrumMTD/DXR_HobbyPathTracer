@@ -14,7 +14,7 @@
 
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
-#define MAX_ACCUMULATION_RANGE 1000
+#define MAX_ACCUMULATION_RANGE 10000
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -24,18 +24,32 @@ mNormalSphereMaterialTbl()
 {
 }
 
+void DxrPhotonMapper::UpdateWindowText()
+{
+    std::wstringstream windowText;
+    windowText.str(L"");
+    windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
+        << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
+        << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
+        << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
+
+    std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
+    SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
+}
+
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
-    mIntenceBoost = 8;
+    mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
-    mLightRange = 0.054f;
+    mLightRange = 1.0f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
     mPhiDirectional = 70; mThetaDirectional = 280;
     mSpectrumMode = Spectrum_D65;
@@ -68,10 +82,11 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "skull.obj";
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
-            mLightPosX = -11.f; mLightPosY = -91; mLightPosZ = -1;
-            mPhi = 480; mTheta = 257;
-            mInitEyePos = XMFLOAT3(228, 270, -260);
-            mLightRange = 0.0005f;
+            mLightPosX = -5.8f; mLightPosY = -130; mLightPosZ = -1;
+            mPhi = 258; mTheta = 257;
+            mInitEyePos = XMFLOAT3(188, -3.8, -56);
+            mInitTargetPos = XMFLOAT3(0, -116, 0);
+            mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
             mCausticsBoost = 400;
@@ -87,19 +102,19 @@ void DxrPhotonMapper::Setup()
             
             if (isDiamondTest)
             {
-                mLightPosX = 7.f; mLightPosY = 15; mLightPosZ = 5;//for diamond
+                mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;//for diamond
                 mPhi = 417; mTheta = 249;//for diamond
-                mLightRange = 0.00018f;//for diamond
+                mLightRange = 1.9f;//for diamond
                 mGlassModelType = ModelType_Diamond;
             }
             else
             {
-                mLightPosX = 2.1f; mLightPosY = 12; mLightPosZ = 3.3;
+                mLightPosX = 2.1f; mLightPosY = 11.2; mLightPosZ = 3.3;
                 mPhi = 402; mTheta = 232;
-                mLightRange = 0.00054f;
+                mLightRange = 2.6f;
                 mGlassModelType = ModelType_Afrodyta;
             }
-            
+            mCausticsBoost = 200;
             mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             mIsSpotLightPhotonMapper = false;
         }
@@ -110,12 +125,14 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 15; mLightPosY = 26; mLightPosZ = 7;
+            mLightPosX = 6.6; mLightPosY = 16; mLightPosZ = 1;
             mPhi = 412; mTheta = 262;
-            mInitEyePos = XMFLOAT3(19, 44, 32);
-            mLightRange = 0.0002f;
+            mInitEyePos = XMFLOAT3(-23, 10, -21);
+            mInitTargetPos = XMFLOAT3(0, 4, 0);
+            mLightRange = 4.5f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
+            mCausticsBoost = 200;
         }
         break;
         case SceneType_BistroInterior:
@@ -128,12 +145,11 @@ void DxrPhotonMapper::Setup()
             mPhi = 402; mTheta = 256;
             mInitEyePos = XMFLOAT3(24, 8.57, 5.76);
             mInitTargetPos = XMFLOAT3(40, 5, -0.14);
-            mLightRange = 0.001f;
+            mLightRange = 1.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
-            mCausticsBoost = 500;
-            mIntenceBoost = 1;
+            mCausticsBoost = 10;
         }
         break;
     }
@@ -384,20 +400,6 @@ void DxrPhotonMapper::Terminate()
     TerminateRenderDevice();
 }
 
-void DxrPhotonMapper::UpdateWindowText()
-{
-    std::wstringstream windowText;
-    windowText.str(L"");
-    windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
-        << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
-        << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
-        << L"    Photon : " << mPhotonMapSize1D * mPhotonMapSize1D << L"    " << getFrameRate() << L"[ms]"
-        << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
-
-    std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
-    SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
-}
-
 void DxrPhotonMapper::Update()
 {
     for (auto& pos : mLightTbl)
@@ -493,15 +495,17 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'L':
-        mLightRange = Clamp(0.0001f, 0.4f, mLightRange + (mInverseMove ? -0.00001f : 0.00001f));
+        mLightRange = Clamp(0.1f, 10.0f, mLightRange + (mInverseMove ? -0.1f : 0.1f));
         mIsUseAccumulation = false;
         break;
     case 'T':
         mTheta += mInverseMove ? -1 : 1;
+        //mThetaDirectional += mInverseMove ? -1 : 1;
         mIsUseAccumulation = false;
         break;
     case 'P':
         mPhi += mInverseMove ? -1 : 1;
+        //mPhiDirectional += mInverseMove ? -1 : 1;
         mIsUseAccumulation = false;
         break;
     case 'K':

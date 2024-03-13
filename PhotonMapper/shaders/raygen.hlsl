@@ -1,7 +1,8 @@
 #include "opticalFunction.hlsli"
 
 #define SPP 1
-#define REINHARD_L 10
+#define REINHARD_L 1000
+#define MAX_ACCUMULATION_RANGE 10000
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -45,13 +46,13 @@ void applyTimeDivision(inout float3 current, uint2 ID)
     float luminance = luminanceFromRGB(current);
     float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
 
-    if (currentDepth == 0 || prevDepth == 0)
-    {
-        gAccumulationBuffer[ID].rgb = current;
-        gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
-        gAccumulationCountBuffer[ID] = 1;
-        return;
-    }
+    //if (currentDepth == 0 || prevDepth == 0)
+    //{
+    //    gAccumulationBuffer[ID].rgb = current;
+    //    gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
+    //    gAccumulationCountBuffer[ID] = 1;
+    //    return;
+    //}
     
     if (isAccumulationApply())
     {
@@ -87,7 +88,7 @@ void rayGen() {
 
     //random
     float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 10 * (uint) LightSeed.x) * launchIndex.y);
+    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
     randGenState = uint(pcgHash(seed));
     rseed = LightSeed.x;
 

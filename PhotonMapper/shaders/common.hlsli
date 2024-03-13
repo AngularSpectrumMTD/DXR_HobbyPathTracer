@@ -1,7 +1,7 @@
 #ifndef __COMMON_HLSLI__
 #define __COMMON_HLSLI__
 
-#define LIGHT_BASE_LENGTH 0.001f
+#define LIGHT_BASE_LENGTH 1.0f
 
 #define DEFAULT_RAY_ID 0
 #define DEFAULT_MISS_ID 0
@@ -68,8 +68,6 @@ struct LightGenerateParam
 #define LIGHT_TYPE_RECT 1
 #define LIGHT_TYPE_SPOT 2
 #define LIGHT_TYPE_DIRECTIONAL 3
-
-#define MAX_ACCUMULATION_RANGE 1000
 
 #define PI 3.1415926535
 #define LIGHT_INSTANCE_MASK 0x08

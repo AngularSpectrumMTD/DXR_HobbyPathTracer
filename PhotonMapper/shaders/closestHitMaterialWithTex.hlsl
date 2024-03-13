@@ -124,12 +124,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         editMaterial(currentMaterial);
     }
 
-    float3 hittedEmission = 0.xxx;
-    if (payload.recursive == 1 && intersectLightWithCurrentRay(hittedEmission))
+    float3 Le = 0.xxx;
+    if (intersectLightWithCurrentRay(Le))
     {
         storeDepthPositionNormal(payload, vtx.Normal);
-        payload.color = hittedEmission;
-        payload.throughput = 0.xxx;
+        payload.color += payload.throughput * Le;
         return;
     }
 

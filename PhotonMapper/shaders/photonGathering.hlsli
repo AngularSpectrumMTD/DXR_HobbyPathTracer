@@ -183,7 +183,8 @@ float3 surfaceLighting(in MaterialParams material, in float3 N, in float3 scatte
 
     const float G_cosine_surfaceN_L = max(0, dot(N, L));
     
-    return brdfDevPDF * (computeVisibility(scatterPosition, lightSample) * G_cosine_surfaceN_L * lightSample.emission / lightSample.pdf + photonL);
+    //return brdfDevPDF * (computeVisibility(scatterPosition, lightSample) * G_cosine_surfaceN_L * lightSample.emission / lightSample.pdf + photonL);
+    return brdfDevPDF * photonL;
 }
 
 #endif//__PHOTONGATHERING_HLSLI__

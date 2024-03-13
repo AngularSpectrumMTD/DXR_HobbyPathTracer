@@ -168,7 +168,7 @@ float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin,
 //u v : length of axis
 float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 vecU, float3 vecV)
 {
-    float3x3 transMat = constructWorldToLocalMatrix(vecV, normalize(cross(vecU, vecV)));
+    float3x3 transMat = constructWorldToLocalMatrix(normalize(vecV), normalize(cross(vecU, vecV)));
     float3 orig = mul(transMat, lineOrigin - shapeOrigin);
     float3 dir = mul(transMat, lineDir);
     
@@ -186,7 +186,7 @@ float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, fl
 
 float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 vecU, float3 vecV)
 {
-    float3x3 transMat = constructWorldToLocalMatrix(vecV, normalize(cross(vecU, vecV)));
+    float3x3 transMat = constructWorldToLocalMatrix(normalize(vecV), normalize(cross(vecU, vecV)));
     float3 orig = mul(transMat, lineOrigin - shapeOrigin);
     float3 dir = mul(transMat, lineDir);
     
@@ -511,7 +511,7 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     lightSample.pdf *= 1.0f / getLightNum();
 }
 
-bool intersectLightWithCurrentRay(out float3 hittedEmission)
+bool intersectLightWithCurrentRay(out float3 Le)
 {
     const float3 rayOrigin = WorldRayOrigin();
     const float3 rayDiretion = WorldRayDirection();
@@ -520,30 +520,62 @@ bool intersectLightWithCurrentRay(out float3 hittedEmission)
     const uint lightID = (uint) (rand() * (getLightNum()));
     LightGenerateParam param = gLightGenerateParams[lightID];
 
-    float t = RAY_MAX_T;
     if (param.type == LIGHT_TYPE_SPHERE)
     {
         float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
-        normalize(param.U), normalize(param.V), 100 * param.sphereRadius, 100 * param.sphereRadius, 100 * param.sphereRadius);
-        t = min(tt.x, tt.y);
+        normalize(param.U), normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
+        float hittedT = min(tt.x, tt.y);
+
+        Le = param.emission;
+        return (hittedT > 0 && hittedT < rayT);
     }
     else if (param.type == LIGHT_TYPE_RECT)
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        t = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+        float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+        const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
+
+        Le = param.emission;
+        return isFrontHit && (hittedT > 0 && hittedT < rayT);
     }
     else if (param.type == LIGHT_TYPE_SPOT)
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        t = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
-    }
-    else
-    {
-        //
+        float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
+        const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
+
+        Le = param.emission;
+        return isFrontHit && (hittedT > 0 && hittedT < rayT);
     }
 
-    hittedEmission = param.emission;
-    return t > 0 && t < rayT;
+    return false;
+}
+
+float3 directionalLightingOnMissShader(Payload payload)
+{
+    float3 val = 0.xxx;
+
+    float3 directionalDir = 0.xxx;
+    bool isDirectionalLightFinded = false;
+    float3 emis = 0.xxx;
+    for (int i = 0; i < getLightNum(); i++)
+    {
+        LightGenerateParam param = gLightGenerateParams[i];
+
+        if (isDirectionalLightFinded == false && param.type == LIGHT_TYPE_DIRECTIONAL)
+        {
+            isDirectionalLightFinded = true;
+            directionalDir = normalize(param.position);
+            emis = param.emission;
+        }
+    }
+
+    if (payload.recursive > 0 && isDirectionalLightFinded && dot(WorldRayDirection(), -directionalDir) > 0)
+    {
+        val = payload.throughput * emis * dot(WorldRayDirection(), -directionalDir);
+    }
+
+    return val;
 }
 
 void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
@@ -718,7 +750,7 @@ float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo
 void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
 {
     const bool isPathTrace = (wavelength == 0);
-    nextRay.TMin = 0.001;
+    nextRay.TMin = 0.0001;
     nextRay.TMax = 10000;
     
     const float eps = 0.001;

@@ -1,6 +1,8 @@
 #include "common.hlsli"
 #include "opticalFunction.hlsli"
 
+#define ENABLE_IBL
+
 float2 EquirecFetchUV(float3 dir)
 {
     float2 uv = float2(atan2(dir.z , dir.x) / 2.0 / PI + 0.5, acos(dir.y) / PI);
@@ -16,16 +18,21 @@ void miss(inout Payload payload) {
     }
 
     float3 hittedEmission = 0.xxx;
-    if (intersectLightWithCurrentRay(hittedEmission))
+    if (payload.recursive == 0 && intersectLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
         payload.throughput = 0.xxx;
         return;
     }
 
+    payload.color += directionalLightingOnMissShader(payload);
+
     storeDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb);
+
+#ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
     payload.color += payload.throughput * cubemap.rgb;
+#endif
     payload.throughput = 0.xxx;
 }
 
