@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -102,20 +102,21 @@ void DxrPhotonMapper::Setup()
             
             if (isDiamondTest)
             {
-                mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;//for diamond
+                mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;
                 mPhi = 417; mTheta = 249;//for diamond
                 mLightRange = 1.9f;//for diamond
                 mGlassModelType = ModelType_Diamond;
+                mInitEyePos = XMFLOAT3(-20, 19, 2.4);
             }
             else
             {
-                mLightPosX = 2.1f; mLightPosY = 11.2; mLightPosZ = 3.3;
-                mPhi = 402; mTheta = 232;
+                mLightPosX = 1.2; mLightPosY = 5.2; mLightPosZ = 4.5;
+                mPhi = 319; mTheta = 225;
                 mLightRange = 2.6f;
                 mGlassModelType = ModelType_Afrodyta;
+                mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             }
             mCausticsBoost = 200;
-            mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             mIsSpotLightPhotonMapper = false;
         }
         break;
@@ -125,11 +126,11 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 6.6; mLightPosY = 16; mLightPosZ = 1;
+            mLightPosX = 11; mLightPosY = 16; mLightPosZ = 5;
             mPhi = 412; mTheta = 262;
-            mInitEyePos = XMFLOAT3(-23, 10, -21);
-            mInitTargetPos = XMFLOAT3(0, 4, 0);
-            mLightRange = 4.5f;
+            mInitEyePos = XMFLOAT3(-23, 14, -21);
+            mInitTargetPos = XMFLOAT3(0, 8, 0);
+            mLightRange = 6.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
             mCausticsBoost = 200;

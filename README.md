@@ -1,22 +1,16 @@
-# DXRPhotonMapper
-Photon Mapper By Use Of DirectX Raytracing
+# DXRHybridPhotonMapper
+Hybrid Photon Mapper By Use Of DirectX Raytracing(Simple Pathtracing + Photon Mapping[Caustics])
 
-### Bistro Interior
+![interior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/bba581ae-955a-4978-ab4c-f68623357d63)
 
-![interior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/9499ae29-e40b-4640-acfb-c4d25d1c2494)
+![exterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/fdbfda03-80f7-4ea1-a3b0-b1b2feb9b9d6)
 
-### Bistro Exterior
-
-![exterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/4ef04cf0-eeab-4c2a-9ee9-0567db7ab31a)
-
-### Sponza
-
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/2aadea51-2961-4462-9e55-cbec51f9e7b5)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/a31c6d38-5254-44ce-81db-3a771022f0f6)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/f0276941-2c15-4fa7-85b3-cf184f071044)
+![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7008dbae-1b27-46e3-b1bc-cc206841311a)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
