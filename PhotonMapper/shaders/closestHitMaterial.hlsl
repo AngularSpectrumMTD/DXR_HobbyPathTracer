@@ -54,7 +54,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)
     {
-        payload.color = payload.throughput * currentMaterial.emission.xyz;
+        payload.color += payload.throughput * currentMaterial.emission.xyz;
         return;
     }
 

@@ -135,7 +135,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)
     {
-        payload.color = payload.throughput * currentMaterial.emission.xyz;
+        storeDepthPositionNormal(payload, vtx.Normal);
+        payload.color += payload.throughput * currentMaterial.emission.xyz;
         return;
     }
 

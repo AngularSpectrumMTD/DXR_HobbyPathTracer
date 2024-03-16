@@ -114,7 +114,9 @@ void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
     bitangent = cross(normal, tangent);
 }
 
-//GeometryIntersection
+//=========================================================================
+//Geometry Intersection
+//=========================================================================
 #define RAY_MAX_T 1000000
 
 float3x3 constructWorldToLocalMatrix(float3 forwardDir, float3 upDir)
@@ -141,13 +143,6 @@ float2 quadraticFormula(float a, float b, float c)//x : (-b - sqrt(d)) / 2a , y 
     return float2(RAY_MAX_T, RAY_MAX_T);
 }
 
-//u v w: length of axis
-
-//            | v  ªshapeUp                                                                                                | v  ªshapeUp
-//            |                                                                                                                    |
-//---------------------> u (cross(shapeUp, shapeForward))       w(shapeForward) <-----------------------
-//            |                                                                                                                    |
-//            |                                                                                                                    |
 float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
 {
     float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
@@ -199,7 +194,9 @@ float intersectRectangle(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, 
     return isInRectangle ? T : -1;
 }
 
+//=========================================================================
 //Sampling
+//=========================================================================
 float3 tangentToWorld(float3 N, float3 tangentSpaceVec)
 {
     float3 tangent;
@@ -234,7 +231,9 @@ float3 GGX_ImportanceSampling(float3 N, float roughness)
     return tangentToWorld(N, tangentDir);
 }
 
+//=========================================================================
 //PDF
+//=========================================================================
 float CosineSamplingPDF(float dotNL)
 {
     return dotNL / PI;
@@ -245,7 +244,9 @@ float GGX_ImportanceSamplingPDF(float NDF, float dotNH, float dotVH)
     return NDF * dotNH / (4 * dotVH);
 }
 
+//=========================================================================
 //Fresnel
+//=========================================================================
 float3 FresnelSchlick(float dotVH, float3 F0)
 {
     return F0 + (1 - F0) * pow(1 - dotVH, 5.0);
@@ -278,12 +279,9 @@ float FresnelReflectance(float3 I, float3 N, float IoR)
     return kr;
 }
 
-//BRDF / BTDF
-//alpha = roughness * roughness
-
-//alpha^2
-//---------
-//pi * ((dot(N, H))^2 * (alpha^2 - 1) + 1)^2
+//=========================================================================
+//BRDF / BTDF    alpha = roughness * roughness
+//=========================================================================
 float GGX_Distribution(float3 N, float3 H, float roughness)
 {
     float alpha = roughness * roughness;
@@ -297,10 +295,6 @@ float GGX_Distribution(float3 N, float3 H, float roughness)
     return alpha_pow2 / denom;
 }
 
-//k = alpha / 2
-//dot(N, V)
-//---------
-//dot(N, V) * (1 - k) + k
 float GGX_Geometry_Schlick(float dotNX, float roughness)
 {
     float alpha = roughness * roughness;
@@ -308,7 +302,6 @@ float GGX_Geometry_Schlick(float dotNX, float roughness)
     return dotNX / (dotNX * (1 - k) + k);
 }
 
-//GGX_Geometry_Schlick(V) * GGX_Geometry_Schlick(L)
 float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)
 {
     float dotNV = abs(dot(N, V));
@@ -344,7 +337,9 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
     return A * XYZ / B;
 }
 
+//=========================================================================
 //Lighting
+//=========================================================================
 struct LightSample
 {
     float3 direction; //from scatterPos to lightPos;
@@ -671,6 +666,9 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
     }
 }
 
+//=========================================================================
+//Shading
+//=========================================================================
 float3 specularBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
 {
     if (dot(N, wi) <= 0)
@@ -836,9 +834,10 @@ void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout Ra
     }
 }
 
+//=========================================================================
 //Spectral Rendering Helper
+//=========================================================================
 #define REFLECTANCE_BOOST 4
-
 #define LANBDA_INF_NM 770
 #define LAMBDA_VIO_NM 380
 #define LAMBDA_NUM 40
