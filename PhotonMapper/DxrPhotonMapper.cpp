@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -103,8 +103,8 @@ void DxrPhotonMapper::Setup()
             if (isDiamondTest)
             {
                 mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;
-                mPhi = 417; mTheta = 249;//for diamond
-                mLightRange = 1.9f;//for diamond
+                mPhi = 417; mTheta = 249;
+                mLightRange = 1.9f;
                 mGlassModelType = ModelType_Diamond;
                 mInitEyePos = XMFLOAT3(-20, 19, 2.4);
             }
@@ -131,7 +131,15 @@ void DxrPhotonMapper::Setup()
             mInitEyePos = XMFLOAT3(-23, 14, -21);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
             mLightRange = 6.0f;
-            mGlassModelType = ModelType_Afrodyta;
+            const bool isRockTest = false;
+            if (isRockTest)
+            {
+                mGlassModelType = ModelType_Rock;
+            }
+            else
+            {
+                mGlassModelType = ModelType_Afrodyta;
+            }
             mIsSpotLightPhotonMapper = true;
             mCausticsBoost = 200;
         }
@@ -225,13 +233,6 @@ void DxrPhotonMapper::Setup()
         mGlassObjScale = XMFLOAT3(30, 30, 30);
     }
     break;
-    default:
-    {
-        mOBJ0FileName = L"model/crab.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(12, 12, 12);
-    }
-    break;
     case  ModelType::ModelType_HorseStatue:
     {
         mOBJ0FileName = L"model/horse_statue_Tri.obj";
@@ -251,6 +252,20 @@ void DxrPhotonMapper::Setup()
         mOBJ0FileName = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
         mGlassObjYOfsset = 8;
         mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);
+    }
+    break;
+    case  ModelType::ModelType_Rock:
+    {
+        mOBJ0FileName = L"model/rock.obj";
+        mGlassObjYOfsset = 8;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
+    }
+    break;
+    default:
+    {
+        mOBJ0FileName = L"model/crab.obj";
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
     }

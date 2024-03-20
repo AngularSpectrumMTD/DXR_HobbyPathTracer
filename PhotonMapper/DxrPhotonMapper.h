@@ -314,6 +314,7 @@ private:
         ModelType_HorseStatue,
         ModelType_Dragon,
         ModelType_Afrodyta,
+        ModelType_Rock,
     };
 
     enum SceneType

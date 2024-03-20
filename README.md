@@ -12,6 +12,8 @@ Caustics are rendered by spectral rendering
 
 ![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7008dbae-1b27-46e3-b1bc-cc206841311a)
 
+![spectral2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/15d6f3da-fbfb-45cd-9903-2d299581e1c5)
+
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
 
