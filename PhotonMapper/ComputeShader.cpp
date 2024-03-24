@@ -162,4 +162,18 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapA_TrousWaveletFilter["colorBufferDst"] = 5;
         mRegisterMapA_TrousWaveletFilter["varianceBufferDst"] = 6;
     }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
+        CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
+        mRegisterMapDebugView["diffuseAlbedoBuffer"] = 0;
+        mRegisterMapDebugView["depthBuffer"] = 1;
+        mRegisterMapDebugView["normalBuffer"] = 2;
+        mRegisterMapDebugView["finalColor"] = 3;
+    }
 }

@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -62,7 +62,8 @@ void DxrPhotonMapper::Setup()
     mIsDebug = false;
     mVisualizeLightRange = false;
     mInverseMove = false;
-    mIsUseTexture = false;
+    mIsUseTexture = true;
+    mIsUseDebugView = false;
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
     mIsIndirectOnly = false;
@@ -450,7 +451,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
     mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
-    mSceneParam.flags.y = mIsUseTexture;//Box Material 0: Texture 1:One Color
+    mSceneParam.flags.y = mIsUseTexture;
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
     mSceneParam.flags.w = mVisualizeLightRange ? 1 : 0;//1: Visualize Light Range By Photon Intensity
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
@@ -536,10 +537,11 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsSpotLightPhotonMapper = !mIsSpotLightPhotonMapper;
         mIsUseAccumulation = false;
         break;
-    //case 'V':
-    //    mVisualizeLightRange = !mVisualizeLightRange;
-    //    mIsUseAccumulation = false;
-    //    break;
+    case 'V':
+        //mVisualizeLightRange = !mVisualizeLightRange;
+        mIsUseDebugView = !mIsUseDebugView;
+        //mIsUseAccumulation = false;
+        break;
     case 'A':
         mIsIndirectOnly = !mIsIndirectOnly;
         mIsUseAccumulation = false;
@@ -845,6 +847,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevDepthBuffer"], mDepthBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDiffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gOutput"], mMainOutputDescriptorUAV.hGpu);
@@ -872,6 +875,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevDepthBuffer"], mDepthBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDiffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gOutput"], mMainOutputDescriptorUAV.hGpu);
@@ -887,6 +891,26 @@ void DxrPhotonMapper::Draw()
     if (mIsUseDenoise)
     {
         SpatiotemporalVarianceGuidedFiltering();
+    }
+
+    if (mIsUseDebugView)
+    {
+        std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDXRMainOutput.Get()));
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDiffuseAlbedoBuffer.Get()));
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mNormalBuffer.Get()));
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDepthBufferTbl[src].Get()));
+        mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
+
+        mCommandList->SetComputeRootSignature(mRsDebugView.Get());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["diffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["depthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["normalBuffer"], mNormalBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["finalColor"], mMainOutputDescriptorUAV.hGpu);
+        mCommandList->SetPipelineState(mDebugViewPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "DebugView");
+        mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
     }
     
     mCommandList->ResourceBarrier(_countof(barriers), barriers);

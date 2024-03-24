@@ -64,6 +64,32 @@ void DxrPhotonMapper::CreateDenoisedColorBuffer()
     mDenoisedColorBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDenoisedColorBuffer.Get(), &uavDesc);
 }
 
+void DxrPhotonMapper::CreateDiffuseAlbedoBuffer()
+{
+    auto width = GetWidth();
+    auto height = GetHeight();
+
+    mDiffuseAlbedoBuffer = mDevice->CreateTexture2D(
+        width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+        D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        D3D12_HEAP_TYPE_DEFAULT,
+        L"PositionBuffer"
+    );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mDiffuseAlbedoBufferDescriptorSRV = mDevice->CreateShaderResourceView(mDiffuseAlbedoBuffer.Get(), &srvDesc);
+
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    mDiffuseAlbedoBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDiffuseAlbedoBuffer.Get(), &uavDesc);
+}
+
 void DxrPhotonMapper::CreatePositionBuffer()
 {
     auto width = GetWidth();
@@ -452,6 +478,7 @@ void DxrPhotonMapper::CreateRegularBuffer()
 {
     CreateResultBuffer();
     CreateDenoisedColorBuffer();
+    CreateDiffuseAlbedoBuffer();
     CreatePositionBuffer();
     CreateNormalBuffer();
     CreateAccumulationCountBuffer();

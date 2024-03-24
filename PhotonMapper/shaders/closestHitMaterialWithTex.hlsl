@@ -127,7 +127,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 Le = 0.xxx;
     if (intersectLightWithCurrentRay(Le))
     {
-        storeDepthPositionNormal(payload, vtx.Normal);
+        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
         payload.color += payload.throughput * Le;
         return;
     }
@@ -135,7 +135,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)
     {
-        storeDepthPositionNormal(payload, vtx.Normal);
+        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
         payload.color += payload.throughput * currentMaterial.emission.xyz;
         return;
     }
@@ -150,7 +150,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
-        storeDepthPositionNormal(payload, vtx.Normal);
+        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
         nextRay.Direction = 0.xxx;
         payload.color += payload.throughput * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
         updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput);

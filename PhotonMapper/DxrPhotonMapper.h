@@ -80,6 +80,8 @@ namespace ComputeShaders {
 
     const LPCWSTR ComputeVariance = L"computeVariance.cso";
     const LPCWSTR A_Trous = L"A-trous.cso";
+
+    const LPCWSTR DebugView = L"debugView.cso";
 }
 
 template<class T>
@@ -355,6 +357,7 @@ private:
     void CreateLuminanceMomentBuffer();
     void CreateLuminanceVarianceBuffer();
     void CreateDenoisedColorBuffer();
+    void CreateDiffuseAlbedoBuffer();
     void CreatePositionBuffer();
     void CreateNormalBuffer();
     void CreateAccumulationCountBuffer();
@@ -479,12 +482,17 @@ private:
     ComPtr<ID3D12Resource> mPhotonGridId;
     dx12::Descriptor mPhotonGridIdDescriptorSRV;
     dx12::Descriptor mPhotonGridIdDescriptorUAV;
+
     std::vector < ComPtr<ID3D12Resource>> mDepthBufferTbl;
     std::vector < dx12::Descriptor> mDepthBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mDepthBufferDescriptorUAVTbl;
     ComPtr<ID3D12Resource> mDenoisedColorBuffer;
     dx12::Descriptor mDenoisedColorBufferDescriptorSRV;
     dx12::Descriptor mDenoisedColorBufferDescriptorUAV;
+
+    ComPtr<ID3D12Resource> mDiffuseAlbedoBuffer;
+    dx12::Descriptor mDiffuseAlbedoBufferDescriptorSRV;
+    dx12::Descriptor mDiffuseAlbedoBufferDescriptorUAV;
     ComPtr<ID3D12Resource> mPositionBuffer;
     dx12::Descriptor mPositionBufferDescriptorSRV;
     dx12::Descriptor mPositionBufferDescriptorUAV;
@@ -564,6 +572,10 @@ private:
     std::unordered_map < std::string, u32> mRegisterMapA_TrousWaveletFilter;
     ComPtr<ID3D12PipelineState> mA_TrousWaveletFilterPSO;
 
+    ComPtr<ID3D12RootSignature> mRsDebugView;
+    std::unordered_map < std::string, u32> mRegisterMapDebugView;
+    ComPtr<ID3D12PipelineState> mDebugViewPSO;
+
     u32 mRenderFrame = 0;
     u32 mMoveFrame = 0;
 
@@ -608,6 +620,7 @@ private:
     bool mIsMoveModel;
     bool mIsUseTexture;
     bool mIsIndirectOnly;
+    bool mIsUseDebugView;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;

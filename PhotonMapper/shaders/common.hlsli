@@ -86,12 +86,13 @@ RWStructuredBuffer<PhotonInfo> gPhotonMap : register(u0);
 RWTexture2D<float> gDepthBuffer : register(u1);
 RWTexture2D<float> gPrevDepthBuffer : register(u2);
 RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u3);
-RWTexture2D<float4> gPositionBuffer : register(u4);
-RWTexture2D<float4> gNormalBuffer : register(u5);
-RWTexture2D<float4> gOutput : register(u6);
-RWTexture2D<float4> gAccumulationBuffer : register(u7);
-RWTexture2D<float2> gLuminanceMomentBufferDst : register(u8);
-RWTexture2D<uint> gAccumulationCountBuffer : register(u9);
+RWTexture2D<float4> gDiffuseAlbedoBuffer : register(u4);
+RWTexture2D<float4> gPositionBuffer : register(u5);
+RWTexture2D<float4> gNormalBuffer : register(u6);
+RWTexture2D<float4> gOutput : register(u7);
+RWTexture2D<float4> gAccumulationBuffer : register(u8);
+RWTexture2D<float2> gLuminanceMomentBufferDst : register(u9);
+RWTexture2D<uint> gAccumulationCountBuffer : register(u10);
 
 ////////////////////////////////////
 //Interpret Scene Param
@@ -101,7 +102,7 @@ bool isDirectionalLight()
     return gSceneParam.flags.x == 0;
 }
 
-bool isUseTextureForStage()
+bool isUseTexture()
 {
     return gSceneParam.flags.y == 1;
 }
@@ -350,12 +351,13 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeDepthPositionNormal(inout Payload payload, in float3 normal)
+void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in float3 normal)
 {
     if (payload.stored == 0)
     {
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         float2 writeIndex = payload.storeIndexXY;
+        gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
         gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
         gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);

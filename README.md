@@ -24,6 +24,11 @@ Denoiser : SVGF
 
 Shading : GGX
 
+### Debug View
+Enable to check (Diffuse)Albedo / Depth / Normal
+
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/cf9d8a85-9d34-4313-9c87-bab203eeb501)
+
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
@@ -83,6 +88,7 @@ DirectX12
 - S : increase / decrease translucency
 - M : increase / decrease metallic
 - C : change photon emitter type (spot light/rectangular light)
+- V : enable / disable debug view
 - MOUSE_RIGHT : rotate the camera around the gazing point
 - MOUSE_LEFT : move the camera back and forth
 - ↑↓→← : move the camera up, down, left, or right

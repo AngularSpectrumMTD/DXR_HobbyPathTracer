@@ -41,7 +41,8 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     }
     VertexPN vtx = getVertex(attrib);
 
-    storeDepthPositionNormal(payload, vtx.Normal);
+    MaterialParams currentMaterial = constantBuffer;
+    storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
 
     float3 Le = 0.xxx;
     if (intersectLightWithCurrentRay(Le))
@@ -49,8 +50,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
         payload.color += payload.throughput * Le;
         return;
     }
-
-    MaterialParams currentMaterial = constantBuffer;
+    
     //ray hitted the emissive material
     if (length(currentMaterial.emission.xyz) > 0)
     {

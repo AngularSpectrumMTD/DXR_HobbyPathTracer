@@ -30,6 +30,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig["gGridParam"] = 0;
@@ -42,12 +43,13 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gDepthBuffer"] = 7;
         mRegisterMapGlobalRootSig["gPrevDepthBuffer"] = 8;
         mRegisterMapGlobalRootSig["gPhotonGridIdBuffer"] = 9;
-        mRegisterMapGlobalRootSig["gPositionBuffer"] = 10;
-        mRegisterMapGlobalRootSig["gNormalBuffer"] = 11;
-        mRegisterMapGlobalRootSig["gOutput"] = 12;
-        mRegisterMapGlobalRootSig["gAccumulationBuffer"] = 13;
-        mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"] = 14;
-        mRegisterMapGlobalRootSig["gAccumulationCountBuffer"] = 15;
+        mRegisterMapGlobalRootSig["gDiffuseAlbedoBuffer"] = 10;
+        mRegisterMapGlobalRootSig["gPositionBuffer"] = 11;
+        mRegisterMapGlobalRootSig["gNormalBuffer"] = 12;
+        mRegisterMapGlobalRootSig["gOutput"] = 13;
+        mRegisterMapGlobalRootSig["gAccumulationBuffer"] = 14;
+        mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"] = 15;
+        mRegisterMapGlobalRootSig["gAccumulationCountBuffer"] = 16;
     }
 
     //PhotonMapping
@@ -69,6 +71,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton["gGridParam"] = 0;
@@ -81,12 +84,13 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gDepthBuffer"] = 7;
         mRegisterMapGlobalRootSigPhoton["gPrevDepthBuffer"] = 8;
         mRegisterMapGlobalRootSigPhoton["gPhotonGridIdBuffer"] = 9;
-        mRegisterMapGlobalRootSigPhoton["gPositionBuffer"] = 10;
-        mRegisterMapGlobalRootSigPhoton["gNormalBuffer"] = 11;
-        mRegisterMapGlobalRootSigPhoton["gOutput"] = 12;
-        mRegisterMapGlobalRootSigPhoton["gAccumulationBuffer"] = 13;
-        mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"] = 14;
-        mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"] = 15;
+        mRegisterMapGlobalRootSigPhoton["gDiffuseAlbedoBuffer"] = 10;
+        mRegisterMapGlobalRootSigPhoton["gPositionBuffer"] = 11;
+        mRegisterMapGlobalRootSigPhoton["gNormalBuffer"] = 12;
+        mRegisterMapGlobalRootSigPhoton["gOutput"] = 13;
+        mRegisterMapGlobalRootSigPhoton["gAccumulationBuffer"] = 14;
+        mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"] = 15;
+        mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"] = 16;
     }
 }
 

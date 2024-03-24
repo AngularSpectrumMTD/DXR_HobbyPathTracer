@@ -27,7 +27,7 @@ void miss(inout Payload payload) {
 
     payload.color += directionalLightingOnMissShader(payload);
 
-    storeDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb);
+    storeAlbedoDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb, 0.xxx);
 
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);

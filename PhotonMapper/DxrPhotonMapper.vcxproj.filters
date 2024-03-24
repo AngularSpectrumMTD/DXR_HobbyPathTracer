@@ -199,6 +199,9 @@
     <FxCompile Include="shaders\closestHitMaterialWithTex.hlsl">
       <Filter>ソース ファイル\shaders\ClosestHit</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\debugView.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxrPhotonMapper.rc">
