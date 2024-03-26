@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -113,7 +113,7 @@ void DxrPhotonMapper::Setup()
             {
                 mLightPosX = 1.2; mLightPosY = 5.2; mLightPosZ = 4.5;
                 mPhi = 319; mTheta = 225;
-                mLightRange = 2.6f;
+                mLightRange = 1.9f;
                 mGlassModelType = ModelType_Afrodyta;
                 mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             }
@@ -129,20 +129,30 @@ void DxrPhotonMapper::Setup()
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mLightPosX = 11; mLightPosY = 16; mLightPosZ = 5;
             mPhi = 412; mTheta = 262;
-            mInitEyePos = XMFLOAT3(-23, 14, -21);
+            mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
             mLightRange = 6.0f;
-            const bool isRockTest = false;
-            if (isRockTest)
+            const bool isDragonTest = false;
+            if (isDragonTest)
             {
-                mGlassModelType = ModelType_Rock;
+                mPhi = 353; mTheta = 398;
+                mLightPosX = -3.2; mLightPosY = 8.8; mLightPosZ = -2.2;
+                mInitEyePos = XMFLOAT3(29, 11, 30);
+                mInitTargetPos = XMFLOAT3(0, 8, 0);
+                mLightRange = 0.8f;
+                mGatherRadius = 0.08f;
+                mGlassModelType = ModelType_Dragon;
+                mCausticsBoost = 30;
             }
             else
             {
+                mPhi = 412; mTheta = 262;
+                mLightPosX = 4.2; mLightPosY = 8.8; mLightPosZ = 0.2;
+                mLightRange = 0.8f;
                 mGlassModelType = ModelType_Afrodyta;
+                mCausticsBoost = 30;
             }
             mIsSpotLightPhotonMapper = true;
-            mCausticsBoost = 200;
         }
         break;
         case SceneType_BistroInterior:
@@ -155,7 +165,7 @@ void DxrPhotonMapper::Setup()
             mPhi = 402; mTheta = 256;
             mInitEyePos = XMFLOAT3(24, 8.57, 5.76);
             mInitTargetPos = XMFLOAT3(40, 5, -0.14);
-            mLightRange = 1.0f;
+            mLightRange = 0.59f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
@@ -558,7 +568,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseDenoise = !mIsUseDenoise;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(1, 500, mCausticsBoost + (mInverseMove ? -0.5 : 0.5));
+        mCausticsBoost = Clamp(0.1, 500, mCausticsBoost + (mInverseMove ? -0.1 : 0.1));
         mIsUseAccumulation = false;
         break;
     case 'U':

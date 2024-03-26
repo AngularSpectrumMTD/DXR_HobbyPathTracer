@@ -295,7 +295,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material.albedo = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[albedoIndex % _countof(colorTbl)];
         material.metallic = 1;// rndF(mt);
         material.roughness = 0.1;// rndF(mt);
-        material.transColor = (NormalOBJ1s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[transIndex % _countof(colorTbl)];
+        material.transColor = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[transIndex % _countof(colorTbl)];
         material.transRatio = 0;// rndF(mt);
         albedoIndex++;
         transIndex++;
@@ -306,11 +306,11 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material = defaultMaterial;
         material.albedo = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[albedoIndex % _countof(colorTbl)];
         //material.metallic = rndF(mt);
-        material.metallic = 0.0;
+        material.metallic = 0.3;
         //material.roughness = 0.1;// rndF(mt);
         //material.roughness = 0.0;// rndF(mt);
         material.roughness = 0.05;// rndF(mt);
-        material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[transIndex % _countof(colorTbl)];
+        material.transColor = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[transIndex % _countof(colorTbl)];
         //material.transRatio = 0.6;// rndF(mt);
         //material.transRatio = 1;// rndF(mt);
         material.transRatio = 1;// rndF(mt);

@@ -1,18 +1,16 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing(Simple Pathtracing + Photon Mapping[Caustics])
 
-![interior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/bba581ae-955a-4978-ab4c-f68623357d63)
+![exterior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/c0979367-2817-4341-93ed-c633e2308e4b)
 
-![exterior](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/fdbfda03-80f7-4ea1-a3b0-b1b2feb9b9d6)
+![interior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a8d9dd0a-7678-48be-8476-77b1087aee7d)
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/a31c6d38-5254-44ce-81db-3a771022f0f6)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/3fde63b0-98fe-49a1-ad79-9d205aa1b7a0)
 
 ### Caustics
 Caustics are rendered by spectral rendering
 
-![spectral](https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/7008dbae-1b27-46e3-b1bc-cc206841311a)
-
-![spectral2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/15d6f3da-fbfb-45cd-9903-2d299581e1c5)
+![spectral2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2888a709-2811-47b0-8348-4d7161b7e684)
 
 ### Light Type
 Photon emitters emit photons from a spotlight or rectangular light
@@ -27,7 +25,7 @@ Shading : GGX
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal
 
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/cf9d8a85-9d34-4313-9c87-bab203eeb501)
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2ebd7f50-8a61-4353-a636-3f755f663a93)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
