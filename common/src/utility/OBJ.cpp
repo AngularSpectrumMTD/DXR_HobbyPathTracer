@@ -135,33 +135,35 @@ namespace utility {
 					}
 					else if (spaceSplit.size() == 4)//Rectangle
 					{
-						for (s32 i = 0; i < 4; i++)
-						{
-							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
-							//vertexID uvID normalID
-							for (s32 i = 0; i < 3; i++)
-							{
-								s32 currID = vtx_uv_nrmID[i];
+						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+						return false;
+						//for (s32 i = 0; i < 4; i++)
+						//{
+						//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+						//	//vertexID uvID normalID
+						//	for (s32 i = 0; i < 3; i++)
+						//	{
+						//		s32 currID = vtx_uv_nrmID[i];
 
-								if (currID == -1)
-								{
-									continue;
-								}
+						//		if (currID == -1)
+						//		{
+						//			continue;
+						//		}
 
-								switch (i)
-								{
-								case 0:
-									MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
-									break;
-								case 1:
-									MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
-									break;
-								case 2:
-									MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
-									break;
-								}
-							}
-						}
+						//		switch (i)
+						//		{
+						//		case 0:
+						//			MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
+						//			break;
+						//		case 1:
+						//			MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
+						//			break;
+						//		case 2:
+						//			MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
+						//			break;
+						//		}
+						//	}
+						//}
 					}
 					else
 					{

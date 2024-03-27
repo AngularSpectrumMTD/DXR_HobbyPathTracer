@@ -19,7 +19,7 @@ static uint rseed;
 float rand()//0-1
 {
     rseed += 1.0;
-    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) + rseed + getLightRandomSeed() * 0.01) * 43758.5453);
+    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
 }
 
 bool isPhotonStoreRequired(in MaterialParams params)

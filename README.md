@@ -1,19 +1,17 @@
 # DXRHybridPhotonMapper
-Hybrid Photon Mapper By Use Of DirectX Raytracing(Simple Pathtracing + Photon Mapping[Caustics])
+Hybrid Photon Mapper By Use Of DirectX Raytracing(Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![exterior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/c0979367-2817-4341-93ed-c633e2308e4b)
+![exterior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a4a52bdc-ae47-4b4b-bf93-7bbab8f81120)
 
-![interior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a8d9dd0a-7678-48be-8476-77b1087aee7d)
+![interior](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/82859c79-d7e9-4b95-b146-01b11cc17b6a)
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/3fde63b0-98fe-49a1-ad79-9d205aa1b7a0)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/62452d6d-0a23-45a7-a78c-c79e43e7cf0a)
 
-### Caustics
-Caustics are rendered by spectral rendering
+![fireplace](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/057ccc8e-3994-4c4e-aa69-07d38ecb4835)
 
-![spectral2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2888a709-2811-47b0-8348-4d7161b7e684)
+![spectral2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/ef469e08-b0ee-4a08-8de6-6844e646f801)
 
-### Light Type
-Photon emitters emit photons from a spotlight or rectangular light
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/72c23769-fcde-4d80-bd57-76130cdf5f9a)
 
 ### Algorithm
 Photon Mapping : Hashed Grid
@@ -24,8 +22,6 @@ Shading : GGX
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal
-
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2ebd7f50-8a61-4353-a636-3f755f663a93)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
