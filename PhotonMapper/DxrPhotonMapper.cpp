@@ -100,7 +100,7 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "sponza.obj";
             mOBJFolderName = "model/sponza";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-          /*  mOBJFileName = "fireplace_room.obj";
+           /* mOBJFileName = "fireplace_room.obj";
             mOBJFolderName = "model/fireplace";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));*/
             
@@ -114,10 +114,14 @@ void DxrPhotonMapper::Setup()
             }
             else
             {
-                mLightPosX = 1.2; mLightPosY = 5.2; mLightPosZ = 4.5;
+                mLightPosX = 0.8; mLightPosY = 5.2; mLightPosZ = 2.8;
                 mPhi = 319; mTheta = 225;
-                mLightRange = 1.9f;
+                mLightRange = 0.99f;
                 mGlassModelType = ModelType_Afrodyta;
+             /*   mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
+                mPhi = 289; mTheta = 226;
+                mLightRange = 0.99f;
+                mGlassModelType = ModelType_CurvedMesh;*/
                 mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             }
             mCausticsBoost = 200;
@@ -135,7 +139,7 @@ void DxrPhotonMapper::Setup()
             mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
             mLightRange = 6.0f;
-            const bool isDragonTest = false;
+            const bool isDragonTest = true;
             if (isDragonTest)
             {
                 mPhi = 353; mTheta = 398;
@@ -233,6 +237,13 @@ void DxrPhotonMapper::Setup()
         mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
+    case  ModelType::ModelType_CurvedMesh:
+    {
+        mOBJ0FileName = L"model/curvedMesh.obj";
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(4, 4, 4);
+    }
+    break;
     case ModelType::ModelType_Diamond:
     {
         mOBJ0FileName = L"model/diamond.obj";
@@ -297,6 +308,7 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ1FileName = L"model/twistCube.obj";
         mMetalObjYOfsset = 40;
+        //mMetalObjYOfsset = 100;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
     }
     break;
@@ -328,6 +340,13 @@ void DxrPhotonMapper::Setup()
         mOBJ1FileName = L"model/ocean2.obj";
         mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+    }
+    break;
+    case  ModelType::ModelType_CurvedMesh:
+    {
+        mOBJ0FileName = L"model/curvedMesh.obj";
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(4, 4, 4);
     }
     break;
     case ModelType::ModelType_Diamond:

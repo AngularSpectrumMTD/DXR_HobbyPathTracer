@@ -1,7 +1,7 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing(Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/3ba37ec6-1cb6-4c32-8fe9-9b8395c95d23)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/d56ebd54-00c4-4ffd-b717-7eec9813e684)
 
 ![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/72c23769-fcde-4d80-bd57-76130cdf5f9a)
 

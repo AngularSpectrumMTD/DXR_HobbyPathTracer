@@ -317,6 +317,7 @@ private:
         ModelType_Dragon,
         ModelType_Afrodyta,
         ModelType_Rock,
+        ModelType_CurvedMesh
     };
 
     enum SceneType

@@ -312,8 +312,13 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material.roughness = 0.05;// rndF(mt);
         material.transColor = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[transIndex % _countof(colorTbl)];
         //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 0.8f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-        //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-        //material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
+        
+        if (mGlassModelType == ModelType_Dragon)
+        {
+            material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
+            material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
+        }
+
         //material.transRatio = 0.6;// rndF(mt);
         //material.transRatio = 1;// rndF(mt);
         material.transRatio = 1;// rndF(mt);
