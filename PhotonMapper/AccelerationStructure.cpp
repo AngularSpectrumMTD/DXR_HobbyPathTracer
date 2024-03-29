@@ -315,6 +315,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         
         if (mGlassModelType == ModelType_Dragon)
         {
+            material.roughness = 0.3;
             material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
             material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
         }

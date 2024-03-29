@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -96,13 +96,21 @@ void DxrPhotonMapper::Setup()
         case SceneType_Sponza:
         {
             const bool isDiamondTest = false;
+            const bool isRoomTestDebug = false;
             mPhiDirectional = 70; mThetaDirectional = 280;
-            mOBJFileName = "sponza.obj";
-            mOBJFolderName = "model/sponza";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-           /* mOBJFileName = "fireplace_room.obj";
-            mOBJFolderName = "model/fireplace";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));*/
+
+            if (isRoomTestDebug)
+            {
+                mOBJFileName = "fireplace_room.obj";
+                mOBJFolderName = "model/fireplace";
+                mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));
+            }
+            else
+            {
+                mOBJFileName = "sponza.obj";
+                mOBJFolderName = "model/sponza";
+                mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+            }
             
             if (isDiamondTest)
             {
@@ -114,14 +122,20 @@ void DxrPhotonMapper::Setup()
             }
             else
             {
-                mLightPosX = 0.8; mLightPosY = 5.2; mLightPosZ = 2.8;
-                mPhi = 319; mTheta = 225;
-                mLightRange = 0.99f;
-                mGlassModelType = ModelType_Afrodyta;
-             /*   mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
-                mPhi = 289; mTheta = 226;
-                mLightRange = 0.99f;
-                mGlassModelType = ModelType_CurvedMesh;*/
+                if (isRoomTestDebug)
+                {
+                    mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
+                    mPhi = 306; mTheta = 187;
+                    mLightRange = 3.18f;
+                    mGlassModelType = ModelType_CurvedMesh;
+                }
+                else
+                {
+                    mLightPosX = 0.8; mLightPosY = 5.2; mLightPosZ = 2.8;
+                    mPhi = 319; mTheta = 225;
+                    mLightRange = 0.99f;
+                    mGlassModelType = ModelType_Afrodyta;
+                }
                 mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             }
             mCausticsBoost = 200;
@@ -307,8 +321,8 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 40;
-        //mMetalObjYOfsset = 100;
+        //mMetalObjYOfsset = 40;
+        mMetalObjYOfsset = 100;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
     }
     break;
@@ -601,12 +615,12 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'R':
         if (mIsTargetGlass)
         {
-            mMaterialParam0.roughness = Clamp(0.1, 1, mMaterialParam0.roughness + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam0.roughness = Clamp(0.02, 1, mMaterialParam0.roughness + (mInverseMove ? -0.01 : 0.01));
             mIsUseAccumulation = false;
         }
         else
         {
-            mMaterialParam1.roughness = Clamp(0.1, 1, mMaterialParam1.roughness + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam1.roughness = Clamp(0.02, 1, mMaterialParam1.roughness + (mInverseMove ? -0.01 : 0.01));
             mIsUseAccumulation = false;
         }
         break;

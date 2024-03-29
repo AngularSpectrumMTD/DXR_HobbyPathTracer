@@ -164,8 +164,20 @@ void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout Ra
         }
         else //specular
         {
-            const float3 halfVec = GGX_ImportanceSampling(N, material.roughness);
-            L = normalize(2.0f * dot(V, halfVec) * halfVec - V);
+            //const float3 halfVec = GGX_ImportanceSampling(N, material.roughness);
+            float u = rand();
+            float v = rand();
+            float a = material.roughness * material.roughness;
+            float th = atan(a * sqrt(u) / sqrt(1 - u));
+            float ph = 2 * PI * v;
+            float st = sin(th);
+            float ct = cos(th);
+            float sp = sin(ph);
+            float cp = cos(ph);
+            float3 t, b;
+            ONB(N, t, b);
+            float3 h = (st * cp) * t + (sp * cp) * b + ct * N;
+            L = normalize(2.0f * dot(V, h) * h - V);
         }
 
         nextRay.Origin = currentRayOrigin + N * eps;
@@ -190,7 +202,21 @@ void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout Ra
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
         float3 V = normalize(-currentRayDir);
-        float3 H = GGX_ImportanceSampling(N, material.roughness);
+        //float3 H = GGX_ImportanceSampling(N, material.roughness);
+
+        float u = rand();
+        float v = rand();
+        float a = material.roughness * material.roughness;
+        float th = atan(a * sqrt(u) / sqrt(1 - u));
+        float ph = 2 * PI * v;
+        float st = sin(th);
+        float ct = cos(th);
+        float sp = sin(ph);
+        float cp = cos(ph);
+        float3 t, b;
+        ONB(N, t, b);
+        float3 h = (st * cp) * t + (sp * cp) * b + ct * N;
+        float3 H = normalize(h);
         
         const float specRatio = FresnelReflectance(currentRayDir, N, etaOUT);
 
