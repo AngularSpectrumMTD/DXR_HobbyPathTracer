@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);

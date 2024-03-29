@@ -176,7 +176,7 @@ void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout Ra
             float cp = cos(ph);
             float3 t, b;
             ONB(N, t, b);
-            float3 h = (st * cp) * t + (sp * cp) * b + ct * N;
+            float3 h = normalize((st * cp) * t + (sp * cp) * b + ct * N);
             L = normalize(2.0f * dot(V, h) * h - V);
         }
 
@@ -215,8 +215,8 @@ void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout Ra
         float cp = cos(ph);
         float3 t, b;
         ONB(N, t, b);
-        float3 h = (st * cp) * t + (sp * cp) * b + ct * N;
-        float3 H = normalize(h);
+        float3 h = normalize((st * cp) * t + (sp * cp) * b + ct * N);
+        float3 H = h;
         
         const float specRatio = FresnelReflectance(currentRayDir, N, etaOUT);
 
