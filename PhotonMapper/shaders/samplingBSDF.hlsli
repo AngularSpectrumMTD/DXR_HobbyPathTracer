@@ -38,6 +38,22 @@ float3 GGX_ImportanceSampling(float3 N, float roughness)
     return tangentToWorld(N, tangentDir);
 }
 
+float3 ImportanceSampling(float3 N, float roughness)
+{
+    float u = rand();
+    float v = rand();
+    float a = roughness * roughness;
+    float th = atan(a * sqrt(u) / sqrt(1 - u));
+    float ph = 2 * PI * v;
+    float st = sin(th);
+    float ct = cos(th);
+    float sp = sin(ph);
+    float cp = cos(ph);
+    float3 t, b;
+    ONB(N, t, b);
+    return normalize((st * cp) * t + (sp * cp) * b + ct * N);
+}
+
 //=========================================================================
 //PDF
 //=========================================================================
