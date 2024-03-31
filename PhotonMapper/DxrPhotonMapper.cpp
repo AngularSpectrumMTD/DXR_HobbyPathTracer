@@ -40,7 +40,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
@@ -96,6 +96,7 @@ void DxrPhotonMapper::Setup()
         case SceneType_Sponza:
         {
             const bool isDiamondTest = false;
+            const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             mPhiDirectional = 70; mThetaDirectional = 280;
 
@@ -127,14 +128,22 @@ void DxrPhotonMapper::Setup()
                     mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
                     mPhi = 306; mTheta = 187;
                     mLightRange = 3.18f;
-                    mGlassModelType = ModelType_CurvedMesh;
+                    //mGlassModelType = ModelType_CurvedMesh;
+                    mGlassModelType = ModelType_DebugMesh;
                 }
                 else
                 {
                     mLightPosX = 0.8; mLightPosY = 5.2; mLightPosZ = 2.8;
                     mPhi = 319; mTheta = 225;
                     mLightRange = 0.99f;
-                    mGlassModelType = ModelType_Afrodyta;
+                    if (isDebugMeshTest)
+                    {
+                        mGlassModelType = ModelType_DebugMesh;
+                    }
+                    else
+                    {
+                        mGlassModelType = ModelType_Afrodyta;
+                    }
                 }
                 mInitEyePos = XMFLOAT3(-45, 42, 5.3);
             }
@@ -300,6 +309,13 @@ void DxrPhotonMapper::Setup()
         mGlassObjScale = XMFLOAT3(5, 5, 5);
     }
     break;
+    case  ModelType::ModelType_DebugMesh:
+    {
+        mOBJ0FileName = L"model/debugMesh.obj";
+        mGlassObjYOfsset = 8;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
+    }
+    break;
     default:
     {
         mOBJ0FileName = L"model/crab.obj";
@@ -375,6 +391,13 @@ void DxrPhotonMapper::Setup()
         mOBJ1FileName = L"model/skull.obj";
         mMetalObjYOfsset = 15;
         mMetalObjScale = XMFLOAT3(30, 30, 30);
+    }
+    break;
+    case  ModelType::ModelType_DebugMesh:
+    {
+        mOBJ0FileName = L"model/debugMesh.obj";
+        mGlassObjYOfsset = 8;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
     }
     break;
     default:
