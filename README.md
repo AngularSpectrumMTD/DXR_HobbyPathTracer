@@ -7,7 +7,7 @@ Hybrid Photon Mapper By Use Of DirectX Raytracing
 ### Algorithm
 Photon Mapping : Hashed Grid
 
-Denoiser : SVGF
+Denoiser : SVGF[Currently Disabled]
 
 Shading : GGX
 
@@ -66,7 +66,7 @@ DirectX12
 - K : increase / decrease light intensity
 - B : increase / decrease photon gathering block num
 - N : visualize caustics
-- D : enable / disable SVGF(A-Trous wavelet filtering)
+- D : increase / decrease number of bounce
 - Q : increase / decrease caustics boost
 - U : enable / disable texture
 - R : increase / decrease roughness

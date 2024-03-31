@@ -645,6 +645,8 @@ private:
 
     XMFLOAT3 mInitEyePos;
     XMFLOAT3 mInitTargetPos;
+
+    u32 mRecursionDepth = 0;
 };
 
 #endif

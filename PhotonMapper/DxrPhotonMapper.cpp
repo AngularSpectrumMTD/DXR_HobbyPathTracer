@@ -31,6 +31,7 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L"  <D> : Bounce :" << mRecursionDepth
         << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
         << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
@@ -40,8 +41,9 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
+    mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
@@ -530,6 +532,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional.y = mIsIndirectOnly;
     mSceneParam.additional.z = 0;
     mSceneParam.additional.w = 0;
+    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
 
     mRenderFrame++;
 
@@ -624,7 +627,9 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'D':
-        mIsUseDenoise = !mIsUseDenoise;
+        //mIsUseDenoise = !mIsUseDenoise;
+        mRecursionDepth = (u32)Clamp(2, REAL_MAX_RECURSION_DEPTH, mRecursionDepth + (mInverseMove ? -1 : 1));
+        mIsUseAccumulation = false;
         break;
     case 'Q':
         mCausticsBoost = Clamp(0.1, 500, mCausticsBoost + (mInverseMove ? -0.1 : 0.1));
