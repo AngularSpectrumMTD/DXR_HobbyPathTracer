@@ -209,7 +209,8 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         if (count == 0 && NormalOBJ1s == 1)
         {
-            trs = XMMatrixTranslation(-PLANE_SIZE * 0.02f, y, -PLANE_SIZE * 0.02f);
+            //trs = XMMatrixTranslation(-PLANE_SIZE * 0.02f, y, -PLANE_SIZE * 0.02f);
+            trs = XMMatrixTranslation(0, y, 0);
         }
         else
         {
@@ -292,10 +293,12 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
     for (auto& material : mOBJ1MaterialTbl) {
         material = defaultMaterial;
-        material.albedo = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[albedoIndex % _countof(colorTbl)];
+        //material.albedo = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[albedoIndex % _countof(colorTbl)];
+        material.albedo = (NormalOBJ1s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[albedoIndex % _countof(colorTbl)];//test
         material.metallic = 1;// rndF(mt);
         material.roughness = 0.1;// rndF(mt);
-        material.transColor = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[transIndex % _countof(colorTbl)];
+        //material.transColor = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[transIndex % _countof(colorTbl)];
+        material.transColor = (NormalOBJ1s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[transIndex % _countof(colorTbl)];//test
         material.transRatio = 0;// rndF(mt);
         albedoIndex++;
         transIndex++;
@@ -318,6 +321,11 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
             material.roughness = 0.3;
             material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
             material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
+        }
+        else if (mGlassModelType == ModelType_CurvedMesh)
+        {
+            material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
+            material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
         }
 
         //material.transRatio = 0.6;// rndF(mt);

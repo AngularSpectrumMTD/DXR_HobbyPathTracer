@@ -56,7 +56,7 @@ void DxrPhotonMapper::Setup()
     mPhiDirectional = 70; mThetaDirectional = 280;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
-    mGlassRotateRange = 4;
+    mGlassRotateRange = 8;
     mCausticsBoost = 200;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
@@ -130,8 +130,8 @@ void DxrPhotonMapper::Setup()
                     mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
                     mPhi = 306; mTheta = 187;
                     mLightRange = 3.18f;
-                    //mGlassModelType = ModelType_CurvedMesh;
-                    mGlassModelType = ModelType_DebugMesh;
+                    mGlassModelType = ModelType_CurvedMesh;
+                    //mGlassModelType = ModelType_DebugMesh;
                 }
                 else
                 {
@@ -339,9 +339,11 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        //mMetalObjYOfsset = 40;
-        mMetalObjYOfsset = 100;
+        mMetalObjYOfsset = 40;
+        mMetalObjYOfsset = 100;//test
         mMetalObjScale = XMFLOAT3(3, 3, 3);
+        //mMetalObjYOfsset = 10;//test
+        //mMetalObjScale = XMFLOAT3(6, 6, 6);//test
     }
     break;
     case ModelType::ModelType_Teapot:
