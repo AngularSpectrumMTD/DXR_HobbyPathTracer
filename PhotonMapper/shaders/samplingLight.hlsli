@@ -13,6 +13,8 @@ struct LightSample
     float pdf;
 };
 
+#define DIRECTIONAL_LIGHT_SHARPNESS 0.95
+
 void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     const float eps = 0.001f;
@@ -228,7 +230,7 @@ float3 directionalLightingOnMissShader(Payload payload)
         }
     }
 
-    if (payload.recursive > 0 && isDirectionalLightFinded && dot(WorldRayDirection(), -directionalDir) > 0)
+    if (payload.recursive > 0 && isDirectionalLightFinded && dot(WorldRayDirection(), -directionalDir) > DIRECTIONAL_LIGHT_SHARPNESS)
     {
         val = payload.throughput * emis * dot(WorldRayDirection(), -directionalDir);
     }

@@ -15,6 +15,7 @@
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
 #define MAX_ACCUMULATION_RANGE 10000
+#define DIRECTIONAL_LIGHT_POWER 10
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -339,8 +340,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 40;
-        mMetalObjYOfsset = 100;//test
+        mMetalObjYOfsset = 50;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
         //mMetalObjYOfsset = 10;//test
         //mMetalObjScale = XMFLOAT3(6, 6, 6);//test
@@ -838,7 +838,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         LightGenerateParam param;
         XMFLOAT3 direction;
         XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(1, 1, 1));
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER, DIRECTIONAL_LIGHT_POWER, DIRECTIONAL_LIGHT_POWER));
         mLightGenerationParamTbl[count] = param;
         count++;
     }
