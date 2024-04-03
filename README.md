@@ -74,6 +74,7 @@ DirectX12
 - R : increase / decrease roughness
 - S : increase / decrease translucency
 - M : increase / decrease metallic
+- A : enable / disable direct lighting
 - C : change photon emitter type (spot light/rectangular light)
 - V : enable / disable debug view
 - MOUSE_RIGHT : rotate the camera around the gazing point

@@ -18,14 +18,19 @@ void miss(inout Payload payload) {
     }
 
     float3 hittedEmission = 0.xxx;
-    if (payload.recursive == 0 && intersectLightWithCurrentRay(hittedEmission))
+    if (!isIndirectOnly() && payload.recursive == 0 && intersectLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
         payload.throughput = 0.xxx;
         return;
     }
 
-    payload.color += directionalLightingOnMissShader(payload);
+    const bool isLightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
+
+    if (isLightingRequired)
+    {
+        payload.color += directionalLightingOnMissShader(payload);
+    }
 
     storeAlbedoDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb, 0.xxx);
 

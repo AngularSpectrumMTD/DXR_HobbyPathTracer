@@ -17,6 +17,8 @@ using namespace DirectX;
 #define MAX_ACCUMULATION_RANGE 10000
 #define DIRECTIONAL_LIGHT_POWER 10
 
+//#define FORCE_ACCUMULATION_DISABLE
+
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
 DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"PhotonMapper"),
@@ -492,6 +494,10 @@ void DxrPhotonMapper::Terminate()
 
 void DxrPhotonMapper::Update()
 {
+#ifdef FORCE_ACCUMULATION_DISABLE
+    mIsUseAccumulation = false;
+#endif
+
     for (auto& pos : mLightTbl)
     {
         pos = XMMatrixTranslation(mLightPosX, mLightPosY, mLightPosZ);

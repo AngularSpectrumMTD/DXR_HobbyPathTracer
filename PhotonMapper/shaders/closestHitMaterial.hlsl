@@ -45,17 +45,22 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
 
     float3 Le = 0.xxx;
-    if (intersectLightWithCurrentRay(Le))
+    const bool isLightingRequired = isIndirectOnly() ? (payload.recursive >2) : true;
+
+    if (isLightingRequired)
     {
-        payload.color += payload.throughput * Le;
-        return;
-    }
-    
-    //ray hitted the emissive material
-    if (length(currentMaterial.emission.xyz) > 0)
-    {
-        payload.color += payload.throughput * currentMaterial.emission.xyz;
-        return;
+        if (intersectLightWithCurrentRay(Le))
+        {
+            payload.color += payload.throughput * Le;
+            return;
+        }
+
+        //ray hitted the emissive material
+        if (length(currentMaterial.emission.xyz) > 0)
+        {
+            payload.color += payload.throughput * currentMaterial.emission.xyz;
+            return;
+        }
     }
 
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());

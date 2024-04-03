@@ -125,19 +125,24 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     }
 
     float3 Le = 0.xxx;
-    if (intersectLightWithCurrentRay(Le))
-    {
-        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
-        payload.color += payload.throughput * Le;
-        return;
-    }
+    const bool isLightingRequired = isIndirectOnly() ? (payload.recursive > 2) : true;
 
-    //ray hitted the emissive material
-    if (length(currentMaterial.emission.xyz) > 0)
+    if (isLightingRequired)
     {
-        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
-        payload.color += payload.throughput * currentMaterial.emission.xyz;
-        return;
+        if (intersectLightWithCurrentRay(Le))
+        {
+            storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
+            payload.color += payload.throughput * Le;
+            return;
+        }
+
+        //ray hitted the emissive material
+        if (length(currentMaterial.emission.xyz) > 0)
+        {
+            storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
+            payload.color += payload.throughput * currentMaterial.emission.xyz;
+            return;
+        }
     }
 
     float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
