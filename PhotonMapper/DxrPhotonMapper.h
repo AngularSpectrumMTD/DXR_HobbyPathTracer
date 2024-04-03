@@ -126,14 +126,12 @@ private:
 
     struct Payload
     {
-        float3 energy;
+        float3 throughput;
         float3 color;
-        s32 recursive;
         uint2 storeIndexXY;
         float3 eyeDir;
-        s32 stored;
-        u32 isShadowRay;//1 : shadow ray
-        u32 isShadowMiss; //1 : shadow miss
+        int recursive;
+        unsigned int flags;
     };
 
     struct PhotonPayload

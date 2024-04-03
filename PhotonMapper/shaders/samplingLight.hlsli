@@ -263,8 +263,8 @@ void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample l
 float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
 {
     Payload shadowPayload;
-    shadowPayload.isShadowRay = 1;
-    shadowPayload.isShadowMiss = 0;
+    shadowPayload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
+    shadowPayload.flags &= ~PAYLOAD_BIT_MASK_IS_SHADOW_MISS;
 
     const float eps = 0.001;
     RayDesc shadowRay;
@@ -280,7 +280,7 @@ float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
 
     TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, shadowRay, shadowPayload);
 
-    return (shadowPayload.isShadowMiss == 0) ? 0.0f : 1.0f;
+    return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS) ? 1.0f : 0.0f;
 }
 
 float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample finalLightSample)

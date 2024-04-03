@@ -27,16 +27,18 @@ struct SceneCB
     uint4 additional;//x light num
 };
 
+#define PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED 1 << 0
+#define PAYLOAD_BIT_MASK_IS_SHADOW_RAY 1 << 1
+#define PAYLOAD_BIT_MASK_IS_SHADOW_MISS 1 << 2
+
 struct Payload
 {
     float3 throughput;
     float3 color;
-    int recursive;
-    int2 storeIndexXY;
+    uint2 storeIndexXY;
     float3 eyeDir;
-    int stored;
-    uint isShadowRay;//1 : shadow ray
-    uint isShadowMiss; //1 : shadow miss
+    int recursive;
+    uint flags;
 };
 
 struct PhotonPayload
@@ -288,12 +290,19 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 
 inline bool isShadowRay(inout Payload payload)
 {
-    return payload.isShadowRay == 1;
+    return payload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
 }
 
 inline void setVisibility(inout Payload payload, in bool visibility)
 {
-    payload.isShadowMiss = visibility;
+    if (visibility)
+    {
+        payload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_MISS;
+    }
+    else
+    {
+        payload.flags &= ~PAYLOAD_BIT_MASK_IS_SHADOW_MISS;
+    }
 }
 
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
@@ -353,7 +362,7 @@ float compute01Depth(float3 wPos)
 
 void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in float3 normal)
 {
-    if (payload.stored == 0)
+    if (!(payload.flags & PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED))
     {
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         float2 writeIndex = payload.storeIndexXY;
@@ -361,7 +370,7 @@ void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in 
         gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
         gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
-        payload.stored = 1;
+        payload.flags |= PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED;
     }
 }
 

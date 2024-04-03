@@ -113,10 +113,8 @@ void rayGen() {
         payload.color = float3(0, 0, 0);
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;
-        payload.stored = 0;//empty
+        payload.flags = 0;//empty
         payload.eyeDir = nextRay.Direction;
-        payload.isShadowRay = 0;
-        payload.isShadowMiss = 0;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 

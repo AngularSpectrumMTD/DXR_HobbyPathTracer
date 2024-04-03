@@ -42,7 +42,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
