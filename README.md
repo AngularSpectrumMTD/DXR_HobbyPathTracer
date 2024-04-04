@@ -2,15 +2,14 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![gallery](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/9945a7e3-4849-4d6b-aabb-88c72be78add)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/980d28b5-f9dc-4b69-ab80-cb1a64d0a490)
 
-![roughness](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/c037120c-de86-4f10-a783-923ea526aaa1)
+Change due to increase in roughness  
+![roughness](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5cda5235-15ca-4b1f-9d39-c8dd1c0795ba)
 
 ### Algorithm
-Photon Mapping : Hashed Grid
-
-Denoiser : SVGF[Currently Disabled]
-
+Photon Mapping : Hashed Grid  
+Denoiser : SVGF(Currently Disabled)  
 Shading : GGX
 
 ### Debug View
@@ -19,40 +18,27 @@ Enable to check (Diffuse)Albedo / Depth / Normal
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
-#### Simple Scene
-1. Set "SceneType_Simple" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
-
+---
+#### With Simple Scene
+1. Set "SceneType_Simple" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute
-
+---
 #### With Sponza
-1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
-
-2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.
-
-3. Export 3D model as obj file(Name the file "sponza.obj")
-
-4. Create a new folder "sponza" in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.
-
-5. Set "SceneType_Sponza" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
-
+1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  
+2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.  
+3. Export 3D model as obj file(Name the file "sponza.obj")  
+4. Create a new folder "sponza" in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.  
+5. Set "SceneType_Sponza" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 6. Build and Execute
-
-<img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/0b4f954b-4875-4a5f-816b-26174ce90bea" width="300">
-
+---
 #### With Bistro
-1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)
-
-2. Open exterior.obj / interior.obj on blender. Set the size to 0.1 -> Execute Triangulation.
-
-3. Export 3D model as obj file(Name the file "exterior.obj"/"interior.obj")
-
-4. Create a new folder "bistro" in "DXRPhotonMapper/PhotonMapper/model". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj / interior.obj file in the "Exterior" / "Interior".
-
-5. Set "SceneType_BistroExterior" / "SceneType_BistroInterior" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]
-
-6. Build and Execute
-
-<img src="https://github.com/AngularSpectrumMTD/DXR_PhotonMapper/assets/65929274/274017c1-d198-4dc1-81b2-2fc23efd323f" width="300">
+1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  
+2. Open exterior.obj / interior.obj on blender. Set the size to 0.1 -> Execute Triangulation.  
+3. Export 3D model as obj file(Name the file "exterior.obj"/"interior.obj")  
+4. Create a new folder "bistro" in "DXRPhotonMapper/PhotonMapper/model". Then copy the "BuildingTextures" and "Exterior" and "OtherTextures" and "PropTextures" from the downloaded folder to the created folder. Then place the created exterior.obj / interior.obj file in the "Exterior" / "Interior".  
+5. Set "SceneType_BistroExterior" / "SceneType_BistroInterior" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+6. Build and Execute  
+---
 
 ### Graphics API
 DirectX12

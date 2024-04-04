@@ -13,7 +13,7 @@ struct LightSample
     float pdf;
 };
 
-#define DIRECTIONAL_LIGHT_SHARPNESS 0.95
+#define DIRECTIONAL_LIGHT_SHARPNESS 0.99
 
 void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {

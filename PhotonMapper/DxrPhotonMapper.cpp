@@ -15,9 +15,10 @@
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
 #define MAX_ACCUMULATION_RANGE 10000
-#define DIRECTIONAL_LIGHT_POWER 10
+#define DIRECTIONAL_LIGHT_POWER 30
 
 //#define FORCE_ACCUMULATION_DISABLE
+//#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -44,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -138,9 +139,9 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 0.8; mLightPosY = 5.2; mLightPosZ = 2.8;
-                    mPhi = 319; mTheta = 225;
-                    mLightRange = 0.99f;
+                    mLightPosX = 1.6; mLightPosY = 4.7; mLightPosZ = 2.4;
+                    mPhi = 372; mTheta = 238;
+                    mLightRange = 0.28f;
                     if (isDebugMeshTest)
                     {
                         mGlassModelType = ModelType_DebugMesh;
@@ -162,19 +163,19 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 11; mLightPosY = 16; mLightPosZ = 5;
-            mPhi = 412; mTheta = 262;
+            mLightPosX = -3.2; mLightPosY = 10; mLightPosZ = -2.2;
+            mPhi = 327; mTheta = 403;
             mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
             mLightRange = 6.0f;
             const bool isDragonTest = true;
             if (isDragonTest)
             {
-                mPhi = 353; mTheta = 398;
-                mLightPosX = -3.2; mLightPosY = 8.8; mLightPosZ = -2.2;
+                mPhi = 327; mTheta = 403;
+                mLightPosX = -3.2; mLightPosY = 10; mLightPosZ = -2.2;
                 mInitEyePos = XMFLOAT3(29, 11, 30);
                 mInitTargetPos = XMFLOAT3(0, 8, 0);
-                mLightRange = 0.8f;
+                mLightRange = 1.9f;
                 mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;
                 mCausticsBoost = 30;
@@ -344,8 +345,10 @@ void DxrPhotonMapper::Setup()
         mOBJ1FileName = L"model/twistCube.obj";
         mMetalObjYOfsset = 50;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
-        //mMetalObjYOfsset = 10;//test
-        //mMetalObjScale = XMFLOAT3(6, 6, 6);//test
+#ifdef CUBE_TEST
+        mMetalObjYOfsset = 10;//test
+        mMetalObjScale = XMFLOAT3(6, 6, 6);//test
+#endif
     }
     break;
     case ModelType::ModelType_Teapot:
