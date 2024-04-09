@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Simple;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -86,12 +86,12 @@ void DxrPhotonMapper::Setup()
     {
         case SceneType_Simple :
         {
-            mOBJFileName = "skull.obj";
+            mOBJFileName = "diamond.obj";
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
-            mLightPosX = -5.8f; mLightPosY = -130; mLightPosZ = -1;
-            mPhi = 258; mTheta = 257;
-            mInitEyePos = XMFLOAT3(188, -3.8, -56);
+            mLightPosX = -16; mLightPosY = -157; mLightPosZ = -4.2;
+            mPhi = 149; mTheta = 257;
+            mInitEyePos = XMFLOAT3(-61, -38, 265);
             mInitTargetPos = XMFLOAT3(0, -116, 0);
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
@@ -345,6 +345,12 @@ void DxrPhotonMapper::Setup()
         mOBJ1FileName = L"model/twistCube.obj";
         mMetalObjYOfsset = 50;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
+
+        if (mSceneType == SceneType_Simple)
+        {
+            mMetalObjYOfsset = 90;
+            mMetalObjScale = XMFLOAT3(12, 12, 12);
+        }
 #ifdef CUBE_TEST
         mMetalObjYOfsset = 10;//test
         mMetalObjScale = XMFLOAT3(6, 6, 6);//test

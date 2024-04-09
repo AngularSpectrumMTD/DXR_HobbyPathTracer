@@ -19,17 +19,18 @@ Enable to check (Diffuse)Albedo / Depth / Normal
 **NOTE : This program can only handle triangular polygons**
 
 ---
-#### With Simple Scene
+#### With Simple Scene (Easy)
 1. Set "SceneType_Simple" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
-2. Build and Execute
+2. Build and Execute  
+![simpleScene](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/baa3ec1c-abf5-45b3-96b7-ff1aef661f63)
 ---
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  
 2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.  
-3. Export 3D model as obj file(Name the file "sponza.obj")  
-4. Create a new folder "sponza" in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.  
-5. Set "SceneType_Sponza" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
-6. Build and Execute
+4. Export 3D model as obj file(Name the file "sponza.obj")  
+5. Create a new folder "sponza" in "DXRPhotonMapper/PhotonMapper/model" and copy the "textures" and "sponza.mtl" file from the downloaded folder and the obj file you just exported to the folder you just created.  
+6. Set "SceneType_Sponza" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+7. Build and Execute
 ---
 #### With Bistro
 1. Download model(bistro) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  
