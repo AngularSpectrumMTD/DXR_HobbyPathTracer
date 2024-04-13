@@ -338,6 +338,11 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
             material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
             material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
         }
+        else if(mSceneType == SceneType_Sponza)
+        {
+            material.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+            material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+        }
 
         //material.transRatio = 0.6;// rndF(mt);
         //material.transRatio = 1;// rndF(mt);
@@ -349,9 +354,9 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
 
     mStageMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    mStageMaterial.metallic = 0;
-    mStageMaterial.roughness = 1;
-    mStageMaterial.specular = 0;
+    mStageMaterial.metallic = 0.9;
+    mStageMaterial.roughness = 0.3;
+    mStageMaterial.specular = 1;
     mStageMaterial.transRatio = 0;
     mStageMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     mStageMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);

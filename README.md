@@ -2,10 +2,10 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/980d28b5-f9dc-4b69-ab80-cb1a64d0a490)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/9330ba93-6877-4c1a-92cc-af8bbcac468c)
 
 Change due to increase in roughness  
-![roughness](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5cda5235-15ca-4b1f-9d39-c8dd1c0795ba)
+![roughness](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4c75145a-f536-4576-b68c-acdad237ed14)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
@@ -22,7 +22,6 @@ Enable to check (Diffuse)Albedo / Depth / Normal
 #### With Simple Scene (Easy)
 1. Set "SceneType_Simple" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
-![simpleScene](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/baa3ec1c-abf5-45b3-96b7-ff1aef661f63)
 ---
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  

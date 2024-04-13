@@ -24,7 +24,7 @@ float rand()//0-1
 
 bool isPhotonStoreRequired(in MaterialParams params)
 {
-    return 0.3 < params.roughness;
+    return rand() < params.roughness;
 }
 
 void ONB(in float3 normal, out float3 tangent, out float3 bitangent)

@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Simple;
+    mSceneType = SceneType_BistroExterior;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -82,6 +82,12 @@ void DxrPhotonMapper::Setup()
 
     mLightCount = LightCount_ALL - 1;
 
+    mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
+    mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
+
+    mStageType = StageType_Plane;
+    mMetalModelType = ModelType::ModelType_TwistCube;
+
     switch (mSceneType)
     {
         case SceneType_Simple :
@@ -91,12 +97,14 @@ void DxrPhotonMapper::Setup()
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
             mLightPosX = -16; mLightPosY = -157; mLightPosZ = -4.2;
             mPhi = 149; mTheta = 257;
-            mInitEyePos = XMFLOAT3(-61, -38, 265);
+            mPhiDirectional = 70; mThetaDirectional = 220;
+            mInitEyePos = XMFLOAT3(-108, 23, 472);
             mInitTargetPos = XMFLOAT3(0, -116, 0);
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
             mCausticsBoost = 400;
+            mStageType = StageType_Box;
         }
         break;
         case SceneType_Sponza:
@@ -139,9 +147,9 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 1.6; mLightPosY = 4.7; mLightPosZ = 2.4;
+                    mLightPosX = 3.2; mLightPosY = 14.2; mLightPosZ = 2.8;
                     mPhi = 372; mTheta = 238;
-                    mLightRange = 0.28f;
+                    mLightRange = 1.08f;
                     if (isDebugMeshTest)
                     {
                         mGlassModelType = ModelType_DebugMesh;
@@ -209,12 +217,6 @@ void DxrPhotonMapper::Setup()
         }
         break;
     }
-
-    mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
-    mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
-
-    mStageType = StageType_Plane;
-    mMetalModelType = ModelType::ModelType_TwistCube;
 
     switch (mGlassModelType)
     {

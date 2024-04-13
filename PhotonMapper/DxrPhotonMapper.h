@@ -149,11 +149,11 @@ private:
     };
 
     enum SphereTypeCount {
-        NormalSpheres = 8
+        NormalSpheres = 9
     };
 
     enum BoxTypeCount {
-        NormalBoxes = 5
+        NormalBoxes = 6
     };
 
     enum OBJ0TypeCount {
