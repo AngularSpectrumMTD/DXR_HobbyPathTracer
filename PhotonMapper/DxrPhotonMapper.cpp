@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Simple;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -98,7 +98,7 @@ void DxrPhotonMapper::Setup()
             mLightPosX = -16; mLightPosY = -157; mLightPosZ = -4.2;
             mPhi = 149; mTheta = 257;
             mPhiDirectional = 70; mThetaDirectional = 220;
-            mInitEyePos = XMFLOAT3(-108, 23, 472);
+            mInitEyePos = XMFLOAT3(-99, -31, -196);
             mInitTargetPos = XMFLOAT3(0, -116, 0);
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
