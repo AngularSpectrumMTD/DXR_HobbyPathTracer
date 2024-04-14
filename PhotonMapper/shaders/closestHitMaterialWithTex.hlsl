@@ -157,7 +157,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
         nextRay.Direction = 0.xxx;
-        payload.color += payload.throughput * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
+        const float3 photon = accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
+        payload.color += payload.throughput * photon;
         updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput);
     }
     else

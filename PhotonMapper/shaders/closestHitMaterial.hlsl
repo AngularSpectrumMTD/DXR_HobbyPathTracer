@@ -47,6 +47,9 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     float3 Le = 0.xxx;
     const bool isLightingRequired = isIndirectOnly() ? (payload.recursive >2) : true;
 
+    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3)ObjectToWorld4x3());
+
     if (isLightingRequired)
     {
         if (intersectLightWithCurrentRay(Le))
@@ -61,17 +64,24 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
             payload.color += payload.throughput * currentMaterial.emission.xyz;
             return;
         }
+
+       /* LightSample sampledLight;
+        float3 scatterPosition = bestFitWorldPosition;
+        sampleLight(scatterPosition, lightSample);
+        if (isVisible(scatterPosition, sampledLight))
+        {
+            float cos1 = max(0, dot(bestFitWorldNormal, sampledLight.direction));
+            float cos2 = max(0, dot(sampledLight.normal, -sampledLight.direction));
+        }*/
     }
 
-    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
-
     const float3 incidentDirection = WorldRayDirection();
+    const float3 photon = accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
 
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
     nextRay.Direction = 0.xxx;
-    payload.color += payload.throughput * surfaceLighting(currentMaterial, vtx.Normal, bestFitWorldPosition, incidentDirection, payload.eyeDir);
+    payload.color += payload.throughput * photon;
     updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput);
 
     RAY_FLAG flags = RAY_FLAG_NONE;

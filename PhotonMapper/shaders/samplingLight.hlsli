@@ -71,8 +71,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
 {
     lightSample.direction = normalize(-lightGen.position); //pos as dir
     lightSample.normal = normalize(lightGen.position);
-    const float valid = (dot(lightSample.normal, lightSample.direction) < 0) ? 1 : 0;
-    lightSample.emission = lightGen.emission * valid;
+    lightSample.emission = lightGen.emission;
     lightSample.distance = 10000000;
     lightSample.pdf = 1;
 }
@@ -225,7 +224,7 @@ void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample l
     }
 }
 
-float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
+bool isVisible(in float3 scatterPosition, in LightSample lightSample)
 {
     Payload shadowPayload;
     shadowPayload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
@@ -245,7 +244,7 @@ float computeVisibility(in float3 scatterPosition, in LightSample lightSample)
 
     TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, shadowRay, shadowPayload);
 
-    return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS) ? 1.0f : 0.0f;
+    return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }
 
 float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample finalLightSample)
@@ -267,7 +266,7 @@ float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample fina
     }
 
     sampleLightWithID(scatterPosition, reservoir.Y, finalLightSample);
-    p_hat = length(computeVisibility(scatterPosition, finalLightSample) * finalLightSample.emission);
+    p_hat = isVisible(scatterPosition, finalLightSample) ? length(finalLightSample.emission) : 0;
 
     reservoir.W_y = p_hat > 0 ? rcp(p_hat) * reservoir.W_sum / reservoir.M : 0;
     return reservoir.W_y * finalLightSample.emission;

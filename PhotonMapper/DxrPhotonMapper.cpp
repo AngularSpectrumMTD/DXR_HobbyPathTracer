@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Simple;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -180,7 +180,7 @@ void DxrPhotonMapper::Setup()
             if (isDragonTest)
             {
                 mPhi = 327; mTheta = 403;
-                mLightPosX = -3.2; mLightPosY = 10; mLightPosZ = -2.2;
+                mLightPosX = -3.2; mLightPosY = 21; mLightPosZ = -2.2;
                 mInitEyePos = XMFLOAT3(29, 11, 30);
                 mInitTargetPos = XMFLOAT3(0, 8, 0);
                 mLightRange = 1.9f;
@@ -213,7 +213,7 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
-            mCausticsBoost = 10;
+            mCausticsBoost = 2;
         }
         break;
     }
@@ -345,7 +345,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = 50;
+        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15 :  50;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
 
         if (mSceneType == SceneType_Simple)
