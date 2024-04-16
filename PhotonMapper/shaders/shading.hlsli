@@ -131,104 +131,117 @@ float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo
     }
 }
 
-void updateDirectionAndThroughput(in MaterialParams material, float3 N, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
+void updateDirectionAndThroughput(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
 {
     const bool isPathTrace = (wavelength == 0);
     nextRay.TMin = 0.0001;
     nextRay.TMax = 10000;
     
     const float eps = 0.001;
-    const float3 currentRayDir = WorldRayDirection();
+    const float3 wo_global = -WorldRayDirection();
     const float3 currentRayOrigin = nextRay.Origin;
 
     const float roulette = rand();
     const float blending = rand();
     const float probability = 1 - material.transRatio;
 
+    float3 wo_local = worldToTangent(N_global, wo_global);
+
     if (blending < probability)
     {
-        if (dot(currentRayDir, N) > 0)
+        if (wo_local.z < 0)
         {
-            N *= -1;
+            N_global *= -1;
         }
 
+        wo_local = worldToTangent(N_global, wo_global);
+
         //sample direction
-        float3 L = 0.xxx;
+        float3 L_local = 0.xxx;
         
         const float diffRatio = 1.0 - material.metallic;
-        const float3 V = normalize(-currentRayDir);
+        const float3 V_local = normalize(wo_local);
         
         if (roulette < diffRatio)//diffuse
         {
-            L = HemisphereORCosineSampling(N, false);
+            L_local = HemisphereORCosineSampling(Z_AXIS, false);
         }
         else //specular
         {
             //const float3 H = GGX_ImportanceSampling(N, material.roughness);
-            const float3 H = ImportanceSampling(N, material.roughness);
-            L = normalize(2.0f * dot(V, H) * H - V);
+            //const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+            //L_local = normalize(2.0f * dot(V_local, H_local) * H_local - V_local);
+
+            const float a = material.roughness * material.roughness;
+            float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
+            float phi = 2 * PI * rand();
+            float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
+            float R = sqrt(saturate(1 - z * z));
+            float2 sincosXY = 0.xx;
+            sincos(phi, sincosXY.x, sincosXY.y);
+            float x = R * sincosXY.y;
+            float y = R * sincosXY.x;
+            float3 Nh_local = float3(x, y, z) + Vh_local;
+            float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
+            L_local = reflect(-V_local, Ne_local);
         }
 
-        nextRay.Origin = currentRayOrigin + N * eps;
-        nextRay.Direction = L;
+        nextRay.Origin = currentRayOrigin + N_global * eps;
+        nextRay.Direction = tangentToWorld(N_global, L_local);
         
         //compute bsdf    V : wo   L : wi(sample)
-        float3 brdfDevPDF = specularBRDFdevidedPDF(material, N, V, L);
-        const float cosine = max(0, dot(N, nextRay.Direction));
-        throughput *= brdfDevPDF * cosine;// / probability;
+        float3 brdfDevPDF = specularBRDFdevidedPDF(material, Z_AXIS, V_local, L_local);
+        const float cosine = max(0, abs(L_local.z));
+        throughput *= brdfDevPDF * cosine;
     }
     else
     {
         //sample direction
-        bool isFromOutside = dot(currentRayDir, N) < 0;
+        bool isFromOutside = wo_local.z > 0;
 
         //change the normal direction to the incident direction side
-        if (dot(currentRayDir, N) > 0)
+        if (!isFromOutside)
         {
-            N *= -1;
+            N_global *= -1;
         }
+
+        //wo_local = worldToTangent(N_global, wo_global);
         
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
-        float3 V = normalize(-currentRayDir);
-        //const float3 H = GGX_ImportanceSampling(N, material.roughness);
-        const float3 H = ImportanceSampling(N, material.roughness);
-        
-        const float specRatio = FresnelReflectance(currentRayDir, N, etaOUT);
+        float3 V_local = normalize(wo_local);
+        const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
 
-        float3 L = 0.xxx;
+        float3 L_local = 0.xxx;
 
         bool isRefractSampled = true;
         {
             float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
-            float3 refractVec = refract(currentRayDir, H, eta);
+            float3 refractVec = refract(-V_local, H_local, eta);
             if (length(refractVec) < 0.001f)
             {
-                L = reflect(currentRayDir, H); //handle as total reflection
+                L_local = reflect(-V_local, H_local); //handle as total reflection
                 isRefractSampled = false;
             }
             else
             {
-                L = normalize(refractVec);
+                L_local = normalize(refractVec);
                 isRefractSampled = true;
             }
-            nextRay.Origin = currentRayOrigin - N * eps;
-            nextRay.Direction = L;
+            nextRay.Origin = currentRayOrigin - N_global * eps;
+            nextRay.Direction = tangentToWorld(N_global, L_local);
         }
 
         //compute bsdf    V : wo   L : wi(sample)
-        float3 brdfDevPDF = transBRDFdevidedPDF(material, N, V, L, H, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
-        const float cosine = abs(dot(N, nextRay.Direction));
-        throughput *= brdfDevPDF * cosine;// / (1 - probability);
+        float3 brdfDevPDF = transBRDFdevidedPDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+        const float cosine = max(0, abs(L_local.z));
+        throughput *= brdfDevPDF * cosine;
     }
 }
 
-float3 bsdf_pdf(in MaterialParams material, in float3 N, in float3 scatterPosition, in float3 incidentDirection, in float wavelength = 0)
+float3 bsdf_pdf(in MaterialParams material, in float3 N, in float3 incidentDirection, in float3 outputDirection, in float wavelength = 0)
 {
-    LightSample lightSample;
-    sampleLight(scatterPosition, lightSample);
-
-    const float3 L = lightSample.direction;
+    const float3 L = outputDirection;
     const float3 V = normalize(-incidentDirection);
 
     const float roulette = rand();

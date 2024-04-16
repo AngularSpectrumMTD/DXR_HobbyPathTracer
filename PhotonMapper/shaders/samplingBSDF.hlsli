@@ -13,6 +13,15 @@ float3 tangentToWorld(float3 N, float3 tangentSpaceVec)
     return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + N * tangentSpaceVec.z);
 }
 
+float3 worldToTangent(float3 N, float3 worldSpaceVec)
+{
+    float3 tangent;
+    float3 bitangent;
+    ONB(N, tangent, bitangent);
+
+    return normalize(float3(dot(tangent, worldSpaceVec), dot(bitangent, worldSpaceVec), dot(N, worldSpaceVec)));
+}
+
 float3 HemisphereORCosineSampling(float3 N, bool isHemi)
 {
     float cosT = isHemi ? rand() : sqrt(rand());

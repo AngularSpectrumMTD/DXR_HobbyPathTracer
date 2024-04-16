@@ -52,30 +52,37 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     if (isLightingRequired)
     {
-        if (intersectLightWithCurrentRay(Le))
+        //if (payload.recursive == 1)
         {
-            payload.color += payload.throughput * Le;
-            return;
-        }
+            if (intersectLightWithCurrentRay(Le))
+            {
+                payload.color += payload.throughput * Le;
+                return;
+            }
 
-        //ray hitted the emissive material
-        if (length(currentMaterial.emission.xyz) > 0)
-        {
-            payload.color += payload.throughput * currentMaterial.emission.xyz;
-            return;
+            //ray hitted the emissive material
+            if (length(currentMaterial.emission.xyz) > 0)
+            {
+                payload.color += payload.throughput * currentMaterial.emission.xyz;
+                return;
+            }
         }
 
        /* LightSample sampledLight;
         float3 scatterPosition = bestFitWorldPosition;
-        sampleLight(scatterPosition, lightSample);
+        sampleLight(scatterPosition, sampledLight);
         if (isVisible(scatterPosition, sampledLight))
         {
-            float cos1 = max(0, dot(bestFitWorldNormal, sampledLight.direction));
-            float cos2 = max(0, dot(sampledLight.normal, -sampledLight.direction));
+            float cos1 = max(0, dot(bestFitWorldNormal, -sampledLight.direction));
+            float cos2 = max(0, dot(sampledLight.normal, sampledLight.direction));
+            const float3 incidentDirection = -WorldRayDirection();
+            const float3 outputDirection = -sampledLight.direction;
+            float3 bsdfdevPdf = bsdf_pdf(currentMaterial, vtx.Normal, incidentDirection, outputDirection);
+            float G = cos1 * cos2 / (sampledLight.distance * sampledLight.distance);
+            payload.color += payload.throughput * bsdfdevPdf * G * sampledLight.emission;
         }*/
     }
 
-    const float3 incidentDirection = WorldRayDirection();
     const float3 photon = accumulatePhoton(bestFitWorldPosition, payload.eyeDir, bestFitWorldNormal);
 
     RayDesc nextRay;

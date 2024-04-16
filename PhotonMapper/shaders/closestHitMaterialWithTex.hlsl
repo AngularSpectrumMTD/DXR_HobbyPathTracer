@@ -127,26 +127,43 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 Le = 0.xxx;
     const bool isLightingRequired = isIndirectOnly() ? (payload.recursive > 2) : true;
 
+    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3)ObjectToWorld4x3());
+
     if (isLightingRequired)
     {
-        if (intersectLightWithCurrentRay(Le))
+        //if (payload.recursive == 1)
         {
-            storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
-            payload.color += payload.throughput * Le;
-            return;
+            if (intersectLightWithCurrentRay(Le))
+            {
+                storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
+                payload.color += payload.throughput * Le;
+                return;
+            }
+
+            //ray hitted the emissive material
+            if (length(currentMaterial.emission.xyz) > 0)
+            {
+                storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
+                payload.color += payload.throughput * currentMaterial.emission.xyz;
+                return;
+            }
         }
 
-        //ray hitted the emissive material
-        if (length(currentMaterial.emission.xyz) > 0)
+       /* LightSample sampledLight;
+        float3 scatterPosition = bestFitWorldPosition;
+        sampleLight(scatterPosition, sampledLight);
+        if (isVisible(scatterPosition, sampledLight))
         {
-            storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, vtx.Normal);
-            payload.color += payload.throughput * currentMaterial.emission.xyz;
-            return;
-        }
+            float cos1 = max(0, dot(bestFitWorldNormal, -sampledLight.direction));
+            float cos2 = max(0, dot(sampledLight.normal, sampledLight.direction));
+            const float3 incidentDirection = -WorldRayDirection();
+            const float3 outputDirection = -sampledLight.direction;
+            float3 bsdfdevPdf = bsdf_pdf(currentMaterial, vtx.Normal, incidentDirection, outputDirection);
+            float G = cos1 * cos2 / (sampledLight.distance * sampledLight.distance);
+            payload.color += payload.throughput * bsdfdevPdf * G * sampledLight.emission;
+        }*/
     }
-
-    float3 bestFitWorldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestFitWorldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
     
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;

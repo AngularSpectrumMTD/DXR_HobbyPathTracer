@@ -305,6 +305,7 @@ private:
     {
         ModelType_Crab,
         ModelType_TwistCube,
+        ModelType_SimpleCube,
         ModelType_Teapot,
         ModelType_LikeWater,
         ModelType_Ocean,

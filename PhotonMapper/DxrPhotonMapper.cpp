@@ -18,7 +18,7 @@ using namespace DirectX;
 #define DIRECTIONAL_LIGHT_POWER 30
 
 //#define FORCE_ACCUMULATION_DISABLE
-//#define CUBE_TEST
+#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Simple;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -86,7 +86,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
     mStageType = StageType_Plane;
-    mMetalModelType = ModelType::ModelType_TwistCube;
+    mMetalModelType = ModelType::ModelType_SimpleCube;
 
     switch (mSceneType)
     {
@@ -95,11 +95,11 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "diamond.obj";
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
-            mLightPosX = -16; mLightPosY = -157; mLightPosZ = -4.2;
+            mLightPosX = -16; mLightPosY = -172; mLightPosZ = -4.2;
             mPhi = 149; mTheta = 257;
             mPhiDirectional = 70; mThetaDirectional = 220;
-            mInitEyePos = XMFLOAT3(-99, -31, -196);
-            mInitTargetPos = XMFLOAT3(0, -116, 0);
+            mInitEyePos = XMFLOAT3(188, -163, -101);
+            mInitTargetPos = XMFLOAT3(0, -132, 0);
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
@@ -147,19 +147,19 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 3.2; mLightPosY = 14.2; mLightPosZ = 2.8;
-                    mPhi = 372; mTheta = 238;
-                    mLightRange = 1.08f;
+                    mLightPosX = 1.59; mLightPosY = 9.8; mLightPosZ = 3.19;
+                    mPhi = 413; mTheta = 242;
+                    mLightRange = 0.279f;
                     if (isDebugMeshTest)
                     {
                         mGlassModelType = ModelType_DebugMesh;
                     }
                     else
                     {
-                        mGlassModelType = ModelType_Afrodyta;
+                        mGlassModelType = ModelType_Teapot;
                     }
                 }
-                mInitEyePos = XMFLOAT3(-45, 42, 5.3);
+                mInitEyePos = XMFLOAT3(-27.9, 15, 5.54);
             }
             mCausticsBoost = 200;
             mIsSpotLightPhotonMapper = false;
@@ -180,10 +180,15 @@ void DxrPhotonMapper::Setup()
             if (isDragonTest)
             {
                 mPhi = 327; mTheta = 403;
-                mLightPosX = -3.2; mLightPosY = 21; mLightPosZ = -2.2;
-                mInitEyePos = XMFLOAT3(29, 11, 30);
+                mLightPosX = -1.59; mLightPosY = 21; mLightPosZ = -4.2;
+                mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mInitTargetPos = XMFLOAT3(0, 8, 0);
-                mLightRange = 1.9f;
+#ifdef CUBE_TEST
+                mLightRange = 2.29f;
+#else
+                mLightRange = 0.28;
+                mLightPosX = -2.38; mLightPosY = 7.8; mLightPosZ = -2.9;
+#endif
                 mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;
                 mCausticsBoost = 30;
@@ -205,11 +210,11 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = 34.0f; mLightPosY = 8.6; mLightPosZ = 5.7;
-            mPhi = 402; mTheta = 256;
-            mInitEyePos = XMFLOAT3(24, 8.57, 5.76);
-            mInitTargetPos = XMFLOAT3(40, 5, -0.14);
-            mLightRange = 0.59f;
+            mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
+            mPhi = 376; mTheta = 107;
+            mInitEyePos = XMFLOAT3(45, 14.60, 0.86);
+            mInitTargetPos = XMFLOAT3(66, 10, -11.41);
+            mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
@@ -234,12 +239,19 @@ void DxrPhotonMapper::Setup()
         mGlassObjScale = XMFLOAT3(5, 5, 5);
     }
     break;
+    case ModelType::ModelType_SimpleCube:
+    {
+        mOBJ0FileName = L"model/simpleCube.obj";
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(5, 5, 5);
+    }
+    break;
     case ModelType::ModelType_Teapot:
     {
         mOBJ0FileName = L"model/teapot.obj";
         mCausticsBoost *= 0.5;
         mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(8, 8, 8);
+        mGlassObjScale = XMFLOAT3(2, 2, 2);
     }
     break;
     case  ModelType::ModelType_LikeWater:
@@ -299,7 +311,13 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_Dragon:
     {
         mOBJ0FileName = L"model/dragon.obj";
-        mGlassObjYOfsset = 5;
+        mGlassObjYOfsset = 11;
+        if (mSceneType == SceneType_BistroExterior)
+        {
+#ifndef CUBE_TEST
+            mGlassObjYOfsset = 4;
+#endif
+        }
         mGlassObjScale = XMFLOAT3(12, 12, 12);
     }
     break;
@@ -353,10 +371,45 @@ void DxrPhotonMapper::Setup()
             mMetalObjYOfsset = 90;
             mMetalObjScale = XMFLOAT3(12, 12, 12);
         }
+        else if (mSceneType == SceneType_Sponza)
+        {
+            mMetalObjYOfsset = 90;
+            mMetalObjScale = XMFLOAT3(12, 12, 12);
+        }
 #ifdef CUBE_TEST
         mMetalObjYOfsset = 10;//test
         mMetalObjScale = XMFLOAT3(6, 6, 6);//test
 #endif
+    }
+    break;
+    case ModelType::ModelType_SimpleCube:
+    {
+        mOBJ1FileName = L"model/simpleCube.obj";
+        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15 : 50;
+        mMetalObjScale = XMFLOAT3(3, 3, 3);
+
+        if (mSceneType == SceneType_Simple)
+        {
+            mMetalObjYOfsset = 90;
+            mMetalObjScale = XMFLOAT3(12, 12, 12);
+        }
+        else if (mSceneType == SceneType_Sponza)
+        {
+            mMetalObjYOfsset = 90;
+            mMetalObjScale = XMFLOAT3(12, 12, 12);
+        }
+        else if (mSceneType == SceneType_BistroInterior)
+        {
+            mMetalObjYOfsset = 90;
+            mMetalObjScale = XMFLOAT3(12, 12, 12);
+        }
+        else
+        {
+#ifdef CUBE_TEST
+            mMetalObjYOfsset = 10;//test
+            mMetalObjScale = XMFLOAT3(6, 6, 6);//test
+#endif
+        }
     }
     break;
     case ModelType::ModelType_Teapot:

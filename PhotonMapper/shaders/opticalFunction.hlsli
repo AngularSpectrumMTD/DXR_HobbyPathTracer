@@ -3,6 +3,8 @@
 
 #include "common.hlsli"
 
+#define Z_AXIS float3(0, 0, 1)
+
 struct MaterialParams
 {
     float4 albedo;
