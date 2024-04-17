@@ -18,7 +18,7 @@ using namespace DirectX;
 #define DIRECTIONAL_LIGHT_POWER 30
 
 //#define FORCE_ACCUMULATION_DISABLE
-#define CUBE_TEST
+//#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Simple;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;

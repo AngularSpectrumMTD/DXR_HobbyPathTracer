@@ -375,6 +375,11 @@ namespace utility {
 					fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
 					mtl.Reflection4Color.specular = vec4d;
 				}
+				if (strcmp(key, "Ke") == 0)
+				{
+					fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
+					mtl.Reflection4Color.emission = vec4d;
+				}
 				if (strcmp(key, "Ns") == 0)
 				{
 					fscanf_s(fp, "%f", &vec4d.x);

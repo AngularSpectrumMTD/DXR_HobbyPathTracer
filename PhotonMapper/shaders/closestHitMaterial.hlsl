@@ -115,6 +115,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
 
     if (isPhotonStoreRequired(currentMaterial))
     {
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         storePhoton(payload);
     }
     else

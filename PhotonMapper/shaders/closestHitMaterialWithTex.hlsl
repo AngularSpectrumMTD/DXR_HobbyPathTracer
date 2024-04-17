@@ -226,6 +226,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
     {
+        updateDirectionAndThroughput(currentMaterial, vtx.Normal, nextRay, payload.throughput, payload.lambdaNM);
         storePhoton(payload);
     }
     else
