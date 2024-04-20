@@ -132,7 +132,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (isLightingRequired)
     {
-        //if (payload.recursive == 1)
+        const bool isHitLightingRequired = isUseNEE() ? (payload.recursive == 1) : true;
+        if (isHitLightingRequired)
         {
             if (intersectLightWithCurrentRay(Le))
             {
@@ -150,25 +151,48 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
             }
         }
 
-       /* LightSample sampledLight;
-        float3 scatterPosition = bestFitWorldPosition;
-        sampleLight(scatterPosition, sampledLight);
-        if (isVisible(scatterPosition, sampledLight))
+        if (isUseNEE())
         {
-            float cos1 = max(0, dot(bestFitWorldNormal, -sampledLight.direction));
-            float cos2 = max(0, dot(sampledLight.normal, sampledLight.direction));
-            const float3 incidentDirection = -WorldRayDirection();
-            const float3 outputDirection = -sampledLight.direction;
-            float3 bsdfdevPdf = bsdf_pdf(currentMaterial, vtx.Normal, incidentDirection, outputDirection);
-            float G = cos1 * cos2 / (sampledLight.distance * sampledLight.distance);
-            payload.color += payload.throughput * bsdfdevPdf * G * sampledLight.emission;
-        }*/
+            LightSample sampledLight;
+            float3 scatterPosition = bestFitWorldPosition;
+            bool isDirectionalLightSampled = false;
+            sampleLight(scatterPosition, sampledLight, isDirectionalLightSampled);
+            if (isVisible(scatterPosition, sampledLight))
+            {
+                float3 lightNormal = sampledLight.normal;
+                float3 wi = sampledLight.directionToLight;
+                float dist2 = sampledLight.distance * sampledLight.distance;
+                float nwi = dot(vtx.Normal, wi);
+                bool isValid = (nwi > 0.001f);
+                if (isValid)
+                {
+                    float light_nwo = -dot(lightNormal, wi);
+                    if (light_nwo > 0)
+                    {
+                        float misWeight = 1;
+                        float4 bsdfPDF = bsdf_pdf(currentMaterial, vtx.Normal, -WorldRayDirection(), wi);
+                        bsdfPDF.w *= light_nwo / dist2;
+                        misWeight = (pow(bsdfPDF.w, 2)) / (pow(bsdfPDF.w, 2) + pow(sampledLight.pdf, 2));
+
+                        dist2 = isDirectionalLightSampled ? 1 : dist2;
+
+                        float G = abs(nwi) * abs(light_nwo) / dist2;
+                        payload.color += sampledLight.emission
+                            * bsdfPDF.xyz
+                            * G / sampledLight.pdf
+                            //* misWeight
+                            * payload.throughput;
+
+                        //payload.color += (sampledLight.emission * bsdfPDF.xyz * (light_nwo / (dist2 * sampledLight.pdf)) * misWeight) * payload.throughput;
+                    }
+                }
+            }
+        }
+
     }
     
     RayDesc nextRay;
     nextRay.Origin = bestFitWorldPosition;
-
-    const float3 incidentDirection = WorldRayDirection();
 
     if (!isIgnoreHit)
     {

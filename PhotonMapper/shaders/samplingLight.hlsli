@@ -6,14 +6,14 @@
 //=========================================================================
 struct LightSample
 {
-    float3 direction; //from scatterPos to lightPos;
+    float3 directionToLight;
     float3 normal;
     float3 emission;
     float distance;
     float pdf;
 };
 
-#define DIRECTIONAL_LIGHT_SHARPNESS 0.99
+#define DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN 5 * PI / 180
 
 void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
@@ -24,11 +24,11 @@ void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     float x = sqrt(max(0, 1 - z * z)) * cos(2.0f * PI * v);
 
     float3 pos = lightGen.position + lightGen.sphereRadius * float3(x, y, z);
-    lightSample.direction = pos - scatterPosition;
+    lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(float3(x, y, z));
     lightSample.emission = lightGen.emission;
-    lightSample.distance = sqrt(length(lightSample.direction));
-    lightSample.direction /= lightSample.distance;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (4 * PI * lightGen.sphereRadius * lightGen.sphereRadius);
 }
 
@@ -38,11 +38,11 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float v = rand();
 
     float3 pos = lightGen.position + 2 * (u - 0.5) * lightGen.U + 2 * (v - 0.5) * lightGen.V;
-    lightSample.direction = pos - scatterPosition;
+    lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     lightSample.emission = lightGen.emission;
-    lightSample.distance = sqrt(length(lightSample.direction));
-    lightSample.direction /= lightSample.distance;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (4 * sqrt(length(lightGen.U)) * sqrt(length(lightGen.V)));
 }
 
@@ -59,21 +59,36 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     y *= lenV / lenU;
     
     float3 pos = lightGen.position + x * normalize(lightGen.U) + y * normalize(lightGen.V);
-    lightSample.direction = pos - scatterPosition;
+    lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     lightSample.emission = lightGen.emission;
-    lightSample.distance = sqrt(length(lightSample.direction));
-    lightSample.direction /= lightSample.distance;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (PI * lenU * lenV);
+}
+
+float3 coneSample(float3 N, float cosMax)
+{
+    float ct = 1 - rand() * (1 - cosMax);
+    float st = sqrt(1 - ct * ct);
+    float phi = 2 * PI * rand();
+    float2 csp;
+    sincos(phi, csp.x, csp.y);
+    return tangentToWorld(N, float3(st * csp.x, st * csp.y, ct));
 }
 
 void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
-    lightSample.direction = normalize(-lightGen.position); //pos as dir
-    lightSample.normal = normalize(lightGen.position);
+    const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
+
+    float3 fromLight = normalize(lightGen.position);
+    float3 emit = coneSample(fromLight, cosMax);
+    
+    lightSample.directionToLight = -emit;
+    lightSample.normal = fromLight;
     lightSample.emission = lightGen.emission;
     lightSample.distance = 10000000;
-    lightSample.pdf = 1;
+    lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
 }
 
 void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
@@ -101,19 +116,18 @@ void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
 
 void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
 {
-    float rnd0 = (pcgHashState() - 0.5) * 2; //-1 to 1
-    float rnd1 = (pcgHashState() - 0.5) * 2; //-1 to 1
-    emitDir = normalize(lightGen.position); //pos as dir
-    float3 tangent;
-    float3 bitangent;
-    ONB(emitDir, tangent, bitangent);
-    position = 1000 * -emitDir + tangent * 1000 * rnd0 + bitangent * 1000 * rnd1;
+    const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
+    float3 fromLight = normalize(lightGen.position);
+    emitDir = coneSample(fromLight, cosMax);
+    position = 100 * -emitDir;
 }
 
-void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
+void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
     const uint lightID = (uint) (rand() * (getLightNum()));
     LightGenerateParam param = gLightGenerateParams[lightID];
+
+    isDirectionalLightSampled = false;
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
@@ -129,6 +143,7 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
+        isDirectionalLightSampled = true;
         sampleDirectionalLight(param, scatterPosition, lightSample);
     }
 
@@ -182,21 +197,23 @@ float3 directionalLightingOnMissShader(Payload payload)
     float3 directionalDir = 0.xxx;
     bool isDirectionalLightFinded = false;
     float3 emis = 0.xxx;
+    float3 dominantDir = 0.xxx;
     for (int i = 0; i < getLightNum(); i++)
     {
-        LightGenerateParam param = gLightGenerateParams[i];
+        LightGenerateParam lightGen = gLightGenerateParams[i];
 
-        if (isDirectionalLightFinded == false && param.type == LIGHT_TYPE_DIRECTIONAL)
+        if (isDirectionalLightFinded == false && lightGen.type == LIGHT_TYPE_DIRECTIONAL)
         {
             isDirectionalLightFinded = true;
-            directionalDir = normalize(param.position);
-            emis = param.emission;
+            emis = lightGen.emission;
+            dominantDir = normalize(lightGen.position);
         }
     }
-
-    if (payload.recursive > 0 && isDirectionalLightFinded && dot(WorldRayDirection(), -directionalDir) > DIRECTIONAL_LIGHT_SHARPNESS)
+    
+    const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
+    if (payload.recursive > 0 && isDirectionalLightFinded && dot(dominantDir, -WorldRayDirection()) > cosMax)
     {
-        val = payload.throughput * emis * dot(WorldRayDirection(), -directionalDir);
+        val = payload.throughput * emis;
     }
 
     return val;
@@ -227,15 +244,15 @@ void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample l
 bool isVisible(in float3 scatterPosition, in LightSample lightSample)
 {
     Payload shadowPayload;
+    shadowPayload.flags = 0;
     shadowPayload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
-    shadowPayload.flags &= ~PAYLOAD_BIT_MASK_IS_SHADOW_MISS;
 
     const float eps = 0.001;
     RayDesc shadowRay;
     shadowRay.TMin = eps;
     shadowRay.TMax = lightSample.distance - eps;
 
-    shadowRay.Direction = lightSample.direction;
+    shadowRay.Direction = lightSample.directionToLight;
     shadowRay.Origin = scatterPosition;
 
     RAY_FLAG flags = RAY_FLAG_NONE;
@@ -274,8 +291,9 @@ float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample fina
 
 void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 {
-    const uint lightID = (uint) (rand() * (getLightNum()));
-    LightGenerateParam param = gLightGenerateParams[lightID];
+    const uint lightID = (uint) (rand() * (getLightNum()) + 0.5);
+    LightGenerateParam param = gLightGenerateParams[0];
+    //LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (param.type == LIGHT_TYPE_SPHERE)
     {

@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/213b14a1-674a-436d-b743-056bba8d9ff7)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/689526ac-4110-4586-9d4f-b3ed4bee49a8)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

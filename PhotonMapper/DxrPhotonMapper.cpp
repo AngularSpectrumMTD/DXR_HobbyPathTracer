@@ -45,7 +45,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
     mIntenceBoost = 40;
@@ -73,6 +73,7 @@ void DxrPhotonMapper::Setup()
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
     mIsIndirectOnly = false;
+    mIsUseNEE = false;
     mStageTextureFileName = L"model/tileTex.png";
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
@@ -212,7 +213,7 @@ void DxrPhotonMapper::Setup()
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
             mPhi = 376; mTheta = 107;
-            mInitEyePos = XMFLOAT3(45, 14.60, 0.86);
+            mInitEyePos = XMFLOAT3(30, 12, 9);
             mInitTargetPos = XMFLOAT3(66, 10, -11.41);
             mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
@@ -601,8 +602,8 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
     mSceneParam.additional.x = mLightCount;
-    mSceneParam.additional.y = mIsIndirectOnly;
-    mSceneParam.additional.z = 0;
+    mSceneParam.additional.y = mIsIndirectOnly ? 1 : 0;
+    mSceneParam.additional.z = mIsUseNEE ? 1 : 0;
     mSceneParam.additional.w = 0;
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
 
@@ -635,6 +636,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'I':
         mInverseMove = !mInverseMove;
         break;
+  /*  case 'E':
+        mIsUseNEE = !mIsUseNEE;
+        mIsUseAccumulation = false;
+        break;*/
     case 'J':
         mIsMoveModel = !mIsMoveModel;
         mIsUseAccumulation = false;
@@ -908,7 +913,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         LightGenerateParam param;
         XMFLOAT3 direction;
         XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER, DIRECTIONAL_LIGHT_POWER, DIRECTIONAL_LIGHT_POWER));
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost));
         mLightGenerationParamTbl[count] = param;
         count++;
     }

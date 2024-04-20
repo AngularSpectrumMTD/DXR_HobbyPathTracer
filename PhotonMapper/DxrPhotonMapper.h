@@ -640,6 +640,7 @@ private:
     bool mIsTargetGlass;
 
     bool mIsUseAccumulation;
+    bool mIsUseNEE;
     //bool mIsUseDirectionalLight;
 
     XMFLOAT3 mInitEyePos;

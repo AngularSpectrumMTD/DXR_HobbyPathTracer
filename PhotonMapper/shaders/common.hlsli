@@ -129,6 +129,11 @@ bool isIndirectOnly()
     return gSceneParam.additional.y == 1;
 }
 
+bool isUseNEE()
+{
+    return gSceneParam.additional.z == 1;
+}
+
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;

@@ -25,9 +25,9 @@ void miss(inout Payload payload) {
         return;
     }
 
-    const bool isLightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
+    const bool isHitLightingRequired = isUseNEE() ? false : (isIndirectOnly() ? (payload.recursive > 1) : true);
 
-    if (isLightingRequired)
+    if (isHitLightingRequired)
     {
         payload.color += directionalLightingOnMissShader(payload);
     }
