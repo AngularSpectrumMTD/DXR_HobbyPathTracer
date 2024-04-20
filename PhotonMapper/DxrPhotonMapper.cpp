@@ -34,8 +34,9 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText.str(L"");
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
-        << L"  <SPACE> : ChangeTargetModel <R> : Roughness <S> : TransRatio <M> : Metallic"
-        << L"  <D> : Bounce :" << mRecursionDepth
+        //<< L" <E> : NEE - " << (mIsUseNEE ? L"ON" : L"OFF")
+        << L"  <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L"  <D> : Bounce : " << mRecursionDepth
         << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
         << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
@@ -45,9 +46,9 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
-    mRecursionDepth = REAL_MAX_RECURSION_DEPTH;
+    mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 1;
@@ -114,6 +115,7 @@ void DxrPhotonMapper::Setup()
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             mPhiDirectional = 70; mThetaDirectional = 280;
+            mInitEyePos = XMFLOAT3(-27.9, 15, 5.54);
 
             if (isRoomTestDebug)
             {
@@ -157,10 +159,10 @@ void DxrPhotonMapper::Setup()
                     }
                     else
                     {
+                        mInitEyePos = XMFLOAT3(-71, 39, -7);
                         mGlassModelType = ModelType_Teapot;
                     }
                 }
-                mInitEyePos = XMFLOAT3(-27.9, 15, 5.54);
             }
             mCausticsBoost = 200;
             mIsSpotLightPhotonMapper = false;
@@ -636,10 +638,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'I':
         mInverseMove = !mInverseMove;
         break;
-  /*  case 'E':
-        mIsUseNEE = !mIsUseNEE;
+    case 'E':
+        //mIsUseNEE = !mIsUseNEE;
         mIsUseAccumulation = false;
-        break;*/
+        break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
         mIsUseAccumulation = false;

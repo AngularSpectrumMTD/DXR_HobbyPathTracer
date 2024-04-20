@@ -25,7 +25,8 @@ void miss(inout Payload payload) {
         return;
     }
 
-    const bool isHitLightingRequired = isUseNEE() ? false : (isIndirectOnly() ? (payload.recursive > 1) : true);
+    const bool isNEE_Prev_Executable = payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
+    const bool isHitLightingRequired = isUseNEE() ? !isNEE_Prev_Executable : (isIndirectOnly() ? (payload.recursive > 1) : true);
 
     if (isHitLightingRequired)
     {

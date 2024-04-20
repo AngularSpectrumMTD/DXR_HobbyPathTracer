@@ -36,6 +36,8 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
 {
     float u = rand();
     float v = rand();
+    float lenU = sqrt(dot(lightGen.U, lightGen.U));
+    float lenV = sqrt(dot(lightGen.V, lightGen.V));
 
     float3 pos = lightGen.position + 2 * (u - 0.5) * lightGen.U + 2 * (v - 0.5) * lightGen.V;
     lightSample.directionToLight = pos - scatterPosition;
@@ -43,15 +45,15 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.emission = lightGen.emission;
     lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
     lightSample.directionToLight /= lightSample.distance;
-    lightSample.pdf = 1 / (4 * sqrt(length(lightGen.U)) * sqrt(length(lightGen.V)));
+    lightSample.pdf = 1 / (4 * lenU * lenV);
 }
 
 void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     float u = rand();
     float v = rand();
-    float lenU = sqrt(length(lightGen.U));
-    float lenV = sqrt(length(lightGen.V));
+    float lenU = sqrt(dot(lightGen.U, lightGen.U));
+    float lenV = sqrt(dot(lightGen.V, lightGen.V));
     float r = lenU * sqrt(u);
     float theta = 2 * PI * v;
     float x = r * cos(theta);
@@ -84,7 +86,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     float3 fromLight = normalize(lightGen.position);
     float3 emit = coneSample(fromLight, cosMax);
     
-    lightSample.directionToLight = -emit;
+    lightSample.directionToLight = -normalize(emit);
     lightSample.normal = fromLight;
     lightSample.emission = lightGen.emission;
     lightSample.distance = 10000000;

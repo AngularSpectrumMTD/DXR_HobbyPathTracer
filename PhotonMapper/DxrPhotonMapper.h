@@ -29,7 +29,7 @@
 #define PLANE_SIZE 200
 
 #define PHOTON_NUM_1D 1024
-#define DENOISE_ITE 2
+#define DENOISE_ITE 1
 #define MAX_RECURSION_DEPTH 10//0---31
 #define REAL_MAX_RECURSION_DEPTH 8//0---31
 

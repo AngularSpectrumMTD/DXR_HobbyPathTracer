@@ -415,4 +415,90 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
     return brdfAndPDF;
 }
 
+void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+{
+    LightSample sampledLight;
+    bool isDirectionalLightSampled = false;
+    sampleLight(scatterPosition, sampledLight, isDirectionalLightSampled);
+    if (isVisible(scatterPosition, sampledLight))
+    {
+        float3 lightNormal = sampledLight.normal;
+        float3 wi = sampledLight.directionToLight;
+        float dist2 = sampledLight.distance * sampledLight.distance;
+        float reseiverCos = dot(surfaceNormal, wi);
+        if (reseiverCos > 0.001f)
+        {
+            float emitterCos = dot(lightNormal, -wi);
+            if (emitterCos > 0.001f)
+            {
+                float misWeight = 1;
+                float4 bsdfPDF = bsdf_pdf(material, surfaceNormal, -WorldRayDirection(), wi);
+
+                dist2 = isDirectionalLightSampled ? 1 : dist2;
+                        //misWeight = isDirectionalLightSampled ? (pow(sampledLight.pdf, 2)) / (pow(bsdfPDF.w, 2) + pow(sampledLight.pdf, 2)) : (pow(bsdfPDF.w * emitterCos / dist2, 2)) / (pow(bsdfPDF.w * emitterCos / dist2, 2) + pow(sampledLight.pdf, 2));
+
+                float G = reseiverCos * emitterCos / dist2;
+                payload.color +=
+                            sampledLight.emission
+                            //* (isDirectionalLightSampled ? 1.xxx : bsdfPDF.xyz)
+                            * bsdfPDF.xyz
+                            * G / sampledLight.pdf
+                            * misWeight
+                            * payload.throughput;
+            }
+        }
+    }
+}
+
+bool isNEEExecutable(in MaterialParams material)
+{
+    return (material.roughness > 0.5f) && (material.transRatio == 0) && (material.metallic == 0)  && isUseNEE();
+}
+
+bool executeLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+{
+    float3 Le = 0.xxx;
+    const bool isNEE_Exec = isNEEExecutable(material);
+
+    if (isNEE_Exec)
+    {
+        if (!(payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE))
+        {
+            payload.flags |= PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
+        }
+    }
+    else
+    {
+        if (payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE)
+        {
+            payload.flags &= ~PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
+        }
+    }
+
+    const bool isHitLightingRequired = isNEE_Exec ? (payload.recursive == 1) : true;
+    if (isHitLightingRequired)
+    {
+        if (intersectLightWithCurrentRay(Le))
+        {
+            storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
+            payload.color += payload.throughput * Le;
+            return true;
+        }
+
+        //ray hitted the emissive material
+        if (length(material.emission.xyz) > 0)
+        {
+            storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
+            payload.color += payload.throughput * material.emission.xyz;
+            return false;
+        }
+    }
+
+    if (isNEE_Exec)
+    {
+        NEE(payload, material, scatterPosition, surfaceNormal);
+    }
+    return false;
+}
+
 #endif//__SHADING_HLSLI__
