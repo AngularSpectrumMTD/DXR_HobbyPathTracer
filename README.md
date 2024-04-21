@@ -46,6 +46,7 @@ DirectX12
 
 - I : determine other button meaning (+ / -)
 - J : start / stop model
+- E : enable / disable NEE
 - G : increase / decrease photon gather radius
 - X / Y / Z : light position
 - L : increase / decrease light emission range
