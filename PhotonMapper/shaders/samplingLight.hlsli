@@ -126,7 +126,7 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 
 void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
-    const uint lightID = (uint) (rand() * (getLightNum()));
+    const uint lightID = (uint) (rand() * (getLightNum()) + 0.5);
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     isDirectionalLightSampled = false;

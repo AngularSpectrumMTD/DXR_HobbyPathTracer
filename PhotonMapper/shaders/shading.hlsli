@@ -426,16 +426,16 @@ void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPos
         float3 wi = sampledLight.directionToLight;
         float dist2 = sampledLight.distance * sampledLight.distance;
         float reseiverCos = dot(surfaceNormal, wi);
-        if (reseiverCos > 0.001f)
+        if (reseiverCos > 0)
         {
             float emitterCos = dot(lightNormal, -wi);
-            if (emitterCos > 0.001f)
+            if (emitterCos > 0)
             {
                 float misWeight = 1;
                 float4 bsdfPDF = bsdf_pdf(material, surfaceNormal, -WorldRayDirection(), wi);
 
                 dist2 = isDirectionalLightSampled ? 1 : dist2;
-                        //misWeight = isDirectionalLightSampled ? (pow(sampledLight.pdf, 2)) / (pow(bsdfPDF.w, 2) + pow(sampledLight.pdf, 2)) : (pow(bsdfPDF.w * emitterCos / dist2, 2)) / (pow(bsdfPDF.w * emitterCos / dist2, 2) + pow(sampledLight.pdf, 2));
+                //misWeight = isDirectionalLightSampled ? (pow(sampledLight.pdf, 2)) / (pow(bsdfPDF.w, 2) + pow(sampledLight.pdf, 2)) : (pow(bsdfPDF.w * emitterCos / dist2, 2)) / (pow(bsdfPDF.w * emitterCos / dist2, 2) + pow(sampledLight.pdf, 2));
 
                 float G = reseiverCos * emitterCos / dist2;
                 payload.color +=
@@ -452,11 +452,13 @@ void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPos
 
 bool isNEEExecutable(in MaterialParams material)
 {
-    return (material.roughness > 0.5f) && (material.transRatio == 0) && (material.metallic == 0)  && isUseNEE();
+    //return (material.roughness > 0.5f) && (material.transRatio == 0) && (material.metallic == 0)  && isUseNEE();
+    return isUseNEE();
 }
 
 bool executeLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
 {
+    bool isFinish = false;
     float3 Le = 0.xxx;
     const bool isNEE_Exec = isNEEExecutable(material);
 
@@ -475,14 +477,30 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         }
     }
 
-    const bool isHitLightingRequired = isNEE_Exec ? (payload.recursive == 1) : true;
+    const bool isHitLightingRequired = true;
     if (isHitLightingRequired)
     {
+        //ray hitted the light source
         if (intersectLightWithCurrentRay(Le))
         {
             storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
-            payload.color += payload.throughput * Le;
-            return true;
+            if (isNEE_Exec)
+            {
+                if (payload.recursive == 1)
+                {
+                    payload.color += payload.throughput * Le;
+                }
+            }
+            else
+            {
+                const bool isLighting = isIndirectOnly() ? (payload.recursive > 1) : true;
+                if (isLighting)
+                {
+                    payload.color += payload.throughput * Le;
+                }
+            }
+            isFinish = true;
+            return isFinish;
         }
 
         //ray hitted the emissive material
@@ -490,7 +508,8 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         {
             storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
             payload.color += payload.throughput * material.emission.xyz;
-            return false;
+            isFinish = false;
+            return isFinish;
         }
     }
 
@@ -498,7 +517,9 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
     {
         NEE(payload, material, scatterPosition, surfaceNormal);
     }
-    return false;
+
+    isFinish = false;
+    return isFinish;
 }
 
 #endif//__SHADING_HLSLI__
