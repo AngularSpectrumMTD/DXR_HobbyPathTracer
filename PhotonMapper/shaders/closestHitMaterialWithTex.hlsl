@@ -133,7 +133,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (isLightingRequired)
     {
-        if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
+        if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
         {
             return;
         }

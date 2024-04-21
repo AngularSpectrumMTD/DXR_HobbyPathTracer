@@ -2,12 +2,14 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
 
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/12b13554-f92d-4c68-b47d-5e54883d8f14)
+Left Next Event Estimation off / Right Next Event Estimation on  
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/08c241dc-bd43-474e-a492-5f925e056604)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
 Denoiser : SVGF(Currently Disabled)  
 Shading : GGX
+Sampling : Next Event Estimation
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal

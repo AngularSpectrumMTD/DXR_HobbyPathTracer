@@ -325,6 +325,7 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
     const float probability = 1 - material.transRatio;
 
     float3 wo_local = worldToTangent(N_global, wo_global);
+    float3 L_local = worldToTangent(N_global, wi_global);
 
     if (blending < probability)
     {
@@ -334,41 +335,11 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
         }
 
         wo_local = worldToTangent(N_global, wo_global);
-
-        //sample direction
-        float3 L_local = 0.xxx;
         
-        const float diffRatio = 1.0 - material.metallic;
         const float3 V_local = normalize(wo_local);
         
-        if (roulette < diffRatio)//diffuse
-        {
-            L_local = HemisphereORCosineSampling(Z_AXIS, false);
-        }
-        else //specular
-        {
-            //const float3 H = GGX_ImportanceSampling(N, material.roughness);
-            //const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
-            //L_local = normalize(2.0f * dot(V_local, H_local) * H_local - V_local);
-
-            const float a = material.roughness * material.roughness;
-            float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
-            float phi = 2 * PI * rand();
-            float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
-            float R = sqrt(saturate(1 - z * z));
-            float2 sincosXY = 0.xx;
-            sincos(phi, sincosXY.x, sincosXY.y);
-            float x = R * sincosXY.y;
-            float y = R * sincosXY.x;
-            float3 Nh_local = float3(x, y, z) + Vh_local;
-            float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
-            L_local = reflect(-V_local, Ne_local);
-        }
-        
         //compute bsdf    V : wo   L : wi(sample)
-        const float cosine = 1;
-        //max(0, abs(L_local.z));
-        brdfAndPDF = specularBRDFandPDF(material, Z_AXIS, V_local, L_local) * cosine;
+        brdfAndPDF = specularBRDFandPDF(material, Z_AXIS, V_local, L_local);
     }
     else
     {
@@ -381,35 +352,15 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
             N_global *= -1;
         }
 
-        //wo_local = worldToTangent(N_global, wo_global);
-        
+        wo_local = worldToTangent(N_global, wo_global);
+
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
         float3 V_local = normalize(wo_local);
         const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
 
-        float3 L_local = 0.xxx;
-
-        bool isRefractSampled = true;
-        {
-            float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
-            float3 refractVec = refract(-V_local, H_local, eta);
-            if (length(refractVec) < 0.001f)
-            {
-                L_local = reflect(-V_local, H_local); //handle as total reflection
-                isRefractSampled = false;
-            }
-            else
-            {
-                L_local = normalize(refractVec);
-                isRefractSampled = true;
-            }
-        }
-
         //compute bsdf    V : wo   L : wi(sample)
-        const float cosine = 1;
-        //max(0, abs(L_local.z));
-        brdfAndPDF = transBRDFandPDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside) * cosine;
+        brdfAndPDF = transBRDFandPDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, true, isFromOutside);
     }
 
     return brdfAndPDF;
@@ -441,8 +392,8 @@ void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPos
                 payload.color +=
                             sampledLight.emission
                             //* (isDirectionalLightSampled ? 1.xxx : bsdfPDF.xyz)
-                            * bsdfPDF.xyz
-                            * G / sampledLight.pdf
+                            * saturate(bsdfPDF.xyz
+                            * G) / sampledLight.pdf
                             * misWeight
                             * payload.throughput;
             }
@@ -453,10 +404,11 @@ void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPos
 bool isNEEExecutable(in MaterialParams material)
 {
     //return (material.roughness > 0.5f) && (material.transRatio == 0) && (material.metallic == 0)  && isUseNEE();
-    return isUseNEE();
+    //return isUseNEE();
+    return (material.roughness > 0.001f) && (material.transRatio == 0) && isUseNEE();
 }
 
-bool executeLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+bool executeLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, bool isIgnoreHit = false)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
@@ -513,7 +465,7 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         }
     }
 
-    if (isNEE_Exec)
+    if (isNEE_Exec && !isIgnoreHit)
     {
         NEE(payload, material, scatterPosition, surfaceNormal);
     }

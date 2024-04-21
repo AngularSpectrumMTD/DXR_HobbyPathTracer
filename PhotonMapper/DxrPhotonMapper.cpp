@@ -17,12 +17,14 @@ using namespace DirectX;
 #define MAX_ACCUMULATION_RANGE 10000
 #define DIRECTIONAL_LIGHT_POWER 30
 
+#define NEE_AVAILABLE
+
 //#define FORCE_ACCUMULATION_DISABLE
-//#define CUBE_TEST
+#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
-DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"PhotonMapper"),
+DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"HobbyTracer"),
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
 mNormalSphereMaterialTbl()
 {
@@ -34,7 +36,7 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText.str(L"");
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
-        //<< L" <E> : NEE - " << (mIsUseNEE ? L"ON" : L"OFF")
+        << L" <E> : NEE - " << (mIsUseNEE ? L"ON" : L"OFF")
         << L"  <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
         << L"  <D> : Bounce : " << mRecursionDepth
         << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
@@ -74,7 +76,7 @@ void DxrPhotonMapper::Setup()
     mIsTargetGlass = true;
     mIsUseAccumulation = false;
     mIsIndirectOnly = false;
-    mIsUseNEE = false;
+    mIsUseNEE = true;
     mStageTextureFileName = L"model/tileTex.png";
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
@@ -639,7 +641,9 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mInverseMove = !mInverseMove;
         break;
     case 'E':
-        //mIsUseNEE = !mIsUseNEE;
+#ifdef NEE_AVAILABLE
+        mIsUseNEE = !mIsUseNEE;
+#endif
         mIsUseAccumulation = false;
         break;
     case 'J':
