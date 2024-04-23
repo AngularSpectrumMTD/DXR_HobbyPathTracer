@@ -207,13 +207,13 @@ void DxrPhotonMapper::CreateDepthBuffer()
 
 void DxrPhotonMapper::CreateLightGenerateBuffer()
 {
-    const u32 lightBufferSizeInBites = LightCount_ALL * sizeof(LightGenerateParam);
+    const u32 lightBufferSizeInBites = mLightGenerationParamTbl.size() * sizeof(LightGenerateParam);
     mLightGenerationParamBuffer = mDevice->CreateBuffer(lightBufferSizeInBites, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_HEAP_TYPE_UPLOAD, nullptr, L"LightGenerateParams");
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Buffer.NumElements = LightCount_ALL;
+    srvDesc.Buffer.NumElements = mLightGenerationParamTbl.size();
     srvDesc.Buffer.FirstElement = 0;
     srvDesc.Buffer.StructureByteStride = sizeof(LightGenerateParam);
     mLightGenerationParamSRV = mDevice->CreateShaderResourceView(mLightGenerationParamBuffer.Get(), &srvDesc);

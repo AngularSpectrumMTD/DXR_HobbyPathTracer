@@ -443,7 +443,7 @@ private:
     ComPtr<ID3D12Resource> mStageMaterialCB;
 
     //Lights
-    std::array<LightGenerateParam, LightCount_ALL> mLightGenerationParamTbl;
+    std::vector<LightGenerateParam> mLightGenerationParamTbl;
     ComPtr <ID3D12Resource> mLightGenerationParamBuffer;
     dx12::Descriptor mLightGenerationParamSRV;
 
@@ -647,6 +647,7 @@ private:
     XMFLOAT3 mInitTargetPos;
 
     u32 mRecursionDepth = 0;
+    u32 mSceneLightNum = 0;
 };
 
 #endif

@@ -301,7 +301,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         material.metallic = 0;// rndF(mt);
         material.roughness = 0.3;// rndF(mt);
-        material.transRatio = 1;// rndF(mt);
+        material.transRatio = (mSceneType == SceneType_Sponza) ? 0 : 1;// rndF(mt);
 
         albedoIndex++;
         transIndex++;
@@ -350,8 +350,8 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     }
 
     mStageMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-    mStageMaterial.metallic = 0.9;
-    mStageMaterial.roughness = 0.3;
+    mStageMaterial.metallic = 0.1;
+    mStageMaterial.roughness = 0.9;
     mStageMaterial.specular = 1;
     mStageMaterial.transRatio = 0;
     mStageMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);

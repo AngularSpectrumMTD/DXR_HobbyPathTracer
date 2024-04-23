@@ -15,12 +15,12 @@
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
 #define MAX_ACCUMULATION_RANGE 10000
-#define DIRECTIONAL_LIGHT_POWER 30
+#define DIRECTIONAL_LIGHT_POWER 5
 
 #define NEE_AVAILABLE
 
 //#define FORCE_ACCUMULATION_DISABLE
-#define CUBE_TEST
+//#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -108,15 +108,13 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
             mCausticsBoost = 400;
-            mStageType = StageType_Box;
         }
         break;
         case SceneType_Sponza:
         {
-            const bool isDiamondTest = false;
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
-            mPhiDirectional = 70; mThetaDirectional = 280;
+            mPhiDirectional = 100; mThetaDirectional = 280;
             mInitEyePos = XMFLOAT3(-27.9, 15, 5.54);
 
             if (isRoomTestDebug)
@@ -132,38 +130,30 @@ void DxrPhotonMapper::Setup()
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
             }
             
-            if (isDiamondTest)
+            if (isRoomTestDebug)
             {
-                mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;
-                mPhi = 417; mTheta = 249;
-                mLightRange = 1.9f;
-                mGlassModelType = ModelType_Diamond;
-                mInitEyePos = XMFLOAT3(-20, 19, 2.4);
+                mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
+                mPhi = 306; mTheta = 187;
+                mLightRange = 3.18f;
+                mGlassModelType = ModelType_CurvedMesh;
+                //mGlassModelType = ModelType_DebugMesh;
             }
             else
             {
-                if (isRoomTestDebug)
+                mLightPosX = 1.59; mLightPosY = 9.8; mLightPosZ = 3.19;
+                mPhi = 413; mTheta = 242;
+                mLightRange = 0.279f;
+                if (isDebugMeshTest)
                 {
-                    mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
-                    mPhi = 306; mTheta = 187;
-                    mLightRange = 3.18f;
-                    mGlassModelType = ModelType_CurvedMesh;
-                    //mGlassModelType = ModelType_DebugMesh;
+                    mGlassModelType = ModelType_DebugMesh;
                 }
                 else
                 {
-                    mLightPosX = 1.59; mLightPosY = 9.8; mLightPosZ = 3.19;
-                    mPhi = 413; mTheta = 242;
-                    mLightRange = 0.279f;
-                    if (isDebugMeshTest)
-                    {
-                        mGlassModelType = ModelType_DebugMesh;
-                    }
-                    else
-                    {
-                        mInitEyePos = XMFLOAT3(-71, 39, -7);
-                        mGlassModelType = ModelType_Teapot;
-                    }
+                    mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;
+                    mPhi = 417; mTheta = 249;
+                    mLightRange = 1.9f;
+                    mGlassModelType = ModelType_Diamond;
+                    mInitEyePos = XMFLOAT3(-20, 19, 2.4);
                 }
             }
             mCausticsBoost = 200;
@@ -605,7 +595,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
-    mSceneParam.additional.x = mLightCount;
+    mSceneParam.additional.x = mLightGenerationParamTbl.size();
     mSceneParam.additional.y = mIsIndirectOnly ? 1 : 0;
     mSceneParam.additional.z = mIsUseNEE ? 1 : 0;
     mSceneParam.additional.w = 0;
@@ -823,13 +813,12 @@ void DxrPhotonMapper::UpdateMaterialParams()
 
 void DxrPhotonMapper::InitializeLightGenerateParams()
 {
-    u32 count = 0;
+    mLightGenerationParamTbl.resize(0);
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
         LightGenerateParam param;
         param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
@@ -837,8 +826,7 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
         {
             LightGenerateParam param;
             param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-            mLightGenerationParamTbl[count] = param;
-            count++;
+            mLightGenerationParamTbl.push_back(param);
         }
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
@@ -847,30 +835,27 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
         {
             LightGenerateParam param;
             param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-            mLightGenerationParamTbl[count] = param;
-            count++;
+            mLightGenerationParamTbl.push_back(param);
         }
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
         LightGenerateParam param;
         param.setParamAsDirectionalLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1));
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        mLightGenerationParamTbl.push_back(param);
     }
 }
 
 void DxrPhotonMapper::UpdateLightGenerateParams()
 {
-    u32 count = 0;
-
     const f32 scale = mLightRange;
+    const u32 prevSize = mLightGenerationParamTbl.size();
+    mLightGenerationParamTbl.resize(0);
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
         LightGenerateParam param;
         param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), scale, 150);
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
@@ -889,8 +874,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.y *= scale;
             bitangent.z *= scale;
             param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
-            mLightGenerationParamTbl[count] = param;
-            count++;
+            mLightGenerationParamTbl.push_back(param);
         }
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
@@ -910,8 +894,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.y *= scale;
             bitangent.z *= scale;
             param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
-            mLightGenerationParamTbl[count] = param;
-            count++;
+            mLightGenerationParamTbl.push_back(param);
         }
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
@@ -919,9 +902,13 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         LightGenerateParam param;
         XMFLOAT3 direction;
         XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost));
-        mLightGenerationParamTbl[count] = param;
-        count++;
+        param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost));
+        mLightGenerationParamTbl.push_back(param);
+    }
+
+    if (prevSize != mLightGenerationParamTbl.size())
+    {
+        CreateLightGenerateBuffer();
     }
 
     auto buf = mLightGenerationParamBuffer.Get();

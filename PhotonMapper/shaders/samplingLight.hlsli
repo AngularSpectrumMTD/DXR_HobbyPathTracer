@@ -90,8 +90,8 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.normal = fromLight;
     lightSample.emission = lightGen.emission;
     lightSample.distance = 10000000;
-    //lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
-    lightSample.pdf = 1 / (2 * PI * (1 - cos(2 * DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN)));//sr is "2 * pi * (1 - cos(halfAngle))" but currently my conputation is failed...?
+    lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
+    //lightSample.pdf = 1 / (2 * PI * (1 - cos(2 * DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN)));//sr is "2 * pi * (1 - cos(halfAngle))" but currently my conputation is failed...?
 }
 
 void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
@@ -168,7 +168,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         normalize(param.U), normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
         float hittedT = min(tt.x, tt.y);
 
-        Le = param.emission;
+        Le = param.emission * max(1, getLightNum() - 1);
         return (hittedT > 0 && hittedT < rayT);
     }
     else if (param.type == LIGHT_TYPE_RECT)
@@ -177,7 +177,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
-        Le = param.emission;
+        Le = param.emission * max(1, getLightNum() - 1);
         return isFrontHit && (hittedT > 0 && hittedT < rayT);
     }
     else if (param.type == LIGHT_TYPE_SPOT)
@@ -186,7 +186,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
-        Le = param.emission;
+        Le = param.emission * max(1, getLightNum() - 1);
         return isFrontHit && (hittedT > 0 && hittedT < rayT);
     }
 

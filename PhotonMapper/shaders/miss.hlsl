@@ -30,7 +30,7 @@ void miss(inout Payload payload) {
 
     if (isHitLightingRequired)
     {
-        payload.color += directionalLightingOnMissShader(payload);
+        payload.color += payload.throughput * directionalLightingOnMissShader(payload);
     }
 
     storeAlbedoDepthPositionNormal(payload, gSceneParam.backgroundColor.rgb, 0.xxx);
