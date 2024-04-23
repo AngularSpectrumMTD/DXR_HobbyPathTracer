@@ -429,7 +429,7 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         }
     }
 
-    const bool isHitLightingRequired = true;
+    const bool isHitLightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
     if (isHitLightingRequired)
     {
         //ray hitted the light source
@@ -438,7 +438,7 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
             storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
             if (isNEE_Exec)
             {
-                if (payload.recursive == 1)
+                if (payload.recursive == 1 && !isIndirectOnly())
                 {
                     payload.color += payload.throughput * Le;
                 }
@@ -467,7 +467,11 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
 
     if (isNEE_Exec && !isIgnoreHit)
     {
-        NEE(payload, material, scatterPosition, surfaceNormal);
+        const bool isNEELightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
+        if (isNEELightingRequired)
+        {
+            NEE(payload, material, scatterPosition, surfaceNormal);
+        }
     }
 
     isFinish = false;
