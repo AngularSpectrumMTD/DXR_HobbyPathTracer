@@ -15,7 +15,7 @@ Simple Pathtracing
 ### Algorithm
 Photon Mapping : Hashed Grid  
 Denoiser : SVGF(Currently Disabled)  
-Shading : GGX
+Shading : GGX  
 Sampling : Next Event Estimation
 
 ### Debug View
