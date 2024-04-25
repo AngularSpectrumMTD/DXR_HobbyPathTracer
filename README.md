@@ -1,16 +1,11 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
-(Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])
-
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/3aae5b41-6658-4fae-812a-27794482b9d9)
+(Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])  
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/ee152d98-33a3-4c21-86a4-e51d5bb0e525)
 
 "Next Event Estimation" is implemented  
-NEE
-![ENABLE_NEE_100](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/6c4252b5-071d-4e37-be54-51bb62d8ba84)
-
-Simple Pathtracing  
-![DISABLE_NEE_100](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2a5ed194-cb6f-4ce8-a528-f543eed2a04d)
-
+Left : "NEE" Right : "Simple Pathtracing"
+![NEE_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b060029b-0dc0-49c9-bf97-2c36b79ec325)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

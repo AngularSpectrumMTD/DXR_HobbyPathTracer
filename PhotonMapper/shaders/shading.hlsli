@@ -280,7 +280,7 @@ void updateDirectionAndThroughput(in MaterialParams material, in float3 N_global
             N_global *= -1;
         }
 
-        //wo_local = worldToTangent(N_global, wo_global);
+        wo_local = worldToTangent(N_global, wo_global);
         
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 

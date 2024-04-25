@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -149,14 +149,14 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 1.7f; mLightPosY = 6.2f; mLightPosZ = 2.2;
-                    mPhi = 417; mTheta = 249;
-                    mLightRange = 1.9f;
+                    mLightPosX = 1.7f; mLightPosY = 5.79f; mLightPosZ = 2.2;
+                    mPhi = 417; mTheta = 231;
+                    mLightRange = 0.4f;
                     mGlassModelType = ModelType_Diamond;
                     mInitEyePos = XMFLOAT3(-20, 19, 2.4);
                 }
             }
-            mCausticsBoost = 200;
+            mCausticsBoost = 100;
             mIsSpotLightPhotonMapper = false;
         }
         break;
