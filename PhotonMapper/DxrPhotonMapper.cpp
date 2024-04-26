@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -205,6 +205,25 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
+            mPhi = 376; mTheta = 107;
+            mInitEyePos = XMFLOAT3(30, 12, 9);
+            mInitTargetPos = XMFLOAT3(66, 10, -11.41);
+            mLightRange = 3.68f;
+            mGlassModelType = ModelType_Afrodyta;
+            mIsSpotLightPhotonMapper = false;
+            mGatherRadius = 0.021f;
+            mCausticsBoost = 2;
+        }
+        break;
+        case SceneType_SanMiguel:
+        {
+            //mPhiDirectional = 70; mThetaDirectional = 220;
+            //mPhiDirectional = 100; mThetaDirectional = 280;//1
+            mPhiDirectional = 104; mThetaDirectional = 255;//1
+            mOBJFileName = "San_Miguel_Low_Poly_Triangulate.obj";
+            mOBJFolderName = "model/San_Miguel";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(20, 0, 0));
             mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
             mPhi = 376; mTheta = 107;
             mInitEyePos = XMFLOAT3(30, 12, 9);
@@ -662,12 +681,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'T':
         mTheta += mInverseMove ? -1 : 1;
-        //mThetaDirectional += mInverseMove ? -1 : 1;
         mIsUseAccumulation = false;
         break;
     case 'P':
         mPhi += mInverseMove ? -1 : 1;
-        //mPhiDirectional += mInverseMove ? -1 : 1;
         mIsUseAccumulation = false;
         break;
     case 'K':
@@ -691,8 +708,12 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsIndirectOnly = !mIsIndirectOnly;
         mIsUseAccumulation = false;
         break;
+    case 'O':
+        mThetaDirectional += mInverseMove ? -1 : 1;
+        mIsUseAccumulation = false;
+        break;
     case 'W':
-        mLightLambdaNum = (u32)Clamp(3, 12, (f32)mLightLambdaNum + (mInverseMove ? -1 : 1));
+        mPhiDirectional += mInverseMove ? -1 : 1;
         mIsUseAccumulation = false;
         break;
     case 'N':

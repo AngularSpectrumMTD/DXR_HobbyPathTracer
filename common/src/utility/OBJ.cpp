@@ -136,7 +136,7 @@ namespace utility {
 					else if (spaceSplit.size() == 4)//Rectangle
 					{
 						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						return false;
+						//return true;
 						//for (s32 i = 0; i < 4; i++)
 						//{
 						//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
@@ -168,7 +168,7 @@ namespace utility {
 					else
 					{
 						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						return false;
+						//return true;
 					}
 				}
 
@@ -491,46 +491,56 @@ namespace utility {
 		return true;
 	}
 
-	void OBJ_MODEL::CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName)
+	bool OBJ_MODEL::CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName)
 	{
 		u32 ibStride = u32(sizeof(u32)), vbStride = u32(sizeof(utility::VertexPNT));
 		const auto flags = D3D12_RESOURCE_FLAG_NONE;
 		const auto heapType = D3D12_HEAP_TYPE_DEFAULT;
 
-		auto vbsize = vbStride * mat.TriangleVertexTbl.size();
-		auto ibsize = ibStride * mat.TriangleVertexIDTbl.size();
-		mat.TriangleVertexBuffer = device->CreateBuffer(vbsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexTbl.data(), vbName);
-		mat.TriangleIndexBuffer = device->CreateBuffer(ibsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexIDTbl.data(), ibName);
-		mat.TriangleVertexCount = u32(mat.TriangleVertexTbl.size());
-		mat.TriangleIndexCount = u32(mat.TriangleVertexIDTbl.size());
-		mat.TriangleVertexStride = vbStride;
+		//triangle only
+		if (mat.TriangleVertexTbl.size() > 0 && mat.TriangleVertexIDTbl.size() > 0)
+		{
+			auto vbsize = vbStride * mat.TriangleVertexTbl.size();
+			auto ibsize = ibStride * mat.TriangleVertexIDTbl.size();
+			mat.TriangleVertexBuffer = device->CreateBuffer(vbsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexTbl.data(), vbName);
+			mat.TriangleIndexBuffer = device->CreateBuffer(ibsize, flags, D3D12_RESOURCE_STATE_COPY_DEST, heapType, mat.TriangleVertexIDTbl.data(), ibName);
+			mat.TriangleVertexCount = u32(mat.TriangleVertexTbl.size());
+			mat.TriangleIndexCount = u32(mat.TriangleVertexIDTbl.size());
+			mat.TriangleVertexStride = vbStride;
 
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDescVB{};
-		srvDescVB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDescVB.Format = DXGI_FORMAT_UNKNOWN;
-		srvDescVB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDescVB.Buffer.NumElements = mat.TriangleVertexCount;
-		srvDescVB.Buffer.FirstElement = 0;
-		srvDescVB.Buffer.StructureByteStride = vbStride;
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDescVB{};
+			srvDescVB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDescVB.Format = DXGI_FORMAT_UNKNOWN;
+			srvDescVB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDescVB.Buffer.NumElements = mat.TriangleVertexCount;
+			srvDescVB.Buffer.FirstElement = 0;
+			srvDescVB.Buffer.StructureByteStride = vbStride;
 
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDescIB{};
-		srvDescIB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDescIB.Format = DXGI_FORMAT_UNKNOWN;
-		srvDescIB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDescIB.Buffer.NumElements = mat.TriangleIndexCount;
-		srvDescIB.Buffer.FirstElement = 0;
-		srvDescIB.Buffer.StructureByteStride = ibStride;
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDescIB{};
+			srvDescIB.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDescIB.Format = DXGI_FORMAT_UNKNOWN;
+			srvDescIB.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDescIB.Buffer.NumElements = mat.TriangleIndexCount;
+			srvDescIB.Buffer.FirstElement = 0;
+			srvDescIB.Buffer.StructureByteStride = ibStride;
 
-		mat.descriptorTriangleVB = device->CreateShaderResourceView(mat.TriangleVertexBuffer.Get(), &srvDescVB);
-		mat.descriptorTriangleIB = device->CreateShaderResourceView(mat.TriangleIndexBuffer.Get(), &srvDescIB);
+			mat.descriptorTriangleVB = device->CreateShaderResourceView(mat.TriangleVertexBuffer.Get(), &srvDescVB);
+			mat.descriptorTriangleIB = device->CreateShaderResourceView(mat.TriangleIndexBuffer.Get(), &srvDescIB);
 
-		mat.shaderName = shaderName;
+			mat.shaderName = shaderName;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	void OBJ_MODEL::CreateMeshBuffers(std::unique_ptr<dx12::RenderDeviceDX12>& device, const wchar_t* modelNamePtr)
 	{
 		u32 count = 0;
 
+		vector<u32> validMaterialIDTbl;
 		for (auto& m : MaterialTbl)
 		{
 			wchar_t nameVB[60];
@@ -539,20 +549,36 @@ namespace utility {
 			wchar_t nameIB[60];
 			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
 			
-			CreateMeshBuffer(device, m, nameVB, nameIB, L"");
+			const bool isValidMat = CreateMeshBuffer(device, m, nameVB, nameIB, L"");
 
-			MaterialParam mparams;
-			mparams.albedo = XMVectorSet(m.Reflection4Color.diffuse.x, m.Reflection4Color.diffuse.y, m.Reflection4Color.diffuse.z, m.Reflection4Color.diffuse.w);
-			mparams.specular = (m.Reflection4Color.specular.x + m.Reflection4Color.specular.y + m.Reflection4Color.specular.z + m.Reflection4Color.specular.w) / 4.0f;
-			mparams.metallic = mparams.specular;
-			mparams.roughness = 1 - mparams.metallic;
-			mparams.transRatio = 0;
-			mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
-			m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
-			device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
+			if (isValidMat)
+			{
+				MaterialParam mparams;
+				mparams.albedo = XMVectorSet(m.Reflection4Color.diffuse.x, m.Reflection4Color.diffuse.y, m.Reflection4Color.diffuse.z, m.Reflection4Color.diffuse.w);
+				mparams.specular = (m.Reflection4Color.specular.x + m.Reflection4Color.specular.y + m.Reflection4Color.specular.z + m.Reflection4Color.specular.w) / 4.0f;
+				mparams.metallic = mparams.specular;
+				mparams.roughness = 1 - mparams.metallic;
+				mparams.transRatio = 0;
+				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+				m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
+				device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
+
+				validMaterialIDTbl.push_back(count);
+			}
 
 			count++;
 		}
+
+		vector <MATERIAL> validMaterialTbl(validMaterialIDTbl.size());
+
+		u32 countValid = 0;
+		for (auto& id : validMaterialIDTbl)
+		{
+			validMaterialTbl[countValid] = MaterialTbl[id];
+			countValid++;
+		}
+
+		MaterialTbl = validMaterialTbl;
 	}
 
 	void OBJ_MODEL::CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr)

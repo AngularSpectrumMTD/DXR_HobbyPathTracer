@@ -317,7 +317,7 @@ private:
         ModelType_Afrodyta,
         ModelType_Rock,
         ModelType_CurvedMesh,
-        ModelType_DebugMesh,
+        ModelType_DebugMesh
     };
 
     enum SceneType
@@ -325,7 +325,8 @@ private:
         SceneType_Simple,
         SceneType_Sponza,
         SceneType_BistroExterior,
-        SceneType_BistroInterior
+        SceneType_BistroInterior,
+        SceneType_SanMiguel,
     };
 
     enum Spectrum

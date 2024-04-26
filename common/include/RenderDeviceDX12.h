@@ -68,7 +68,7 @@ namespace dx12
         static const u32 BackBufferCount = 3;
         static const u32 RenderTargetViewMax = 64;
         static const u32 DepthStencilViewMax = 64;
-        static const u32 ShaderResourceViewMax = 1024;
+        static const u32 ShaderResourceViewMax = 2048;
 
         RenderDeviceDX12();
         RenderDeviceDX12(const RenderDeviceDX12&) = delete;
