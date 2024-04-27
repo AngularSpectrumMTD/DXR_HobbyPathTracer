@@ -53,6 +53,7 @@ DirectX12
 - X / Y / Z : light position
 - L : increase / decrease light emission range
 - T / P : light emission angle(theta / phi)
+- O / W : directional light angle(theta / phi)
 - K : increase / decrease light intensity
 - B : increase / decrease photon gathering block num
 - N : visualize caustics
