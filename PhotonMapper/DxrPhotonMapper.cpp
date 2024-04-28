@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -600,13 +600,9 @@ void DxrPhotonMapper::Update()
     mSceneParam.mtxProj = mCamera.GetProjectionMatrix();
     mSceneParam.mtxViewInv = XMMatrixInverse(nullptr, mSceneParam.mtxView);
     mSceneParam.mtxProjInv = XMMatrixInverse(nullptr, mSceneParam.mtxProj);
-    mSceneParam.lightColor = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-    mSceneParam.backgroundColor = XMVectorSet(0.3f, 0.45f, 0.45f, 1.0f);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, mIntenceBoost, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
     mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
-    mSceneParam.spotLightPosition = XMVectorSet(mLightPosX, mLightPosY, mLightPosZ, 0.0f);
-    mSceneParam.spotLightDirection = XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
     mSceneParam.flags.y = mIsUseTexture;
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
@@ -886,7 +882,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
             XMFLOAT3 normal;
-            XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+            XMStoreFloat3(&normal, XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f));
             utility::ONB(normal, tangent, bitangent);
             tangent.x *= scale;
             tangent.y *= scale;
@@ -906,7 +902,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
             XMFLOAT3 normal;
-            XMStoreFloat3(&normal, mSceneParam.spotLightDirection);
+            XMStoreFloat3(&normal, XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f));
             utility::ONB(normal, tangent, bitangent);
             tangent.x *= scale;
             tangent.y *= scale;

@@ -13,10 +13,6 @@ struct SceneCB
     matrix mtxProj;
     matrix mtxViewInv;
     matrix mtxProjInv;
-    float4 lightColor;
-    float4 backgroundColor;
-    float4 spotLightPosition;
-    float4 spotLightDirection;
     uint4 flags;
     float4 photonParams;
     float4 cameraParams;

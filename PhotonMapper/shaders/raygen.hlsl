@@ -86,7 +86,7 @@ void rayGen() {
 
     //clear gbuffer
     gDiffuseAlbedoBuffer[launchIndex] = 0.xxxx;
-    gDepthBuffer[launchIndex] = 0.xxxx;
+    gDepthBuffer[launchIndex] = 0;
     gPositionBuffer[launchIndex] = 0.xxxx;
     gNormalBuffer[launchIndex] = 0.xxxx;
 
@@ -191,8 +191,7 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    float emitIntensity = length(gSceneParam.lightColor.xyz);
-    payload.throughput = emitIntensity * getBaseLightXYZ(LAMBDA_NM);
+    payload.throughput = getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.storeIndex = serialIndex;
     payload.stored = 0;//empty

@@ -181,10 +181,6 @@ private:
         XMMATRIX mtxProj;
         XMMATRIX mtxViewInv;
         XMMATRIX mtxProjInv;
-        XMVECTOR lightColor;
-        XMVECTOR backgroundColor;
-        XMVECTOR spotLightPosition;
-        XMVECTOR spotLightDirection;
         XMUINT4 flags;
         XMFLOAT4 photonParams;//x unused
         XMVECTOR cameraParams;//near far reserved reserved
