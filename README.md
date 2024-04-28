@@ -4,14 +4,20 @@ Hybrid Photon Mapper By Use Of DirectX Raytracing
 ![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4d1a14ce-2f81-4827-a33c-b6b22ec8bdf6)
 
 "Next Event Estimation" is implemented  
-Left : "NEE" Right : "Simple Pathtracing"
+Left : "NEE" / Right : "Simple Pathtracing"
 ![NEE_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b060029b-0dc0-49c9-bf97-2c36b79ec325)
+
+Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights
+  Left : Uniform Sampling (from 400 lights ONLY 1frame) / Right : WRS (8 stream inputs from 400 lights ONLY 1frame)
+![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a1434599-5ede-4ac5-a81a-9e14f6a217cc)
+This sampling technique can easily generate beautiful rendering images of scenes with many light sources.
+![ManyLightsWRSRIS](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/e2349918-e0ad-4fe1-97ca-855d47bb01f9)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
-Denoiser : SVGF(Currently Disabled)  
+Denoiser : SVGF (Currently Disabled)  
 Shading : GGX  
-Sampling : Next Event Estimation
+Sampling : Next Event Estimation / Streaming RIS
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal  
@@ -53,8 +59,8 @@ DirectX12
 - G : increase / decrease photon gather radius
 - X / Y / Z : light position
 - L : increase / decrease light emission range
-- T / P : light emission angle(theta / phi)
-- O / W : directional light angle(theta / phi)
+- T / P : light emission angle (theta / phi)
+- O / W : directional light angle (theta / phi)
 - K : increase / decrease light intensity
 - B : increase / decrease photon gathering block num
 - N : visualize caustics
@@ -67,6 +73,9 @@ DirectX12
 - A : enable / disable direct lighting
 - C : change photon emitter type (spot light/rectangular light)
 - V : enable / disable debug view
+- F : enable / disable lighting by use of many sphere lights
 - MOUSE_RIGHT : rotate the camera around the gazing point
 - MOUSE_LEFT : move the camera back and forth
 - ↑↓→← : move the camera up, down, left, or right
+- SPACE : change the target to edit the material
+- CTRL : enable / disable Streaming RIS

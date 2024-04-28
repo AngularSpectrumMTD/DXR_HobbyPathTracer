@@ -330,31 +330,6 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
     return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }
 
-float3 RIS_WRS_LightIrradiance(in float3 scatterPosition, inout LightSample finalLightSample)
-{
-    const float pdf = 1.0f / getLightNum();
-    float p_hat = 0;
-    LightSample lightSample;
-
-    Reservoir reservoir;
-    reservoir.initialize();
-
-    for (int i = 0; i < getLightNum(); i++)
-    {
-        const uint lightID = (uint) (rand() * (getLightNum()));
-        sampleLightWithID(scatterPosition, lightID, lightSample);
-        p_hat = length(lightSample.emission);
-        float updateW = p_hat / pdf;
-        updateReservoir(reservoir, lightID, updateW, 1u, rand());
-    }
-
-    sampleLightWithID(scatterPosition, reservoir.Y, finalLightSample);
-    p_hat = isVisible(scatterPosition, finalLightSample) ? length(finalLightSample.emission) : 0;
-
-    reservoir.W_y = p_hat > 0 ? rcp(p_hat) * reservoir.W_sum / reservoir.M : 0;
-    return reservoir.W_y * finalLightSample.emission;
-}
-
 void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 {
     const uint lightID = (uint) (rand() * (getLightNum()) + 0.5);

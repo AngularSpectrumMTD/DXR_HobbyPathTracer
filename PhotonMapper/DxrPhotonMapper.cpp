@@ -14,7 +14,7 @@
 
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
-#define MAX_ACCUMULATION_RANGE 10000
+#define MAX_ACCUMULATION_RANGE 1000
 #define DIRECTIONAL_LIGHT_POWER 5
 
 #define NEE_AVAILABLE
@@ -82,6 +82,7 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
+    mIsUseWRS_RIS = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -633,7 +634,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional.x = mLightGenerationParamTbl.size();
     mSceneParam.additional.y = mIsIndirectOnly ? 1 : 0;
     mSceneParam.additional.z = mIsUseNEE ? 1 : 0;
-    mSceneParam.additional.w = 0;
+    mSceneParam.additional.w = mIsUseWRS_RIS ? 1 : 0;
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
 
     mRenderFrame++;
@@ -666,8 +667,8 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mInverseMove = !mInverseMove;
         break;
     case 'F':
-        //mIsUseManySphereLightLighting = !mIsUseManySphereLightLighting;
-        //mIsUseAccumulation = false;
+        mIsUseManySphereLightLighting = !mIsUseManySphereLightLighting;
+        mIsUseAccumulation = false;
         break;
     case 'E':
 #ifdef NEE_AVAILABLE
@@ -793,6 +794,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case VK_SPACE:
         mIsTargetGlass = !mIsTargetGlass;
         break;
+    case VK_CONTROL:
+        mIsUseWRS_RIS = !mIsUseWRS_RIS;
+        mIsUseAccumulation = false;
+        break;
     }
 }
 
@@ -855,15 +860,6 @@ void DxrPhotonMapper::UpdateMaterialParams()
 void DxrPhotonMapper::InitializeLightGenerateParams()
 {
     mLightGenerationParamTbl.resize(0);
-    for (u32 i = 0; i < LightCount_Sphere; i++)
-    {
-        if (mIsUseManySphereLightLighting)
-        {
-            LightGenerateParam param;
-            param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
-            mLightGenerationParamTbl.push_back(param);
-        }
-    }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
         LightGenerateParam param;
@@ -875,6 +871,15 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
         LightGenerateParam param;
         param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
         mLightGenerationParamTbl.push_back(param);
+    }
+    for (u32 i = 0; i < LightCount_Sphere; i++)
+    {
+        if (mIsUseManySphereLightLighting)
+        {
+            LightGenerateParam param;
+            param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
+            mLightGenerationParamTbl.push_back(param);
+        }
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
@@ -891,21 +896,6 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     mLightGenerationParamTbl.resize(0);
     u32 count = 0;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION_FOR_LIGHT_POSITION;
-    for (u32 i = 0; i < LightCount_Sphere; i++)
-    {
-        if (mIsUseManySphereLightLighting)
-        {
-            f32 y = mLightPosY;
-            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            LightGenerateParam param;
-            param.setParamAsSphereLight(XMFLOAT3(x, mLightPosY, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2f), mLightRange, 150);
-            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
-            mLightGenerationParamTbl.push_back(param);
-        }
-        count++;
-    }
-    count = 0;
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
         if (i == 0 && !mIsSpotLightPhotonMapper)
@@ -989,6 +979,22 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         }
         count++;
     }
+    count = 0;
+    for (u32 i = 0; i < LightCount_Sphere; i++)
+    {
+        if (mIsUseManySphereLightLighting)
+        {
+            f32 y = mLightPosY;
+            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            LightGenerateParam param;
+            param.setParamAsSphereLight(XMFLOAT3(x, mLightPosY, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2f), mLightRange, 150);
+            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
+            mLightGenerationParamTbl.push_back(param);
+        }
+        count++;
+    }
+    count = 0;
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
         LightGenerateParam param;

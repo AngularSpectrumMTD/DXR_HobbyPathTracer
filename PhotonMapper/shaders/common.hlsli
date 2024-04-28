@@ -131,6 +131,11 @@ bool isUseNEE()
     return gSceneParam.additional.z == 1;
 }
 
+bool isUseWRS_RIS()
+{
+    return gSceneParam.additional.w == 1;
+}
+
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;

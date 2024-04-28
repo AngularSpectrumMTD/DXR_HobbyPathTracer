@@ -655,6 +655,7 @@ private:
 
     bool mIsUseManySphereLightLighting;
     bool isPrimalLightSRVUpdate = true;
+    bool mIsUseWRS_RIS = false;
 };
 
 #endif
