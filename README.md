@@ -7,8 +7,8 @@ Hybrid Photon Mapper By Use Of DirectX Raytracing
 Left : "NEE" / Right : "Simple Pathtracing"
 ![NEE_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b060029b-0dc0-49c9-bf97-2c36b79ec325)
 
-Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights
-  Left : Uniform Sampling (from 400 lights ONLY 1frame) / Right : WRS (8 stream inputs from 400 lights ONLY 1frame)
+Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
+Left : Uniform Sampling (from 400 lights ONLY 1frame) / Right : WRS (8 stream inputs from 400 lights ONLY 1frame)
 ![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/d8f82100-4f00-4395-b18d-e05f50e70506)
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.
 ![ManyLightsWRSRIS](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/57d99358-f755-4e6a-85cb-8b181f87f1d8)
