@@ -14,7 +14,8 @@ Shading : GGX
 Sampling : Next Event Estimation
 
 ### Debug View
-Enable to check (Diffuse)Albedo / Depth / Normal
+Enable to check (Diffuse)Albedo / Depth / Normal  
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/cc8bf838-8cfd-4ba9-90cc-1b9174afe542)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

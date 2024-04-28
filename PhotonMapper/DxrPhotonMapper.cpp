@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -221,7 +221,7 @@ void DxrPhotonMapper::Setup()
             //mPhiDirectional = 70; mThetaDirectional = 220;
             //mPhiDirectional = 100; mThetaDirectional = 280;//1
             mPhiDirectional = 104; mThetaDirectional = 255;//1
-            mOBJFileName = "San_Miguel_Low_Poly_Triangulate.obj";
+            mOBJFileName = "san-miguel-low-poly.obj";
             mOBJFolderName = "model/San_Miguel";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(20, 0, 0));
             mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
@@ -688,7 +688,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'K':
-        mIntenceBoost = Clamp(1, 100, mIntenceBoost + (mInverseMove ? -1 : 1));
+        mIntenceBoost = Clamp(1, 10000, mIntenceBoost + (mInverseMove ? -10 : 10));
         mIsUseAccumulation = false;
         break;
     case 'B':

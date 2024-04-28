@@ -368,7 +368,7 @@ float compute01Depth(float3 wPos)
 
 void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in float3 normal)
 {
-    if (!(payload.flags & PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED))
+    if (!(payload.flags & PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED) && (payload.recursive == 1))
     {
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         float2 writeIndex = payload.storeIndexXY;

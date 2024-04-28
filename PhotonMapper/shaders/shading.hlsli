@@ -435,7 +435,6 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         //ray hitted the light source
         if (intersectLightWithCurrentRay(Le))
         {
-            storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
             if (isNEE_Exec)
             {
                 if (payload.recursive == 1 && !isIndirectOnly())
@@ -458,7 +457,6 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         //ray hitted the emissive material
         if (length(material.emission.xyz) > 0)
         {
-            storeAlbedoDepthPositionNormal(payload, material.albedo.xyz, surfaceNormal);
             payload.color += payload.throughput * material.emission.xyz;
             isFinish = false;
             return isFinish;

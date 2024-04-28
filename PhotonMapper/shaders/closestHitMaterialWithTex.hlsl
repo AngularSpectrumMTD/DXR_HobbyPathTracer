@@ -131,6 +131,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
+    if (!isIgnoreHit)
+    {
+        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, surfaceNormal);
+    }
+
     if (isLightingRequired)
     {
         if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
@@ -144,7 +149,6 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
-        storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, surfaceNormal);
         nextRay.Direction = 0.xxx;
         const float3 photon = accumulatePhoton(scatterPosition, payload.eyeDir, bestFitWorldNormal);
         payload.color += payload.throughput * photon;

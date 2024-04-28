@@ -84,6 +84,12 @@ void rayGen() {
     gDepthBuffer[launchIndex] = 0;
     float2 dims = float2(DispatchRaysDimensions().xy);
 
+    //clear gbuffer
+    gDiffuseAlbedoBuffer[launchIndex] = 0.xxxx;
+    gDepthBuffer[launchIndex] = 0.xxxx;
+    gPositionBuffer[launchIndex] = 0.xxxx;
+    gNormalBuffer[launchIndex] = 0.xxxx;
+
     float3 accumColor = 0.xxx;
 
     //random
