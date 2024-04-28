@@ -19,6 +19,9 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
+#define STAGE_DIVISION 4
+#define STAGE_DIVISION_FOR_LIGHT_POSITION 20
+
 #define BITONIC_BLOCK_SIZE 1024
 #define TRANSPOSE_BLOCK_SIZE 16
 
@@ -290,7 +293,7 @@ private:
 
     enum LightCount
     {
-        LightCount_Sphere = 0,
+        LightCount_Sphere = 400,
         LightCount_Rect = 1,
         LightCount_Spot = 1,
         LightCount_Directional = 1,
@@ -645,6 +648,13 @@ private:
 
     u32 mRecursionDepth = 0;
     u32 mSceneLightNum = 0;
+
+    f32 mStageOffsetY = 0;
+    f32 mStageOffsetX = 0;
+    f32 mStageOffsetZ = 0;
+
+    bool mIsUseManySphereLightLighting;
+    bool isPrimalLightSRVUpdate = true;
 };
 
 #endif

@@ -15,6 +15,7 @@ struct LightSample
 
 #define DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN 5 * PI / 180
 
+//ok
 void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     float u = rand();
@@ -127,7 +128,7 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 
 void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
-    const uint lightID = (uint) (rand() * (getLightNum()) + 0.5);
+    const uint lightID = min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     isDirectionalLightSampled = false;
@@ -159,17 +160,20 @@ bool intersectLightWithCurrentRay(out float3 Le)
     const float3 rayDiretion = WorldRayDirection();
     const float rayT = RayTCurrent();
 
-    const uint lightID = (uint) (rand() * (getLightNum()));
+    const uint lightID = min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
-        normalize(param.U), normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
-        float hittedT = min(tt.x, tt.y);
+        const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+        //float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
+        //shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
+        //float frontT = tt.x >= 0 ? tt.x : tt.y;
+        float t = intersectSphere(rayOrigin, rayDiretion, param.position,
+        shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
 
         Le = param.emission * max(1, getLightNum() - 1);
-        return (hittedT > 0 && hittedT < rayT);
+        return (t >= 0 && t < rayT);
     }
     else if (param.type == LIGHT_TYPE_RECT)
     {
@@ -191,6 +195,65 @@ bool intersectLightWithCurrentRay(out float3 Le)
     }
 
     return false;
+}
+
+bool intersectAllLightWithCurrentRay(out float3 Le)
+{
+    const float3 rayOrigin = WorldRayOrigin();
+    const float3 rayDiretion = WorldRayDirection();
+    const float rayT = RayTCurrent();
+
+    bool isIntersect = false;
+
+    for (int i = 0; i < getLightNum(); i++)
+    {
+        LightGenerateParam param = gLightGenerateParams[i];
+
+        if (param.type == LIGHT_TYPE_SPHERE)
+        {
+            const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+        //float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
+        //shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
+        //float frontT = tt.x >= 0 ? tt.x : tt.y;
+            float t = intersectSphere(rayOrigin, rayDiretion, param.position,
+            shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
+
+            Le = param.emission * max(1, getLightNum() - 1);
+            isIntersect = (t >= 0 && t < rayT);
+            if (isIntersect)
+            {
+                break;
+            }
+        }
+        else if (param.type == LIGHT_TYPE_RECT)
+        {
+            const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+            float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+            const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
+
+            Le = param.emission * max(1, getLightNum() - 1);
+            isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
+            if (isIntersect)
+            {
+                break;
+            }
+        }
+        else if (param.type == LIGHT_TYPE_SPOT)
+        {
+            const float3 shapeForwardDir = normalize(cross(param.U, param.V));
+            float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
+            const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
+
+            Le = param.emission * max(1, getLightNum() - 1);
+            isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
+            if (isIntersect)
+            {
+                break;
+            }
+        }
+    }
+
+    return isIntersect;
 }
 
 float3 directionalLightingOnMissShader(Payload payload)

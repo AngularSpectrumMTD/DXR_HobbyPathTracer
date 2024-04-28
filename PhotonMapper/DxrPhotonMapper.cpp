@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -77,6 +77,7 @@ void DxrPhotonMapper::Setup()
     mIsUseAccumulation = false;
     mIsIndirectOnly = false;
     mIsUseNEE = true;
+    mIsUseManySphereLightLighting = false;
     mStageTextureFileName = L"model/tileTex.png";
     //mCubeMapTextureFileName = L"model/ParisEquirec.png";
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
@@ -99,6 +100,9 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "diamond.obj";
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
+            mStageOffsetX = 0;
+            mStageOffsetY = -55;
+            mStageOffsetZ = 0;
             mLightPosX = -16; mLightPosY = -172; mLightPosZ = -4.2;
             mPhi = 149; mTheta = 257;
             mPhiDirectional = 70; mThetaDirectional = 220;
@@ -122,12 +126,18 @@ void DxrPhotonMapper::Setup()
                 mOBJFileName = "fireplace_room.obj";
                 mOBJFolderName = "model/fireplace";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));
+                mStageOffsetX = -20;
+                mStageOffsetY = 0;
+                mStageOffsetZ = 10;
             }
             else
             {
                 mOBJFileName = "sponza.obj";
                 mOBJFolderName = "model/sponza";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+                mStageOffsetX = 0;
+                mStageOffsetY = 0;
+                mStageOffsetZ = 0;
             }
             
             if (isRoomTestDebug)
@@ -166,7 +176,10 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
-            mLightPosX = -3.2; mLightPosY = 10; mLightPosZ = -2.2;
+            mStageOffsetX = 20;
+            mStageOffsetY = 0;
+            mStageOffsetZ = 0;
+            mLightPosX = -2.3; mLightPosY = 7.8; mLightPosZ = -2.9;
             mPhi = 327; mTheta = 403;
             mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
@@ -176,12 +189,13 @@ void DxrPhotonMapper::Setup()
             {
                 mPhi = 327; mTheta = 403;
                 mLightPosX = -1.59; mLightPosY = 21; mLightPosZ = -4.2;
-                mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mInitTargetPos = XMFLOAT3(0, 8, 0);
 #ifdef CUBE_TEST
+                mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
-                mLightRange = 0.28;
+                mInitEyePos = XMFLOAT3(16.8, 9.77, 31.4);
+                mLightRange = 1.98f;
                 mLightPosX = -2.38; mLightPosY = 7.8; mLightPosZ = -2.9;
 #endif
                 mGatherRadius = 0.08f;
@@ -205,6 +219,9 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mStageOffsetX = 20;
+            mStageOffsetY = 0;
+            mStageOffsetZ = 0;
             mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
             mPhi = 376; mTheta = 107;
             mInitEyePos = XMFLOAT3(30, 12, 9);
@@ -224,6 +241,9 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "san-miguel-low-poly.obj";
             mOBJFolderName = "model/San_Miguel";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(20, 0, 0));
+            mStageOffsetX = 20;
+            mStageOffsetY = 0;
+            mStageOffsetZ = 0;
             mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
             mPhi = 376; mTheta = 107;
             mInitEyePos = XMFLOAT3(30, 12, 9);
@@ -645,6 +665,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'I':
         mInverseMove = !mInverseMove;
         break;
+    case 'F':
+        //mIsUseManySphereLightLighting = !mIsUseManySphereLightLighting;
+        //mIsUseAccumulation = false;
+        break;
     case 'E':
 #ifdef NEE_AVAILABLE
         mIsUseNEE = !mIsUseNEE;
@@ -833,27 +857,24 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
     mLightGenerationParamTbl.resize(0);
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
-        LightGenerateParam param;
-        param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
-        mLightGenerationParamTbl.push_back(param);
+        if (mIsUseManySphereLightLighting)
+        {
+            LightGenerateParam param;
+            param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
+            mLightGenerationParamTbl.push_back(param);
+        }
     }
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
-        if (i == 0 && !mIsSpotLightPhotonMapper)
-        {
-            LightGenerateParam param;
-            param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-            mLightGenerationParamTbl.push_back(param);
-        }
+        LightGenerateParam param;
+        param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
-        if (i == 0 && mIsSpotLightPhotonMapper)
-        {
-            LightGenerateParam param;
-            param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
-            mLightGenerationParamTbl.push_back(param);
-        }
+        LightGenerateParam param;
+        param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
@@ -868,12 +889,23 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     const f32 scale = mLightRange;
     const u32 prevSize = mLightGenerationParamTbl.size();
     mLightGenerationParamTbl.resize(0);
+    u32 count = 0;
+    const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION_FOR_LIGHT_POSITION;
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
-        LightGenerateParam param;
-        param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(5, 5, 5), scale, 150);
-        mLightGenerationParamTbl.push_back(param);
+        if (mIsUseManySphereLightLighting)
+        {
+            f32 y = mLightPosY;
+            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            LightGenerateParam param;
+            param.setParamAsSphereLight(XMFLOAT3(x, mLightPosY, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2f), mLightRange, 150);
+            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
+            mLightGenerationParamTbl.push_back(param);
+        }
+        count++;
     }
+    count = 0;
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
         if (i == 0 && !mIsSpotLightPhotonMapper)
@@ -893,7 +925,29 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
             mLightGenerationParamTbl.push_back(param);
         }
+        else if (!mIsSpotLightPhotonMapper)
+        {
+            f32 y = mLightPosY;
+            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            LightGenerateParam param;
+            XMFLOAT3 tangent;
+            XMFLOAT3 bitangent;
+            XMFLOAT3 normal;
+            XMStoreFloat3(&normal, XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f));
+            utility::ONB(normal, tangent, bitangent);
+            tangent.x *= scale;
+            tangent.y *= scale;
+            tangent.z *= scale;
+            bitangent.x *= scale;
+            bitangent.y *= scale;
+            bitangent.z *= scale;
+            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            mLightGenerationParamTbl.push_back(param);
+        }
+        count++;
     }
+    count = 0;
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
         if (i == 0 && mIsSpotLightPhotonMapper)
@@ -913,6 +967,27 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
             mLightGenerationParamTbl.push_back(param);
         }
+        else if (mIsSpotLightPhotonMapper)
+        {
+            f32 y = mLightPosY;
+            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            LightGenerateParam param;
+            XMFLOAT3 tangent;
+            XMFLOAT3 bitangent;
+            XMFLOAT3 normal;
+            XMStoreFloat3(&normal, XMVectorSet(sin(mTheta * ONE_RADIAN) * cos(mPhi * ONE_RADIAN), sin(mTheta * ONE_RADIAN) * sin(mPhi * ONE_RADIAN), cos(mTheta * ONE_RADIAN), 0.0f));
+            utility::ONB(normal, tangent, bitangent);
+            tangent.x *= scale;
+            tangent.y *= scale;
+            tangent.z *= scale;
+            bitangent.x *= scale;
+            bitangent.y *= scale;
+            bitangent.z *= scale;
+            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            mLightGenerationParamTbl.push_back(param);
+        }
+        count++;
     }
     for (u32 i = 0; i < LightCount_Directional; i++)
     {
@@ -987,6 +1062,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->ResourceBarrier(_countof(barriersSRVToUAV), barriersSRVToUAV);
     mCommandList->ResourceBarrier(_countof(meanBarriers), meanBarriers);
 
+    mDevice->WaitForCompletePipe();
     UpdateSceneParams();
     UpdateSceneTLAS();
     UpdateMaterialParams();

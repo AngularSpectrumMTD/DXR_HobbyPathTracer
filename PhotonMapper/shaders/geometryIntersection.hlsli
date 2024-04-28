@@ -23,25 +23,43 @@ float2 quadraticFormula(float a, float b, float c)//x : (-b - sqrt(d)) / 2a , y 
         return float2(minDst, maxDst);
     }
     
-    return float2(RAY_MAX_T, RAY_MAX_T);
+    return float2(-1, -1);
 }
 
-float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
+//float2 intersectEllipsoid(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
+//{
+//    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
+//    float3 orig = mul(transMat, lineOrigin - shapeOrigin);
+//    float3 dir = mul(transMat, lineDir);
+    
+//    float U = 1.0 / (u * u);
+//    float V = 1.0 / (v * v);
+//    float W = 1.0 / (w * w);
+    
+//    float a = dir.x * dir.x * U + dir.y * dir.y * V + dir.z * dir.z * W;
+//    float b = 2 * (orig.x * dir.x * U + orig.y * dir.y * V + orig.z * dir.z * W);
+//    float c = orig.x * orig.x * U + orig.y * orig.y * V + orig.z * orig.z * W - 1;
+    
+//    return quadraticFormula(a, b, c);
+//} 
+
+float intersectSphere(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 shapeForwardDir, float3 shapeUpDir, float u, float v, float w)
 {
-    float3x3 transMat = constructWorldToLocalMatrix(shapeForwardDir, shapeUpDir);
-    float3 orig = mul(transMat, lineOrigin - shapeOrigin);
-    float3 dir = mul(transMat, lineDir);
-    
-    float U = 1.0 / (u * u);
-    float V = 1.0 / (v * v);
-    float W = 1.0 / (w * w);
-    
-    float a = dir.x * dir.x * U + dir.y * dir.y * V + dir.z * dir.z * W;
-    float b = 2 * (orig.x * dir.x * U + orig.y * dir.y * V + orig.z * dir.z * W);
-    float c = orig.x * orig.x * U + orig.y * orig.y * V + orig.z * orig.z * W - 1;
-    
-    return quadraticFormula(a, b, c);
-} 
+    float3 oc = lineOrigin - shapeOrigin;
+    float a = dot(lineDir, lineDir);
+    float b = dot(oc, lineDir);
+    float c = dot(oc, oc) - u * u;
+
+    float D = b * b - a * c;
+    float T = -1;
+
+    if (D > 0.0f) {
+        float DD = (b > 0) ? sqrt(D) : -sqrt(D);
+        T = (-b + DD) / a;
+    }
+
+    return T;
+}
 
 //u v : length of axis
 float intersectEllipse(float3 lineOrigin, float3 lineDir, float3 shapeOrigin, float3 vecU, float3 vecV)

@@ -1,7 +1,7 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Simple Pathtracing + Photon Mapping[Spectral Rendered Caustics])  
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/ee152d98-33a3-4c21-86a4-e51d5bb0e525)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4d1a14ce-2f81-4827-a33c-b6b22ec8bdf6)
 
 "Next Event Estimation" is implemented  
 Left : "NEE" Right : "Simple Pathtracing"

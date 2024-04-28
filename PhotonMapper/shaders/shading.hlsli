@@ -432,8 +432,18 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
     const bool isHitLightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
     if (isHitLightingRequired)
     {
+        bool isIntersect = false;
+        if (payload.recursive == 1)
+        {
+            isIntersect = intersectAllLightWithCurrentRay(Le);
+        }
+        else
+        {
+            isIntersect = intersectLightWithCurrentRay(Le);;
+        }
+
         //ray hitted the light source
-        if (intersectLightWithCurrentRay(Le))
+        if (isIntersect)
         {
             if (isNEE_Exec)
             {

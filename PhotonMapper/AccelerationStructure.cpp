@@ -3,8 +3,6 @@
 
 using namespace DirectX;
 
-#define STAGE_DIVISION 4
-
 void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
 {
     D3D12_RAYTRACING_INSTANCE_DESC templateDesc{};
