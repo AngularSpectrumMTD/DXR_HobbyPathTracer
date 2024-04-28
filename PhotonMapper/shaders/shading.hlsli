@@ -413,7 +413,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
                 float3 FGL = lightSample.emission * bsdfPDF.xyz * G / lightSample.pdf;
                 p_hat = length(FGL);
                 float updateW = p_hat / pdf;
-                updateReservoir(reservoir, lightID, updateW, 1u, rand());
+                updateReservoir(reservoir, lightID, updateW, p_hat, 1u, rand());
             }
         }
     }
@@ -423,7 +423,8 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
 
     //lightSample.emission *= getLightNum();
-    lightSample.emission *= M;
+    const float invPDF = reservoir.W_sum / (reservoir.M * reservoir.targetPDF);
+    lightSample.emission *= invPDF;
 }
 
 void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
