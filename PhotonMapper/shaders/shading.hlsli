@@ -214,7 +214,7 @@ void updateDirectionAndThroughput(in MaterialParams material, in float3 N_global
     
     const float eps = 0.001;
     const float3 wo_global = -WorldRayDirection();
-    const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();;
+    const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
     const float roulette = rand();
     const float blending = rand();
@@ -368,8 +368,8 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
 
 void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
-    const uint M = min(max(getLightNum() / 10, 30), getLightNum());
-    const float pdf = 1.0f / M;
+    const uint M = min(getLightNum(), 30);
+    const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
     const uint directionalLightID = getLightNum() - 1;
 
@@ -378,7 +378,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
 
     for (int i = 0; i < M; i++)
     {
-        const uint lightID = (i == 0) ? directionalLightID : min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+        const uint lightID = getRandomLightID();
         bool isDirectionalLightSampled = false;
         LightGenerateParam param = gLightGenerateParams[lightID];
 

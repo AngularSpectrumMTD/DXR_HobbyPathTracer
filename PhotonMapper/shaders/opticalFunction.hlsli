@@ -36,6 +36,11 @@ void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
     bitangent = cross(normal, tangent);
 }
 
+uint getRandomLightID()
+{
+    return min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+}
+
 #include "reservoir.hlsli"
 #include "geometryIntersection.hlsli"
 #include "samplingBSDF.hlsli"

@@ -8,11 +8,12 @@ Left : "NEE" / Right : "Simple Pathtracing"
 ![NEE_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b060029b-0dc0-49c9-bf97-2c36b79ec325)
 
 Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
-Left :  WRS (30 stream inputs from 400 lights ONLY 1frame) / Right : Uniform Sampling (from 400 lights ONLY 1frame)  
-![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b8402fe4-6600-4e7c-87bd-ffec72a23215)
+Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Uniform Sampling (from 400 lights. Not Accumulated)  
+![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/60dd1bf4-1421-4fb2-a831-c1dfd0363bc2)
 
-This sampling technique can easily generate beautiful rendering images of scenes with many light sources.
-![ManyLightsWRSRIS](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/bb7eb21a-ecf5-4b0d-9ce0-29f7a8a898ed)
+This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
+Left :  WRS (30 stream inputs from 400 lights. 400 frame Accumulated) / Right : Uniform Sampling (from 400 lights. 400 frame Accumulated)  
+![ManyLightsWRSRIS](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/31bd8a32-ab18-4470-af5a-54338af36744)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

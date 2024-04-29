@@ -128,7 +128,7 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 
 void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
-    const uint lightID = min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+    const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     isDirectionalLightSampled = false;
@@ -160,7 +160,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
     const float3 rayDiretion = WorldRayDirection();
     const float rayT = RayTCurrent();
 
-    const uint lightID = min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+    const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (param.type == LIGHT_TYPE_SPHERE)
@@ -349,7 +349,7 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
 
 void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 {
-    const uint lightID = (uint) (rand() * (getLightNum()) + 0.5);
+    const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[0];
     //LightGenerateParam param = gLightGenerateParams[lightID];
 
