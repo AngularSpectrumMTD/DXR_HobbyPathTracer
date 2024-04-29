@@ -18,7 +18,7 @@ void miss(inout Payload payload) {
     }
 
     float3 hittedEmission = 0.xxx;
-    if (!isIndirectOnly() && payload.recursive == 0 && intersectLightWithCurrentRay(hittedEmission))
+    if (!isIndirectOnly() && payload.recursive == 0 && intersectAllLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
         payload.throughput = 0.xxx;

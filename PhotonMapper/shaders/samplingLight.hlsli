@@ -204,6 +204,9 @@ bool intersectAllLightWithCurrentRay(out float3 Le)
     const float rayT = RayTCurrent();
 
     bool isIntersect = false;
+    int mostNearIndex = -1;
+    float currT = 100000000;
+    float3 mostNearLe = 0.xxx;
 
     for (int i = 0; i < getLightNum(); i++)
     {
@@ -212,17 +215,19 @@ bool intersectAllLightWithCurrentRay(out float3 Le)
         if (param.type == LIGHT_TYPE_SPHERE)
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        //float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
-        //shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
-        //float frontT = tt.x >= 0 ? tt.x : tt.y;
-            float t = intersectSphere(rayOrigin, rayDiretion, param.position,
+            float hittedT = intersectSphere(rayOrigin, rayDiretion, param.position,
             shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
 
             Le = param.emission * max(1, getLightNum() - 1);
-            isIntersect = (t >= 0 && t < rayT);
+            isIntersect = (hittedT >= 0 && hittedT < rayT);
             if (isIntersect)
             {
-                break;
+                if(currT > hittedT)
+                {
+                    mostNearIndex = i;
+                    currT = hittedT;
+                    mostNearLe = Le;
+                }
             }
         }
         else if (param.type == LIGHT_TYPE_RECT)
@@ -235,7 +240,12 @@ bool intersectAllLightWithCurrentRay(out float3 Le)
             isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
             if (isIntersect)
             {
-                break;
+                if(currT > hittedT)
+                {
+                    mostNearIndex = i;
+                    currT = hittedT;
+                    mostNearLe = Le;
+                }
             }
         }
         else if (param.type == LIGHT_TYPE_SPOT)
@@ -248,12 +258,19 @@ bool intersectAllLightWithCurrentRay(out float3 Le)
             isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
             if (isIntersect)
             {
-                break;
+                if(currT > hittedT)
+                {
+                    mostNearIndex = i;
+                    currT = hittedT;
+                    mostNearLe = Le;
+                }
             }
         }
     }
 
-    return isIntersect;
+    Le = mostNearLe;
+
+    return (mostNearIndex != -1);
 }
 
 float3 directionalLightingOnMissShader(Payload payload)
