@@ -1,7 +1,7 @@
 #include "common.hlsli"
 #include "opticalFunction.hlsli"
 
-//#define ENABLE_IBL
+#define ENABLE_IBL
 
 float2 EquirecFetchUV(float3 dir)
 {

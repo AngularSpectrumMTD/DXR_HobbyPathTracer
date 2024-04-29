@@ -368,7 +368,7 @@ float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_glo
 
 void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out bool isDirectionalLightSampled)
 {
-    const uint M = min(max(getLightNum() / 10, 32), getLightNum());
+    const uint M = min(max(getLightNum() / 10, 30), getLightNum());
     const float pdf = 1.0f / M;
     float p_hat = 0;
 
@@ -377,7 +377,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
 
     for (int i = 0; i < M; i++)
     {
-        const uint lightID = min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+        const uint lightID = (i == 0) ? getLightNum() - 1 : min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
         bool isDirectionalLightSampled = false;
         LightGenerateParam param = gLightGenerateParams[lightID];
 
@@ -402,16 +402,16 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
         float3 wi = lightSample.directionToLight;
         float dist2 = lightSample.distance * lightSample.distance;
         float reseiverCos = dot(surfaceNormal, wi);
-        if (reseiverCos > 0)
+        //if (reseiverCos > 0)
         {
             float emitterCos = dot(lightNormal, -wi);
-            if (emitterCos > 0)
+            //if (emitterCos > 0)
             {
                 float4 bsdfPDF = bsdf_pdf(material, surfaceNormal, -WorldRayDirection(), wi);
                 dist2 = isDirectionalLightSampled ? 1 : dist2;
-                float G = reseiverCos * emitterCos / dist2;
+                float G = max(0, reseiverCos) * max(0, emitterCos) / dist2;
                 float3 FGL = lightSample.emission * bsdfPDF.xyz * G / lightSample.pdf;
-                p_hat = length(FGL);
+                p_hat = dot(float3(0.2126, 0.7152, 0.0722), FGL);
                 float updateW = p_hat / pdf;
                 updateReservoir(reservoir, lightID, updateW, p_hat, 1u, rand());
             }
@@ -421,6 +421,12 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     LightGenerateParam param = gLightGenerateParams[reservoir.Y];
     isDirectionalLightSampled = (param.type == LIGHT_TYPE_DIRECTIONAL);
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
+
+    if (reservoir.M == 0)
+    {
+        sampleLight(scatterPosition, lightSample, isDirectionalLightSampled);
+        return;
+    }
 
     //lightSample.emission *= getLightNum();
     const float invPDF = reservoir.W_sum / (reservoir.M * reservoir.targetPDF);

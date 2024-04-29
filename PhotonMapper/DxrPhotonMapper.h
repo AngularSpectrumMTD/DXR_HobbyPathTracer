@@ -36,6 +36,8 @@
 #define MAX_RECURSION_DEPTH 10//0---31
 #define REAL_MAX_RECURSION_DEPTH 8//0---31
 
+#define SPHERE_LIGHTS_SIZE_RATIO 0.7f
+
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
     static const wchar_t* ReflectReflactMaterialBox = L"hgReflectReflactBoxes";
@@ -251,36 +253,32 @@ private:
         XMFLOAT3 U = XMFLOAT3(0, 0, 0); //u vector for rectangle or spot light
         XMFLOAT3 V = XMFLOAT3(0, 0, 0); //v vector for rectangle or spot light
         f32 sphereRadius = 0; //radius for sphere light
-        f32 influenceDistance = 0;
         u32 type = 0; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 
-        void setParamAsSphereLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const f32 radius, const f32 influence)
+        void setParamAsSphereLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const f32 radius)
         {
             type = LightType_Sphere;
             position = pos;
             emission = emi;
             sphereRadius = radius;
-            influenceDistance = influence;
         }
 
-        void setParamAsRectLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v, const f32 influence)
+        void setParamAsRectLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v)
         {
             type = LightType_Rect;
             position = pos;
             emission = emi;
             U = u;
             V = v;
-            influenceDistance = influence;
         }
 
-        void setParamAsSpotLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v, const f32 influence)
+        void setParamAsSpotLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v)
         {
             type = LightType_Spot;
             position = pos;
             emission = emi;
             U = u;
             V = v;
-            influenceDistance = influence;
         }
 
         void setParamAsDirectionalLight(const XMFLOAT3 pos, const XMFLOAT3 emi)
@@ -293,7 +291,7 @@ private:
 
     enum LightCount
     {
-        LightCount_Sphere = 400,
+        LightCount_Sphere = 800,
         LightCount_Rect = 1,
         LightCount_Spot = 1,
         LightCount_Directional = 1,
@@ -656,6 +654,7 @@ private:
     bool mIsUseManySphereLightLighting;
     bool isPrimalLightSRVUpdate = true;
     bool mIsUseWRS_RIS = false;
+    bool mIsTemporalAccumulationForceDisable = false;
 };
 
 #endif

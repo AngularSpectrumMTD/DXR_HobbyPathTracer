@@ -19,7 +19,6 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
-//#define FORCE_ACCUMULATION_DISABLE
 //#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
@@ -37,6 +36,7 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L" <E> : NEE - " << (mIsUseNEE ? L"ON" : L"OFF")
+        << L" <CTRL> : RIS - " << (mIsUseWRS_RIS ? L"ON" : L"OFF")
         << L"  <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
         << L"  <D> : Bounce : " << mRecursionDepth
         << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
@@ -593,9 +593,10 @@ void DxrPhotonMapper::Terminate()
 
 void DxrPhotonMapper::Update()
 {
-#ifdef FORCE_ACCUMULATION_DISABLE
-    mIsUseAccumulation = false;
-#endif
+    if (mIsTemporalAccumulationForceDisable)
+    {
+        mIsUseAccumulation = false;
+    }
 
     for (auto& pos : mLightTbl)
     {
@@ -798,6 +799,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseWRS_RIS = !mIsUseWRS_RIS;
         mIsUseAccumulation = false;
         break;
+    case VK_TAB:
+        mIsTemporalAccumulationForceDisable = !mIsTemporalAccumulationForceDisable;
+        mIsUseAccumulation = false;
+        break;
     }
 }
 
@@ -863,13 +868,13 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
         LightGenerateParam param;
-        param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        param.setParamAsRectLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1));
         mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
         LightGenerateParam param;
-        param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1), 10);
+        param.setParamAsSpotLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 1));
         mLightGenerationParamTbl.push_back(param);
     }
     for (u32 i = 0; i < LightCount_Sphere; i++)
@@ -877,7 +882,7 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
         if (mIsUseManySphereLightLighting)
         {
             LightGenerateParam param;
-            param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1, 10);
+            param.setParamAsSphereLight(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), 1);
             mLightGenerationParamTbl.push_back(param);
         }
     }
@@ -891,6 +896,23 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
 
 void DxrPhotonMapper::UpdateLightGenerateParams()
 {
+    XMFLOAT3 colorTbl[] = {
+    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.2f, mIntenceBoost * 0.6f),
+    XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.6f, mIntenceBoost * 0.4f),
+    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
+    XMFLOAT3(mIntenceBoost * 0.6f, mIntenceBoost * 0.4f, mIntenceBoost * 0.2f),   
+    XMFLOAT3(mIntenceBoost * 0.2f, mIntenceBoost * 1.0f, mIntenceBoost * 0.2f),
+    XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
+    XMFLOAT3(mIntenceBoost * 0.2f, mIntenceBoost * 1.0f, mIntenceBoost * 0.8f),
+    XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
+    XMFLOAT3(mIntenceBoost * 0.4f, mIntenceBoost * 0.8f, mIntenceBoost * 1.0),
+    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
+    XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.2f, mIntenceBoost * 0.6f),
+    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.6f, mIntenceBoost * 0.4f),
+    XMFLOAT3(mIntenceBoost * 0.4f, mIntenceBoost * 0.4f, mIntenceBoost * 0.2f),
+    XMFLOAT3(mIntenceBoost * 0.6f, mIntenceBoost * 0.8f, mIntenceBoost * 1.0),
+    };
+
     const f32 scale = mLightRange;
     const u32 prevSize = mLightGenerationParamTbl.size();
     mLightGenerationParamTbl.resize(0);
@@ -912,7 +934,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         else if (!mIsSpotLightPhotonMapper)
@@ -932,7 +954,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
@@ -954,7 +976,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         else if (mIsSpotLightPhotonMapper)
@@ -974,21 +996,33 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent, 150);
+            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
     }
     count = 0;
+    u32 colorOffset = 0;
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
+        if (i == (LightCount_Sphere / 2 - 1))
+        {
+            count = 0;
+            colorOffset = _countof(colorTbl) / 3;
+        }
         if (mIsUseManySphereLightLighting)
         {
             f32 y = mLightPosY;
+            if (i > LightCount_Sphere / 2)
+            {
+                y = mLightPosY + 15;
+            }
+           
             f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
-            param.setParamAsSphereLight(XMFLOAT3(x, mLightPosY, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2f), mLightRange, 150);
+            const u32 colorID = count + colorOffset;
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);
         }
