@@ -33,14 +33,14 @@ void DxrPhotonMapper::UpdateWindowText()
 {
     std::wstringstream windowText;
     windowText.str(L"");
-    windowText << L" <I> : Inverse - " << (mInverseMove ? L"ON" : L"OFF")
-        << L" <A> : Accunmulate - " << (mIsUseAccumulation ? L"ON" : L"OFF")
-        << L" <E> : NEE - " << (mIsUseNEE ? L"ON" : L"OFF")
-        << L" <CTRL> : RIS - " << (mIsUseWRS_RIS ? L"ON" : L"OFF")
-        << L"  <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
-        << L"  <D> : Bounce : " << mRecursionDepth
-        << L"    Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
-        << L"    Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
+    windowText << L" <I> : Inverse " << (mInverseMove ? L"ON" : L"OFF")
+        << L" <A> : Accunmulate " << (mIsUseAccumulation ? L"ON" : L"OFF")
+        << L" <E> : NEE " << (mIsUseNEE ? L"ON" : L"OFF")
+        << L" <CTRL> : RIS " << (mIsUseWRS_RIS ? L"ON" : L"OFF")
+        << L" <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L" <D> : Bounce : " << mRecursionDepth
+        << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
+        << L" Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());

@@ -130,7 +130,7 @@ void rayGen() {
 
         accumColor += payload.color;
     }
-    float3 finalCol = accumColor / SPP;
+    float3 finalCol = max(0.xxx, accumColor / SPP);
     applyTimeDivision(finalCol, launchIndex);
 
     float luminance = computeLuminance(finalCol);
