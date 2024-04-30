@@ -23,7 +23,7 @@ struct SceneCB
     uint4 additional;//x light num
 };
 
-#define PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED 1 << 0
+#define PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED 1 << 0
 #define PAYLOAD_BIT_MASK_IS_SHADOW_RAY 1 << 1
 #define PAYLOAD_BIT_MASK_IS_SHADOW_MISS 1 << 2
 #define PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE 1 << 3
@@ -368,7 +368,7 @@ float compute01Depth(float3 wPos)
 
 void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in float3 normal)
 {
-    if (!(payload.flags & PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED) && (payload.recursive == 1))
+    if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         float2 writeIndex = payload.storeIndexXY;
@@ -376,7 +376,7 @@ void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in 
         gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
         gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
-        payload.flags |= PAYLOAD_BIT_MASK_DENOISE_HINT_IS_STORED;
+        payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }
 }
 
