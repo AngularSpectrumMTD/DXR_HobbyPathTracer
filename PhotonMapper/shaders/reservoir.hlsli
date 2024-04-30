@@ -5,6 +5,7 @@ struct Reservoir
 {
     uint Y; //index of most important light
     float targetPDF; //weight of light
+    float3 targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
     float M; //number of ligts processed for this reservoir
 
@@ -17,7 +18,7 @@ struct Reservoir
     }
 };
 
-bool updateReservoir(inout Reservoir reservoir, in uint X, in float w, in float p_hat, in uint c, in float rnd01)
+bool updateReservoir(inout Reservoir reservoir, in uint X, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
@@ -26,6 +27,7 @@ bool updateReservoir(inout Reservoir reservoir, in uint X, in float w, in float 
     {
         reservoir.Y = X;
         reservoir.targetPDF = p_hat;
+        reservoir.targetPDF_3f = p_hat_3f;
         return true;
     }
     return false;

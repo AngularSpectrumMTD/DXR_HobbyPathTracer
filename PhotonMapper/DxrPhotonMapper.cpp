@@ -897,20 +897,12 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
 void DxrPhotonMapper::UpdateLightGenerateParams()
 {
     XMFLOAT3 colorTbl[] = {
-    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.2f, mIntenceBoost * 0.6f),
-    XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.6f, mIntenceBoost * 0.4f),
-    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
-    XMFLOAT3(mIntenceBoost * 0.6f, mIntenceBoost * 0.4f, mIntenceBoost * 0.2f),   
-    XMFLOAT3(mIntenceBoost * 0.2f, mIntenceBoost * 1.0f, mIntenceBoost * 0.2f),
-    XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
-    XMFLOAT3(mIntenceBoost * 0.2f, mIntenceBoost * 1.0f, mIntenceBoost * 0.8f),
-    XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
-    XMFLOAT3(mIntenceBoost * 0.4f, mIntenceBoost * 0.8f, mIntenceBoost * 1.0),
-    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
-    XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.2f, mIntenceBoost * 0.6f),
-    XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.6f, mIntenceBoost * 0.4f),
-    XMFLOAT3(mIntenceBoost * 0.4f, mIntenceBoost * 0.4f, mIntenceBoost * 0.2f),
-    XMFLOAT3(mIntenceBoost * 0.6f, mIntenceBoost * 0.8f, mIntenceBoost * 1.0),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
+        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
+        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
+        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 1.0f)
     };
 
     const f32 scale = mLightRange;
@@ -1023,6 +1015,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             LightGenerateParam param;
             const u32 colorID = count + colorOffset;
             param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);
         }

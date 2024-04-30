@@ -179,7 +179,7 @@ void photonEmitting()
         float lmbd = LAMBDA_VIO_NM + LAMBDA_STEP * ((uint)(rand() * 100 * LAMBDA_NUM) % LAMBDA_NUM);
         p_hat = length(getBaseLightXYZ(lmbd));
         float updateW = p_hat * SAMPLE_NUM;
-        updateReservoir(reservoir, lmbd, updateW, 0, 1u, rand());
+        updateReservoir(reservoir, lmbd, updateW, 0, 0, 1u, rand());
     }
 
     const float LAMBDA_NM = (LightSeed.x < 300) ? reservoir.Y : LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
