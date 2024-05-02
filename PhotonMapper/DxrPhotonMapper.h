@@ -186,6 +186,10 @@ private:
         XMMATRIX mtxProj;
         XMMATRIX mtxViewInv;
         XMMATRIX mtxProjInv;
+        XMMATRIX mtxViewPrev;
+        XMMATRIX mtxProjPrev;
+        XMMATRIX mtxViewInvPrev;
+        XMMATRIX mtxProjInvPrev;
         XMUINT4 flags;
         XMFLOAT4 photonParams;//x unused
         XMVECTOR cameraParams;//near far reserved reserved
@@ -360,6 +364,7 @@ private:
     void CreatePositionBuffer();
     void CreateNormalBuffer();
     void CreateAccumulationCountBuffer();
+    void CreateVelocityBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
     void CreateShaderTable();
@@ -501,6 +506,9 @@ private:
     ComPtr<ID3D12Resource> mAccumulationCountBuffer;
     dx12::Descriptor mAccumulationCountBufferDescriptorSRV;
     dx12::Descriptor mAccumulationCountBufferDescriptorUAV;
+    ComPtr<ID3D12Resource> mVelocityBuffer;
+    dx12::Descriptor mVelocityBufferDescriptorSRV;
+    dx12::Descriptor mVelocityBufferDescriptorUAV;
 
     std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;

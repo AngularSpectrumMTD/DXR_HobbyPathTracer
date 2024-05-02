@@ -169,11 +169,13 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
         CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
         mRegisterMapDebugView["diffuseAlbedoBuffer"] = 0;
         mRegisterMapDebugView["depthBuffer"] = 1;
         mRegisterMapDebugView["normalBuffer"] = 2;
-        mRegisterMapDebugView["finalColor"] = 3;
+        mRegisterMapDebugView["velocityBuffer"] = 3;
+        mRegisterMapDebugView["finalColor"] = 4;
     }
 }

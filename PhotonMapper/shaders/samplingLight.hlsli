@@ -6,6 +6,7 @@
 //=========================================================================
 struct LightSample
 {
+    uint type;
     float3 directionToLight;
     float3 normal;
     float3 emission;
@@ -25,6 +26,7 @@ void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     float x = sqrt(max(0, 1 - z * z)) * cos(2.0f * PI * v);
 
     float3 pos = lightGen.position + lightGen.sphereRadius * float3(x, y, z);
+    lightSample.type = LIGHT_TYPE_SPHERE;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(float3(x, y, z));
     lightSample.emission = lightGen.emission;
@@ -41,6 +43,7 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float lenV = sqrt(dot(lightGen.V, lightGen.V));
 
     float3 pos = lightGen.position + 2 * (u - 0.5) * lightGen.U + 2 * (v - 0.5) * lightGen.V;
+    lightSample.type = LIGHT_TYPE_RECT;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     lightSample.emission = lightGen.emission;
@@ -62,6 +65,7 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     y *= lenV / lenU;
     
     float3 pos = lightGen.position + x * normalize(lightGen.U) + y * normalize(lightGen.V);
+    lightSample.type = LIGHT_TYPE_SPOT;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
     lightSample.emission = lightGen.emission;
@@ -87,6 +91,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     float3 fromLight = normalize(lightGen.position);
     float3 emit = coneSample(fromLight, cosMax);
     
+    lightSample.type = LIGHT_TYPE_DIRECTIONAL;
     lightSample.directionToLight = -normalize(emit);
     lightSample.normal = fromLight;
     lightSample.emission = lightGen.emission;
@@ -126,12 +131,10 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
     position = 100 * -emitDir;
 }
 
-void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out bool isDirectionalLightSampled)
+void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
 {
     const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[lightID];
-
-    isDirectionalLightSampled = false;
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
@@ -147,11 +150,44 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample, out b
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        isDirectionalLightSampled = true;
         sampleDirectionalLight(param, scatterPosition, lightSample);
     }
 
     lightSample.pdf *= 1.0f / getLightNum();
+}
+
+void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
+{
+    LightGenerateParam param = gLightGenerateParams[ID];
+    
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        sampleSphereLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_RECT)
+    {
+        sampleRectLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_SPOT)
+    {
+        sampleSpotLight(param, scatterPosition, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        sampleDirectionalLight(param, scatterPosition, lightSample);
+    }
+}
+
+float getModifiedSquaredDistance(in LightSample lightSample)
+{
+    if (lightSample.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        return 1;
+    }
+    else
+    {
+        return lightSample.distance * lightSample.distance;
+    }
 }
 
 bool intersectLightWithCurrentRay(out float3 Le)
@@ -300,28 +336,6 @@ float3 directionalLightingOnMissShader(Payload payload)
     }
 
     return val;
-}
-
-void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
-{
-    LightGenerateParam param = gLightGenerateParams[ID];
-    
-    if (param.type == LIGHT_TYPE_SPHERE)
-    {
-        sampleSphereLight(param, scatterPosition, lightSample);
-    }
-    if (param.type == LIGHT_TYPE_RECT)
-    {
-        sampleRectLight(param, scatterPosition, lightSample);
-    }
-    if (param.type == LIGHT_TYPE_SPOT)
-    {
-        sampleSpotLight(param, scatterPosition, lightSample);
-    }
-    if (param.type == LIGHT_TYPE_DIRECTIONAL)
-    {
-        sampleDirectionalLight(param, scatterPosition, lightSample);
-    }
 }
 
 bool isVisible(in float3 scatterPosition, in LightSample lightSample)

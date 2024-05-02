@@ -618,6 +618,10 @@ void DxrPhotonMapper::Update()
         mRenderFrame = 0;
     }
 
+    mSceneParam.mtxViewPrev = mSceneParam.mtxView;
+    mSceneParam.mtxProjPrev = mSceneParam.mtxProj;
+    mSceneParam.mtxViewInvPrev = mSceneParam.mtxViewInv;
+    mSceneParam.mtxProjInvPrev = mSceneParam.mtxProjInv;
     mSceneParam.mtxView = mCamera.GetViewMatrix();
     mSceneParam.mtxProj = mCamera.GetProjectionMatrix();
     mSceneParam.mtxViewInv = XMMatrixInverse(nullptr, mSceneParam.mtxView);
@@ -1122,6 +1126,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gOutput"], mMainOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationBuffer"], mAccumulationBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
@@ -1150,6 +1155,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gOutput"], mMainOutputDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationBuffer"], mAccumulationBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
@@ -1176,6 +1182,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["diffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["depthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["normalBuffer"], mNormalBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["velocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["finalColor"], mMainOutputDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mDebugViewPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "DebugView");

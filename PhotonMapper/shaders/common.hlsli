@@ -13,6 +13,10 @@ struct SceneCB
     matrix mtxProj;
     matrix mtxViewInv;
     matrix mtxProjInv;
+    matrix mtxViewPrev;
+    matrix mtxProjPrev;
+    matrix mtxViewInvPrev;
+    matrix mtxProjInvPrev;
     uint4 flags;
     float4 photonParams;
     float4 cameraParams;
@@ -91,6 +95,7 @@ RWTexture2D<float4> gOutput : register(u7);
 RWTexture2D<float4> gAccumulationBuffer : register(u8);
 RWTexture2D<float2> gLuminanceMomentBufferDst : register(u9);
 RWTexture2D<uint> gAccumulationCountBuffer : register(u10);
+RWTexture2D<float2> gVelocityBuffer : register(u11);
 
 ////////////////////////////////////
 //Interpret Scene Param
@@ -376,6 +381,13 @@ void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in 
         gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
         gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
+        matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
+        matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
+        float4 currSvPosition = mul(float4(wPos, 1), mtxViewProj);
+        float4 prevSvPosition = mul(float4(wPos, 1), mtxViewProjPrev);
+        float2 velocity = currSvPosition.xy / currSvPosition.w - prevSvPosition.xy / prevSvPosition.w;//-1 to 1
+        //gVelocityBuffer[writeIndex] = 0.5 * velocity + 0.5;
+        gVelocityBuffer[writeIndex] = currSvPosition.xy / currSvPosition.w;
         payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }
 }
@@ -388,6 +400,11 @@ float depthLoad(uint2 index)
 float lengthSqr(float3 v)
 {
     return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+float computeLuminance(const float3 linearRGB)
+{
+    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
 }
 
 #endif//__COMMON_HLSLI__

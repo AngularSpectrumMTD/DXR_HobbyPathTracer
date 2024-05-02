@@ -152,7 +152,7 @@ void DxrPhotonMapper::CreateAccumulationCountBuffer()
         D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
         D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
         D3D12_HEAP_TYPE_DEFAULT,
-        L"NormalBuffer"
+        L"AccumulationCountBuffer"
     );
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -166,6 +166,32 @@ void DxrPhotonMapper::CreateAccumulationCountBuffer()
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     mAccumulationCountBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mAccumulationCountBuffer.Get(), &uavDesc);
+}
+
+void DxrPhotonMapper::CreateVelocityBuffer()
+{
+    auto width = GetWidth();
+    auto height = GetHeight();
+
+    mVelocityBuffer = mDevice->CreateTexture2D(
+        width, height, DXGI_FORMAT_R16G16_FLOAT,
+        D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        D3D12_HEAP_TYPE_DEFAULT,
+        L"VelocitylBuffer"
+    );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    mVelocityBufferDescriptorSRV = mDevice->CreateShaderResourceView(mVelocityBuffer.Get(), &srvDesc);
+
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    mVelocityBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mVelocityBuffer.Get(), &uavDesc);
 }
 
 void DxrPhotonMapper::CreateDepthBuffer()
@@ -482,6 +508,7 @@ void DxrPhotonMapper::CreateRegularBuffer()
     CreatePositionBuffer();
     CreateNormalBuffer();
     CreateAccumulationCountBuffer();
+    CreateVelocityBuffer();
     CreateDepthBuffer();
     CreateLuminanceMomentBuffer();
     CreateLightGenerateBuffer();

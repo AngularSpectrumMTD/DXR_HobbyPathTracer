@@ -10,11 +10,6 @@
 #define LAMBDA_NUM 40
 #define LAMBDA_STEP 10
 
-float luminanceFromRGB(const float3 rgb)
-{
-    return 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b;
-}
-
 //http://nalab.mind.meiji.ac.jp/2017/2018-suzuki.pdf
 static float3 XYZ380to770_10nmTbl[LAMBDA_NUM] =
 {

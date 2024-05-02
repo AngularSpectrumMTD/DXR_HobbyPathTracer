@@ -4,11 +4,6 @@
 #define REINHARD_L 1000
 #define MAX_ACCUMULATION_RANGE 10000
 
-float computeLuminance(const float3 linearRGB)
-{
-    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
-}
-
 float reinhard(float x, float L)
 {
     return (x / (1 + x)) * (1 + x / L / L);
@@ -36,23 +31,18 @@ float3 ACESFilmicTonemapping3f(float3 v)
 
 void applyTimeDivision(inout float3 current, uint2 ID)
 {
-    float3 prev = gAccumulationBuffer[ID].rgb;
-    
-    float currentDepth = gDepthBuffer[ID];
-    float prevDepth = gPrevDepthBuffer[ID];
+    float2 dims = float2(DispatchRaysDimensions().xy);
+    float currDepth = gDepthBuffer[ID];
     uint accCount = gAccumulationCountBuffer[ID];
 
-    float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[ID];
-    float luminance = luminanceFromRGB(current);
-    float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
+    float2 velocity = gVelocityBuffer[ID] * 2.0 - 1.0;
+    uint2 prevID = ID;//(ID / dims - velocity) * dims;
+    float3 prev = gAccumulationBuffer[prevID].rgb;
+    float prevDepth = gPrevDepthBuffer[prevID];
+    float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[prevID];
 
-    //if (currentDepth == 0 || prevDepth == 0)
-    //{
-    //    gAccumulationBuffer[ID].rgb = current;
-    //    gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
-    //    gAccumulationCountBuffer[ID] = 1;
-    //    return;
-    //}
+    float luminance = computeLuminance(current);
+    float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
     
     if (isAccumulationApply())
     {
@@ -89,6 +79,7 @@ void rayGen() {
     gDepthBuffer[launchIndex] = 0;
     gPositionBuffer[launchIndex] = 0.xxxx;
     gNormalBuffer[launchIndex] = 0.xxxx;
+    gVelocityBuffer[launchIndex] = 0.xx;
 
     float3 accumColor = 0.xxx;
 

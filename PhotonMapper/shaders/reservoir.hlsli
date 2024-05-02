@@ -23,7 +23,7 @@ bool updateReservoir(inout Reservoir reservoir, in uint X, in float w, in float 
     reservoir.W_sum += w;
     reservoir.M += c;
 
-    if (rnd01 < w / reservoir.W_sum)
+    if (rnd01 < w / reservoir.W_sum || reservoir.M == 0)
     {
         reservoir.Y = X;
         reservoir.targetPDF = p_hat;

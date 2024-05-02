@@ -1,7 +1,8 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS] + Photon Mapping[Spectral Rendered Caustics])  
-![ManyLights](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/612bcd37-6dfe-4de5-aa64-60281a7a142f)
+![ManyLights](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/8e7185df-84c7-48ed-8f7a-d3822337dcac)
+![RIS_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/036da7b4-9524-45be-9569-7cf2c9228f16)
 ![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4d1a14ce-2f81-4827-a33c-b6b22ec8bdf6)
 
 "Next Event Estimation" is implemented  
@@ -10,11 +11,11 @@ Left : "NEE" / Right : "Simple Pathtracing"
 
 Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
 Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Uniform Sampling (from 400 lights. Not Accumulated)  
-![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/6e8a741c-5f81-43f2-93bf-efe7c1d7d7e0)
+![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/da8a02e4-09c3-4a17-a0a5-3d02f4c2e875)
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 Left :  WRS (30 stream inputs from 400 lights. 400 frame Accumulated) / Right : Uniform Sampling (from 400 lights. 400 frame Accumulated)  
-![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/e2b7b15b-ea01-4281-b20a-961c9dc26501)
+![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/fc76ea80-ea54-4baf-854d-0c925ead0d5a)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
