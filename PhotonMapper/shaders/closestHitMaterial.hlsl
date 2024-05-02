@@ -43,19 +43,14 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     float3 surfaceNormal = vtx.Normal;
 
     MaterialParams currentMaterial = constantBuffer;
-    storeAlbedoDepthPositionNormal(payload, currentMaterial.albedo.xyz, surfaceNormal);
-
-    const bool isLightingRequired = isIndirectOnly() ? (payload.recursive >2) : true;
+    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal);
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    if (isLightingRequired)
+    if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
     {
-        if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
-        {
-            return;
-        }
+        return;
     }
 
     const float3 photon = accumulatePhoton(scatterPosition, payload.eyeDir, bestFitWorldNormal);
@@ -64,7 +59,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
     payload.color += payload.throughput * photon;
-    updateDirectionAndThroughput(currentMaterial, surfaceNormal, nextRay, payload.throughput);
+    updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
@@ -87,15 +82,14 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
+    updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial))
     {
-        updateDirectionAndThroughput(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
         storePhoton(payload);
     }
     else
     {
-        updateDirectionAndThroughput(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
         TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);

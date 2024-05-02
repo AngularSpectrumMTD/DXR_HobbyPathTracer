@@ -207,7 +207,7 @@ float4 transBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo, in
     }
 }
 
-void updateDirectionAndThroughput(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
+void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
 {
     nextRay.TMin = 0.0001;
     nextRay.TMax = 10000;
@@ -314,7 +314,7 @@ void updateDirectionAndThroughput(in MaterialParams material, in float3 N_global
     }
 }
 
-float4 bsdf_pdf(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
+float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
 {
     float4 brdfAndPDF = 0.xxxx;
 
@@ -383,7 +383,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
         float3 wi = lightSample.directionToLight;
         float reseiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        float4 bsdfPDF = bsdf_pdf(material, surfaceNormal, -WorldRayDirection(), wi);
+        float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
         float G = max(0, reseiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -422,7 +422,7 @@ void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPos
                 float emitterCos = dot(lightNormal, -wi);
                 if (emitterCos > 0)
                 {
-                    float4 bsdfPDF = bsdf_pdf(material, surfaceNormal, -WorldRayDirection(), wi);
+                    float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
                     float G = reseiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
                     float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
                     payload.color += FGL * payload.throughput;
@@ -444,21 +444,7 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
     bool isFinish = false;
     float3 Le = 0.xxx;
     const bool isNEE_Exec = isNEEExecutable(material);
-
-    if (isNEE_Exec)
-    {
-        if (!(payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE))
-        {
-            payload.flags |= PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
-        }
-    }
-    else
-    {
-        if (payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE)
-        {
-            payload.flags &= ~PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
-        }
-    }
+    setNEEFlag(payload, isNEE_Exec);
 
     const bool isHitLightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
     if (isHitLightingRequired)

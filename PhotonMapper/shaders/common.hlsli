@@ -371,7 +371,7 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeAlbedoDepthPositionNormal(inout Payload payload, in float3 albedo, in float3 normal)
+void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
@@ -420,6 +420,24 @@ bool isDirectRay(in Payload payload)
 bool isIndirectRay(in Payload payload)
 {
     return (payload.recursive > 1);
+}
+
+void setNEEFlag(inout Payload payload, in bool isNEE_Exec)
+{
+    if (isNEE_Exec)
+    {
+        if (!(payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE))
+        {
+            payload.flags |= PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
+        }
+    }
+    else
+    {
+        if (payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE)
+        {
+            payload.flags &= ~PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
+        }
+    }
 }
 
 #endif//__COMMON_HLSLI__
