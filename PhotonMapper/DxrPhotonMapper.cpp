@@ -102,57 +102,57 @@ void DxrPhotonMapper::Setup()
             mOBJFolderName = "model";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
             mStageOffsetX = 0;
-            mStageOffsetY = -55;
+            mStageOffsetY = -55.0f;
             mStageOffsetZ = 0;
-            mLightPosX = -16; mLightPosY = -172; mLightPosZ = -4.2;
-            mPhi = 149; mTheta = 257;
-            mPhiDirectional = 70; mThetaDirectional = 220;
-            mInitEyePos = XMFLOAT3(188, -163, -101);
-            mInitTargetPos = XMFLOAT3(0, -132, 0);
+            mLightPosX = -16.0f; mLightPosY = -172.0f; mLightPosZ = -4.2f;
+            mPhi = 149.0f; mTheta = 257.0f;
+            mPhiDirectional = 70.0f; mThetaDirectional = 220.0f;
+            mInitEyePos = XMFLOAT3(188.0f, -163.0f, -101.0f);
+            mInitTargetPos = XMFLOAT3(0.0f, -132.0f, 0.0f);
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
-            mCausticsBoost = 400;
+            mCausticsBoost = 400.0f;
         }
         break;
         case SceneType_Sponza:
         {
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
-            mPhiDirectional = 100; mThetaDirectional = 280;
-            mInitEyePos = XMFLOAT3(-27.9, 15, 5.54);
+            mPhiDirectional = 100.0f; mThetaDirectional = 280.0f;
+            mInitEyePos = XMFLOAT3(-27.9f, 15.0f, 5.54f);
 
             if (isRoomTestDebug)
             {
                 mOBJFileName = "fireplace_room.obj";
                 mOBJFolderName = "model/fireplace";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));
-                mStageOffsetX = -20;
-                mStageOffsetY = 0;
-                mStageOffsetZ = 10;
+                mStageOffsetX = -20.0f;
+                mStageOffsetY = 0.0f;
+                mStageOffsetZ = 10.0f;
             }
             else
             {
                 mOBJFileName = "sponza.obj";
                 mOBJFolderName = "model/sponza";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
-                mStageOffsetX = 0;
-                mStageOffsetY = 0;
-                mStageOffsetZ = 0;
+                mStageOffsetX = 0.0f;
+                mStageOffsetY = 0.0f;
+                mStageOffsetZ = 0.0f;
             }
             
             if (isRoomTestDebug)
             {
-                mLightPosX = 1.99; mLightPosY = 2.8; mLightPosZ = 4.9;
-                mPhi = 306; mTheta = 187;
+                mLightPosX = 1.99f; mLightPosY = 2.8f; mLightPosZ = 4.9f;
+                mPhi = 306.0f; mTheta = 187.0f;
                 mLightRange = 3.18f;
                 mGlassModelType = ModelType_CurvedMesh;
                 //mGlassModelType = ModelType_DebugMesh;
             }
             else
             {
-                mLightPosX = 1.59; mLightPosY = 9.8; mLightPosZ = 3.19;
-                mPhi = 413; mTheta = 242;
+                mLightPosX = 1.59f; mLightPosY = 9.8f; mLightPosZ = 3.19f;
+                mPhi = 413.0f; mTheta = 242.0f;
                 mLightRange = 0.279f;
                 if (isDebugMeshTest)
                 {
@@ -160,11 +160,11 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 1.7f; mLightPosY = 5.79f; mLightPosZ = 2.2;
-                    mPhi = 417; mTheta = 231;
+                    mLightPosX = 1.7f; mLightPosY = 5.79f; mLightPosZ = 2.2f;
+                    mPhi = 417.0f; mTheta = 231.0f;
                     mLightRange = 0.4f;
                     mGlassModelType = ModelType_Diamond;
-                    mInitEyePos = XMFLOAT3(-20, 19, 2.4);
+                    mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
                 }
             }
             mCausticsBoost = 100;
@@ -180,7 +180,7 @@ void DxrPhotonMapper::Setup()
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
-            mLightPosX = -2.3; mLightPosY = 7.8; mLightPosZ = -2.9;
+            mLightPosX = -2.3f; mLightPosY = 7.8f; mLightPosZ = -2.9f;
             mPhi = 327; mTheta = 403;
             mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
@@ -189,15 +189,15 @@ void DxrPhotonMapper::Setup()
             if (isDragonTest)
             {
                 mPhi = 327; mTheta = 403;
-                mLightPosX = -1.59; mLightPosY = 21; mLightPosZ = -4.2;
+                mLightPosX = -1.59f; mLightPosY = 21.0f; mLightPosZ = -4.2f;
                 mInitTargetPos = XMFLOAT3(0, 8, 0);
 #ifdef CUBE_TEST
                 mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
-                mInitEyePos = XMFLOAT3(16.8, 9.77, 31.4);
+                mInitEyePos = XMFLOAT3(16.8f, 9.77f, 31.4f);
                 mLightRange = 1.98f;
-                mLightPosX = -2.38; mLightPosY = 7.8; mLightPosZ = -2.9;
+                mLightPosX = -2.38f; mLightPosY = 7.8f; mLightPosZ = -2.9f;
 #endif
                 mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;
@@ -206,7 +206,7 @@ void DxrPhotonMapper::Setup()
             else
             {
                 mPhi = 412; mTheta = 262;
-                mLightPosX = 4.2; mLightPosY = 8.8; mLightPosZ = 0.2;
+                mLightPosX = 4.2f; mLightPosY = 8.8f; mLightPosZ = 0.2f;
                 mLightRange = 0.8f;
                 mGlassModelType = ModelType_Afrodyta;
                 mCausticsBoost = 30;
@@ -223,10 +223,10 @@ void DxrPhotonMapper::Setup()
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
-            mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
+            mLightPosX = 53; mLightPosY = 11.3f; mLightPosZ = -5.1f;
             mPhi = 376; mTheta = 107;
             mInitEyePos = XMFLOAT3(30, 12, 9);
-            mInitTargetPos = XMFLOAT3(66, 10, -11.41);
+            mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
             mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
@@ -245,10 +245,10 @@ void DxrPhotonMapper::Setup()
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
-            mLightPosX = 53; mLightPosY = 11.3; mLightPosZ = -5.1;
+            mLightPosX = 53; mLightPosY = 11.3f; mLightPosZ = -5.1f;
             mPhi = 376; mTheta = 107;
             mInitEyePos = XMFLOAT3(30, 12, 9);
-            mInitTargetPos = XMFLOAT3(66, 10, -11.41);
+            mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
             mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
@@ -360,7 +360,7 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
         mGlassObjYOfsset = 8;
-        mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);
+        mGlassObjScale = XMFLOAT3(0.1f, 0.1f, 0.1f);
     }
     break;
     case  ModelType::ModelType_Rock:
@@ -398,7 +398,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_TwistCube:
     {
         mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15 :  50;
+        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15.0f :  50.0f;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
 
         if (mSceneType == SceneType_Simple)
@@ -420,7 +420,7 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_SimpleCube:
     {
         mOBJ1FileName = L"model/simpleCube.obj";
-        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15 : 50;
+        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15.0f : 50.0f;
         mMetalObjScale = XMFLOAT3(3, 3, 3);
 
         if (mSceneType == SceneType_Simple)
@@ -609,7 +609,7 @@ void DxrPhotonMapper::Update()
         mMoveFrame++;
         for (auto& pos : mOBJ0sNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4 * mMoveFrame * ONE_RADIAN), 0);
+            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4f * mMoveFrame * ONE_RADIAN), 0);
         }
     }
 
@@ -628,7 +628,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.mtxProjInv = XMMatrixInverse(nullptr, mSceneParam.mtxProj);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, mIntenceBoost, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
-    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1 : 0, 0, 0);
+    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1.0f : 0.0f, 0.0f, 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
     mSceneParam.flags.y = mIsUseTexture;
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
@@ -636,11 +636,11 @@ void DxrPhotonMapper::Update()
     mSceneParam.photonParams.x = mIsApplyCaustics ? 1.f : 0.f;
     mSceneParam.photonParams.z = (f32)mSpectrumMode;
     mSceneParam.viewVec = XMVector3Normalize(mCamera.GetTarget() - mCamera.GetPosition());
-    mSceneParam.additional.x = mLightGenerationParamTbl.size();
+    mSceneParam.additional.x = (u32)mLightGenerationParamTbl.size();
     mSceneParam.additional.y = mIsIndirectOnly ? 1 : 0;
     mSceneParam.additional.z = mIsUseNEE ? 1 : 0;
     mSceneParam.additional.w = mIsUseWRS_RIS ? 1 : 0;
-    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
+    mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, (f32)min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
 
     mRenderFrame++;
 
@@ -659,7 +659,7 @@ void DxrPhotonMapper::Update()
 
 void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
 {
-    const f32 clampRange = (mStageType == StageType_Plane) ? 1.5 * PLANE_SIZE : 0.9 * PLANE_SIZE;
+    const f32 clampRange = (mStageType == StageType_Plane) ? 1.5f * PLANE_SIZE : 0.9f * PLANE_SIZE;
 
     if (mCamera.OnKeyDown(wparam))
     {
@@ -748,11 +748,11 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'D':
         //mIsUseDenoise = !mIsUseDenoise;
-        mRecursionDepth = (u32)Clamp(2, REAL_MAX_RECURSION_DEPTH, mRecursionDepth + (mInverseMove ? -1 : 1));
+        mRecursionDepth = (u32)Clamp(2.f, REAL_MAX_RECURSION_DEPTH * 1.0f, (f32)(mRecursionDepth + (mInverseMove ? -1 : 1)));
         mIsUseAccumulation = false;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(0.1, 500, mCausticsBoost + (mInverseMove ? -0.1 : 0.1));
+        mCausticsBoost = Clamp(0.1f, 500, mCausticsBoost + (mInverseMove ? -0.1f : 0.1f));
         mIsUseAccumulation = false;
         break;
     case 'U':
@@ -763,36 +763,36 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     case 'R':
         if (mIsTargetGlass)
         {
-            mMaterialParam0.roughness = Clamp(0.02, 1, mMaterialParam0.roughness + (mInverseMove ? -0.01 : 0.01));
+            mMaterialParam0.roughness = Clamp(0.02f, 1, mMaterialParam0.roughness + (mInverseMove ? -0.01f : 0.01f));
             mIsUseAccumulation = false;
         }
         else
         {
-            mMaterialParam1.roughness = Clamp(0.02, 1, mMaterialParam1.roughness + (mInverseMove ? -0.01 : 0.01));
+            mMaterialParam1.roughness = Clamp(0.02f, 1, mMaterialParam1.roughness + (mInverseMove ? -0.01f : 0.01f));
             mIsUseAccumulation = false;
         }
         break;
     case 'S':
         if (mIsTargetGlass)
         {
-            mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1f : 0.1f));
             mIsUseAccumulation = false;
         }
         else
         {
-            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mInverseMove ? -0.1f : 0.1f));
             mIsUseAccumulation = false;
         }
         break;
     case 'M':
         if (mIsTargetGlass)
         {
-            mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1f : 0.1f));
             mIsUseAccumulation = false;
         }
         else
         {
-            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mInverseMove ? -0.1 : 0.1));
+            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mInverseMove ? -0.1f : 0.1f));
             mIsUseAccumulation = false;
         }
         break;
@@ -910,7 +910,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     };
 
     const f32 scale = mLightRange;
-    const u32 prevSize = mLightGenerationParamTbl.size();
+    const u32 prevSize = (u32)mLightGenerationParamTbl.size();
     mLightGenerationParamTbl.resize(0);
     u32 count = 0;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION_FOR_LIGHT_POSITION;
@@ -936,8 +936,8 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         else if (!mIsSpotLightPhotonMapper)
         {
             f32 y = mLightPosY;
-            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
@@ -978,8 +978,8 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
         else if (mIsSpotLightPhotonMapper)
         {
             f32 y = mLightPosY;
-            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
@@ -1014,8 +1014,8 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
                 y = mLightPosY + 15;
             }
            
-            f32 x = mStageOffsetX + cellSize * 0.5 + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5 + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
             const u32 colorID = count + colorOffset;
             param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);

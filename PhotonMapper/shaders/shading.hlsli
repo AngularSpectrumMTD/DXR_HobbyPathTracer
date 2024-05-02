@@ -371,7 +371,6 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     const uint M = min(getLightNum(), 30);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
-    const uint directionalLightID = getLightNum() - 1;
 
     reservoir.initialize();
 
@@ -393,8 +392,6 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
         float updateW = p_hat / pdf;
         updateReservoir(reservoir, lightID, updateW, p_hat, p_hat_3F, 1u, rand());
     }
-
-    LightGenerateParam param = gLightGenerateParams[reservoir.Y];
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
 }
 
