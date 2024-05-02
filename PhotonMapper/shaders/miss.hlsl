@@ -18,7 +18,7 @@ void miss(inout Payload payload) {
     }
 
     float3 hittedEmission = 0.xxx;
-    if (!isIndirectOnly() && payload.recursive == 0 && intersectAllLightWithCurrentRay(hittedEmission))
+    if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
         payload.throughput = 0.xxx;
@@ -26,7 +26,7 @@ void miss(inout Payload payload) {
     }
 
     const bool isNEE_Prev_Executable = payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
-    const bool isHitLightingRequired = isUseNEE() ? !isNEE_Prev_Executable : (isIndirectOnly() ? (payload.recursive > 1) : true);
+    const bool isHitLightingRequired = isUseNEE() ? !isNEE_Prev_Executable : (isIndirectOnly() ? isIndirectRay(payload) : true);
 
     if (isHitLightingRequired)
     {

@@ -460,11 +460,11 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         }
     }
 
-    const bool isHitLightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
+    const bool isHitLightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
     if (isHitLightingRequired)
     {
         bool isIntersect = false;
-        if (payload.recursive == 1)
+        if (isDirectRay(payload))
         {
             isIntersect = intersectAllLightWithCurrentRay(Le);
         }
@@ -478,14 +478,14 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         {
             if (isNEE_Exec)
             {
-                if (payload.recursive == 1 && !isIndirectOnly())
+                if (isDirectRay(payload) && !isIndirectOnly())
                 {
                     payload.color += payload.throughput * Le;
                 }
             }
             else
             {
-                const bool isLighting = isIndirectOnly() ? (payload.recursive > 1) : true;
+                const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
                 if (isLighting)
                 {
                     payload.color += payload.throughput * Le;
@@ -506,7 +506,7 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
 
     if (isNEE_Exec && !isIgnoreHit)
     {
-        const bool isNEELightingRequired = isIndirectOnly() ? (payload.recursive > 1) : true;
+        const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
         if (isNEELightingRequired)
         {
             NEE(payload, material, scatterPosition, surfaceNormal);

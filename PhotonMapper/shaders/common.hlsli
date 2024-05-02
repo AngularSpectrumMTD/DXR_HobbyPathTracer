@@ -407,4 +407,19 @@ float computeLuminance(const float3 linearRGB)
     return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
 }
 
+bool isCompletelyMissRay(in Payload payload)
+{
+    return (payload.recursive == 0);
+}
+
+bool isDirectRay(in Payload payload)
+{
+    return (payload.recursive == 1);
+}
+
+bool isIndirectRay(in Payload payload)
+{
+    return (payload.recursive > 1);
+}
+
 #endif//__COMMON_HLSLI__
