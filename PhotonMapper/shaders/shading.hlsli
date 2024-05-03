@@ -55,83 +55,7 @@ static OpticalGlass J_Bak4 =
 //=========================================================================
 //Shading
 //=========================================================================
-float3 specularBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
-{
-    if (dot(N, wi) <= 0)
-    {
-        return 0.xxx;
-    }
-
-    const float diffRatio = 1.0 - material.metallic;
-
-    const float specRatio = 1 - diffRatio;
-    const float3 H = normalize(wi + wo);
-
-    const float dotNL = abs(dot(N, wi));
-    const float dotNH = abs(dot(N, H));
-    const float dotVH = abs(dot(wo, H));
-
-    float3 F0 = 0.08.xxx;
-    F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
-        
-    const float NDF = GGX_Distribution(N, H, material.roughness);
-    const float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
-    const float3 F = FresnelSchlick(max(dot(wo, H), 0), F0);
-
-    const float3 kS = F;
-    const float3 kD = (1 - kS) * (1 - material.metallic);
-        
-    const float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
-    const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-    const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
-    const float diffPDF = CosineSamplingPDF(dotNL);
-    const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
-    const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
-
-    if (sumPDF > 0)
-    {
-        return sumBRDF / sumPDF;
-    }
-    else
-    {
-        return 0.xxx;
-    }
-}
-
-float3 transBRDFdevidedPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
-{
-    const float specRatio = FresnelReflectance(-wo, N, etaOUT);
-
-    const float dotNL = abs(dot(N, wi));
-    const float dotNV = abs(dot(N, wo));
-    const float dotNH = abs(dot(N, H));
-    const float dotVH = abs(dot(wo, H));
-    const float dotLH = abs(dot(wi, H));
-
-    float3 F0 = 0.08.xxx * material.specular;
-    float3 F = FresnelSchlick(max(dot(H, wo), 0), F0);
-
-    float NDF = GGX_Distribution(N, H, material.roughness);
-    float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
-
-    float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
-    float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-    float3 refrBTDF = RefractionBTDF(NDF, G, F, wo, wi, N, H, etaIN, etaOUT);
-    float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-    const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
-    const float sumPDF = specRatio * specPDF + (1 - specRatio) * refrPDF;
-
-    if (sumPDF > 0)
-    {
-        return sumBRDF / sumPDF;
-    }
-    else
-    {
-        return 0.xxx;
-    }
-}
-
-float4 specularBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
+float4 specularBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
 {
     if (dot(N, wi) <= 0)
     {
@@ -161,12 +85,12 @@ float4 specularBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo,
     const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
     const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
     const float diffPDF = CosineSamplingPDF(dotNL);
-    const float3 sumBRDF = (diffBRDF * kD + specBRDF) * dotNL;
+    const float3 sumBSDF = (diffBRDF * kD + specBRDF) * dotNL;
     const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
 
     if (sumPDF > 0)
     {
-        return float4(sumBRDF, sumPDF);
+        return float4(sumBSDF, sumPDF);
     }
     else
     {
@@ -174,7 +98,7 @@ float4 specularBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo,
     }
 }
 
-float4 transBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
+float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
 {
     const float specRatio = FresnelReflectance(-wo, N, etaOUT);
 
@@ -194,12 +118,12 @@ float4 transBRDFandPDF(in MaterialParams material, in float3 N, in float3 wo, in
     float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
     float3 refrBTDF = RefractionBTDF(NDF, G, F, wo, wi, N, H, etaIN, etaOUT);
     float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
-    const float3 sumBRDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
+    const float3 sumBSDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
     const float sumPDF = specRatio * specPDF + (1 - specRatio) * refrPDF;
 
     if (sumPDF > 0)
     {
-        return float4(sumBRDF, sumPDF);
+        return float4(sumBSDF, sumPDF);
     }
     else
     {
@@ -265,9 +189,9 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         nextRay.Direction = tangentToWorld(N_global, L_local);
         
         //compute bsdf    V : wo   L : wi(sample)
-        float3 brdfDevPDF = specularBRDFdevidedPDF(material, Z_AXIS, V_local, L_local);
+        float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
-        throughput *= brdfDevPDF * cosine;
+        throughput *= BSDF_PDF.xyz * cosine / BSDF_PDF.w;
     }
     else
     {
@@ -308,15 +232,15 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         }
 
         //compute bsdf    V : wo   L : wi(sample)
-        float3 brdfDevPDF = transBRDFdevidedPDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+        float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
-        throughput *= brdfDevPDF * cosine;
+        throughput *= BSDF_PDF.xyz * cosine / BSDF_PDF.w;
     }
 }
 
 float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
 {
-    float4 brdfAndPDF = 0.xxxx;
+    float4 BSDF_PDF = 0.xxxx;
 
     const float eps = 0.001;
 
@@ -339,7 +263,7 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
         const float3 V_local = normalize(wo_local);
         
         //compute bsdf    V : wo   L : wi(sample)
-        brdfAndPDF = specularBRDFandPDF(material, Z_AXIS, V_local, L_local);
+        BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
     }
     else
     {
@@ -360,10 +284,10 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
         const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
 
         //compute bsdf    V : wo   L : wi(sample)
-        brdfAndPDF = transBRDFandPDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, true, isFromOutside);
+        BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, true, isFromOutside);
     }
 
-    return brdfAndPDF;
+    return BSDF_PDF;
 }
 
 void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out Reservoir reservoir)
@@ -410,6 +334,7 @@ void NextEventEstimation(inout Payload payload, in MaterialParams material, in f
     }
     else
     {
+        //explicitly connect to light source
         LightSample lightSample;
         sampleLight(scatterPosition, lightSample);
         if (isVisible(scatterPosition, lightSample))
