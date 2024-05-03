@@ -135,7 +135,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal);
     }
 
-    if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
+    if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
     {
         return;
     }
@@ -152,8 +152,8 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     }
     else
     {
-        nextRay.TMin = 0.001;
-        nextRay.TMax = 10000;
+        nextRay.TMin = RAY_MIN_T;
+        nextRay.TMax = RAY_MAX_T;
         nextRay.Direction = WorldRayDirection();
     }
 
@@ -192,8 +192,8 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
    
-    nextRay.TMin = 0.001;
-    nextRay.TMax = 10000;
+    nextRay.TMin = RAY_MIN_T;
+    nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 

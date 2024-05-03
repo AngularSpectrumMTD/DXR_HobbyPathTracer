@@ -32,6 +32,9 @@ struct SceneCB
 #define PAYLOAD_BIT_MASK_IS_SHADOW_MISS 1 << 2
 #define PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE 1 << 3
 
+#define RAY_MIN_T 0.001f
+#define RAY_MAX_T 1000000.0f
+
 struct Payload
 {
     float3 throughput;

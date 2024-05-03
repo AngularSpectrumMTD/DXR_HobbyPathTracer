@@ -1,6 +1,5 @@
 #ifndef __GEOMETRY_INTERSECTION_HLSLI__
 #define __GEOMETRY_INTERSECTION_HLSLI__
-#define RAY_MAX_T 1000000
 
 float3x3 constructWorldToLocalMatrix(float3 forwardDir, float3 upDir)
 {

@@ -95,7 +95,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.directionToLight = -normalize(emit);
     lightSample.normal = fromLight;
     lightSample.emission = lightGen.emission;
-    lightSample.distance = 10000000;
+    lightSample.distance = RAY_MAX_T;
     lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
     //lightSample.pdf = 1 / (2 * PI * (1 - cos(2 * DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN)));//sr is "2 * pi * (1 - cos(halfAngle))" but currently my conputation is failed...?
 }
@@ -241,7 +241,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le)
 
     bool isIntersect = false;
     int mostNearIndex = -1;
-    float currT = 100000000;
+    float currT = RAY_MAX_T;
     float3 mostNearLe = 0.xxx;
 
     for (int i = 0; i < getLightNum(); i++)

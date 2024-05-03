@@ -48,7 +48,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    if (executeLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
+    if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
     {
         return;
     }

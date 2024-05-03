@@ -395,7 +395,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
 }
 
-void NEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+void NextEventEstimation(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
 {
     if (isUseWRS_RIS())
     {
@@ -439,7 +439,7 @@ bool isNEEExecutable(in MaterialParams material)
     return (material.roughness > 0.001f) && (material.transRatio == 0) && isUseNEE();
 }
 
-bool executeLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, bool isIgnoreHit = false)
+bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, bool isIgnoreHit = false)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
@@ -456,42 +456,55 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
         isIntersect = intersectLightWithCurrentRay(Le);
     }
 
-    //ray hitted the light source
-    if (isIntersect)
+    if (isNEE_Exec)
     {
-        if (isNEE_Exec)
+        //ray hitted the light source
+        if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            if (isDirectRay(payload) && !isIndirectOnly())
+            payload.color += payload.throughput * Le;
+            isFinish = true;
+            return isFinish;
+        }
+
+        //ray hitted the emissive material
+        if (length(material.emission.xyz) > 0)
+        {
+            payload.color += payload.throughput * material.emission.xyz;
+            isFinish = false;
+            return isFinish;
+        }
+
+        if(!isIgnoreHit)
+        {
+            const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
+            if (isNEELightingRequired)
             {
-                payload.color += payload.throughput * Le;
+                NextEventEstimation(payload, material, scatterPosition, surfaceNormal);
             }
         }
-        else
+        isFinish = false;
+        return isFinish;
+    }
+    else
+    {
+        //ray hitted the light source
+        if (isIntersect)
         {
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
                 payload.color += payload.throughput * Le;
             }
+            isFinish = true;
+            return isFinish;
         }
-        isFinish = true;
-        return isFinish;
-    }
 
-    //ray hitted the emissive material
-    if (length(material.emission.xyz) > 0)
-    {
-        payload.color += payload.throughput * material.emission.xyz;
-        isFinish = false;
-        return isFinish;
-    }
-
-    if (isNEE_Exec && !isIgnoreHit)
-    {
-        const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
-        if (isNEELightingRequired)
+        //ray hitted the emissive material
+        if (length(material.emission.xyz) > 0)
         {
-            NEE(payload, material, scatterPosition, surfaceNormal);
+            payload.color += payload.throughput * material.emission.xyz;
+            isFinish = false;
+            return isFinish;
         }
     }
 
