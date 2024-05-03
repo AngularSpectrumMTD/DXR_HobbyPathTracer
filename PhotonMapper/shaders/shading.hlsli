@@ -446,48 +446,44 @@ bool executeLighting(inout Payload payload, in MaterialParams material, in float
     const bool isNEE_Exec = isNEEExecutable(material);
     setNEEFlag(payload, isNEE_Exec);
 
-    const bool isHitLightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
-    if (isHitLightingRequired)
+    bool isIntersect = false;
+    if (isDirectRay(payload))
     {
-        bool isIntersect = false;
-        if (isDirectRay(payload))
+        isIntersect = intersectAllLightWithCurrentRay(Le);
+    }
+    else
+    {
+        isIntersect = intersectLightWithCurrentRay(Le);
+    }
+
+    //ray hitted the light source
+    if (isIntersect)
+    {
+        if (isNEE_Exec)
         {
-            isIntersect = intersectAllLightWithCurrentRay(Le);
+            if (isDirectRay(payload) && !isIndirectOnly())
+            {
+                payload.color += payload.throughput * Le;
+            }
         }
         else
         {
-            isIntersect = intersectLightWithCurrentRay(Le);
-        }
-
-        //ray hitted the light source
-        if (isIntersect)
-        {
-            if (isNEE_Exec)
+            const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
+            if (isLighting)
             {
-                if (isDirectRay(payload) && !isIndirectOnly())
-                {
-                    payload.color += payload.throughput * Le;
-                }
+                payload.color += payload.throughput * Le;
             }
-            else
-            {
-                const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
-                if (isLighting)
-                {
-                    payload.color += payload.throughput * Le;
-                }
-            }
-            isFinish = true;
-            return isFinish;
         }
+        isFinish = true;
+        return isFinish;
+    }
 
-        //ray hitted the emissive material
-        if (length(material.emission.xyz) > 0)
-        {
-            payload.color += payload.throughput * material.emission.xyz;
-            isFinish = false;
-            return isFinish;
-        }
+    //ray hitted the emissive material
+    if (length(material.emission.xyz) > 0)
+    {
+        payload.color += payload.throughput * material.emission.xyz;
+        isFinish = false;
+        return isFinish;
     }
 
     if (isNEE_Exec && !isIgnoreHit)
