@@ -137,6 +137,8 @@ private:
         float3 eyeDir;
         int recursive;
         unsigned int flags;
+        float3 DI;
+        float3 GI;
     };
 
     struct PhotonPayload
@@ -495,6 +497,14 @@ private:
     ComPtr<ID3D12Resource> mVelocityBuffer;
     dx12::Descriptor mVelocityBufferDescriptorSRV;
     dx12::Descriptor mVelocityBufferDescriptorUAV;
+
+    ComPtr<ID3D12Resource> mDIBuffer;
+    dx12::Descriptor mDIBufferDescriptorSRV;
+    dx12::Descriptor mDIBufferDescriptorUAV;
+
+    ComPtr<ID3D12Resource> mGIBuffer;
+    dx12::Descriptor mGIBufferDescriptorSRV;
+    dx12::Descriptor mGIBufferDescriptorUAV;
 
     std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;

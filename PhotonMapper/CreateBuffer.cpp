@@ -389,6 +389,46 @@ void DxrPhotonMapper::CreateRegularBuffer()
             mPhotonGridIdDescriptorUAV = mDevice->CreateUnorderedAccessView(mPhotonGridId.Get(), &uavDesc);
         }
     }
+    // DI Gi
+    {
+        mDIBuffer = mDevice->CreateTexture2D(
+            width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+            D3D12_HEAP_TYPE_DEFAULT,
+            L"DIBuffer"
+        );
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mDIBufferDescriptorSRV = mDevice->CreateShaderResourceView(mDIBuffer.Get(), &srvDesc);
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        mDIBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDIBuffer.Get(), &uavDesc);
+
+        mGIBuffer = mDevice->CreateTexture2D(
+            width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+            D3D12_HEAP_TYPE_DEFAULT,
+            L"GIBuffer"
+        );
+
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mGIBufferDescriptorSRV = mDevice->CreateShaderResourceView(mGIBuffer.Get(), &srvDesc);
+
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        mGIBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mGIBuffer.Get(), &uavDesc);
+    }
 }
 
 void DxrPhotonMapper::CreateConstantBuffer()

@@ -32,6 +32,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 11);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 12);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 13);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig["gGridParam"] = 0;
@@ -52,6 +54,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"] = 15;
         mRegisterMapGlobalRootSig["gAccumulationCountBuffer"] = 16;
         mRegisterMapGlobalRootSig["gVelocityBuffer"] = 17;
+        mRegisterMapGlobalRootSig["gDIBuffer"] = 18;
+        mRegisterMapGlobalRootSig["gGIBuffer"] = 19;
     }
 
     //PhotonMapping
@@ -75,6 +79,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 11);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 12);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 13);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton["gGridParam"] = 0;
@@ -95,6 +101,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"] = 15;
         mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"] = 16;
         mRegisterMapGlobalRootSigPhoton["gVelocityBuffer"] = 17;
+        mRegisterMapGlobalRootSigPhoton["gDIBuffer"] = 18;
+        mRegisterMapGlobalRootSigPhoton["gGIBuffer"] = 19;
     }
 }
 

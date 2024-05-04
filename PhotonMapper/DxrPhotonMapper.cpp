@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -1080,6 +1080,8 @@ void DxrPhotonMapper::Draw()
     };
     CD3DX12_RESOURCE_BARRIER uavBarriers[] = {
         CD3DX12_RESOURCE_BARRIER::UAV(mAccumulationBuffer.Get()),
+        CD3DX12_RESOURCE_BARRIER::UAV(mDIBuffer.Get()),
+        CD3DX12_RESOURCE_BARRIER::UAV(mGIBuffer.Get()),
     };
     // Copy To BackBuffer
     D3D12_RESOURCE_BARRIER barriers[] = {
@@ -1130,12 +1132,12 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDIBuffer"], mDIBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gGIBuffer"], mGIBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
         PIXEndEvent(mCommandList.Get());
-
-        mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
         Grid3DSort();
     }
 
@@ -1159,15 +1161,19 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIBuffer"], mDIBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gGIBuffer"], mGIBufferDescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
     PIXEndEvent(mCommandList.Get());
 
-    if (mIsUseDenoise)
-    {
-        SpatiotemporalVarianceGuidedFiltering();
-    }
+    mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
+
+    //if (mIsUseDenoise)
+    //{
+    //    SpatiotemporalVarianceGuidedFiltering();
+    //}
 
     if (mIsUseDebugView)
     {

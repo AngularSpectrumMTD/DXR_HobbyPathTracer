@@ -81,7 +81,13 @@ void rayGen() {
     gNormalBuffer[launchIndex] = 0.xxxx;
     gVelocityBuffer[launchIndex] = 0.xx;
 
+    //clear DI / GI buffer
+    gDIBuffer[launchIndex] = 0.xxxx;
+    gGIBuffer[launchIndex] = 0.xxxx;
+
     float3 accumColor = 0.xxx;
+    float3 accumDI = 0.xxx;
+    float3 accumGI = 0.xxx;
 
     //random
     float LightSeed = getLightRandomSeed();
@@ -112,6 +118,8 @@ void rayGen() {
         payload.storeIndexXY = launchIndex;
         payload.flags = 0;//empty
         payload.eyeDir = nextRay.Direction;
+        payload.DI = 0.xxx;
+        payload.GI = 0.xxx;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -120,8 +128,12 @@ void rayGen() {
         TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 
         accumColor += payload.color;
+        accumDI += payload.DI;
+        accumGI += payload.GI;
     }
     float3 finalCol = max(0.xxx, accumColor / SPP);
+    float3 finalDI = max(0.xxx, accumDI / SPP);
+    float3 finalGI = max(0.xxx, accumGI / SPP);
     applyTimeDivision(finalCol, launchIndex);
 
     float luminance = computeLuminance(finalCol);
@@ -130,6 +142,9 @@ void rayGen() {
     gOutput[launchIndex.xy] = float4(finalCol * reinhard(luminance, REINHARD_L) / luminance, 1);//luminance based tone mapping
     //gOutput[launchIndex.xy] = float4(ACESFilmicTonemapping3f(finalCol), 1);
     //gOutput[launchIndex.xy] = float4(finalCol * ACESFilmicTonemapping(luminance) / luminance, 1);
+
+    gDIBuffer[launchIndex.xy] = float4(finalDI, 0);
+    gGIBuffer[launchIndex.xy] = float4(finalGI, 0);
 }
 
 //

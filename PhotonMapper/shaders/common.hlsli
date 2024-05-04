@@ -7,25 +7,7 @@
 #define DEFAULT_MISS_ID 0
 #define DEFAULT_GEOM_CONT_MUL 1
 
-struct SceneCB
-{
-    matrix mtxView;
-    matrix mtxProj;
-    matrix mtxViewInv;
-    matrix mtxProjInv;
-    matrix mtxViewPrev;
-    matrix mtxProjPrev;
-    matrix mtxViewInvPrev;
-    matrix mtxProjInvPrev;
-    uint4 flags;
-    float4 photonParams;
-    float4 cameraParams;
-    float4 gatherParams;
-    float4 gatherParams2;
-    float4 spotLightParams;
-    float4 viewVec;
-    uint4 additional;//x light num
-};
+#include "sceneCBDefinition.hlsli"
 
 #define PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED 1 << 0
 #define PAYLOAD_BIT_MASK_IS_SHADOW_RAY 1 << 1
@@ -43,6 +25,8 @@ struct Payload
     float3 eyeDir;
     int recursive;
     uint flags;
+    float3 DI;
+    float3 GI;
 };
 
 struct PhotonPayload
@@ -100,133 +84,10 @@ RWTexture2D<float2> gLuminanceMomentBufferDst : register(u9);
 RWTexture2D<uint> gAccumulationCountBuffer : register(u10);
 RWTexture2D<float2> gVelocityBuffer : register(u11);
 
-////////////////////////////////////
-//Interpret Scene Param
-////////////////////////////////////
-bool isDirectionalLight()
-{
-    return gSceneParam.flags.x == 0;
-}
+RWTexture2D<float4> gDIBuffer : register(u12);
+RWTexture2D<float4> gGIBuffer : register(u13);
 
-bool isUseTexture()
-{
-    return gSceneParam.flags.y == 1;
-}
-
-bool isVisualizePhotonDebugDraw()
-{
-    return gSceneParam.flags.z == 1;
-}
-
-bool isVisualizeLightRange()
-{
-    return gSceneParam.flags.w == 1;
-}
-
-uint getLightNum()
-{
-    return gSceneParam.additional.x;
-}
-
-bool isIndirectOnly()
-{
-    return gSceneParam.additional.y == 1;
-}
-
-bool isUseNEE()
-{
-    return gSceneParam.additional.z == 1;
-}
-
-bool isUseWRS_RIS()
-{
-    return gSceneParam.additional.w == 1;
-}
-
-bool isApplyCaustics()
-{
-    return gSceneParam.photonParams.x == 1;
-}
-
-float getSpectrumMode()
-{
-    return gSceneParam.photonParams.z;
-}
-
-float getMaxPhotonBounceNum()
-{
-    return gSceneParam.photonParams.w;
-}
-
-float getNearPlaneDistance()
-{
-    return gSceneParam.cameraParams.x;
-}
-
-float getFarPlaneDistance()
-{
-    return gSceneParam.cameraParams.y;
-}
-
-float getMaxBounceNum()
-{
-    return gSceneParam.cameraParams.z;
-}
-
-float getGatherRadius()
-{
-    return gSceneParam.gatherParams.x;
-}
-
-float getGatherSharpness()
-{
-    return gSceneParam.gatherParams.y;
-}
-
-float getGatherBoost()
-{
-    return gSceneParam.gatherParams.z;
-}
-
-float getGatherBlockRange()
-{
-    return gSceneParam.gatherParams.w;
-}
-
-uint getPhotonUnitNum()
-{
-    return gSceneParam.gatherParams2.x;
-}
-
-bool isAccumulationApply()
-{
-    return (gSceneParam.gatherParams2.y == 1);
-}
-
-float getLightRange()
-{
-    return gSceneParam.spotLightParams.x;
-}
-
-float getLightRandomSeed()
-{
-    return gSceneParam.spotLightParams.y;
-}
-
-float getLightLambdaNum()
-{
-    return gSceneParam.spotLightParams.z;
-}
-
-float getCausticsBoost()
-{
-    return gSceneParam.spotLightParams.w;
-}
-
-float3 getViewVec()
-{
-    return gSceneParam.viewVec.xyz;
-}
+#include "sceneParamInterface.hlsli"
 
 ////////////////////////////////////
 //Random

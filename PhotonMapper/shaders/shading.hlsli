@@ -388,7 +388,9 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            payload.color += payload.throughput * Le;
+            float3 element = payload.throughput * Le;
+            payload.color += element;
+            payload.DI = element;
             isFinish = true;
             return isFinish;
         }
@@ -396,7 +398,17 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (length(material.emission.xyz) > 0)
         {
-            payload.color += payload.throughput * material.emission.xyz;
+            float3 element = payload.throughput * material.emission.xyz;
+            payload.color += element;
+            if(isDirectRay(payload))
+            {
+                payload.DI = element;
+            }
+            if(isIndirectRay(payload))
+            {
+                payload.GI += element;
+            }
+
             isFinish = false;
             return isFinish;
         }
@@ -406,7 +418,16 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isNEELightingRequired)
             {
-                payload.color += NextEventEstimation(material, scatterPosition, surfaceNormal) * payload.throughput;
+                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal) * payload.throughput;
+                payload.color += element;
+                if(isDirectRay(payload))
+                {
+                    payload.DI = element;
+                }
+                if(isIndirectRay(payload))
+                {
+                    payload.GI += element;
+                }
             }
         }
         isFinish = false;
@@ -420,7 +441,16 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
-                payload.color += payload.throughput * Le;
+                float3 element = payload.throughput * Le;
+                payload.color += element;
+                if(isDirectRay(payload))
+                {
+                    payload.DI = element;
+                }
+                if(isIndirectRay(payload))
+                {
+                    payload.GI += element;
+                }
             }
             isFinish = true;
             return isFinish;
@@ -429,7 +459,16 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (length(material.emission.xyz) > 0)
         {
-            payload.color += payload.throughput * material.emission.xyz;
+            float3 element = payload.throughput * material.emission.xyz;
+            payload.color += element;
+            if(isDirectRay(payload))
+            {
+                payload.DI = element;
+            }
+            if(isIndirectRay(payload))
+            {
+                payload.GI += element;
+            }
             isFinish = false;
             return isFinish;
         }
