@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -1169,6 +1169,8 @@ void DxrPhotonMapper::Draw()
         SpatiotemporalVarianceGuidedFiltering();
     }
 
+
+
     if (mIsUseDebugView)
     {
         std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
@@ -1176,6 +1178,7 @@ void DxrPhotonMapper::Draw()
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDiffuseAlbedoBuffer.Get()));
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mNormalBuffer.Get()));
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDepthBufferTbl[src].Get()));
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mVelocityBuffer.Get()));
         mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
 
         mCommandList->SetComputeRootSignature(mRsDebugView.Get());

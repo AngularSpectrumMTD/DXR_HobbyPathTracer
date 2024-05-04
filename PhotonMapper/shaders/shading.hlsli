@@ -319,8 +319,9 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
 }
 
-void NextEventEstimation(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
 {
+    float3 estimatedColor = 0.xxx;
     if (isUseWRS_RIS())
     {
         LightSample lightSample;
@@ -329,7 +330,7 @@ void NextEventEstimation(inout Payload payload, in MaterialParams material, in f
         if (isVisible(scatterPosition, lightSample))
         {
            const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-           payload.color += reservoir.targetPDF_3f * invPDF * payload.throughput;
+           estimatedColor = reservoir.targetPDF_3f * invPDF;
         }
     }
     else
@@ -350,11 +351,12 @@ void NextEventEstimation(inout Payload payload, in MaterialParams material, in f
                     float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
                     float G = reseiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
                     float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
-                    payload.color += FGL * payload.throughput;
+                    estimatedColor = FGL;
                 }
             }
         }
     }
+    return estimatedColor;
 }
 
 bool isNEEExecutable(in MaterialParams material)
@@ -404,7 +406,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isNEELightingRequired)
             {
-                NextEventEstimation(payload, material, scatterPosition, surfaceNormal);
+                payload.color += NextEventEstimation(material, scatterPosition, surfaceNormal) * payload.throughput;
             }
         }
         isFinish = false;
