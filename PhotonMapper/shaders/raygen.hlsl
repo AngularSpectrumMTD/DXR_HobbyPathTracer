@@ -1,69 +1,6 @@
 #include "opticalFunction.hlsli"
 
 #define SPP 1
-#define REINHARD_L 1000
-#define MAX_ACCUMULATION_RANGE 10000
-
-// float reinhard(float x, float L)
-// {
-//     return (x / (1 + x)) * (1 + x / L / L);
-// }
-
-// float3 reinhard3f(float3 v, float L)
-// {
-//     return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
-// }
-
-// float ACESFilmicTonemapping(float x)
-// {
-//     const float a = 2.51;
-//     const float b = 0.03;
-//     const float c = 2.43;
-//     const float d = 0.59;
-//     const float e = 0.14;
-//     return saturate(x * (a * x + b) / (x * (c * x + d) + c));
-// }
-
-// float3 ACESFilmicTonemapping3f(float3 v)
-// {
-//     return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
-// }
-
-// void applyTimeDivision(inout float3 current, uint2 ID)
-// {
-//     float2 dims = float2(DispatchRaysDimensions().xy);
-//     float currDepth = gDepthBuffer[ID];
-//     uint accCount = gAccumulationCountBuffer[ID];
-
-//     float2 velocity = gVelocityBuffer[ID] * 2.0 - 1.0;
-//     uint2 prevID = ID;//(ID / dims - velocity) * dims;
-//     float3 prev = gAccumulationBuffer[prevID].rgb;
-//     float prevDepth = gPrevDepthBuffer[prevID];
-//     float2 prevLuminanceMoment = gLuminanceMomentBufferSrc[prevID];
-
-//     float luminance = computeLuminance(current);
-//     float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
-    
-//     if (isAccumulationApply())
-//     {
-//         accCount++;
-//     }
-//     else
-//     {
-//         accCount = 1;
-//     }
-//     gAccumulationCountBuffer[ID] = accCount;
-
-//     const float tmpAccmuRatio = 1.f / accCount;
-//     current = lerp(prev, current, tmpAccmuRatio);
-//     if (accCount < MAX_ACCUMULATION_RANGE)
-//     {
-//         curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
-//         curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-//         gAccumulationBuffer[ID].rgb = current;
-//         gLuminanceMomentBufferDst[ID] = curremtLuminanceMoment;
-//     }
-// }
 
 //
 //DispatchRays By Screen Size2D
@@ -85,7 +22,10 @@ void rayGen() {
     gDIBuffer[launchIndex] = 0.xxxx;
     gGIBuffer[launchIndex] = 0.xxxx;
 
-    float3 accumColor = 0.xxx;
+    //clear caustics buffer
+    gCausticsBuffer[launchIndex] = 0.xxxx;
+
+    float3 accumCaustics = 0.xxx;
     float3 accumDI = 0.xxx;
     float3 accumGI = 0.xxx;
 
@@ -113,7 +53,7 @@ void rayGen() {
 
         Payload payload;
         payload.throughput = energyBoost * float3(1, 1, 1);
-        payload.color = float3(0, 0, 0);
+        payload.caustics = float3(0, 0, 0);
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex;
         payload.flags = 0;//empty
@@ -127,24 +67,17 @@ void rayGen() {
 
         TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 
-        accumColor += payload.color;
+        accumCaustics += payload.caustics;
         accumDI += payload.DI;
         accumGI += payload.GI;
     }
-    float3 finalCol = max(0.xxx, accumColor / SPP);
     float3 finalDI = max(0.xxx, accumDI / SPP);
     float3 finalGI = max(0.xxx, accumGI / SPP);
-    //applyTimeDivision(finalCol, launchIndex);
-
-    float luminance = computeLuminance(finalCol);
-
-    //gOutput[launchIndex.xy] = float4(reinhard3f(finalCol, REINHARD_L), 1);
-    //gOutput[launchIndex.xy] = float4(finalCol * reinhard(luminance, REINHARD_L) / luminance, 1);//luminance based tone mapping
-    //gOutput[launchIndex.xy] = float4(ACESFilmicTonemapping3f(finalCol), 1);
-    //gOutput[launchIndex.xy] = float4(finalCol * ACESFilmicTonemapping(luminance) / luminance, 1);
+    float3 finalCaustics = max(0.xxx, accumCaustics / SPP);
 
     gDIBuffer[launchIndex.xy] = float4(finalDI, 0);
     gGIBuffer[launchIndex.xy] = float4(finalGI, 0);
+    gCausticsBuffer[launchIndex.xy] = float4(finalCaustics, 0);
 }
 
 //

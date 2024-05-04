@@ -135,7 +135,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
     uint photonMapWidth = 1;
     uint photonStride = 1;
     gPhotonMap.GetDimensions(photonMapWidth, photonStride);
-    return boost * mul(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
+    return boost * length(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
 }
 
 float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)

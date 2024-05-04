@@ -20,7 +20,6 @@ void miss(inout Payload payload) {
     float3 hittedEmission = 0.xxx;
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hittedEmission))
     {
-        payload.color = hittedEmission;
         payload.DI = hittedEmission;
         payload.throughput = 0.xxx;
         return;
@@ -32,7 +31,6 @@ void miss(inout Payload payload) {
     if (isHitLightingRequired)
     {
         float3 element = payload.throughput * directionalLightingOnMissShader(payload);
-        payload.color += element;
 
         if(isDirectRay(payload) || isCompletelyMissRay(payload))
         {
@@ -49,7 +47,6 @@ void miss(inout Payload payload) {
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
     float3 element = payload.throughput * cubemap.rgb;
-    payload.color += element;
     if(isDirectRay(payload) || isCompletelyMissRay(payload))
     {
         payload.DI += element;

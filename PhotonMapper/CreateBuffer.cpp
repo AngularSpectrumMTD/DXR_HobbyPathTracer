@@ -401,6 +401,10 @@ void DxrPhotonMapper::CreateRegularBuffer()
         mGIBufferDescriptorSRVPingPongTbl.resize(size);
         mGIBufferDescriptorUAVPingPongTbl.resize(size);
 
+        mCausticsBufferPingPongTbl.resize(size);
+        mCausticsBufferDescriptorSRVPingPongTbl.resize(size);
+        mCausticsBufferDescriptorUAVPingPongTbl.resize(size);
+
         for (u32 i = 0; i < size; i++)
         {
             {
@@ -448,6 +452,29 @@ void DxrPhotonMapper::CreateRegularBuffer()
                 D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
                 uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
                 mGIBufferDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mGIBufferPingPongTbl.at(i).Get(), &uavDesc);
+            }
+            {
+                wchar_t name[30];
+                swprintf(name, 30, L"CausticsBufferTbl[%d]", i);
+                mCausticsBufferPingPongTbl.at(i) = mDevice->CreateTexture2D(
+                    width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    (i % 2 == 0) ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    name
+                );
+
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mCausticsBufferDescriptorSRVPingPongTbl.at(i) = mDevice->CreateShaderResourceView(mCausticsBufferPingPongTbl.at(i).Get(), &srvDesc);
+
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mCausticsBufferDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mCausticsBufferPingPongTbl.at(i).Get(), &uavDesc);
             }
         }
     }

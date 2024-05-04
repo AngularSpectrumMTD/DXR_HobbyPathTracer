@@ -389,7 +389,6 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
             float3 element = payload.throughput * Le;
-            payload.color += element;
             payload.DI = element;
             isFinish = true;
             return isFinish;
@@ -399,7 +398,6 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (length(material.emission.xyz) > 0)
         {
             float3 element = payload.throughput * material.emission.xyz;
-            payload.color += element;
             if(isDirectRay(payload))
             {
                 payload.DI = element;
@@ -419,7 +417,6 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             if (isNEELightingRequired)
             {
                 float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal) * payload.throughput;
-                payload.color += element;
                 if(isDirectRay(payload))
                 {
                     payload.DI = element;
@@ -442,7 +439,6 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             if (isLighting)
             {
                 float3 element = payload.throughput * Le;
-                payload.color += element;
                 if(isDirectRay(payload))
                 {
                     payload.DI = element;
@@ -460,7 +456,6 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (length(material.emission.xyz) > 0)
         {
             float3 element = payload.throughput * material.emission.xyz;
-            payload.color += element;
             if(isDirectRay(payload))
             {
                 payload.DI = element;

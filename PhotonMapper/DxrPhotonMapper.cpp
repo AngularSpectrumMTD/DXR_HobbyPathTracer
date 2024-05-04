@@ -1094,6 +1094,8 @@ void DxrPhotonMapper::Draw()
             CD3DX12_RESOURCE_BARRIER::Transition(mDIBufferPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
             CD3DX12_RESOURCE_BARRIER::Transition(mGIBufferPingPongTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mGIBufferPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+            CD3DX12_RESOURCE_BARRIER::Transition(mCausticsBufferPingPongTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mCausticsBufferPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
     };
     // BackBuffer To RT
     auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -1130,6 +1132,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -1153,6 +1156,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -1171,13 +1175,14 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapTemporalReuse["gSceneParam"], sceneCB->GetGPUVirtualAddress());
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["HistoryDIBuffer"], mDIBufferDescriptorSRVPingPongTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["HistoryGIBuffer"], mGIBufferDescriptorSRVPingPongTbl[src].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DepthBuffer"], mDepthBufferDescriptorSRVTbl[src].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["HistoryCausticsBuffer"], mCausticsBufferDescriptorSRVPingPongTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["PrevDepthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DepthBuffer"], mDepthBufferDescriptorSRVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["PrevDepthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["VelocityBuffer"], mVelocityBufferDescriptorSRV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIGIBuffer"], mMainOutputDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);

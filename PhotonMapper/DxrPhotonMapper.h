@@ -134,7 +134,7 @@ private:
     struct Payload
     {
         float3 throughput;
-        float3 color;
+        float3 caustics;
         uint2 storeIndexXY;
         float3 eyeDir;
         int recursive;
@@ -507,6 +507,10 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mGIBufferPingPongTbl;
     std::vector < dx12::Descriptor> mGIBufferDescriptorSRVPingPongTbl;
     std::vector < dx12::Descriptor> mGIBufferDescriptorUAVPingPongTbl;
+
+    std::vector < ComPtr<ID3D12Resource>> mCausticsBufferPingPongTbl;
+    std::vector < dx12::Descriptor> mCausticsBufferDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mCausticsBufferDescriptorUAVPingPongTbl;
 
     std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;

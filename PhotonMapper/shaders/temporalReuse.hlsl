@@ -8,19 +8,18 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 
 Texture2D<float4> HistoryDIBuffer : register(t0);
 Texture2D<float4> HistoryGIBuffer : register(t1);
-Texture2D<float> DepthBuffer : register(t2);
-Texture2D<float> PrevDepthBuffer : register(t3);
-Texture2D<float2> VelocityBuffer : register(t4);
-Texture2D<float2> LuminanceMomentBufferSrc : register(t5);
+Texture2D<float4> HistoryCausticsBuffer : register(t2);
+Texture2D<float> DepthBuffer : register(t3);
+Texture2D<float> PrevDepthBuffer : register(t4);
+Texture2D<float2> VelocityBuffer : register(t5);
+Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
-
-RWTexture2D<float4> DIGIBuffer : register(u2);
-
-RWTexture2D<uint> AccumulationCountBuffer : register(u3);
-
-RWTexture2D<float2> LuminanceMomentBufferDst : register(u4);
+RWTexture2D<float4> CurrentCausticsBuffer : register(u2);
+RWTexture2D<float4> DIGIBuffer : register(u3);
+RWTexture2D<uint> AccumulationCountBuffer : register(u4);
+RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -67,8 +66,10 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 
     float3 currDI = CurrentDIBuffer[currID].rgb;
     float3 currGI = CurrentGIBuffer[currID].rgb;
+    float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
     float3 prevDI = HistoryDIBuffer[prevID].rgb;
     float3 prevGI = HistoryGIBuffer[prevID].rgb;
+    float3 prevCaustics = HistoryCausticsBuffer[prevID].rgb;
     float3 currDIGI = currDI + currGI;
 
     float prevDepth = PrevDepthBuffer[prevID];
@@ -90,7 +91,8 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     const float tmpAccmuRatio = 1.f / accCount;
     currDI = lerp(prevDI, currDI, tmpAccmuRatio);
     currGI = lerp(prevGI, currGI, tmpAccmuRatio);
-    currDIGI = currDI + currGI;
+    currCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
+    currDIGI = currDI + currGI + currCaustics;
     if (accCount < MAX_ACCUMULATION_RANGE)
     {
         curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
@@ -99,6 +101,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         DIGIBuffer[currID].rgb = toneMappedDIGI;
         CurrentDIBuffer[currID].rgb = currDI;
         CurrentGIBuffer[currID].rgb = currGI;
+        CurrentCausticsBuffer[currID].rgb = currCaustics;
         LuminanceMomentBufferDst[currID] = curremtLuminanceMoment;
     }
 }

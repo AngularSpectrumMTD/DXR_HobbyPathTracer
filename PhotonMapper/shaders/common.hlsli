@@ -20,7 +20,7 @@
 struct Payload
 {
     float3 throughput;
-    float3 color;
+    float3 caustics;
     uint2 storeIndexXY;
     float3 eyeDir;
     int recursive;
@@ -80,6 +80,8 @@ RWTexture2D<float2> gVelocityBuffer : register(u6);
 
 RWTexture2D<float4> gDIBuffer : register(u7);
 RWTexture2D<float4> gGIBuffer : register(u8);
+
+RWTexture2D<float4> gCausticsBuffer : register(u9);
 
 #include "sceneParamInterface.hlsli"
 
@@ -151,7 +153,6 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
     payload.recursive++;
     if (payload.recursive >= getMaxBounceNum() || length(payload.throughput) < 1e-2)
     {
-        payload.color = float3(0, 0, 0);
         return true;
     }
     return false;
