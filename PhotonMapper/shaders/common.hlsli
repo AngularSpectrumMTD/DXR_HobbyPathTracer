@@ -66,26 +66,20 @@ struct LightGenerateParam
 // Global Root Signature
 RaytracingAccelerationStructure gRtScene : register(t0);
 Texture2D<float4> gEquiRecEnvMap : register(t1);
-Texture2D<float2> gLuminanceMomentBufferSrc : register(t2);
-StructuredBuffer<LightGenerateParam> gLightGenerateParams : register(t3);
+StructuredBuffer<LightGenerateParam> gLightGenerateParams : register(t2);
 ConstantBuffer<SceneCB> gSceneParam : register(b1);
 SamplerState gSampler : register(s0);
 
 RWStructuredBuffer<PhotonInfo> gPhotonMap : register(u0);
 RWTexture2D<float> gDepthBuffer : register(u1);
-RWTexture2D<float> gPrevDepthBuffer : register(u2);
-RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u3);
-RWTexture2D<float4> gDiffuseAlbedoBuffer : register(u4);
-RWTexture2D<float4> gPositionBuffer : register(u5);
-RWTexture2D<float4> gNormalBuffer : register(u6);
-RWTexture2D<float4> gOutput : register(u7);
-RWTexture2D<float4> gAccumulationBuffer : register(u8);
-RWTexture2D<float2> gLuminanceMomentBufferDst : register(u9);
-RWTexture2D<uint> gAccumulationCountBuffer : register(u10);
-RWTexture2D<float2> gVelocityBuffer : register(u11);
+RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u2);
+RWTexture2D<float4> gDiffuseAlbedoBuffer : register(u3);
+RWTexture2D<float4> gPositionBuffer : register(u4);
+RWTexture2D<float4> gNormalBuffer : register(u5);
+RWTexture2D<float2> gVelocityBuffer : register(u6);
 
-RWTexture2D<float4> gDIBuffer : register(u12);
-RWTexture2D<float4> gGIBuffer : register(u13);
+RWTexture2D<float4> gDIBuffer : register(u7);
+RWTexture2D<float4> gGIBuffer : register(u8);
 
 #include "sceneParamInterface.hlsli"
 
