@@ -21,6 +21,7 @@ void miss(inout Payload payload) {
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hittedEmission))
     {
         payload.color = hittedEmission;
+        payload.DI = hittedEmission;
         payload.throughput = 0.xxx;
         return;
     }
@@ -30,14 +31,33 @@ void miss(inout Payload payload) {
 
     if (isHitLightingRequired)
     {
-        payload.color += payload.throughput * directionalLightingOnMissShader(payload);
+        float3 element = payload.throughput * directionalLightingOnMissShader(payload);
+        payload.color += element;
+
+        if(isDirectRay(payload) || isCompletelyMissRay(payload))
+        {
+            payload.DI += element;
+        }
+        if(isIndirectRay(payload))
+        {
+            payload.GI += element;
+        }
     }
 
     storeGBuffer(payload, 0.xxx, 0.xxx);
 
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
-    payload.color += payload.throughput * cubemap.rgb;
+    float3 element = payload.throughput * cubemap.rgb;
+    payload.color += element;
+    if(isDirectRay(payload) || isCompletelyMissRay(payload))
+    {
+        payload.DI += element;
+    }
+    if(isIndirectRay(payload))
+    {
+        payload.GI += element;
+    }
 #endif
     payload.throughput = 0.xxx;
 }

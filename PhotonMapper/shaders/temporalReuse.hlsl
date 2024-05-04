@@ -11,6 +11,7 @@ Texture2D<float4> HistoryGIBuffer : register(t1);
 Texture2D<float> DepthBuffer : register(t2);
 Texture2D<float> PrevDepthBuffer : register(t3);
 Texture2D<float2> VelocityBuffer : register(t4);
+Texture2D<float2> LuminanceMomentBufferSrc : register(t5);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -19,8 +20,7 @@ RWTexture2D<float4> DIGIBuffer : register(u2);
 
 RWTexture2D<uint> AccumulationCountBuffer : register(u3);
 
-RWTexture2D<float2> LuminanceMomentBufferSrc : register(u4);
-RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
+RWTexture2D<float2> LuminanceMomentBufferDst : register(u4);
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -70,7 +70,6 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float3 prevDI = HistoryDIBuffer[prevID].rgb;
     float3 prevGI = HistoryGIBuffer[prevID].rgb;
     float3 currDIGI = currDI + currGI;
-    float3 prevDIGI = prevDI + prevGI;
 
     float prevDepth = PrevDepthBuffer[prevID];
     float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
@@ -89,14 +88,15 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     AccumulationCountBuffer[currID] = accCount;
 
     const float tmpAccmuRatio = 1.f / accCount;
-    currDIGI = lerp(prevDIGI, currDIGI, tmpAccmuRatio);
     currDI = lerp(prevDI, currDI, tmpAccmuRatio);
     currGI = lerp(prevGI, currGI, tmpAccmuRatio);
+    currDIGI = currDI + currGI;
     if (accCount < MAX_ACCUMULATION_RANGE)
     {
         curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
         curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-        DIGIBuffer[currID].rgb = currDIGI;
+        float3 toneMappedDIGI = float3(currDIGI * reinhard(computeLuminance(currDIGI), REINHARD_L) / computeLuminance(currDIGI));//luminance based tone mapping
+        DIGIBuffer[currID].rgb = toneMappedDIGI;
         CurrentDIBuffer[currID].rgb = currDI;
         CurrentGIBuffer[currID].rgb = currGI;
         LuminanceMomentBufferDst[currID] = curremtLuminanceMoment;

@@ -58,7 +58,16 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    payload.color += payload.throughput * photon;
+    const float3 element = payload.throughput * photon;
+    payload.color += element;
+    if(isDirectRay(payload))
+    {
+        payload.DI += element;
+    }
+    if(isIndirectRay(payload))
+    {
+        payload.GI += element;
+    }
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
 
     RAY_FLAG flags = RAY_FLAG_NONE;

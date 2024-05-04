@@ -87,6 +87,8 @@ namespace ComputeShaders {
     const LPCWSTR A_Trous = L"A-trous.cso";
 
     const LPCWSTR DebugView = L"debugView.cso";
+
+    const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 }
 
 template<class T>
@@ -498,13 +500,13 @@ private:
     dx12::Descriptor mVelocityBufferDescriptorSRV;
     dx12::Descriptor mVelocityBufferDescriptorUAV;
 
-    ComPtr<ID3D12Resource> mDIBuffer;
-    dx12::Descriptor mDIBufferDescriptorSRV;
-    dx12::Descriptor mDIBufferDescriptorUAV;
+    std::vector < ComPtr<ID3D12Resource>> mDIBufferPingPongTbl;
+    std::vector < dx12::Descriptor> mDIBufferDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mDIBufferDescriptorUAVPingPongTbl;
 
-    ComPtr<ID3D12Resource> mGIBuffer;
-    dx12::Descriptor mGIBufferDescriptorSRV;
-    dx12::Descriptor mGIBufferDescriptorUAV;
+    std::vector < ComPtr<ID3D12Resource>> mGIBufferPingPongTbl;
+    std::vector < dx12::Descriptor> mGIBufferDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mGIBufferDescriptorUAVPingPongTbl;
 
     std::vector < ComPtr<ID3D12Resource>> mLuminanceMomentBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceMomentBufferDescriptorSRVTbl;
@@ -582,6 +584,10 @@ private:
     ComPtr<ID3D12RootSignature> mRsDebugView;
     std::unordered_map < std::string, u32> mRegisterMapDebugView;
     ComPtr<ID3D12PipelineState> mDebugViewPSO;
+
+    ComPtr<ID3D12RootSignature> mRsTemporalReuse;
+    std::unordered_map < std::string, u32> mRegisterMapTemporalReuse;
+    ComPtr<ID3D12PipelineState> mTemporalReusePSO;
 
     u32 mRenderFrame = 0;
     u32 mMoveFrame = 0;

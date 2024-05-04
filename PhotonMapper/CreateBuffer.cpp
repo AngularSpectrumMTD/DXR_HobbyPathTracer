@@ -391,43 +391,65 @@ void DxrPhotonMapper::CreateRegularBuffer()
     }
     // DI Gi
     {
-        mDIBuffer = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
-            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-            D3D12_HEAP_TYPE_DEFAULT,
-            L"DIBuffer"
-        );
+        const u32 size = 2;
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        mDIBufferDescriptorSRV = mDevice->CreateShaderResourceView(mDIBuffer.Get(), &srvDesc);
+        mDIBufferPingPongTbl.resize(size);
+        mDIBufferDescriptorSRVPingPongTbl.resize(size);
+        mDIBufferDescriptorUAVPingPongTbl.resize(size);
 
-        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        mDIBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDIBuffer.Get(), &uavDesc);
+        mGIBufferPingPongTbl.resize(size);
+        mGIBufferDescriptorSRVPingPongTbl.resize(size);
+        mGIBufferDescriptorUAVPingPongTbl.resize(size);
 
-        mGIBuffer = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
-            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-            D3D12_HEAP_TYPE_DEFAULT,
-            L"GIBuffer"
-        );
+        for (u32 i = 0; i < size; i++)
+        {
+            {
+                wchar_t name[30];
+                swprintf(name, 30, L"DIBufferTbl[%d]", i);
+                mDIBufferPingPongTbl.at(i) = mDevice->CreateTexture2D(
+                    width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    (i % 2 == 0) ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    name
+                );
 
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        mGIBufferDescriptorSRV = mDevice->CreateShaderResourceView(mGIBuffer.Get(), &srvDesc);
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mDIBufferDescriptorSRVPingPongTbl.at(i) = mDevice->CreateShaderResourceView(mDIBufferPingPongTbl.at(i).Get(), &srvDesc);
 
-        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        mGIBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mGIBuffer.Get(), &uavDesc);
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mDIBufferDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mDIBufferPingPongTbl.at(i).Get(), &uavDesc);
+            }
+            {
+                wchar_t name[30];
+                swprintf(name, 30, L"GIBufferTbl[%d]", i);
+                mGIBufferPingPongTbl.at(i) = mDevice->CreateTexture2D(
+                    width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    (i % 2 == 0) ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    name
+                );
+
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mGIBufferDescriptorSRVPingPongTbl.at(i) = mDevice->CreateShaderResourceView(mGIBufferPingPongTbl.at(i).Get(), &srvDesc);
+
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mGIBufferDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mGIBufferPingPongTbl.at(i).Get(), &uavDesc);
+            }
+        }
     }
 }
 

@@ -147,7 +147,16 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         nextRay.Direction = 0.xxx;
         const float3 photon = accumulatePhoton(scatterPosition, payload.eyeDir, bestFitWorldNormal);
-        payload.color += payload.throughput * photon;
+        const float3 element = payload.throughput * photon;
+        payload.color += element;
+        if(isDirectRay(payload))
+        {
+            payload.DI += element;
+        }
+        if(isIndirectRay(payload))
+        {
+            payload.GI += element;
+        }
         updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
     }
     else

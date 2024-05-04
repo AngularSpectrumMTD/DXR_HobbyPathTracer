@@ -178,4 +178,34 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapDebugView["velocityBuffer"] = 3;
         mRegisterMapDebugView["finalColor"] = 4;
     }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
+        mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
+        CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
+        mRegisterMapTemporalReuse["gSceneParam"] = 0;
+        mRegisterMapTemporalReuse["HistoryDIBuffer"] = 1;
+        mRegisterMapTemporalReuse["HistoryGIBuffer"] = 2;
+        mRegisterMapTemporalReuse["DepthBuffer"] = 3;
+        mRegisterMapTemporalReuse["PrevDepthBuffer"] = 4;
+        mRegisterMapTemporalReuse["VelocityBuffer"] = 5;
+        mRegisterMapTemporalReuse["LuminanceMomentBufferSrc"] = 6;
+        mRegisterMapTemporalReuse["CurrentDIBuffer"] = 7;
+        mRegisterMapTemporalReuse["CurrentGIBuffer"] = 8;
+        mRegisterMapTemporalReuse["DIGIBuffer"] = 9;
+        mRegisterMapTemporalReuse["AccumulationCountBuffer"] = 10;
+        mRegisterMapTemporalReuse["LuminanceMomentBufferDst"] = 11;
+    }
 }
