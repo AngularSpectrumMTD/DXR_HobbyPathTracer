@@ -353,25 +353,11 @@ private:
     void CreateSceneBLAS();
     void CreateSceneTLAS();
     void CreateStateObject();
-    void CreateResultBuffer();
-    void CreatePhotonMappingBuffer();
-    void CreateDepthBuffer();
-    void CreateLightGenerateBuffer();
-    void CreateLuminanceMomentBuffer();
-    void CreateLuminanceVarianceBuffer();
-    void CreateDenoisedColorBuffer();
-    void CreateDiffuseAlbedoBuffer();
-    void CreatePositionBuffer();
-    void CreateNormalBuffer();
-    void CreateAccumulationCountBuffer();
-    void CreateVelocityBuffer();
+    void CreateLightGenerationBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
     void CreateShaderTable();
     void CreateComputeRootSignatureAndPSO();
-    void CreateBitonicSortCBs();
-    void CreateGridSortCB();
-    void CreateDenoiseCBs();
     void CreateComputeShaderStateObject(const LPCWSTR& compiledComputeShaderName, ComPtr<ID3D12PipelineState>& computePipelineState, ComPtr<ID3D12RootSignature> rootSig);
     //Å´ combine
     void CreateAccelerationStructure();
@@ -517,6 +503,10 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mLuminanceVarianceBufferTbl;
     std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorUAVTbl;
+
+    ComPtr<ID3D12Resource> mCurrentPathtarcedColor;
+    dx12::Descriptor mCurrentPathtarcedColorDescriptorSRV;
+    dx12::Descriptor mCurrentPathtarcedColorDescriptorUAV;
 
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;

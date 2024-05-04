@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 40;
@@ -1037,7 +1037,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
 
     if (prevSize != mLightGenerationParamTbl.size())
     {
-        CreateLightGenerateBuffer();
+        CreateLightGenerationBuffer();
     }
 
     auto buf = mLightGenerationParamBuffer.Get();
@@ -1168,8 +1168,6 @@ void DxrPhotonMapper::Draw()
     {
         SpatiotemporalVarianceGuidedFiltering();
     }
-
-
 
     if (mIsUseDebugView)
     {
