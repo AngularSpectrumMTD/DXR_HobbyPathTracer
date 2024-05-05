@@ -1,15 +1,15 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS] + Photon Mapping[Spectral Rendered Caustics(Currently Corrupted...)])  
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/915d732a-7f6d-4868-a3d5-45c20ef1d5fb)
+![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/f61004de-6ac9-4599-8622-b6383444c728)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
 Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Uniform Sampling (from 400 lights. Not Accumulated)  
-![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/1dde56d5-f355-4074-a37d-c2def0ba79f8)
+![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/864e337c-89cc-442a-b925-fd9b4d116f36)
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 Left :  WRS (30 stream inputs from 400 lights. 40 frame Accumulated) / Right : Uniform Sampling (from 400 lights. 40 frame Accumulated)  
-![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/815bcc47-d254-4b47-9288-d037167b3b22)
+![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5b1ae3eb-c67f-4fc5-9967-8d4b9bead0ff)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
@@ -19,7 +19,7 @@ Sampling : Next Event Estimation / Streaming RIS
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal  
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4c924bef-8f7e-4593-87a6-7f40569d6430)
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/b1159009-0959-49aa-b3f5-035673e03ebb)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

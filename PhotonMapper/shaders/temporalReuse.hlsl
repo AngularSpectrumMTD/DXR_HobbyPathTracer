@@ -2,9 +2,11 @@
 ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "sceneParamInterface.hlsli"
 
+#include "spectralRenderingHelper.hlsli"
+
 #define THREAD_NUM 16
 #define REINHARD_L 1000
-#define MAX_ACCUMULATION_RANGE 10000
+#define MAX_ACCUMULATION_RANGE 1000
 
 Texture2D<float4> HistoryDIBuffer : register(t0);
 Texture2D<float4> HistoryGIBuffer : register(t1);
@@ -88,21 +90,23 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     }
     AccumulationCountBuffer[currID] = accCount;
 
-    const float tmpAccmuRatio = 1.f / accCount;
-    currDI = lerp(prevDI, currDI, tmpAccmuRatio);
-    currGI = lerp(prevGI, currGI, tmpAccmuRatio);
-    currCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
-    
-    currDIGI = currDI + currGI + currCaustics;
     if (accCount < MAX_ACCUMULATION_RANGE)
     {
+        const float tmpAccmuRatio = 1.f / accCount;
+
+        float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
+        float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
+        float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
+        float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
+
         curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
         curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-        float3 toneMappedDIGI = float3(currDIGI * reinhard(computeLuminance(currDIGI), REINHARD_L) / computeLuminance(currDIGI));//luminance based tone mapping
-        DIGIBuffer[currID].rgb = toneMappedDIGI;
-        CurrentDIBuffer[currID].rgb = currDI;
-        CurrentGIBuffer[currID].rgb = currGI;
-        CurrentCausticsBuffer[currID].rgb = currCaustics;
+        
+        float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
+        DIGIBuffer[currID].rgb = toneMappedDIGI + mul(accumulatedCaustics, XYZtoRGB2);
+        CurrentDIBuffer[currID].rgb = accumulatedDI;
+        CurrentGIBuffer[currID].rgb = accumulatedGI;
+        CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
         LuminanceMomentBufferDst[currID] = curremtLuminanceMoment;
     }
 }

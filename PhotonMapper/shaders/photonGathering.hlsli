@@ -73,7 +73,6 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
 
     int X = 0, Y = 0, Z = 0, G = 0;
     float3 accumulateXYZ = float3(0, 0, 0);
-    int count = 0;
 
     float3 normWN = normalize(worldNormal);
     float3 normEYE = normalize(eyeDir);
@@ -103,10 +102,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
                 uint GridID = GridHash(XYZ);
 
                 uint2 photonIDstardEnd = gPhotonGridIdBuffer[GridID];
-                if (photonIDstardEnd.x == UINT32_MAX)
-                    continue; //avoid infinite loop
-
-                if (photonIDstardEnd.y == UINT32_MAX)
+                if ((photonIDstardEnd.x == UINT32_MAX) || (photonIDstardEnd.y == UINT32_MAX))
                     continue; //avoid infinite loop
 
                 for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
@@ -115,10 +111,9 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
                     bool isVisiblePhotonPrimary = true;
                     //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
                         
-                    float distanceSqr = lengthSqr(gatherCenterPos - comparePhoton.position);
+                    float distanceSqr = dot(gatherCenterPos - comparePhoton.position, gatherCenterPos - comparePhoton.position);
                     if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
                     {
-                        count++;
                         accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                     }
                 }
@@ -126,7 +121,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
                 if (isDebug)
                 {
                     float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
-                    accumulateXYZ += float3(db, db, 0); //debug
+                    accumulateXYZ = float3(db, db, 0); //debug
                 }
             }
         }
@@ -135,7 +130,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
     uint photonMapWidth = 1;
     uint photonStride = 1;
     gPhotonMap.GetDimensions(photonMapWidth, photonStride);
-    return boost * mul(accumulateXYZ, XYZtoRGB2) / photonMapWidth;
+    return boost * accumulateXYZ / photonMapWidth;
 }
 
 float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
