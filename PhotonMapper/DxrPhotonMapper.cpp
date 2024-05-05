@@ -19,7 +19,7 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
-//#define CUBE_TEST
+#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
@@ -66,7 +66,7 @@ void DxrPhotonMapper::Setup()
     mGlassRotateRange = 8;
     mCausticsBoost = 200;
     mIsMoveModel = false;
-    mIsApplyCaustics = true;
+    mIsApplyCaustics = false;
     mIsUseDenoise = false;
     mIsDebug = false;
     mVisualizeLightRange = false;
@@ -153,7 +153,7 @@ void DxrPhotonMapper::Setup()
             {
                 mLightPosX = 1.59f; mLightPosY = 9.8f; mLightPosZ = 3.19f;
                 mPhi = 413.0f; mTheta = 242.0f;
-                mLightRange = 0.279f;
+                mLightRange = 2.2f;
                 if (isDebugMeshTest)
                 {
                     mGlassModelType = ModelType_DebugMesh;
@@ -162,7 +162,7 @@ void DxrPhotonMapper::Setup()
                 {
                     mLightPosX = 1.7f; mLightPosY = 5.79f; mLightPosZ = 2.2f;
                     mPhi = 417.0f; mTheta = 231.0f;
-                    mLightRange = 0.4f;
+                    mLightRange = 2.2f;
                     mGlassModelType = ModelType_Diamond;
                     mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
                 }

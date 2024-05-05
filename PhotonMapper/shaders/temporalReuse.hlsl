@@ -92,6 +92,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     currDI = lerp(prevDI, currDI, tmpAccmuRatio);
     currGI = lerp(prevGI, currGI, tmpAccmuRatio);
     currCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
+    
     currDIGI = currDI + currGI + currCaustics;
     if (accCount < MAX_ACCUMULATION_RANGE)
     {
