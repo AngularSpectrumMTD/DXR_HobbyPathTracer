@@ -58,7 +58,6 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
 {
     float gatherRadius = getGatherRadius();
     float sharp = getGatherSharpness();
-    float boost = getGatherBoost();
     const int range = getGatherBlockRange();
     int rangeX = range;
     int rangeY = range;
@@ -78,19 +77,6 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
     float3 normEYE = normalize(eyeDir);
     bool isEyeFlag = dot(normEYE, normWN) > 0;
 
-    if (abs(dot(normWN, AxisX)) < 0.1)
-    {
-        rangeX = 0;
-    }
-    if (abs(dot(normWN, AxisY)) < 0.1)
-    {
-        rangeY = 0;
-    }
-    if (abs(dot(normWN, AxisZ)) < 0.1)
-    {
-        rangeZ = 0;
-    }
-
     //Search Near Cell
     for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
     {
@@ -108,11 +94,8 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
                 for (G = photonIDstardEnd.x; G <= photonIDstardEnd.y; G++)
                 {
                     PhotonInfo comparePhoton = gPhotonMap[G];
-                    bool isVisiblePhotonPrimary = true;
-                    //((dot(normalize(comparePhoton.inDir), normWN) > 0) == isEyeFlag);
-                        
                     float distanceSqr = dot(gatherCenterPos - comparePhoton.position, gatherCenterPos - comparePhoton.position);
-                    if ((distanceSqr < gatherRadius * gatherRadius) && isVisiblePhotonPrimary)
+                    if ((distanceSqr < gatherRadius * gatherRadius))
                     {
                         accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
                     }
@@ -126,11 +109,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
             }
         }
     }
-
-    uint photonMapWidth = 1;
-    uint photonStride = 1;
-    gPhotonMap.GetDimensions(photonMapWidth, photonStride);
-    return boost * accumulateXYZ / photonMapWidth;
+    return accumulateXYZ;
 }
 
 float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)

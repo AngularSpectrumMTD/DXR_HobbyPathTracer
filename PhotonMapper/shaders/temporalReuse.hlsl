@@ -101,9 +101,9 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 
         curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
         curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-        
+
         float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
-        DIGIBuffer[currID].rgb = toneMappedDIGI + mul(accumulatedCaustics, XYZtoRGB2);
+        DIGIBuffer[currID].rgb = toneMappedDIGI + getGatherBoost() * mul(accumulatedCaustics, XYZtoRGB2);
         CurrentDIBuffer[currID].rgb = accumulatedDI;
         CurrentGIBuffer[currID].rgb = accumulatedGI;
         CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;

@@ -107,21 +107,8 @@ void photonEmitting()
     float3 emitDir = 0.xxx;
 
     sampleLightEmitDirAndPosition(emitDir, emitOrigin);
-    
-    Reservoir reservoir;
-    reservoir.initialize();
 
-    const uint SAMPLE_NUM = LAMBDA_NUM / 8;
-    float p_hat = 0;
-    for (int i = 0; i < SAMPLE_NUM; i++)
-    {
-        float lmbd = LAMBDA_VIO_NM + LAMBDA_STEP * ((uint)(rand() * 100 * LAMBDA_NUM) % LAMBDA_NUM);
-        p_hat = length(getBaseLightXYZ(lmbd));
-        float updateW = p_hat * SAMPLE_NUM;
-        updateReservoir(reservoir, lmbd, updateW, 0, 0, 1u, rand());
-    }
-
-    const float LAMBDA_NM = (LightSeed.x < 300) ? reservoir.Y : LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
+    const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
     RayDesc nextRay;
     nextRay.Origin = emitOrigin;
