@@ -84,11 +84,6 @@ float getGatherSharpness()
     return gSceneParam.gatherParams.y;
 }
 
-float getGatherBoost()
-{
-    return gSceneParam.gatherParams.z;
-}
-
 float getGatherBlockRange()
 {
     return gSceneParam.gatherParams.w;

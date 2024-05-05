@@ -29,7 +29,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
     else
     {
         PhotonInfo photon;
-        photon.throughput = (payload.recursive <= 1) ? payload.throughput : getCausticsBoost() * payload.throughput;
+        photon.throughput = payload.throughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         //photon.inDir = WorldRayDirection();
         gPhotonMap[payload.storeIndex] = photon;

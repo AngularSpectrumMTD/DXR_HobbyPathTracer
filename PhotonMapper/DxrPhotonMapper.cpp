@@ -48,12 +48,12 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Simple;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
-    mGatherBlockRange = 1;
+    mGatherBlockRange = 2;
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
@@ -64,7 +64,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 8;
-    mCausticsBoost = 10;
+    mCausticsBoost = 0.1f;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -112,7 +112,6 @@ void DxrPhotonMapper::Setup()
             mLightRange = 10.0f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
-            mCausticsBoost = 400.0f;
         }
         break;
         case SceneType_Sponza:
@@ -166,7 +165,6 @@ void DxrPhotonMapper::Setup()
                     mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
                 }
             }
-            mCausticsBoost = 100;
             mIsSpotLightPhotonMapper = false;
         }
         break;
@@ -200,7 +198,6 @@ void DxrPhotonMapper::Setup()
 #endif
                 mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;
-                mCausticsBoost = 30;
             }
             else
             {
@@ -208,7 +205,6 @@ void DxrPhotonMapper::Setup()
                 mLightPosX = 4.2f; mLightPosY = 8.8f; mLightPosZ = 0.2f;
                 mLightRange = 0.8f;
                 mGlassModelType = ModelType_Afrodyta;
-                mCausticsBoost = 30;
             }
             mIsSpotLightPhotonMapper = true;
         }
@@ -230,7 +226,7 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
-            mCausticsBoost = 2;
+            mCausticsBoost = 0.001f;
         }
         break;
         case SceneType_SanMiguel:
@@ -252,7 +248,6 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mGatherRadius = 0.021f;
-            mCausticsBoost = 2;
         }
         break;
     }
@@ -283,7 +278,6 @@ void DxrPhotonMapper::Setup()
     case ModelType::ModelType_Teapot:
     {
         mOBJ0FileName = L"model/teapot.obj";
-        mCausticsBoost *= 0.5;
         mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(2, 2, 2);
     }
@@ -291,7 +285,6 @@ void DxrPhotonMapper::Setup()
     case  ModelType::ModelType_LikeWater:
     {
         mOBJ0FileName = L"model/likeWater.obj";
-        mCausticsBoost *= 3;
         mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(4, 4, 4);
     }
@@ -808,7 +801,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.mtxProj = mCamera.GetProjectionMatrix();
     mSceneParam.mtxViewInv = XMMatrixInverse(nullptr, mSceneParam.mtxView);
     mSceneParam.mtxProjInv = XMMatrixInverse(nullptr, mSceneParam.mtxProj);
-    mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, 0.001f, (f32)mGatherBlockRange);//radius sharp(if larger, photon visualize in small region) boost if radis large photon blured, w is blockRange
+    mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, 0, (f32)mGatherBlockRange);
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
     mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1.0f : 0.0f, 0.0f, 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
@@ -934,7 +927,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(0.1f, 500, mCausticsBoost + (mInverseMove ? -0.1f : 0.1f));
+        mCausticsBoost = Clamp(0.001f, 20.0f, mCausticsBoost + (mInverseMove ? -0.001f : 0.001f));
         mIsUseAccumulation = false;
         break;
     case 'U':
