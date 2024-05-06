@@ -1,6 +1,9 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS] + Photon Mapping[Spectral Rendered Caustics)  
+
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/eb27c92e-ae53-437f-8cc7-5d4603c05eac  
+
 ![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/82773f10-6b0c-48f5-9ecf-419ee6d1697f)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  

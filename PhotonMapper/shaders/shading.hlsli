@@ -305,10 +305,10 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
 
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
-        float reseiverCos = dot(surfaceNormal, wi);
+        float receiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
         float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
-        float G = max(0, reseiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
+        float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
         float3 p_hat_3F = FGL;
@@ -342,14 +342,14 @@ float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition
         {
             float3 lightNormal = lightSample.normal;
             float3 wi = lightSample.directionToLight;
-            float reseiverCos = dot(surfaceNormal, wi);
-            if (reseiverCos > 0)
+            float receiverCos = dot(surfaceNormal, wi);
+            if (receiverCos > 0)
             {
                 float emitterCos = dot(lightNormal, -wi);
                 if (emitterCos > 0)
                 {
                     float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
-                    float G = reseiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+                    float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
                     float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
                     estimatedColor = FGL;
                 }

@@ -48,7 +48,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Simple;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
