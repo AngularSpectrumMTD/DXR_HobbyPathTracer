@@ -64,7 +64,7 @@ struct LightGenerateParam
 #include "Grid3D_Header.hlsli"
 
 // Global Root Signature
-RaytracingAccelerationStructure gRtScene : register(t0);
+RaytracingAccelerationStructure gBVH : register(t0);
 Texture2D<float4> gEquiRecEnvMap : register(t1);
 StructuredBuffer<LightGenerateParam> gLightGenerateParams : register(t2);
 ConstantBuffer<SceneCB> gSceneParam : register(b1);

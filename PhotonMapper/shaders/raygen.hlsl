@@ -65,7 +65,7 @@ void rayGen() {
 
         uint rayMask = 0xFF;
 
-        TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+        TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 
         accumCaustics += payload.caustics;
         accumDI += payload.DI;
@@ -127,5 +127,5 @@ void photonEmitting()
 
     uint rayMask = ~(LIGHT_INSTANCE_MASK); //ignore your self!! lightsource model
 
-    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }

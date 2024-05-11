@@ -64,7 +64,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
-    TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
 
 [shader("closesthit")]
@@ -93,7 +93,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     {
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
-        TraceRay(gRtScene, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+        TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
     }
 }
 

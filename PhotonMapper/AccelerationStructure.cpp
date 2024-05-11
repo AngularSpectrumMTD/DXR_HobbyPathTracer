@@ -408,7 +408,7 @@ void DxrPhotonMapper::CreateSceneTLAS()
     auto sceneASB = mDevice->CreateAccelerationStructure(asDesc);
     mTLAS = sceneASB.ASBuffer;
     mTLASUpdate = sceneASB.updateBuffer;
-    sceneASB.ASBuffer->SetName(L"Scene-Tlas");
+    sceneASB.ASBuffer->SetName(L"TLAS");
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_RAYTRACING_ACCELERATION_STRUCTURE;

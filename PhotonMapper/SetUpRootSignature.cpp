@@ -32,7 +32,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig["gGridParam"] = 0;
-        mRegisterMapGlobalRootSig["gRtScene"] = 1;
+        mRegisterMapGlobalRootSig["gBVH"] = 1;
         mRegisterMapGlobalRootSig["gEquiRecEnvMap"] = 2;
         mRegisterMapGlobalRootSig["gLightGenerateParams"] = 3;
         mRegisterMapGlobalRootSig["gSceneParam"] = 4;
@@ -69,7 +69,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton["gGridParam"] = 0;
-        mRegisterMapGlobalRootSigPhoton["gRtScene"] = 1;
+        mRegisterMapGlobalRootSigPhoton["gBVH"] = 1;
         mRegisterMapGlobalRootSigPhoton["gEquiRecEnvMap"] = 2;
         mRegisterMapGlobalRootSigPhoton["gLightGenerateParams"] = 3;
         mRegisterMapGlobalRootSigPhoton["gSceneParam"] = 4;
