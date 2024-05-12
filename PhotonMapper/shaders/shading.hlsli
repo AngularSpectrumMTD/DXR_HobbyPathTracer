@@ -290,7 +290,7 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
     return BSDF_PDF;
 }
 
-void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out Reservoir reservoir)
+void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir)
 {
     const uint M = min(getLightNum(), 30);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
@@ -314,23 +314,25 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
         float3 p_hat_3F = FGL;
         p_hat = computeLuminance(FGL);
         float updateW = p_hat / pdf;
-        updateReservoir(reservoir, lightID, updateW, p_hat, p_hat_3F, 1u, rand());
+        updateDIReservoir(reservoir, lightID, updateW, p_hat, p_hat_3F, 1u, rand());
     }
     sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
 }
 
-float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal)
+float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseWRS_RIS())
     {
         LightSample lightSample;
-        Reservoir reservoir;
         sampleLightWRSbasedRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir);
         if (isVisible(scatterPosition, lightSample))
         {
-           const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-           estimatedColor = reservoir.targetPDF_3f * invPDF;
+           estimatedColor = shadeDIReservoir(reservoir);
+        }
+        else
+        {
+            reservoir.initialize();
         }
     }
     else
@@ -416,10 +418,18 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isNEELightingRequired)
             {
-                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal) * payload.throughput;
+                DIReservoir reservoir;
+                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal, reservoir) * payload.throughput;
                 if(isDirectRay(payload))
                 {
-                    payload.DI = element;
+                    if(isUseWRS_RIS())
+                    {
+                        storeDIReservoir(reservoir, payload);
+                    }
+                    else
+                    {
+                        payload.DI = element;
+                    }
                 }
                 if(isIndirectRay(payload))
                 {

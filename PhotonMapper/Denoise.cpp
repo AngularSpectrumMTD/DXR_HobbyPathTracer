@@ -7,7 +7,7 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
     const u32 dst = (mRenderFrame + 1) % 2;
 
     std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
-    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDXRMainOutput.Get()));
+    uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()));
     uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDenoisedColorBuffer.Get()));
     mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
 
@@ -40,7 +40,7 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
     //wavelet
     {
         D3D12_RESOURCE_BARRIER initBarrier[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDXRMainOutput.Get() ,D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mFinalRenderResult.Get() ,D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceVarianceBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         };
 
@@ -56,11 +56,11 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
 
             mCommandList->SetComputeRootSignature(mRsA_TrousWaveletFilter.Get());
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapA_TrousWaveletFilter["gWaveletParam"], denoiseCB->GetGPUVirtualAddress());
-            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferSrc"], (i % 2 == 0) ? mMainOutputDescriptorSRV.hGpu : mDenoisedColorBufferDescriptorSRV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferSrc"], (i % 2 == 0) ? mFinalRenderResultDescriptorSRV.hGpu : mDenoisedColorBufferDescriptorSRV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["depthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["normalBuffer"], mNormalBufferDescriptorSRV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferSrc"], mLuminanceVarianceBufferDescriptorSRVTbl[(i % 2 == 0) ? dst : src].hGpu);
-            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferDst"], (i % 2 == 1) ? mMainOutputDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferDst"], (i % 2 == 1) ? mFinalRenderResultDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferDst"], mLuminanceVarianceBufferDescriptorUAVTbl[(i % 2 == 0) ? src : dst].hGpu);
             mCommandList->SetPipelineState(mA_TrousWaveletFilterPSO.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "A_TrousWaveletFiltering");
@@ -70,15 +70,15 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
             D3D12_RESOURCE_BARRIER wavelet_barrier[] = {
                 CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceVarianceBufferTbl[(i % 2 == 1) ? dst : src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
                 CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceVarianceBufferTbl[(i % 2 == 1) ? src : dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
-                CD3DX12_RESOURCE_BARRIER::Transition((i % 2 == 0) ? mDXRMainOutput.Get() : mDenoisedColorBuffer.Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
-                CD3DX12_RESOURCE_BARRIER::Transition((i % 2 == 0) ? mDenoisedColorBuffer.Get() : mDXRMainOutput.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+                CD3DX12_RESOURCE_BARRIER::Transition((i % 2 == 0) ? mFinalRenderResult.Get() : mDenoisedColorBuffer.Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+                CD3DX12_RESOURCE_BARRIER::Transition((i % 2 == 0) ? mDenoisedColorBuffer.Get() : mFinalRenderResult.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
             };
 
             mCommandList->ResourceBarrier(_countof(wavelet_barrier), wavelet_barrier);
         }
 
         D3D12_RESOURCE_BARRIER wavelet_barrier2[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition((DENOISE_ITE % 2 == 0) ? mDXRMainOutput.Get() : mDenoisedColorBuffer.Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+            CD3DX12_RESOURCE_BARRIER::Transition((DENOISE_ITE % 2 == 0) ? mFinalRenderResult.Get() : mDenoisedColorBuffer.Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
             CD3DX12_RESOURCE_BARRIER::Transition((DENOISE_ITE % 2 == 0) ? mLuminanceVarianceBufferTbl[dst].Get() : mLuminanceVarianceBufferTbl[src].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
         };
 

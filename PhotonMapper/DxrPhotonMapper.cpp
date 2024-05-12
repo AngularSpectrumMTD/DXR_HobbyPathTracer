@@ -588,20 +588,22 @@ void DxrPhotonMapper::Draw()
 
     // To UAV
     D3D12_RESOURCE_BARRIER barriersSRVToUAV[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDXRMainOutput.Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+            CD3DX12_RESOURCE_BARRIER::Transition(mFinalRenderResult.Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
     };
     CD3DX12_RESOURCE_BARRIER uavBarriers[] = {
         CD3DX12_RESOURCE_BARRIER::UAV(mAccumulationBuffer.Get())
     };
     // Copy To BackBuffer
     D3D12_RESOURCE_BARRIER barriers[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDXRMainOutput.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mFinalRenderResult.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_COPY_DEST)
     };
 
     D3D12_RESOURCE_BARRIER swapBarriers[] = {
             CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceMomentBufferTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceMomentBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
             CD3DX12_RESOURCE_BARRIER::Transition(mDIBufferPingPongTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mDIBufferPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
             CD3DX12_RESOURCE_BARRIER::Transition(mGIBufferPingPongTbl[src].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
@@ -645,6 +647,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDIReservoirBuffer"], mDIReservoirDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -669,6 +672,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIReservoirBuffer"], mDIReservoirDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -680,6 +684,17 @@ void DxrPhotonMapper::Draw()
     //{
     //    SpatiotemporalVarianceGuidedFiltering();
     //}
+
+    {
+        CD3DX12_RESOURCE_BARRIER uavB[] = {
+            CD3DX12_RESOURCE_BARRIER::UAV(mDIBufferPingPongTbl[dst].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mGIBufferPingPongTbl[dst].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mCausticsBufferPingPongTbl[dst].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mDIReservoirPingPongTbl[dst].Get()),
+        };
+
+        mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
+    }
 
     //temporal reuse
     {
@@ -695,10 +710,12 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIGIBuffer"], mMainOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIGIBuffer"], mFinalRenderResultDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIReservoirBufferSrc"], mDIReservoirDescriptorSRVPingPongTbl[src].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIReservoirBufferDst"], mDIReservoirDescriptorUAVPingPongTbl[dst].hGpu);
         mCommandList->SetPipelineState(mTemporalReusePSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "TemporalReuse");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -708,7 +725,7 @@ void DxrPhotonMapper::Draw()
     if (mIsUseDebugView)
     {
         std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers;
-        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDXRMainOutput.Get()));
+        uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()));
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDiffuseAlbedoBuffer.Get()));
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mNormalBuffer.Get()));
         uavBarriers.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mDepthBufferTbl[src].Get()));
@@ -720,7 +737,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["depthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["normalBuffer"], mNormalBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["velocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["finalColor"], mMainOutputDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["finalColor"], mFinalRenderResultDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mDebugViewPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "DebugView");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -728,7 +745,7 @@ void DxrPhotonMapper::Draw()
     }
 
     mCommandList->ResourceBarrier(_countof(barriers), barriers);
-    mCommandList->CopyResource(renderTarget.Get(), mDXRMainOutput.Get());
+    mCommandList->CopyResource(renderTarget.Get(), mFinalRenderResult.Get());
 
     mCommandList->ResourceBarrier(1, &barrierToRT);
 
@@ -1194,6 +1211,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             LightGenerateParam param;
             const u32 colorID = count + colorOffset;
             param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);

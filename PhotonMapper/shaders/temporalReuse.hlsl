@@ -3,6 +3,7 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "sceneParamInterface.hlsli"
 
 #include "spectralRenderingHelper.hlsli"
+#include "reservoir.hlsli"
 
 #define THREAD_NUM 16
 #define REINHARD_L 1000
@@ -15,6 +16,7 @@ Texture2D<float> DepthBuffer : register(t3);
 Texture2D<float> PrevDepthBuffer : register(t4);
 Texture2D<float2> VelocityBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
+StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -22,6 +24,7 @@ RWTexture2D<float4> CurrentCausticsBuffer : register(u2);
 RWTexture2D<float4> DIGIBuffer : register(u3);
 RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
+RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u6);
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -56,7 +59,8 @@ float3 ACESFilmicTonemapping3f(float3 v)
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
-    float2 dims = float2(DispatchRaysDimensions().xy);
+    float2 dims;
+    CurrentDIBuffer.GetDimensions(dims.x, dims.y);
 
     uint2 currID = dtid.xy;
 
@@ -66,7 +70,17 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float2 velocity = VelocityBuffer[currID] * 2.0 - 1.0;
     uint2 prevID = currID;//(ID / dims - velocity) * dims;
 
-    float3 currDI = CurrentDIBuffer[currID].rgb;
+    float3 currDI = 0.xxx;
+    if(isUseNEE() && isUseWRS_RIS())
+    {
+        DIReservoir currDIReservoir = DIReservoirBufferDst[currID.y * dims.x + currID.x];
+        float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
+        currDI = shadeDIReservoir(currDIReservoir) + reservoirElementRemovedDI;
+    }
+    else
+    {
+        currDI = CurrentDIBuffer[currID].rgb;
+    }
     float3 currGI = CurrentGIBuffer[currID].rgb;
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
     float3 prevDI = HistoryDIBuffer[prevID].rgb;

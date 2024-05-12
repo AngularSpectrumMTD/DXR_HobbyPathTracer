@@ -189,12 +189,14 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
         mRegisterMapTemporalReuse["gSceneParam"] = 0;
@@ -205,11 +207,13 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalReuse["PrevDepthBuffer"] = 5;
         mRegisterMapTemporalReuse["VelocityBuffer"] = 6;
         mRegisterMapTemporalReuse["LuminanceMomentBufferSrc"] = 7;
-        mRegisterMapTemporalReuse["CurrentDIBuffer"] = 8;
-        mRegisterMapTemporalReuse["CurrentGIBuffer"] = 9;
-        mRegisterMapTemporalReuse["CurrentCausticsBuffer"] = 10;
-        mRegisterMapTemporalReuse["DIGIBuffer"] = 11;
-        mRegisterMapTemporalReuse["AccumulationCountBuffer"] = 12;
-        mRegisterMapTemporalReuse["LuminanceMomentBufferDst"] = 13;
+        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 8;
+        mRegisterMapTemporalReuse["CurrentDIBuffer"] = 9;
+        mRegisterMapTemporalReuse["CurrentGIBuffer"] = 10;
+        mRegisterMapTemporalReuse["CurrentCausticsBuffer"] = 11;
+        mRegisterMapTemporalReuse["DIGIBuffer"] = 12;
+        mRegisterMapTemporalReuse["AccumulationCountBuffer"] = 13;
+        mRegisterMapTemporalReuse["LuminanceMomentBufferDst"] = 14;
+        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 15;
     }
 }

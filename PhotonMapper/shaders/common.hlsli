@@ -62,6 +62,7 @@ struct LightGenerateParam
 #define LIGHT_INSTANCE_MASK 0x08
 
 #include "Grid3D_Header.hlsli"
+#include "reservoir.hlsli"
 
 // Global Root Signature
 RaytracingAccelerationStructure gBVH : register(t0);
@@ -82,6 +83,8 @@ RWTexture2D<float4> gDIBuffer : register(u7);
 RWTexture2D<float4> gGIBuffer : register(u8);
 
 RWTexture2D<float4> gCausticsBuffer : register(u9);
+
+RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
 
 #include "sceneParamInterface.hlsli"
 
@@ -249,6 +252,14 @@ void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
         gVelocityBuffer[writeIndex] = currSvPosition.xy / currSvPosition.w;
         payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }
+}
+
+void storeDIReservoir(in DIReservoir reservoir, in Payload payload)
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    gDIReservoirBuffer[serialIndex] = reservoir;
 }
 
 float depthLoad(uint2 index)

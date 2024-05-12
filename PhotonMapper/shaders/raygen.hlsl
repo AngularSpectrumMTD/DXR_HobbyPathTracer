@@ -7,23 +7,29 @@
 //
 [shader("raygeneration")]
 void rayGen() {
-    uint2 launchIndex = DispatchRaysIndex().xy;
-    gDepthBuffer[launchIndex] = 0;
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
     float2 dims = float2(DispatchRaysDimensions().xy);
 
     //clear gbuffer
-    gDiffuseAlbedoBuffer[launchIndex] = 0.xxxx;
-    gDepthBuffer[launchIndex] = 0;
-    gPositionBuffer[launchIndex] = 0.xxxx;
-    gNormalBuffer[launchIndex] = 0.xxxx;
-    gVelocityBuffer[launchIndex] = 0.xx;
+    gDiffuseAlbedoBuffer[launchIndex.xy] = 0.xxxx;
+    gDepthBuffer[launchIndex.xy] = 0;
+    gPositionBuffer[launchIndex.xy] = 0.xxxx;
+    gNormalBuffer[launchIndex.xy] = 0.xxxx;
+    gVelocityBuffer[launchIndex.xy] = 0.xx;
 
     //clear DI / GI buffer
-    gDIBuffer[launchIndex] = 0.xxxx;
-    gGIBuffer[launchIndex] = 0.xxxx;
+    gDIBuffer[launchIndex.xy] = 0.xxxx;
+    gGIBuffer[launchIndex.xy] = 0.xxxx;
 
     //clear caustics buffer
-    gCausticsBuffer[launchIndex] = 0.xxxx;
+    gCausticsBuffer[launchIndex.xy] = 0.xxxx;
+
+    //clear reservoir buffer
+    DIReservoir dummyReservoir;
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    dummyReservoir.initialize();
+    gDIReservoirBuffer[serialIndex] = dummyReservoir;
 
     float3 accumCaustics = 0.xxx;
     float3 accumDI = 0.xxx;
@@ -55,7 +61,7 @@ void rayGen() {
         payload.throughput = energyBoost * float3(1, 1, 1);
         payload.caustics = float3(0, 0, 0);
         payload.recursive = 0;
-        payload.storeIndexXY = launchIndex;
+        payload.storeIndexXY = launchIndex.xy;
         payload.flags = 0;//empty
         payload.eyeDir = nextRay.Direction;
         payload.DI = 0.xxx;

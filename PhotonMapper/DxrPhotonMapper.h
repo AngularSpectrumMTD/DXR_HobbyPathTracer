@@ -157,6 +157,15 @@ private:
         float2 barys;
     };
 
+    struct DIReservoir
+    {
+        u32 Y; //index of most important light
+        f32 targetPDF; //weight of light
+        float3 targetPDF_3f; //weight of light(float 3)
+        f32 W_sum; //sum of all weight
+        f32 M; //number of ligts processed for this reservoir
+    };
+
     enum SphereTypeCount {
         NormalSpheres = 9
     };
@@ -454,13 +463,11 @@ private:
     ComPtr<ID3D12Resource> mInstanceDescsBuffer;
 
     //Buffers
-    ComPtr <ID3D12Resource> mDXRMainOutput;
-    dx12::Descriptor mMainOutputDescriptorUAV;
-    dx12::Descriptor mMainOutputDescriptorSRV;
+    ComPtr <ID3D12Resource> mFinalRenderResult;
+    dx12::Descriptor mFinalRenderResultDescriptorUAV;
+    dx12::Descriptor mFinalRenderResultDescriptorSRV;
     ComPtr<ID3D12Resource> mAccumulationBuffer;
     dx12::Descriptor mAccumulationBufferDescriptorUAV;
-    ComPtr<ID3D12Resource> mCausticsMapPingPongTbl[2];
-    dx12::Descriptor mOCausticsMapPingPongUAVTbl[2];
     ComPtr<ID3D12Resource> mPhotonMap;
     dx12::Descriptor mPhotonMapDescriptorSRV;
     dx12::Descriptor mPhotonMapDescriptorUAV;
@@ -523,6 +530,10 @@ private:
     ComPtr<ID3D12Resource> mCurrentPathtarcedColor;
     dx12::Descriptor mCurrentPathtarcedColorDescriptorSRV;
     dx12::Descriptor mCurrentPathtarcedColorDescriptorUAV;
+
+    std::vector < ComPtr<ID3D12Resource>> mDIReservoirPingPongTbl;
+    std::vector < dx12::Descriptor> mDIReservoirDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mDIReservoirDescriptorUAVPingPongTbl;
 
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;

@@ -22,12 +22,12 @@ void DxrPhotonMapper::CreateRegularBuffer()
     auto height = GetHeight();
     //RayTraced Result
     {
-        mDXRMainOutput = mDevice->CreateTexture2D(
+        mFinalRenderResult = mDevice->CreateTexture2D(
             width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
             D3D12_RESOURCE_STATE_COPY_SOURCE,
             D3D12_HEAP_TYPE_DEFAULT,
-            L"DXRMainOutput"
+            L"FinalRenderResult"
         );
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -36,11 +36,11 @@ void DxrPhotonMapper::CreateRegularBuffer()
         srvDesc.Texture2D.MostDetailedMip = 0;
         srvDesc.Texture2D.ResourceMinLODClamp = 0;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        mMainOutputDescriptorSRV = mDevice->CreateShaderResourceView(mDXRMainOutput.Get(), &srvDesc);
+        mFinalRenderResultDescriptorSRV = mDevice->CreateShaderResourceView(mFinalRenderResult.Get(), &srvDesc);
 
         D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        mMainOutputDescriptorUAV = mDevice->CreateUnorderedAccessView(mDXRMainOutput.Get(), &uavDesc);
+        mFinalRenderResultDescriptorUAV = mDevice->CreateUnorderedAccessView(mFinalRenderResult.Get(), &uavDesc);
 
         mAccumulationBuffer = mDevice->CreateTexture2D(
             width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -405,6 +405,10 @@ void DxrPhotonMapper::CreateRegularBuffer()
         mCausticsBufferDescriptorSRVPingPongTbl.resize(size);
         mCausticsBufferDescriptorUAVPingPongTbl.resize(size);
 
+        mDIReservoirPingPongTbl.resize(size);
+        mDIReservoirDescriptorSRVPingPongTbl.resize(size);
+        mDIReservoirDescriptorUAVPingPongTbl.resize(size);
+
         for (u32 i = 0; i < size; i++)
         {
             {
@@ -475,6 +479,30 @@ void DxrPhotonMapper::CreateRegularBuffer()
                 D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
                 uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
                 mCausticsBufferDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mCausticsBufferPingPongTbl.at(i).Get(), &uavDesc);
+            }
+            {
+                wchar_t name[30];
+                swprintf(name, 30, L"DIReservoirTbl[%d]", i);
+
+                const u32 DIReservoirElements = GetWidth() * GetHeight();
+                const u32 DIReservoirSizeInBytes = DIReservoirElements * sizeof(DIReservoir);
+
+                mDIReservoirPingPongTbl.at(i) = mDevice->CreateBuffer(DIReservoirSizeInBytes, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_DEFAULT, nullptr, name);
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+                srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                srvDesc.Buffer.NumElements = DIReservoirElements;
+                srvDesc.Buffer.FirstElement = 0;
+                srvDesc.Buffer.StructureByteStride = sizeof(DIReservoir);
+                mDIReservoirDescriptorSRVPingPongTbl.at(i) = mDevice->CreateShaderResourceView(mDIReservoirPingPongTbl.at(i).Get(), &srvDesc);
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+                uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+                uavDesc.Buffer.NumElements = DIReservoirElements;
+                uavDesc.Buffer.FirstElement = 0;
+                uavDesc.Buffer.StructureByteStride = sizeof(DIReservoir);
+                mDIReservoirDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mDIReservoirPingPongTbl.at(i).Get(), &uavDesc);
             }
         }
     }
