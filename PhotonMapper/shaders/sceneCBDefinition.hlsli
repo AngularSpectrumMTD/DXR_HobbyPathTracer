@@ -18,7 +18,8 @@ struct SceneCB
     float4 gatherParams2;
     float4 spotLightParams;
     float4 viewVec;
-    uint4 additional; //x light num
+    uint4 additional;
+    uint4 additional1;
 };
 
 #endif//__SCENE_CB_DEFINITION_HLSLI__

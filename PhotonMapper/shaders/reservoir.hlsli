@@ -1,6 +1,8 @@
 #ifndef __RESERVOIR_HLSLI__
 #define __RESERVOIR_HLSLI__
 
+#define MAX_TEMPORAL_REUSE_M 100
+
 struct DIReservoir
 {
     uint Y; //index of most important light
@@ -24,7 +26,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint X, in float w, in fl
     reservoir.W_sum += w;
     reservoir.M += c;
 
-    if (rnd01 < w / reservoir.W_sum || reservoir.M == 0)
+    if ((rnd01 < (w / reservoir.W_sum)) || reservoir.M == 0)
     {
         reservoir.Y = X;
         reservoir.targetPDF = p_hat;
@@ -32,6 +34,11 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint X, in float w, in fl
         return true;
     }
     return false;
+}
+
+bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
+{
+    return updateDIReservoir(reservoir, reservoirCombineElem.Y, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)
@@ -43,6 +50,16 @@ float3 shadeDIReservoir(in DIReservoir reservoir)
 
     const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
     return reservoir.targetPDF_3f * invPDF;
+}
+
+bool isValidReservoir(in DIReservoir reservoir)
+{
+    return (reservoir.M > 0);
+}
+
+void recognizeAsShadowedReservoir(inout DIReservoir reservoir)
+{
+    reservoir.targetPDF_3f = 0.xxx;
 }
 
 #endif//__RESERVOIR_HLSLI__

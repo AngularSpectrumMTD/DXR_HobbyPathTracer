@@ -210,7 +210,8 @@ private:
         XMVECTOR gatherParams2;
         XMVECTOR spotLightParams;
         XMVECTOR viewVec;
-        XMUINT4 additional;//x light num
+        XMUINT4 additional;
+        XMUINT4 additional1;
     };
 
     struct PhotonInfo
@@ -527,9 +528,17 @@ private:
     std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mLuminanceVarianceBufferDescriptorUAVTbl;
 
-    ComPtr<ID3D12Resource> mCurrentPathtarcedColor;
-    dx12::Descriptor mCurrentPathtarcedColorDescriptorSRV;
-    dx12::Descriptor mCurrentPathtarcedColorDescriptorUAV;
+    ComPtr<ID3D12Resource> mDebugTexture;
+    dx12::Descriptor mDebugTextureDescriptorSRV;
+    dx12::Descriptor mDebugTextureDescriptorUAV;
+
+    ComPtr<ID3D12Resource> mDebugTexture0;
+    dx12::Descriptor mDebugTexture0DescriptorSRV;
+    dx12::Descriptor mDebugTexture0DescriptorUAV;
+
+    ComPtr<ID3D12Resource> mDebugTexture1;
+    dx12::Descriptor mDebugTexture1DescriptorSRV;
+    dx12::Descriptor mDebugTexture1DescriptorUAV;
 
     std::vector < ComPtr<ID3D12Resource>> mDIReservoirPingPongTbl;
     std::vector < dx12::Descriptor> mDIReservoirDescriptorSRVPingPongTbl;
@@ -684,6 +693,8 @@ private:
     bool isPrimalLightSRVUpdate = true;
     bool mIsUseWRS_RIS = false;
     bool mIsTemporalAccumulationForceDisable = false;
+
+    bool mIsUseReservoirTemporalReuse = false;
 };
 
 #endif

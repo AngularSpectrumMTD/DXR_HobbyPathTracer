@@ -197,6 +197,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
         mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
         mRegisterMapTemporalReuse["gSceneParam"] = 0;
@@ -215,5 +218,8 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalReuse["AccumulationCountBuffer"] = 13;
         mRegisterMapTemporalReuse["LuminanceMomentBufferDst"] = 14;
         mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 15;
+        mRegisterMapTemporalReuse["DebugTexture"] = 16;
+        mRegisterMapTemporalReuse["DebugTexture0"] = 17;
+        mRegisterMapTemporalReuse["DebugTexture1"] = 18;
     }
 }

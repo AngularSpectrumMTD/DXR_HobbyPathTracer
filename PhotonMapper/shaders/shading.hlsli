@@ -332,7 +332,7 @@ float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition
         }
         else
         {
-            reservoir.initialize();
+            recognizeAsShadowedReservoir(reservoir);
         }
     }
     else

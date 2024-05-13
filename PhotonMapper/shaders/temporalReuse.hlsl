@@ -9,6 +9,8 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #define REINHARD_L 1000
 #define MAX_ACCUMULATION_RANGE 1000
 
+#define MAX_TEMPORAL_RESERVOIR_M_RATIO 10
+
 Texture2D<float4> HistoryDIBuffer : register(t0);
 Texture2D<float4> HistoryGIBuffer : register(t1);
 Texture2D<float4> HistoryCausticsBuffer : register(t2);
@@ -25,6 +27,17 @@ RWTexture2D<float4> DIGIBuffer : register(u3);
 RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u6);
+RWTexture2D<float4> DebugTexture : register(u7);
+RWTexture2D<float4> DebugTexture0 : register(u8);
+RWTexture2D<float4> DebugTexture1 : register(u9);
+
+static uint rseed;
+
+float rand(in int2 indexXY)//0-1
+{
+    rseed += 1.0;
+    return frac(sin(dot(indexXY.xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
+}
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -56,13 +69,40 @@ float3 ACESFilmicTonemapping3f(float3 v)
     return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
 }
 
+void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in uint serialPrevID, in uint2 dims, in uint2 currID)
+{
+    DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
+    DebugTexture1[currID] = float4(prevDIReservoir.targetPDF, prevDIReservoir.W_sum, prevDIReservoir.M, prevDIReservoir.Y);
+
+    //Limitting
+    if(prevDIReservoir.M > MAX_TEMPORAL_REUSE_M)
+    {
+        float r = max(0, ((float)MAX_TEMPORAL_REUSE_M / prevDIReservoir.M));
+        prevDIReservoir.W_sum *= r;
+        prevDIReservoir.M = MAX_TEMPORAL_REUSE_M;
+    }
+
+    DIReservoir tempDIReservoir;
+    tempDIReservoir.initialize();
+    //combine reservoirs
+    {
+        const float currUpdateW = currDIReservoir.W_sum;
+        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(currID));
+        const float prevUpdateW = prevDIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
+        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(currID));
+    }
+    currDIReservoir = tempDIReservoir;
+}
+
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
+    rseed = getLightRandomSeed();
     float2 dims;
     CurrentDIBuffer.GetDimensions(dims.x, dims.y);
 
     uint2 currID = dtid.xy;
+    DebugTexture[currID] = 0.xxxx;
 
     float currDepth = DepthBuffer[currID];
     uint accCount = AccumulationCountBuffer[currID];
@@ -73,9 +113,21 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
     {
-        DIReservoir currDIReservoir = DIReservoirBufferDst[currID.y * dims.x + currID.x];
+        const uint serialCurrID = currID.y * dims.x + currID.x;
+        const uint serialPrevID = prevID.y * dims.x + prevID.x;
+        DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
+        DebugTexture0[currID] = float4(currDIReservoir.targetPDF, currDIReservoir.W_sum, currDIReservoir.M, currDIReservoir.Y);
+
+        if (isAccumulationApply() && isUseReservoirTemporalReuse())
+        {
+            DIReservoirTemporalReuse(currDIReservoir, serialPrevID, dims, currID);
+        }
+
         float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
         currDI = shadeDIReservoir(currDIReservoir) + reservoirElementRemovedDI;
+
+        DIReservoirBufferDst[serialCurrID] = currDIReservoir;
+        DebugTexture[currID] = float4(currDIReservoir.targetPDF, currDIReservoir.W_sum, currDIReservoir.M, currDIReservoir.Y);
     }
     else
     {

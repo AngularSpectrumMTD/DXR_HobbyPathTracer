@@ -124,4 +124,9 @@ float3 getViewVec()
     return gSceneParam.viewVec.xyz;
 }
 
+bool isUseReservoirTemporalReuse()
+{
+    return gSceneParam.additional1.x == 1;
+}
+
 #endif//__SCENE_PARAM_INTERFACE_HLSLI__

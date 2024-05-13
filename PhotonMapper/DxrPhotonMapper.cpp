@@ -33,13 +33,17 @@ void DxrPhotonMapper::UpdateWindowText()
 {
     std::wstringstream windowText;
     windowText.str(L"");
-    windowText << L" <I> : Inverse " << (mInverseMove ? L"ON" : L"OFF")
+
+    windowText 
+        << L" <I> : Inverse " << (mInverseMove ? L"ON" : L"OFF")
         << L" <A> : Accunmulate " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L" <E> : NEE " << (mIsUseNEE ? L"ON" : L"OFF")
         << L" <CTRL> : RIS " << (mIsUseWRS_RIS ? L"ON" : L"OFF")
+        << L" <F1> : TempReuse " << (mIsUseReservoirTemporalReuse ? L"ON" : L"OFF")
         << L" <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
         << L" <D> : Bounce : " << mRecursionDepth
-        << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024 //<< L"    " << getFrameRate() << L"[ms]"
+        << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024
+        //<< L"    " << getFrameRate() << L"[ms]"
         << L" Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
@@ -48,9 +52,9 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroInterior;
 
-    mRecursionDepth = min(8, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 2;
@@ -66,7 +70,7 @@ void DxrPhotonMapper::Setup()
     mGlassRotateRange = 8;
     mCausticsBoost = 0.1f;
     mIsMoveModel = false;
-    mIsApplyCaustics = true;
+    mIsApplyCaustics = false;
     mIsUseDenoise = false;
     mIsDebug = true;
     mVisualizeLightRange = false;
@@ -83,6 +87,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseWRS_RIS = true;
+    mIsUseReservoirTemporalReuse = false;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -716,6 +721,9 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIReservoirBufferSrc"], mDIReservoirDescriptorSRVPingPongTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DIReservoirBufferDst"], mDIReservoirDescriptorUAVPingPongTbl[dst].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DebugTexture"], mDebugTextureDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DebugTexture0"], mDebugTexture0DescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalReuse["DebugTexture1"], mDebugTexture1DescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mTemporalReusePSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "TemporalReuse");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -833,6 +841,10 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional.z = mIsUseNEE ? 1 : 0;
     mSceneParam.additional.w = mIsUseWRS_RIS ? 1 : 0;
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, (f32)min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
+    mSceneParam.additional1.x = mIsUseReservoirTemporalReuse ? 1 : 0;
+    mSceneParam.additional1.y = 0;
+    mSceneParam.additional1.z = 0;
+    mSceneParam.additional1.w = 0;
 
     mRenderFrame++;
 
@@ -940,7 +952,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case 'D':
         //mIsUseDenoise = !mIsUseDenoise;
-        mRecursionDepth = (u32)Clamp(2.f, REAL_MAX_RECURSION_DEPTH * 1.0f, (f32)(mRecursionDepth + (mInverseMove ? -1 : 1)));
+        mRecursionDepth = (u32)Clamp(1.f, REAL_MAX_RECURSION_DEPTH * 1.0f, (f32)(mRecursionDepth + (mInverseMove ? -1 : 1)));
         mIsUseAccumulation = false;
         break;
     case 'Q':
@@ -997,6 +1009,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case VK_TAB:
         mIsTemporalAccumulationForceDisable = !mIsTemporalAccumulationForceDisable;
+        mIsUseAccumulation = false;
+        break;
+    case VK_F1:
+        mIsUseReservoirTemporalReuse = !mIsUseReservoirTemporalReuse;
         mIsUseAccumulation = false;
         break;
     }
