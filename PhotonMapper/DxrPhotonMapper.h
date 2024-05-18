@@ -67,6 +67,7 @@ namespace RayTracingEntryPoints {
     static const wchar_t* MissPhoton = L"photonMiss";
     static const wchar_t* ClosestHitMaterialPhoton = L"materialStorePhotonClosestHit";
     static const wchar_t* ClosestHitMaterialWithTexPhoton = L"materialWithTexStorePhotonClosestHit";
+    static const wchar_t* RayGenSpatialReuse = L"spatialReuse";
 }
 
 namespace ComputeShaders {
@@ -555,21 +556,32 @@ private:
     ComPtr<ID3D12Resource> mSceneCB;
 
     //Pipeline State
+    //--Ordinal Raytrace
     ComPtr<ID3D12StateObject> mRTPSO;
     ComPtr<ID3D12Resource> mShaderTable;
     D3D12_DISPATCH_RAYS_DESC mDispatchRayDesc;
     ComPtr<ID3D12RootSignature> mGlobalRootSig;
     std::unordered_map < std::string, u32> mRegisterMapGlobalRootSig;
+
+    //--PhotonMapping
+    ComPtr<ID3D12StateObject> mRTPSOPhoton;
+    ComPtr<ID3D12Resource> mShaderTablePhoton;
+    D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
+    ComPtr<ID3D12RootSignature> mGlobalRootSigPhoton;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigPhoton;
+
+    //--Reservoir Spatial Reuse
+    ComPtr<ID3D12StateObject> mRTPSOReservoirSpatialReuse;
+    ComPtr<ID3D12Resource> mShaderTableReservoirSpatialReuse;
+    D3D12_DISPATCH_RAYS_DESC mDispatchReservoirSpatialReuseRayDesc;
+    ComPtr<ID3D12RootSignature> mGlobalRootSigReservoirSpatialReuse;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigReservoirSpatialReuse;
+
+    //material binding
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterial;
     std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterial;
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterialWithTex;
     std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterialWithTex;
-
-    ComPtr<ID3D12StateObject> mRTPSOPhoton;
-    ComPtr<ID3D12Resource> mShaderPhotonTable;
-    D3D12_DISPATCH_RAYS_DESC mDispatchPhotonRayDesc;
-    ComPtr<ID3D12RootSignature> mGlobalRootSigPhoton;
-    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigPhoton;
 
     ComPtr<ID3D12RootSignature> mRsBitonicSortLDS;
     std::unordered_map < std::string, u32> mRegisterMapBitonicSortLDS;

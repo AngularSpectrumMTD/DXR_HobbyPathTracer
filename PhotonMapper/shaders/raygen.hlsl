@@ -135,3 +135,8 @@ void photonEmitting()
 
     TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
+
+[shader("raygeneration")]
+void spatialReuse() {
+    
+}
