@@ -675,4 +675,11 @@ void DxrPhotonMapper::CreateConstantBuffer()
     }
     //Scene
     mSceneCB = mDevice->CreateConstantBuffer(sizeof(SceneParam), nullptr, L"SceneCB");
+
+    for (u32 i = 0; i < MAX_SPATIAL_REUSE_TAP; i++)
+    {
+        wchar_t name[30];
+        swprintf(name, 30, L"ReSTIRParamCB[%d]", i);
+        mReSTIRParamCBTbl.push_back(mDevice->CreateConstantBuffer(sizeof(ReSTIRParam), nullptr, name));
+    }
 }

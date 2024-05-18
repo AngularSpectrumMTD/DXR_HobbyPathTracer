@@ -38,6 +38,8 @@
 
 #define SPHERE_LIGHTS_SIZE_RATIO 0.7f
 
+#define MAX_SPATIAL_REUSE_TAP 5
+
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
     static const wchar_t* ReflectReflactMaterialBox = L"hgReflectReflactBoxes";
@@ -264,6 +266,11 @@ private:
         LightType_Rect = 1,
         LightType_Spot = 2,
         LightType_Directional = 3
+    };
+
+    struct ReSTIRParam
+    {
+        XMUINT4 data;
     };
 
     struct LightGenerateParam
@@ -558,6 +565,7 @@ private:
     ComPtr<ID3D12Resource> mGridSortCB;
     std::vector<ComPtr<ID3D12Resource>> mDenoiseCBTbl;
     ComPtr<ID3D12Resource> mSceneCB;
+    std::vector<ComPtr<ID3D12Resource>> mReSTIRParamCBTbl;
 
     //Pipeline State
     //--Ordinal Raytrace

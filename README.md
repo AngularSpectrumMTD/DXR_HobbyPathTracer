@@ -2,24 +2,26 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/81b59ace-747e-4939-94b0-9de96fc036de
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/e9079ddf-5bed-4006-b591-22061105107b
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0faad258-1cd9-46a4-a2e5-5b628e7135c8)
 
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
-Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Uniform Sampling (from 400 lights. Not Accumulated)  
+Left :  WRS (30 stream inputs from 400 lights. Not Accumulated)  
+Right : Uniform Sampling (from 400 lights. Not Accumulated)  
 ![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/864e337c-89cc-442a-b925-fd9b4d116f36)
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
-Left :  WRS (30 stream inputs from 400 lights. 40 frame Accumulated) / Right : Uniform Sampling (from 400 lights. 40 frame Accumulated)  
+Left :  WRS (30 stream inputs from 400 lights. 40 frame Accumulated)  
+Right : Uniform Sampling (from 400 lights. 40 frame Accumulated)  
 ![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5b1ae3eb-c67f-4fc5-9967-8d4b9bead0ff)
 
 (Doing) ReSTIR DI is implemented for improving the quality RIS.
-
-Left :  Initial Sampling Right Spatial Reuse  
-![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/79581028-1310-4d4d-8579-7cf31e7c18ff)
+Left :  Initial Sampling  
+Right Spatial Reuse  
+![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/85884e5f-412b-4599-a263-31e05eb0f1c3)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

@@ -137,8 +137,7 @@ void photonEmitting()
     TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
 
-#define SPATIAL_REUSE_NUM 8
-#define SPATIAL_REUSE_RADIUS 2
+#define SPATIAL_REUSE_NUM 4
 
 float rand2(in int2 indexXY)//0-1
 {
@@ -174,7 +173,7 @@ void spatialReuse() {
         [unroll]
         for(int s = 0; s < SPATIAL_REUSE_NUM; s++)
         {
-            const float r = rand() * SPATIAL_REUSE_RADIUS;
+            const float r = rand() * gReSTIRParam.data.x;
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;

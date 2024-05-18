@@ -87,6 +87,13 @@ RWTexture2D<float4> gCausticsBuffer : register(u9);
 RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
 RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
 
+struct ReSTIRParam
+{
+    uint4 data;
+};
+
+ConstantBuffer<ReSTIRParam> gReSTIRParam : register(b2);
+
 #include "sceneParamInterface.hlsli"
 
 ////////////////////////////////////

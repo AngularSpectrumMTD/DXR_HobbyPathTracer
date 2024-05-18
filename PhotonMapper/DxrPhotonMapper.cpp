@@ -751,6 +751,17 @@ void DxrPhotonMapper::Draw()
 
         for (int i = 0; i < mSpatialReuseTap; i++)
         {
+            ReSTIRParam cb;
+            XMUINT4 d;
+            d.x = max(1, (4 >> i));
+            d.y = 0;
+            d.z = 0;
+            d.w = 0;
+            cb.data = d;
+
+            auto restirCB = mReSTIRParamCBTbl.at(i).Get();
+            mDevice->ImmediateBufferUpdateHostVisible(restirCB, &cb, sizeof(cb));
+
             mCommandList->SetComputeRootSignature(mGlobalRootSigReservoirSpatialReuse.Get());
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gGridParam"], gridCB->GetGPUVirtualAddress());
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gSceneParam"], sceneCB->GetGPUVirtualAddress());
@@ -769,6 +780,7 @@ void DxrPhotonMapper::Draw()
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPing].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPong].hGpu);
+            mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
             mCommandList->DispatchRays(&mDispatchReservoirSpatialReuseRayDesc);
@@ -1118,7 +1130,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case VK_F4:
-        mSpatialReuseTap = Clamp(1, 5, mSpatialReuseTap + (mInverseMove ? -1 : 1));
+        mSpatialReuseTap = Clamp(1, MAX_SPATIAL_REUSE_TAP, mSpatialReuseTap + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
     }
