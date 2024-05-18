@@ -53,7 +53,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -724,6 +724,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->ResourceBarrier(u32(_countof(tempBarrier)), tempBarrier);
     }
 
+    u32 finalSpatialID = 0;
     //Reservoir Spatial Reuse
     {
         D3D12_RESOURCE_BARRIER copyReservoirBarrier[] = {
@@ -745,33 +746,47 @@ void DxrPhotonMapper::Draw()
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
 
-        mCommandList->SetComputeRootSignature(mGlobalRootSigReservoirSpatialReuse.Get());
-        mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gGridParam"], gridCB->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gSceneParam"], sceneCB->GetGPUVirtualAddress());
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gBVH"], mTLASDescriptor.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gEquiRecEnvMap"], mCubeMapTex.srv.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonMap"], mPhotonMapDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDiffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"], mDISpatialReservoirDescriptorUAVPingPongTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[src].hGpu);
-        mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
-        PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
-        mCommandList->DispatchRays(&mDispatchReservoirSpatialReuseRayDesc);
-        PIXEndEvent(mCommandList.Get());
+        u32 spatialIDPing = dst;
+        u32 spatialIDPong = src;
+
+        for (int i = 0; i < mSpatialReuseTap; i++)
+        {
+            mCommandList->SetComputeRootSignature(mGlobalRootSigReservoirSpatialReuse.Get());
+            mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gGridParam"], gridCB->GetGPUVirtualAddress());
+            mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gBVH"], mTLASDescriptor.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gEquiRecEnvMap"], mCubeMapTex.srv.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gLightGenerateParams"], mLightGenerationParamSRV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonMap"], mPhotonMapDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDepthBuffer"], mDepthBufferDescriptorUAVTbl[src].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonGridIdBuffer"], mPhotonGridIdDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDiffuseAlbedoBuffer"], mDiffuseAlbedoBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPositionBuffer"], mPositionBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gNormalBuffer"], mNormalBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gVelocityBuffer"], mVelocityBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[dst].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPing].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPong].hGpu);
+            mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
+            PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
+            mCommandList->DispatchRays(&mDispatchReservoirSpatialReuseRayDesc);
+            PIXEndEvent(mCommandList.Get());
+
+            u32 tmp = spatialIDPing;
+            spatialIDPing = spatialIDPong;
+            spatialIDPong = tmp;
+
+            mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
+        }
+
+        finalSpatialID = spatialIDPong;
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
 
         D3D12_RESOURCE_BARRIER UAVToSRVReservoirBarrier[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         };
 
         mCommandList->ResourceBarrier(u32(_countof(UAVToSRVReservoirBarrier)), UAVToSRVReservoirBarrier);
@@ -794,7 +809,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[src].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[dst].hGpu);//"dst"
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetPipelineState(mTemporalAccumulationPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "TemporalAccumulation");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -1100,6 +1115,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case VK_F3:
         mIsUseReservoirSpatialReuse = !mIsUseReservoirSpatialReuse;
+        mIsUseAccumulation = false;
+        break;
+    case VK_F4:
+        mSpatialReuseTap = Clamp(1, 5, mSpatialReuseTap + (mInverseMove ? -1 : 1));
         mIsUseAccumulation = false;
         break;
     }

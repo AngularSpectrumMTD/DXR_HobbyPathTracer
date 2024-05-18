@@ -717,6 +717,8 @@ private:
 
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
+
+    u32 mSpatialReuseTap = 4;
 };
 
 #endif

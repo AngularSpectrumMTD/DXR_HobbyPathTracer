@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/90a77170-6b51-4cf1-b393-46bd2a46b2cb
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/81b59ace-747e-4939-94b0-9de96fc036de
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0faad258-1cd9-46a4-a2e5-5b628e7135c8)
 
@@ -90,3 +90,4 @@ DirectX12
 - TAB : enable / disable Temporal Accumulation  
 - F1 : enable / disable Temporal Reuse of Reservoir
 - F3 : enable / disable Spatial Reuse of Reservoir
+- F4 : increase / decrease the number of taps for Spatial Reuse of Reservoir
