@@ -2,9 +2,9 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + WRS based RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/e9079ddf-5bed-4006-b591-22061105107b
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/16545132-b4b9-4b25-8980-078d2ffff88c
 
-![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0faad258-1cd9-46a4-a2e5-5b628e7135c8)
+![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5c812a25-4087-4113-b072-b91da0287822)
 
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
@@ -21,7 +21,7 @@ Right : Uniform Sampling (from 400 lights. 40 frame Accumulated)
 (Doing) ReSTIR DI is implemented for improving the quality RIS.
 Left :  Initial Sampling  
 Right Spatial Reuse  
-![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/85884e5f-412b-4599-a263-31e05eb0f1c3)
+![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/6da5460c-339f-4078-a873-35e96aeadd64)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

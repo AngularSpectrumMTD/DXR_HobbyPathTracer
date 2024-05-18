@@ -245,7 +245,7 @@ void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
-        float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+        float3 wPos = WorldRayOrigin() + WorldRayDirection() * 0.99f * RayTCurrent();//hack : for avoiding self occlusion at spatial reuse
         float2 writeIndex = payload.storeIndexXY;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
         gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);

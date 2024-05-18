@@ -166,6 +166,8 @@ void spatialReuse() {
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currUpdateW, rand());
 
     const float centerDepth = gDepthBuffer[launchIndex.xy];
+    const float3 normal = gNormalBuffer[launchIndex.xy].xyz;
+    const float3 scatterPosition = gPositionBuffer[launchIndex.xy].xyz;
 
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
@@ -190,13 +192,21 @@ void spatialReuse() {
             DIReservoir nearDIReservoir = gDISpatialReservoirBufferSrc[serialNearID];
             const float nearDepth = gDepthBuffer[nearIndex.xy];
 
-            const bool isSimilar = ((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            const bool isSimilar = abs(nearDepth - centerDepth) < 0.001f;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
             if(!isSimilar)
             {
                 continue;
             }
 
-            const float nearUpdateW = nearDIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
+            LightSample lightSample;
+            sampleLightWithID(scatterPosition, nearDIReservoir.Y, lightSample);
+
+            if(!isVisible(scatterPosition, lightSample))
+            {
+                continue;
+            }
+
+            const float nearUpdateW = nearDIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
             combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand2(nearIndex.xy));
         }
     }
