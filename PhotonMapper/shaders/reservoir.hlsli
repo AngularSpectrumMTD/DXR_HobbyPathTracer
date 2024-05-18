@@ -19,6 +19,15 @@ struct DIReservoir
         W_sum = 0;
         M = 0;
     }
+
+    void debugInitialize()
+    {
+        Y = 1;
+        targetPDF = 2;
+        targetPDF_3f = 3.xxx;
+        W_sum = 4;
+        M = 5;
+    }
 };
 
 bool updateDIReservoir(inout DIReservoir reservoir, in uint X, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)

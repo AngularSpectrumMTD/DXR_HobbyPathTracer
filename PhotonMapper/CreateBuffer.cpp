@@ -409,6 +409,10 @@ void DxrPhotonMapper::CreateRegularBuffer()
         mDIReservoirDescriptorSRVPingPongTbl.resize(size);
         mDIReservoirDescriptorUAVPingPongTbl.resize(size);
 
+        mDISpatialReservoirPingPongTbl.resize(size);
+        mDISpatialReservoirDescriptorSRVPingPongTbl.resize(size);
+        mDISpatialReservoirDescriptorUAVPingPongTbl.resize(size);
+
         for (u32 i = 0; i < size; i++)
         {
             {
@@ -503,6 +507,30 @@ void DxrPhotonMapper::CreateRegularBuffer()
                 uavDesc.Buffer.FirstElement = 0;
                 uavDesc.Buffer.StructureByteStride = sizeof(DIReservoir);
                 mDIReservoirDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mDIReservoirPingPongTbl.at(i).Get(), &uavDesc);
+            }
+            {
+                wchar_t name[30];
+                swprintf(name, 30, L"DISpatialReservoirTbl[%d]", i);
+
+                const u32 DIReservoirElements = GetWidth() * GetHeight();
+                const u32 DIReservoirSizeInBytes = DIReservoirElements * sizeof(DIReservoir);
+
+                mDISpatialReservoirPingPongTbl.at(i) = mDevice->CreateBuffer(DIReservoirSizeInBytes, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_DEFAULT, nullptr, name);
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+                srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                srvDesc.Buffer.NumElements = DIReservoirElements;
+                srvDesc.Buffer.FirstElement = 0;
+                srvDesc.Buffer.StructureByteStride = sizeof(DIReservoir);
+                mDISpatialReservoirDescriptorSRVPingPongTbl.at(i) = mDevice->CreateShaderResourceView(mDISpatialReservoirPingPongTbl.at(i).Get(), &srvDesc);
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+                uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+                uavDesc.Buffer.NumElements = DIReservoirElements;
+                uavDesc.Buffer.FirstElement = 0;
+                uavDesc.Buffer.StructureByteStride = sizeof(DIReservoir);
+                mDISpatialReservoirDescriptorUAVPingPongTbl.at(i) = mDevice->CreateUnorderedAccessView(mDISpatialReservoirPingPongTbl.at(i).Get(), &uavDesc);
             }
         }
     }

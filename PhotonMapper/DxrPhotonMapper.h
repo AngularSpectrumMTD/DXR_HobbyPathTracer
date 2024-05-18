@@ -546,6 +546,10 @@ private:
     std::vector < dx12::Descriptor> mDIReservoirDescriptorSRVPingPongTbl;
     std::vector < dx12::Descriptor> mDIReservoirDescriptorUAVPingPongTbl;
 
+    std::vector < ComPtr<ID3D12Resource>> mDISpatialReservoirPingPongTbl;
+    std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorUAVPingPongTbl;
+
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB1Tbl;

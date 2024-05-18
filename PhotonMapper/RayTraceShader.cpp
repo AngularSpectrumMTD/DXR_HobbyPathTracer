@@ -429,7 +429,7 @@ void DxrPhotonMapper::CreateStateObject()
         //Set Global Root Signature
         {
             auto rootsig = subobjects.CreateSubobject<CD3DX12_GLOBAL_ROOT_SIGNATURE_SUBOBJECT>();
-            rootsig->SetRootSignature(mGlobalRootSig.Get());
+            rootsig->SetRootSignature(mGlobalRootSigReservoirSpatialReuse.Get());
         }
 
         //Bind Local Root Signature For Shader

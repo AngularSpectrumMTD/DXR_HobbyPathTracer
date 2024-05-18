@@ -138,5 +138,11 @@ void photonEmitting()
 
 [shader("raygeneration")]
 void spatialReuse() {
-    
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    float2 dims = float2(DispatchRaysDimensions().xy);
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    // DIReservoir reservoir;
+    // reservoir.debugInitialize();
+    gDIReservoirBuffer[serialIndex] = gDISpatialReservoirBufferSrc[serialIndex];
 }

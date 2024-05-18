@@ -85,7 +85,7 @@ RWTexture2D<float4> gGIBuffer : register(u8);
 RWTexture2D<float4> gCausticsBuffer : register(u9);
 
 RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
-StructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(t3);//for reservoir spatial reuse
+RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
 
 #include "sceneParamInterface.hlsli"
 

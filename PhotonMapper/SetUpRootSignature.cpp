@@ -88,6 +88,45 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gCausticsBuffer"] = 14;
         mRegisterMapGlobalRootSigPhoton["gDIReservoirBuffer"] = 15;
     }
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 11);
+        rsCreater.PushStaticSampler(0);
+        mGlobalRootSigReservoirSpatialReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirSpatialReuse");
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gGridParam"] = 0;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gBVH"] = 1;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gEquiRecEnvMap"] = 2;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gLightGenerateParams"] = 3;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gSceneParam"] = 4;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonMap"] = 5;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDepthBuffer"] = 6;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonGridIdBuffer"] = 7;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDiffuseAlbedoBuffer"] = 8;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPositionBuffer"] = 9;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gNormalBuffer"] = 10;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gVelocityBuffer"] = 11;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIBuffer"] = 12;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIBuffer"] = 13;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"] = 14;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"] = 15;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"] = 16;
+    }
 }
 
 void DxrPhotonMapper::CreateRootSignatureLocal()

@@ -540,7 +540,7 @@ void DxrPhotonMapper::CreateShaderTable()
         auto hitgroupRegion = utility::RoundUp(hitGroupSize, tableAlign);
 
         auto tableSize = raygenRegion + missRegion + hitgroupRegion;
-        mShaderTableReservoirSpatialReuse = mDevice->CreateBuffer(tableSize, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_UPLOAD, nullptr, L"ShaderTable");
+        mShaderTableReservoirSpatialReuse = mDevice->CreateBuffer(tableSize, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_UPLOAD, nullptr, L"ShaderTableReservoirSpatialReuse");
 
         ComPtr<ID3D12StateObjectProperties> rtsoProps;
         mRTPSOReservoirSpatialReuse.As(&rtsoProps);
