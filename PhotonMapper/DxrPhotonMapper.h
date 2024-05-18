@@ -88,6 +88,7 @@ namespace ComputeShaders {
 
     const LPCWSTR DebugView = L"debugView.cso";
 
+    const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
     const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 }
 
@@ -608,6 +609,10 @@ private:
     ComPtr<ID3D12RootSignature> mRsDebugView;
     std::unordered_map < std::string, u32> mRegisterMapDebugView;
     ComPtr<ID3D12PipelineState> mDebugViewPSO;
+
+    ComPtr<ID3D12RootSignature> mRsTemporalAccumulation;
+    std::unordered_map < std::string, u32> mRegisterMapTemporalAccumulation;
+    ComPtr<ID3D12PipelineState> mTemporalAccumulationPSO;
 
     ComPtr<ID3D12RootSignature> mRsTemporalReuse;
     std::unordered_map < std::string, u32> mRegisterMapTemporalReuse;

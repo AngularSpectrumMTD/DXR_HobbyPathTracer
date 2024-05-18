@@ -186,6 +186,24 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
+        CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
+        mRegisterMapTemporalReuse["gSceneParam"] = 0;
+        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 1;
+        mRegisterMapTemporalReuse["DepthBuffer"] = 2;
+        mRegisterMapTemporalReuse["PrevDepthBuffer"] = 3;
+        mRegisterMapTemporalReuse["VelocityBuffer"] = 4;
+        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 5;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
@@ -196,30 +214,22 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
-        mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
-        CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
-        mRegisterMapTemporalReuse["gSceneParam"] = 0;
-        mRegisterMapTemporalReuse["HistoryDIBuffer"] = 1;
-        mRegisterMapTemporalReuse["HistoryGIBuffer"] = 2;
-        mRegisterMapTemporalReuse["HistoryCausticsBuffer"] = 3;
-        mRegisterMapTemporalReuse["DepthBuffer"] = 4;
-        mRegisterMapTemporalReuse["PrevDepthBuffer"] = 5;
-        mRegisterMapTemporalReuse["VelocityBuffer"] = 6;
-        mRegisterMapTemporalReuse["LuminanceMomentBufferSrc"] = 7;
-        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 8;
-        mRegisterMapTemporalReuse["CurrentDIBuffer"] = 9;
-        mRegisterMapTemporalReuse["CurrentGIBuffer"] = 10;
-        mRegisterMapTemporalReuse["CurrentCausticsBuffer"] = 11;
-        mRegisterMapTemporalReuse["DIGIBuffer"] = 12;
-        mRegisterMapTemporalReuse["AccumulationCountBuffer"] = 13;
-        mRegisterMapTemporalReuse["LuminanceMomentBufferDst"] = 14;
-        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 15;
-        mRegisterMapTemporalReuse["DebugTexture"] = 16;
-        mRegisterMapTemporalReuse["DebugTexture0"] = 17;
-        mRegisterMapTemporalReuse["DebugTexture1"] = 18;
+        mRsTemporalAccumulation = rsCreater.Create(mDevice, false, L"rsTemporalAccumulation");
+        CreateComputeShaderStateObject(ComputeShaders::TemporalAccumulation, mTemporalAccumulationPSO, mRsTemporalAccumulation);
+        mRegisterMapTemporalAccumulation["gSceneParam"] = 0;
+        mRegisterMapTemporalAccumulation["HistoryDIBuffer"] = 1;
+        mRegisterMapTemporalAccumulation["HistoryGIBuffer"] = 2;
+        mRegisterMapTemporalAccumulation["HistoryCausticsBuffer"] = 3;
+        mRegisterMapTemporalAccumulation["DepthBuffer"] = 4;
+        mRegisterMapTemporalAccumulation["PrevDepthBuffer"] = 5;
+        mRegisterMapTemporalAccumulation["VelocityBuffer"] = 6;
+        mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = 7;
+        mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = 8;
+        mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = 9;
+        mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = 10;
+        mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = 11;
+        mRegisterMapTemporalAccumulation["DIGIBuffer"] = 12;
+        mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = 13;
+        mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = 14;
     }
 }

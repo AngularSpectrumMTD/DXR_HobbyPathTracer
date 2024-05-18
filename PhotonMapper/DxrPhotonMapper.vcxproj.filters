@@ -208,6 +208,9 @@
     <FxCompile Include="shaders\temporalReuse.hlsl">
       <Filter>ソース ファイル\shaders\Reuse</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\temporalAccumulation.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxrPhotonMapper.rc">
