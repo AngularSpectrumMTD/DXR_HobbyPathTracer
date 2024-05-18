@@ -6,6 +6,8 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/165
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5c812a25-4087-4113-b072-b91da0287822)
 
+![ReSTIRDI2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/feff5609-bdd2-4afd-84a9-2c746e8cb317)
+
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  

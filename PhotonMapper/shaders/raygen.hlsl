@@ -192,7 +192,7 @@ void spatialReuse() {
             DIReservoir nearDIReservoir = gDISpatialReservoirBufferSrc[serialNearID];
             const float nearDepth = gDepthBuffer[nearIndex.xy];
 
-            const bool isSimilar = abs(nearDepth - centerDepth) < 0.001f;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            const bool isSimilar = abs(nearDepth - centerDepth) < 0.005f;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
             if(!isSimilar)
             {
                 continue;
