@@ -1,10 +1,12 @@
 # DXRHybridPhotonMapper
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
-(Pathtracing[NEE + WRS based RIS] + Photon Mapping[Spectral Rendered Caustics)  
+(Pathtracing[NEE + WRS based RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/eb27c92e-ae53-437f-8cc7-5d4603c05eac  
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/90a77170-6b51-4cf1-b393-46bd2a46b2cb
 
-![all](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/82773f10-6b0c-48f5-9ecf-419ee6d1697f)
+![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0faad258-1cd9-46a4-a2e5-5b628e7135c8)
+
+![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
 Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Uniform Sampling (from 400 lights. Not Accumulated)  
@@ -13,6 +15,11 @@ Left :  WRS (30 stream inputs from 400 lights. Not Accumulated) / Right : Unifor
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 Left :  WRS (30 stream inputs from 400 lights. 40 frame Accumulated) / Right : Uniform Sampling (from 400 lights. 40 frame Accumulated)  
 ![RIS_comparison_converged](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/5b1ae3eb-c67f-4fc5-9967-8d4b9bead0ff)
+
+(Doing) ReSTIR DI is implemented for improving the quality RIS.
+
+Left :  Initial Sampling Right Spatial Reuse  
+![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/79581028-1310-4d4d-8579-7cf31e7c18ff)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
@@ -82,3 +89,4 @@ DirectX12
 - CTRL : enable / disable Streaming RIS
 - TAB : enable / disable Temporal Accumulation  
 - F1 : enable / disable Temporal Reuse of Reservoir
+- F3 : enable / disable Spatial Reuse of Reservoir
