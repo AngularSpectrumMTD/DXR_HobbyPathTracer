@@ -35,16 +35,17 @@ void DxrPhotonMapper::UpdateWindowText()
     windowText.str(L"");
 
     windowText 
-        << L" <I> : Inverse " << (mInverseMove ? L"ON" : L"OFF")
-        << L" <A> : Accunmulate " << (mIsUseAccumulation ? L"ON" : L"OFF")
+        << L" <I> : Inv " << (mInverseMove ? L"ON" : L"OFF")
+        << L" <A> : Acc " << (mIsUseAccumulation ? L"ON" : L"OFF")
         << L" <E> : NEE " << (mIsUseNEE ? L"ON" : L"OFF")
         << L" <CTRL> : RIS " << (mIsUseWRS_RIS ? L"ON" : L"OFF")
-        << L" <F1> : TempReuse " << (mIsUseReservoirTemporalReuse ? L"ON" : L"OFF")
-        << L" <SPACE> : Target <R> : Roughness <S> : TransRatio <M> : Metallic"
+        << L" <F1> : Temporal " << (mIsUseReservoirTemporalReuse ? L"ON" : L"OFF")
+        << L" <F3> : Spatial " << (mIsUseReservoirSpatialReuse ? L"ON" : L"OFF")
+        << L" <SPACE> : Target <R> : Rough <S> : Trans <M> : Metal"
         << L" <D> : Bounce : " << mRecursionDepth
         << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024
         //<< L"    " << getFrameRate() << L"[ms]"
-        << L" Accumulated : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
+        << L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
@@ -52,9 +53,9 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_BistroExterior;
 
-    mRecursionDepth = min(2, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 2;
@@ -88,6 +89,7 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseWRS_RIS = true;
     mIsUseReservoirTemporalReuse = false;
+    mIsUseReservoirSpatialReuse = false;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -678,6 +680,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[dst].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIReservoirBuffer"], mDIReservoirDescriptorUAVPingPongTbl[dst].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[src].hGpu);//clear
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -922,7 +925,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional.w = mIsUseWRS_RIS ? 1 : 0;
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, (f32)min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
     mSceneParam.additional1.x = mIsUseReservoirTemporalReuse ? 1 : 0;
-    mSceneParam.additional1.y = 0;
+    mSceneParam.additional1.y = mIsUseReservoirSpatialReuse ? 1 : 0;
     mSceneParam.additional1.z = 0;
     mSceneParam.additional1.w = 0;
 
@@ -1093,6 +1096,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case VK_F1:
         mIsUseReservoirTemporalReuse = !mIsUseReservoirTemporalReuse;
+        mIsUseAccumulation = false;
+        break;
+    case VK_F3:
+        mIsUseReservoirSpatialReuse = !mIsUseReservoirSpatialReuse;
         mIsUseAccumulation = false;
         break;
     }

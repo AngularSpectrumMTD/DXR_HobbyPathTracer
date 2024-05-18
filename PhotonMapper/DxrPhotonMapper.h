@@ -716,6 +716,7 @@ private:
     bool mIsTemporalAccumulationForceDisable = false;
 
     bool mIsUseReservoirTemporalReuse = false;
+    bool mIsUseReservoirSpatialReuse = false;
 };
 
 #endif

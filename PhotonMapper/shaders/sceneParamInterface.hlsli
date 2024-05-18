@@ -129,4 +129,9 @@ bool isUseReservoirTemporalReuse()
     return gSceneParam.additional1.x == 1;
 }
 
+bool isUseReservoirSpatialReuse()
+{
+    return gSceneParam.additional1.y == 1;
+}
+
 #endif//__SCENE_PARAM_INTERFACE_HLSLI__

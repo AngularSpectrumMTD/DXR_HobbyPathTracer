@@ -95,11 +95,11 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     float luminance = computeLuminance(currDIGI);
     float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
     
-    // if (isAccumulationApply())
-    // {
-    //     accCount++;
-    // }
-    // else
+    if (isAccumulationApply())
+    {
+        accCount++;
+    }
+    else
     {
         accCount = 1;
     }
