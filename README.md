@@ -11,7 +11,7 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/65f
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights.      
-Right : Uniform Sampling (from 400 lights. Not Accumulated) 
+Right : Uniform Sampling (from 400 lights. Not Accumulated)   
 Left : Streaming RIS (30 stream inputs from 400 lights. Not Accumulated)  
 ![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/325660bd-0008-4a77-848f-56c600b32054)
 
