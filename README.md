@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/d80b9ccc-285b-48d8-b17f-edb92448258a
+![movie](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/545c9a7e-9a2e-4cc8-bd66-40f6fd913d41)
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0e17407d-f343-46b3-8925-34ddb2c181f6)
 
