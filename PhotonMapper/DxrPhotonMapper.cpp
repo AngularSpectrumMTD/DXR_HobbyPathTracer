@@ -19,6 +19,8 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
+//#define USE_SPATIAL_RESERVOIR_FEEDBACK
+
 //#define CUBE_TEST
 
 //This Program supports TRIANGULAR POLYGON only
@@ -797,8 +799,21 @@ void DxrPhotonMapper::Draw()
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
 
+        //feedback
+ #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
+        D3D12_RESOURCE_BARRIER copyReservoirBarrier2[] = {
+            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
+            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE)
+        };
+        mCommandList->ResourceBarrier(u32(_countof(copyReservoirBarrier2)), copyReservoirBarrier2);
+        mCommandList->CopyResource(mDIReservoirPingPongTbl[dst].Get(), mDISpatialReservoirPingPongTbl[finalSpatialID].Get());
+#endif
+
         D3D12_RESOURCE_BARRIER UAVToSRVReservoirBarrier[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+ #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
+           CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
+ #endif
+            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         };
 
         mCommandList->ResourceBarrier(u32(_countof(UAVToSRVReservoirBarrier)), UAVToSRVReservoirBarrier);

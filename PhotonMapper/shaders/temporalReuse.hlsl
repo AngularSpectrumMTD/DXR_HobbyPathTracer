@@ -9,8 +9,6 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #define REINHARD_L 1000
 #define MAX_ACCUMULATION_RANGE 1000
 
-#define MAX_TEMPORAL_RESERVOIR_M_RATIO 20
-
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t0);
 Texture2D<float> DepthBuffer : register(t1);
 Texture2D<float> PrevDepthBuffer : register(t2);

@@ -2,6 +2,7 @@
 #define __RESERVOIR_HLSLI__
 
 #define MAX_TEMPORAL_REUSE_M 100
+#define MAX_SPATIAL_REUSE_M 20
 
 struct DIReservoir
 {

@@ -210,6 +210,11 @@ void spatialReuse() {
             combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand2(nearIndex.xy));
         }
     }
-    
+    if(spatDIReservoir.M > MAX_SPATIAL_REUSE_M)
+    {
+        float r = max(0, ((float)MAX_SPATIAL_REUSE_M / spatDIReservoir.M));
+        spatDIReservoir.W_sum *= r;
+        spatDIReservoir.M = MAX_SPATIAL_REUSE_M;
+    }
     gDIReservoirBuffer[serialIndex] = spatDIReservoir;
 }
