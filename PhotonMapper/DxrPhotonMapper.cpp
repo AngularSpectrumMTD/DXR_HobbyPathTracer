@@ -1359,9 +1359,9 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
             const u32 colorID = count + colorOffset;
-            param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorID % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.2), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);
         }
