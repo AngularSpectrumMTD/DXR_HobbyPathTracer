@@ -11,13 +11,13 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/65f
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights  
-Left :  WRS (30 stream inputs from 400 lights. Not Accumulated)  
+Left :  WRS (30 stream inputs from 400 lights. Not Accumulated)      
 Right : Uniform Sampling (from 400 lights. Not Accumulated)  
 ![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/325660bd-0008-4a77-848f-56c600b32054)
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 
-(Doing) ReSTIR DI is implemented for improving the quality RIS.
+(Doing) ReSTIR DI is implemented for improving the quality RIS.  
 Left :  Initial Sampling  
 Right Spatial Reuse  
 ![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/12bcfad7-f1f3-4a26-a091-f04c88132674)
