@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/65fa88a4-5a59-45cc-8520-5cf09ed7a195
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4bb02326-d59c-4c29-8af9-8f51626c6dcb
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0e17407d-f343-46b3-8925-34ddb2c181f6)
 
@@ -11,7 +11,7 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/65f
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights.      
-Right : Uniform Sampling (from 400 lights. Not Accumulated)   
+Right : Uniform Sampling (from 400 lights. Not Accumulated) 
 Left : Streaming RIS (30 stream inputs from 400 lights. Not Accumulated)  
 ![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/325660bd-0008-4a77-848f-56c600b32054)
 
@@ -91,3 +91,4 @@ DirectX12
 - F1 : enable / disable Temporal Reuse of Reservoir
 - F3 : enable / disable Spatial Reuse of Reservoir
 - F4 : increase / decrease the number of taps for Spatial Reuse of Reservoir
+- F5 : enable / disable Metal Test

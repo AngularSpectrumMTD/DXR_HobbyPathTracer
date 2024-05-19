@@ -968,7 +968,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.cameraParams = XMVectorSet(0.1f, 100.f, (f32)min(mRecursionDepth, REAL_MAX_RECURSION_DEPTH), 0);
     mSceneParam.additional1.x = mIsUseReservoirTemporalReuse ? 1 : 0;
     mSceneParam.additional1.y = mIsUseReservoirSpatialReuse ? 1 : 0;
-    mSceneParam.additional1.z = 0;
+    mSceneParam.additional1.z = mIsUseMetallicTest ? 1 : 0;
     mSceneParam.additional1.w = 0;
 
     mRenderFrame++;
@@ -1146,6 +1146,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case VK_F4:
         mSpatialReuseTap = Clamp(1, MAX_SPATIAL_REUSE_TAP, mSpatialReuseTap + (mInverseMove ? -1 : 1));
+        mIsUseAccumulation = false;
+        break;
+    case VK_F5:
+        mIsUseMetallicTest = !mIsUseMetallicTest;
         mIsUseAccumulation = false;
         break;
     }

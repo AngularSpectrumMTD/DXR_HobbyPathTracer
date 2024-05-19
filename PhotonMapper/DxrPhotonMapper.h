@@ -727,6 +727,8 @@ private:
     bool mIsUseReservoirSpatialReuse = false;
 
     u32 mSpatialReuseTap = 4;
+
+    bool mIsUseMetallicTest = false;
 };
 
 #endif

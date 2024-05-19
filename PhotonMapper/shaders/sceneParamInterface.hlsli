@@ -134,4 +134,9 @@ bool isUseReservoirSpatialReuse()
     return gSceneParam.additional1.y == 1;
 }
 
+bool isUseMetallicTest()
+{
+    return gSceneParam.additional1.z == 1;
+}
+
 #endif//__SCENE_PARAM_INTERFACE_HLSLI__

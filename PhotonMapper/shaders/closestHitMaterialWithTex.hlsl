@@ -120,8 +120,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
 
     //test metallic surface
-    currentMaterial.roughness = 0.2;
-    currentMaterial.metallic = 0.5;
+    if(isUseMetallicTest())
+    {
+        currentMaterial.roughness = 0.2;
+        currentMaterial.metallic = 0.5;
+    }
 
     //recognize as glass
     if (length(currentMaterial.albedo) == 0 && !isNoTexture)
