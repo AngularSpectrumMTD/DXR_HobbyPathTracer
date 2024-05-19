@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4bb02326-d59c-4c29-8af9-8f51626c6dcb
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/d80b9ccc-285b-48d8-b17f-edb92448258a
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0e17407d-f343-46b3-8925-34ddb2c181f6)
 
@@ -13,13 +13,13 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4bb
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights.      
 Right : Uniform Sampling (from 400 lights. Not Accumulated) 
 Left : Streaming RIS (30 stream inputs from 400 lights. Not Accumulated)  
-![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/325660bd-0008-4a77-848f-56c600b32054)
+![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/f047e569-1797-42ad-a579-40dd3b04ca70)
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 (Doing) ReSTIR DI is implemented for improving the quality RIS.   
 Left : Initial Sampling  
 Right : Spatial Reuse  
-![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/12bcfad7-f1f3-4a26-a091-f04c88132674)
+![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a87be472-a398-4c6d-9d30-dd3a236d9aa6)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  

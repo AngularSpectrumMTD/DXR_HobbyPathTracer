@@ -38,7 +38,7 @@
 
 #define SPHERE_LIGHTS_SIZE_RATIO 0.7f
 
-#define MAX_SPATIAL_REUSE_TAP 5
+#define MAX_SPATIAL_REUSE_TAP 8
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -726,7 +726,7 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 4;
+    u32 mSpatialReuseTap = 8;
 
     bool mIsUseMetallicTest = false;
 };
