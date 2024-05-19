@@ -172,8 +172,7 @@ void spatialReuse() {
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
     {
-        [unroll]
-        for(int s = 0; s < SPATIAL_REUSE_NUM; s++)
+        for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
             const float r = rand() * gReSTIRParam.data.x;
             const float v = rand();
@@ -181,7 +180,7 @@ void spatialReuse() {
             float2 sc = 0.xx;
             sincos(phi, sc.x, sc.y);
             int3 nearIndex = launchIndex + int3(r * sc, 0);
-
+            
             if(nearIndex.x >= dims.x || nearIndex.y >= dims.y)
             {
                 continue;
