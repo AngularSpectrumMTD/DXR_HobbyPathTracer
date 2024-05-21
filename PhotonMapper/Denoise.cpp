@@ -13,12 +13,11 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
 
     std::vector<CD3DX12_RESOURCE_BARRIER> uavBarriers2;
     uavBarriers2.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mPositionBuffer.Get()));
-    uavBarriers2.emplace_back(CD3DX12_RESOURCE_BARRIER::UAV(mNormalBuffer.Get()));
     mCommandList->ResourceBarrier(u32(uavBarriers2.size()), uavBarriers2.data());
 
     D3D12_RESOURCE_BARRIER uavToSrvForVariance[] = {
         CD3DX12_RESOURCE_BARRIER::Transition(mDepthBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
-        CD3DX12_RESOURCE_BARRIER::Transition(mNormalBuffer.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+        CD3DX12_RESOURCE_BARRIER::Transition(mNormalBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
         CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceMomentBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
     };
 
@@ -28,7 +27,7 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
     {
         mCommandList->SetComputeRootSignature(mRsComputeVariance.Get());
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["depthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["normalBuffer"], mNormalBufferDescriptorSRV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["normalBuffer"], mNormalBufferDescriptorSRVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["luminanceMomentBuffer"], mLuminanceMomentBufferDescriptorSRVTbl[dst].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapComputeVariance["varianceBuffer"], mLuminanceVarianceBufferDescriptorUAVTbl[dst].hGpu);
         mCommandList->SetPipelineState(mComputeVariancePSO.Get());
@@ -58,7 +57,7 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapA_TrousWaveletFilter["gWaveletParam"], denoiseCB->GetGPUVirtualAddress());
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferSrc"], (i % 2 == 0) ? mFinalRenderResultDescriptorSRV.hGpu : mDenoisedColorBufferDescriptorSRV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["depthBuffer"], mDepthBufferDescriptorSRVTbl[dst].hGpu);
-            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["normalBuffer"], mNormalBufferDescriptorSRV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["normalBuffer"], mNormalBufferDescriptorSRVTbl[dst].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferSrc"], mLuminanceVarianceBufferDescriptorSRVTbl[(i % 2 == 0) ? dst : src].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["colorBufferDst"], (i % 2 == 1) ? mFinalRenderResultDescriptorUAV.hGpu : mDenoisedColorBufferDescriptorUAV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapA_TrousWaveletFilter["varianceBufferDst"], mLuminanceVarianceBufferDescriptorUAVTbl[(i % 2 == 0) ? src : dst].hGpu);
@@ -87,7 +86,7 @@ void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
 
     D3D12_RESOURCE_BARRIER srvToUav[] = {
         CD3DX12_RESOURCE_BARRIER::Transition(mDepthBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
-        CD3DX12_RESOURCE_BARRIER::Transition(mNormalBuffer.Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+        CD3DX12_RESOURCE_BARRIER::Transition(mNormalBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
         CD3DX12_RESOURCE_BARRIER::Transition(mLuminanceMomentBufferTbl[dst].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
     };
 

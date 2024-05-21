@@ -234,7 +234,7 @@ float3 getConeSample(float randSeed, float3 direction, float coneAngle)
 float compute01Depth(float3 wPos)
 {
     matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
-    float4 svPosition = mul(float4(wPos, 1), mtxViewProj);
+    float4 svPosition = mul(mtxViewProj, float4(wPos, 1));
     float depth = (svPosition.z - getNearPlaneDistance())
      / (getFarPlaneDistance() - getNearPlaneDistance());
     float zeroOneDepth = 0.5 * (depth + 1); //near 1 to far 0
@@ -245,19 +245,27 @@ void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
-        float3 wPos = WorldRayOrigin() + WorldRayDirection() * 0.99f * RayTCurrent();//hack : for avoiding self occlusion at spatial reuse
+        float3 wPosOrig = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+        float3 wPos = WorldRayOrigin() + WorldRayDirection() * 0.9f * RayTCurrent();//hack : for avoiding self occlusion at spatial reuse
         float2 writeIndex = payload.storeIndexXY;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
-        gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPos);
-        gPositionBuffer[writeIndex] = float4(wPos.x, wPos.y, wPos.z, 0);
+        gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPosOrig);
+        gPositionBuffer[writeIndex] = float4(wPosOrig.x, wPosOrig.y, wPosOrig.z, 0);
         gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
         matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
         matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
-        float4 currSvPosition = mul(float4(wPos, 1), mtxViewProj);
-        float4 prevSvPosition = mul(float4(wPos, 1), mtxViewProjPrev);
-        float2 velocity = currSvPosition.xy / currSvPosition.w - prevSvPosition.xy / prevSvPosition.w;//-1 to 1
-        //gVelocityBuffer[writeIndex] = 0.5 * velocity + 0.5;
-        gVelocityBuffer[writeIndex] = currSvPosition.xy / currSvPosition.w;
+        float4 currSvPosition = mul(mtxViewProj, float4(wPosOrig, 1));
+        float4 prevSvPosition = mul(mtxViewProjPrev, float4(wPosOrig, 1));
+
+        float2 bufferSize = 0.xx;
+        gDepthBuffer.GetDimensions(bufferSize.x, bufferSize.y);
+        float3 currPosNDC = currSvPosition.xyz / currSvPosition.w;//-1 to 1
+        currPosNDC.xy = currPosNDC.xy * 0.5 + 0.5;//0 to 1
+        float3 prevPosNDC = prevSvPosition.xyz / prevSvPosition.w;//-1 to 1
+        prevPosNDC.xy = prevPosNDC.xy * 0.5 + 0.5;//0 to 1
+        float2 velocity = float2(prevPosNDC.x - currPosNDC.x, currPosNDC.y - prevPosNDC.y);//velocity y is inverted?
+        gVelocityBuffer[writeIndex] = velocity;
+        //gVelocityBuffer[writeIndex] = (prevPosNDC.xy + 1) * 0.5;
         payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }
 }
@@ -316,6 +324,12 @@ void setNEEFlag(inout Payload payload, in bool isNEE_Exec)
             payload.flags &= ~PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
         }
     }
+}
+
+//restrict
+bool isWithinBounds(int2 id, int2 size)
+{
+    return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
 }
 
 #endif//__COMMON_HLSLI__

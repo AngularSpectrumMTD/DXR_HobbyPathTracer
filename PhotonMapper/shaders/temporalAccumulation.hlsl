@@ -17,6 +17,8 @@ Texture2D<float> PrevDepthBuffer : register(t4);
 Texture2D<float2> VelocityBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
+Texture2D<float3> NormalBuffer : register(t8);
+Texture2D<float3> PrevNormalBuffer : register(t9);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -24,6 +26,12 @@ RWTexture2D<float4> CurrentCausticsBuffer : register(u2);
 RWTexture2D<float4> DIGIBuffer : register(u3);
 RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
+
+//restrict
+bool isWithinBounds(int2 id, int2 size)
+{
+    return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
+}
 
 float computeLuminance(const float3 linearRGB)
 {
@@ -64,10 +72,13 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     uint2 currID = dtid.xy;
 
     float currDepth = DepthBuffer[currID];
+    float3 currNormal = NormalBuffer[currID];
     uint accCount = AccumulationCountBuffer[currID];
 
-    float2 velocity = VelocityBuffer[currID] * 2.0 - 1.0;
-    uint2 prevID = currID;//(ID / dims - velocity) * dims;
+    float2 velocity = VelocityBuffer[currID];
+    float2 currUV = currID / dims;
+    float2 prevUV = currUV + velocity;
+    int2 prevID = prevUV * dims;
 
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
@@ -84,44 +95,67 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     }
     float3 currGI = CurrentGIBuffer[currID].rgb;
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
-    float3 prevDI = HistoryDIBuffer[prevID].rgb;
-    float3 prevGI = HistoryGIBuffer[prevID].rgb;
-    float3 prevCaustics = HistoryCausticsBuffer[prevID].rgb;
-    float3 currDIGI = currDI + currGI;
 
-    float prevDepth = PrevDepthBuffer[prevID];
-    float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
-
-    float luminance = computeLuminance(currDIGI);
-    float2 curremtLuminanceMoment = float2(luminance, luminance * luminance);
-    
-    if (isAccumulationApply())
+    if(isWithinBounds(prevID, dims))
     {
-        accCount++;
+        float3 prevDI = HistoryDIBuffer[prevID].rgb;
+        float3 prevGI = HistoryGIBuffer[prevID].rgb;
+        float3 prevCaustics = HistoryCausticsBuffer[prevID].rgb;
+        float3 currDIGI = currDI + currGI;
+
+        float prevDepth = PrevDepthBuffer[prevID];
+        float3 prevNormal = PrevNormalBuffer[prevID];
+        float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
+
+        float luminance = computeLuminance(currDIGI);
+        float2 currLuminanceMoment = float2(luminance, luminance * luminance);
+
+        const bool isNearDepth = ((currDepth * 0.95 < prevDepth) && (prevDepth < currDepth * 1.05)) && (currDepth > 0) && (prevDepth > 0);
+        const bool isNearNormal = dot(currNormal, prevNormal) > 0.8;
+        //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
+        const bool isAccumulationEnable = isNearDepth && isNearNormal;// && (length(velocity) < 1.0);
+        
+        if (isAccumulationApply())
+        {
+            accCount++;
+        }
+        else
+        {
+            accCount = 1;
+        }
+        AccumulationCountBuffer[currID] = accCount;
+
+        if (accCount < MAX_ACCUMULATION_RANGE)
+        {
+            const float tmpAccmuRatio = 1.f / accCount;
+
+            float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
+            float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
+            float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
+            float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
+
+            currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
+            currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
+
+            float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
+            DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(accumulatedCaustics, XYZtoRGB2);
+            CurrentDIBuffer[currID].rgb = accumulatedDI;
+            CurrentGIBuffer[currID].rgb = accumulatedGI;
+            CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
+            LuminanceMomentBufferDst[currID] = currLuminanceMoment;
+        }
     }
     else
     {
-        accCount = 1;
-    }
-    AccumulationCountBuffer[currID] = accCount;
-
-    if (accCount < MAX_ACCUMULATION_RANGE)
-    {
-        const float tmpAccmuRatio = 1.f / accCount;
-
-        float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
-        float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
-        float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
-        float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
-
-        curremtLuminanceMoment.x = lerp(prevLuminanceMoment.x, curremtLuminanceMoment.x, tmpAccmuRatio);
-        curremtLuminanceMoment.y = lerp(prevLuminanceMoment.y, curremtLuminanceMoment.y, tmpAccmuRatio);
-
-        float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
-        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(accumulatedCaustics, XYZtoRGB2);
-        CurrentDIBuffer[currID].rgb = accumulatedDI;
-        CurrentGIBuffer[currID].rgb = accumulatedGI;
-        CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
-        LuminanceMomentBufferDst[currID] = curremtLuminanceMoment;
+        AccumulationCountBuffer[currID] = 1;
+        float3 currDIGI = currDI + currGI;
+        float3 toneMappedDIGI = float3(currDIGI * reinhard(computeLuminance(currDIGI), REINHARD_L) / computeLuminance(currDIGI));//luminance based tone mapping
+        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(currCaustics, XYZtoRGB2);
+        CurrentDIBuffer[currID].rgb = currDI;
+        CurrentGIBuffer[currID].rgb = currGI;
+        CurrentCausticsBuffer[currID].rgb = currCaustics;
+        float luminance = computeLuminance(currDIGI);
+        float2 currLuminanceMoment = float2(luminance, luminance * luminance);
+        LuminanceMomentBufferDst[currID] = currLuminanceMoment;
     }
 }

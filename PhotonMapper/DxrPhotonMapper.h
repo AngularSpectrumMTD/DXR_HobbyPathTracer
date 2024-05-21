@@ -497,6 +497,9 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mDepthBufferTbl;
     std::vector < dx12::Descriptor> mDepthBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mDepthBufferDescriptorUAVTbl;
+    std::vector < ComPtr<ID3D12Resource>> mNormalBufferTbl;
+    std::vector < dx12::Descriptor> mNormalBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mNormalBufferDescriptorUAVTbl;
     ComPtr<ID3D12Resource> mDenoisedColorBuffer;
     dx12::Descriptor mDenoisedColorBufferDescriptorSRV;
     dx12::Descriptor mDenoisedColorBufferDescriptorUAV;
@@ -507,9 +510,6 @@ private:
     ComPtr<ID3D12Resource> mPositionBuffer;
     dx12::Descriptor mPositionBufferDescriptorSRV;
     dx12::Descriptor mPositionBufferDescriptorUAV;
-    ComPtr<ID3D12Resource> mNormalBuffer;
-    dx12::Descriptor mNormalBufferDescriptorSRV;
-    dx12::Descriptor mNormalBufferDescriptorUAV;
     ComPtr<ID3D12Resource> mAccumulationCountBuffer;
     dx12::Descriptor mAccumulationCountBufferDescriptorSRV;
     dx12::Descriptor mAccumulationCountBufferDescriptorUAV;

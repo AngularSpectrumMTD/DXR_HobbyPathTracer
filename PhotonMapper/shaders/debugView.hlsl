@@ -40,33 +40,8 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
         }
         else if (3 * offsetY <= computePix.y && computePix.y < 4 * offsetY)
         {
-            float2 srcVelocity = velocityBuffer[(computePix - int2(offsetX, 3 * offsetY)) / sizeRatio].xy;
-            // if(srcVelocity.x == 0 && srcVelocity.y == 0)
-            // {
-            //     finalColorSrc = float3(1, 1, 1);
-            // }
-            // else if(abs(srcVelocity.x) > 1 || abs(srcVelocity.y) > 1)
-            // {
-            //     finalColorSrc = float3(1, 1, 0);
-            // }
-            // else if(srcVelocity.y < 0 && srcVelocity.y < 0)
-            // {
-            //     finalColorSrc = float3(1, 0, 0);
-            // }
-            // else if(srcVelocity.y > 0 && srcVelocity.y > 0)
-            // {
-            //     finalColorSrc = float3(0, 1, 0);
-            // }
-            // else if(srcVelocity.y > 0 && srcVelocity.y < 0)
-            // {
-            //     finalColorSrc = float3(0, 0, 1);
-            // }
-            // else if(srcVelocity.y < 0 && srcVelocity.y > 0)
-            // {
-            //     finalColorSrc = float3(1, 1, 0);
-            // }
-            //finalColorSrc = float3((abs(velocityBuffer[(computePix - int2(offsetX, 3 * offsetY)) / sizeRatio].xy) + 1.xx) * 0.5, 0);
-            //finalColorSrc = float3((abs(velocityBuffer[(computePix - int2(offsetX, 3 * offsetY)) / sizeRatio].xy) * 0.5.xx) + 0.5.xx, 0);
+            float2 srcVelocity = velocityBuffer[(computePix - int2(offsetX, 3 * offsetY)) / sizeRatio].xy;//-1 to 1
+            finalColorSrc = float3((srcVelocity.xy + 1.xx) * 0.5.xx, 0);//0 to 1
         }
     }
     finalColor[computePix].xyz = finalColorSrc;

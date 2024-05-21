@@ -2,7 +2,7 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-![movie](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/545c9a7e-9a2e-4cc8-bd66-40f6fd913d41)
+![movieGif](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/85db7b94-6a09-42b0-9b1d-df9f1e5f5c6c)
 
 ![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0e17407d-f343-46b3-8925-34ddb2c181f6)
 
@@ -28,8 +28,8 @@ Shading : GGX
 Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
 
 ### Debug View
-Enable to check (Diffuse)Albedo / Depth / Normal  
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/84182a96-4723-494a-b478-df1070e60d4a)
+Enable to check (Diffuse)Albedo / Depth / Normal  / Velocity
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/78b0f245-0dc6-491e-80b3-cddab47daa15)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

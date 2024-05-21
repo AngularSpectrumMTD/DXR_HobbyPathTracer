@@ -181,7 +181,7 @@ void spatialReuse() {
             sincos(phi, sc.x, sc.y);
             int3 nearIndex = launchIndex + int3(r * sc, 0);
             
-            if(nearIndex.x >= dims.x || nearIndex.y >= dims.y)
+            if(!isWithinBounds(nearIndex.xy, dims))
             {
                 continue;
             }

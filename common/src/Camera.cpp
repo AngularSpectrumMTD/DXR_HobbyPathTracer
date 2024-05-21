@@ -13,7 +13,7 @@ void Camera::SetLookAt(XMFLOAT3 vPos, XMFLOAT3 vTarget, XMFLOAT3 vUp)
 {
     mEye = XMLoadFloat3(&vPos);
     mTarget = XMLoadFloat3(&vTarget);
-    mUp = XMLoadFloat3(&vUp);
+    mUp = XMVector3Normalize(XMLoadFloat3(&vUp));
     mMtxView = XMMatrixLookAtRH(mEye, mTarget, mUp);
 }
 

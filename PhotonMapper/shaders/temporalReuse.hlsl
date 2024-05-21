@@ -13,9 +13,17 @@ StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t0);
 Texture2D<float> DepthBuffer : register(t1);
 Texture2D<float> PrevDepthBuffer : register(t2);
 Texture2D<float2> VelocityBuffer : register(t3);
+Texture2D<float3> NormalBuffer : register(t4);
+Texture2D<float3> PrevNormalBuffer : register(t5);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u0);
 
 static uint rseed;
+
+//restrict
+bool isWithinBounds(int2 id, int2 size)
+{
+    return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
+}
 
 float rand(in int2 indexXY)//0-1
 {
@@ -85,9 +93,12 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     uint2 currID = dtid.xy;
 
     float currDepth = DepthBuffer[currID];
+    float3 currNormal = NormalBuffer[currID];
 
-    float2 velocity = VelocityBuffer[currID] * 2.0 - 1.0;
-    uint2 prevID = currID;//(ID / dims - velocity) * dims;
+    float2 velocity = VelocityBuffer[currID];//-1 to 1
+    float2 currUV = currID / dims;
+    float2 prevUV = currUV + velocity;
+    int2 prevID = prevUV * dims;
 
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
@@ -96,10 +107,20 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         const uint serialPrevID = prevID.y * dims.x + prevID.x;
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
 
-        if (isAccumulationApply() && isUseReservoirTemporalReuse())
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
         {
-            DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
-            DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, currID);
+            float prevDepth = PrevDepthBuffer[prevID];
+            float3 prevNormal = PrevNormalBuffer[prevID];
+
+            const bool isNearDepth = ((currDepth * 0.95 < prevDepth) && (prevDepth < currDepth * 1.05)) && (currDepth > 0) && (prevDepth > 0);
+            const bool isNearNormal = dot(currNormal, prevNormal) > 0.8;
+            //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
+            const bool isTemporalReuseEnable = isNearDepth && isNearNormal;// && (length(velocity) < 1.0);
+            if(isTemporalReuseEnable)
+            {
+                DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
+                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, currID);
+            }
         }
 
         DIReservoirBufferDst[serialCurrID] = currDIReservoir;
