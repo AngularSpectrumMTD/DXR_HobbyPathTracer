@@ -72,11 +72,11 @@ ConstantBuffer<SceneCB> gSceneParam : register(b1);
 SamplerState gSampler : register(s0);
 
 RWStructuredBuffer<PhotonInfo> gPhotonMap : register(u0);
-RWTexture2D<float> gDepthBuffer : register(u1);
+RWTexture2D<float4> gNormalDepthBuffer : register(u1);
 RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u2);
 RWTexture2D<float4> gDiffuseAlbedoBuffer : register(u3);
 RWTexture2D<float4> gPositionBuffer : register(u4);
-RWTexture2D<float4> gNormalBuffer : register(u5);
+RWTexture2D<float4> gIDRoughnessBuffer : register(u5);
 RWTexture2D<float2> gVelocityBuffer : register(u6);
 
 RWTexture2D<float4> gDIBuffer : register(u7);
@@ -241,7 +241,7 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
+void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
@@ -249,16 +249,16 @@ void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal)
         float3 wPos = WorldRayOrigin() + WorldRayDirection() * 0.9f * RayTCurrent();//hack : for avoiding self occlusion at spatial reuse
         float2 writeIndex = payload.storeIndexXY;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
-        gDepthBuffer[writeIndex] = (payload.recursive == 0) ? 0 : compute01Depth(wPosOrig);
+        gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(wPosOrig));
         gPositionBuffer[writeIndex] = float4(wPosOrig.x, wPosOrig.y, wPosOrig.z, 0);
-        gNormalBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, 0);
+        gIDRoughnessBuffer[writeIndex] = float4(primitiveIndex, instanceIndex, roughness, dot(float3(0.2126, 0.7152, 0.0722), albedo.rgb));
         matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
         matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
         float4 currSvPosition = mul(mtxViewProj, float4(wPosOrig, 1));
         float4 prevSvPosition = mul(mtxViewProjPrev, float4(wPosOrig, 1));
 
         float2 bufferSize = 0.xx;
-        gDepthBuffer.GetDimensions(bufferSize.x, bufferSize.y);
+        gNormalDepthBuffer.GetDimensions(bufferSize.x, bufferSize.y);
         float3 currPosNDC = currSvPosition.xyz / currSvPosition.w;//-1 to 1
         currPosNDC.xy = currPosNDC.xy * 0.5 + 0.5;//0 to 1
         float3 prevPosNDC = prevSvPosition.xyz / prevSvPosition.w;//-1 to 1
@@ -280,7 +280,7 @@ void storeDIReservoir(in DIReservoir reservoir, in Payload payload)
 
 float depthLoad(uint2 index)
 {
-    return gDepthBuffer[index];
+    return gNormalDepthBuffer[index].w;
 }
 
 float lengthSqr(float3 v)

@@ -42,8 +42,11 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     VertexPN vtx = getVertex(attrib);
     float3 surfaceNormal = vtx.Normal;
 
+    uint primitiveIndex = PrimitiveIndex();
+    uint instanceIndex = InstanceIndex();
+
     MaterialParams currentMaterial = constantBuffer;
-    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal);
+    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());

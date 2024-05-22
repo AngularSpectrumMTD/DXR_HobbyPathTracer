@@ -13,9 +13,9 @@ void rayGen() {
 
     //clear gbuffer
     gDiffuseAlbedoBuffer[launchIndex.xy] = 0.xxxx;
-    gDepthBuffer[launchIndex.xy] = 0;
+    gNormalDepthBuffer[launchIndex.xy] = 0.xxxx;
     gPositionBuffer[launchIndex.xy] = 0.xxxx;
-    gNormalBuffer[launchIndex.xy] = 0.xxxx;
+    gIDRoughnessBuffer[launchIndex.xy] = 0.xxxx;
     gVelocityBuffer[launchIndex.xy] = 0.xx;
 
     //clear DI / GI buffer
@@ -165,9 +165,12 @@ void spatialReuse() {
     const float currUpdateW = currDIReservoir.W_sum;
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currUpdateW, rand());
 
-    const float centerDepth = gDepthBuffer[launchIndex.xy];
-    const float3 normal = gNormalBuffer[launchIndex.xy].xyz;
+    const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
+    const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
     const float3 scatterPosition = gPositionBuffer[launchIndex.xy].xyz;
+    const uint centerPrimitiveIndex = gIDRoughnessBuffer[launchIndex.xy].y;
+    const float centerRoughness = gIDRoughnessBuffer[launchIndex.xy].z;
+    const float centerAlbedoLuminance = gIDRoughnessBuffer[launchIndex.xy].w;
 
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
@@ -189,9 +192,19 @@ void spatialReuse() {
             const uint serialNearID = serialRaysIndex(nearIndex, dispatchDimensions);
 
             DIReservoir nearDIReservoir = gDISpatialReservoirBufferSrc[serialNearID];
-            const float nearDepth = gDepthBuffer[nearIndex.xy];
+            const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
+            const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
+            const uint nearPrimitiveIndex = gIDRoughnessBuffer[nearIndex.xy].y;
+            const float nearRoughness = gIDRoughnessBuffer[nearIndex.xy].z;
+            const float nearAlbedoLuminance = gIDRoughnessBuffer[nearIndex.xy].w;
 
-            const bool isSimilar = abs(nearDepth - centerDepth) < 0.005f;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
+            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isSameInstance = (centerPrimitiveIndex == nearPrimitiveIndex);
+            const bool isNearRoughness = (abs(centerRoughness - nearRoughness) < 0.05);
+            const bool isNearAlbedoLuminance = (abs(centerAlbedoLuminance - nearAlbedoLuminance) < 0.05);
+
+            const bool isSimilar = isNearDepth && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
             if(!isSimilar)
             {
                 continue;

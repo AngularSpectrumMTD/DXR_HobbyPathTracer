@@ -110,6 +110,9 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     bool isNoTexture = false;
     VertexPNT vtx = getVertex(attrib, isNoTexture);
     float3 surfaceNormal = vtx.Normal;
+
+    uint primitiveIndex = PrimitiveIndex();
+    uint instanceIndex = InstanceIndex();
     
     float4 diffuseTexColor = 1.xxxx;
 
@@ -139,7 +142,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (!isIgnoreHit)
     {
-        storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal);
+        storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
     }
 
     if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))

@@ -173,8 +173,8 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
         CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
         mRegisterMapDebugView["diffuseAlbedoBuffer"] = 0;
-        mRegisterMapDebugView["depthBuffer"] = 1;
-        mRegisterMapDebugView["normalBuffer"] = 2;
+        mRegisterMapDebugView["normalDepthBuffer"] = 1;
+        mRegisterMapDebugView["idRoughnessBuffer"] = 2;
         mRegisterMapDebugView["velocityBuffer"] = 3;
         mRegisterMapDebugView["finalColor"] = 4;
     }
@@ -193,11 +193,11 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
         mRegisterMapTemporalReuse["gSceneParam"] = 0;
         mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 1;
-        mRegisterMapTemporalReuse["DepthBuffer"] = 2;
-        mRegisterMapTemporalReuse["PrevDepthBuffer"] = 3;
+        mRegisterMapTemporalReuse["NormalDepthBuffer"] = 2;
+        mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = 3;
         mRegisterMapTemporalReuse["VelocityBuffer"] = 4;
-        mRegisterMapTemporalReuse["NormalBuffer"] = 5;
-        mRegisterMapTemporalReuse["PrevNormalBuffer"] = 6;
+        mRegisterMapTemporalReuse["IDRoughnessBuffer"] = 5;
+        mRegisterMapTemporalReuse["PrevIDRoughnessBuffer"] = 6;
         mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 7;
     }
 
@@ -226,13 +226,13 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["HistoryDIBuffer"] = 1;
         mRegisterMapTemporalAccumulation["HistoryGIBuffer"] = 2;
         mRegisterMapTemporalAccumulation["HistoryCausticsBuffer"] = 3;
-        mRegisterMapTemporalAccumulation["DepthBuffer"] = 4;
-        mRegisterMapTemporalAccumulation["PrevDepthBuffer"] = 5;
+        mRegisterMapTemporalAccumulation["NormalDepthBuffer"] = 4;
+        mRegisterMapTemporalAccumulation["PrevNormalDepthBuffer"] = 5;
         mRegisterMapTemporalAccumulation["VelocityBuffer"] = 6;
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = 7;
         mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = 8;
-        mRegisterMapTemporalAccumulation["NormalBuffer"] = 9;
-        mRegisterMapTemporalAccumulation["PrevNormalBuffer"] = 10;
+        mRegisterMapTemporalAccumulation["IDRoughnessBuffer"] = 9;
+        mRegisterMapTemporalAccumulation["PrevIDRoughnessBuffer"] = 10;
         mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = 11;
         mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = 12;
         mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = 13;

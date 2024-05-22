@@ -42,7 +42,7 @@ void miss(inout Payload payload) {
         }
     }
 
-    storeGBuffer(payload, 0.xxx, 0.xxx);
+    storeGBuffer(payload, 0.xxx, 0.xxx, -1, -1, -1);
 
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);

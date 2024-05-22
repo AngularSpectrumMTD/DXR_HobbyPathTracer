@@ -494,12 +494,12 @@ private:
     dx12::Descriptor mPhotonGridIdDescriptorSRV;
     dx12::Descriptor mPhotonGridIdDescriptorUAV;
 
-    std::vector < ComPtr<ID3D12Resource>> mDepthBufferTbl;
-    std::vector < dx12::Descriptor> mDepthBufferDescriptorSRVTbl;
-    std::vector < dx12::Descriptor> mDepthBufferDescriptorUAVTbl;
-    std::vector < ComPtr<ID3D12Resource>> mNormalBufferTbl;
-    std::vector < dx12::Descriptor> mNormalBufferDescriptorSRVTbl;
-    std::vector < dx12::Descriptor> mNormalBufferDescriptorUAVTbl;
+    std::vector < ComPtr<ID3D12Resource>> mNormalDepthBufferTbl;
+    std::vector < dx12::Descriptor> mNormalDepthBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mNormalDepthBufferDescriptorUAVTbl;
+    std::vector < ComPtr<ID3D12Resource>> mIDRoughnessBufferTbl;
+    std::vector < dx12::Descriptor> mIDRoughnessBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mIDRoughnessBufferDescriptorUAVTbl;
     ComPtr<ID3D12Resource> mDenoisedColorBuffer;
     dx12::Descriptor mDenoisedColorBufferDescriptorSRV;
     dx12::Descriptor mDenoisedColorBufferDescriptorUAV;
@@ -726,9 +726,11 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 8;
+    u32 mSpatialReuseTap = 4;
 
     bool mIsUseMetallicTest = false;
+
+    bool mIsHistoryResetRequested = false;
 };
 
 #endif

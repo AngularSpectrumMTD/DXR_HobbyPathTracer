@@ -139,4 +139,9 @@ bool isUseMetallicTest()
     return gSceneParam.additional1.z == 1;
 }
 
+bool isHistoryResetRequested()
+{
+    return gSceneParam.additional1.w == 1;
+}
+
 #endif//__SCENE_PARAM_INTERFACE_HLSLI__

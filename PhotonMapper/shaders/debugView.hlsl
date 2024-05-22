@@ -1,8 +1,8 @@
 #define THREAD_NUM 16
 
 RWTexture2D<float4> diffuseAlbedoBuffer : register(u0);
-RWTexture2D<float> depthBuffer : register(u1);
-RWTexture2D<float4> normalBuffer : register(u2);
+RWTexture2D<float4> normalDepthBuffer : register(u1);
+RWTexture2D<float4> idRoughnessBuffer : register(u2);
 RWTexture2D<float4> velocityBuffer : register(u3);
 
 RWTexture2D<float4> finalColor : register(u4);
@@ -16,8 +16,6 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
     
     float3 finalColorSrc = finalColor[computePix].xyz;
     float3 diffuseAlbedo = diffuseAlbedoBuffer[computePix].xyz;
-    float3 depth = float3(depthBuffer[computePix], 0, 0);
-    float3 normal = (normalBuffer[computePix].xyz + 1.xxx) * 0.5;
 
     const float sizeRatio = 1.0f / 4;
 
@@ -32,11 +30,11 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
         }
         else if (1 * offsetY <= computePix.y && computePix.y < 2 * offsetY)
         {
-            finalColorSrc = float3(1 - depthBuffer[(computePix - int2(offsetX, offsetY)) / sizeRatio], 0, 0);
+            finalColorSrc = float3(1 - normalDepthBuffer[(computePix - int2(offsetX, offsetY)) / sizeRatio].w, 0, 0);
         }
         else if (2 * offsetY <= computePix.y && computePix.y < 3 * offsetY)
         {
-            finalColorSrc = (normalBuffer[(computePix - int2(offsetX, 2 * offsetY)) / sizeRatio].xyz + 1.xxx) * 0.5;
+            finalColorSrc = (normalDepthBuffer[(computePix - int2(offsetX, 2 * offsetY)) / sizeRatio].xyz + 1.xxx) * 0.5;
         }
         else if (3 * offsetY <= computePix.y && computePix.y < 4 * offsetY)
         {

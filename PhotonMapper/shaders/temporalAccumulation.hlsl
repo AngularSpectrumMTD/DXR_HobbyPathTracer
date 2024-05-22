@@ -12,13 +12,13 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 Texture2D<float4> HistoryDIBuffer : register(t0);
 Texture2D<float4> HistoryGIBuffer : register(t1);
 Texture2D<float4> HistoryCausticsBuffer : register(t2);
-Texture2D<float> DepthBuffer : register(t3);
-Texture2D<float> PrevDepthBuffer : register(t4);
+Texture2D<float4> NormalDepthBuffer : register(t3);
+Texture2D<float4> PrevNormalDepthBuffer : register(t4);
 Texture2D<float2> VelocityBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
-Texture2D<float3> NormalBuffer : register(t8);
-Texture2D<float3> PrevNormalBuffer : register(t9);
+Texture2D<float4> IDRoughnessBuffer : register(t8);
+Texture2D<float4> PrevIDRoughnessBuffer : register(t9);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -71,8 +71,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     uint2 currID = dtid.xy;
 
-    float currDepth = DepthBuffer[currID];
-    float3 currNormal = NormalBuffer[currID];
+    float currDepth = NormalDepthBuffer[currID].w;
+    float3 currNormal = NormalDepthBuffer[currID].xyz;
     uint accCount = AccumulationCountBuffer[currID];
 
     float2 velocity = VelocityBuffer[currID];
@@ -103,8 +103,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float3 prevCaustics = HistoryCausticsBuffer[prevID].rgb;
         float3 currDIGI = currDI + currGI;
 
-        float prevDepth = PrevDepthBuffer[prevID];
-        float3 prevNormal = PrevNormalBuffer[prevID];
+        float prevDepth = PrevNormalDepthBuffer[prevID].w;
+        float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
         float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
 
         float luminance = computeLuminance(currDIGI);

@@ -166,21 +166,21 @@ void DxrPhotonMapper::CreateRegularBuffer()
     {
         const u32 size = 2;
 
-        mDepthBufferTbl.resize(size);
-        mDepthBufferDescriptorSRVTbl.resize(size);
-        mDepthBufferDescriptorUAVTbl.resize(size);
+        mNormalDepthBufferTbl.resize(size);
+        mNormalDepthBufferDescriptorSRVTbl.resize(size);
+        mNormalDepthBufferDescriptorUAVTbl.resize(size);
 
-        mNormalBufferTbl.resize(size);
-        mNormalBufferDescriptorSRVTbl.resize(size);
-        mNormalBufferDescriptorUAVTbl.resize(size);
+        mIDRoughnessBufferTbl.resize(size);
+        mIDRoughnessBufferDescriptorSRVTbl.resize(size);
+        mIDRoughnessBufferDescriptorUAVTbl.resize(size);
 
         for (u32 i = 0; i < size; i++)
         {
             {
                 wchar_t name[30];
-                swprintf(name, 30, L"DepthBufferTbl[%d]", i);
-                mDepthBufferTbl.at(i) = mDevice->CreateTexture2D(
-                    width, height, DXGI_FORMAT_R32_FLOAT,
+                swprintf(name, 30, L"NormalDepthBufferTbl[%d]", i);
+                mNormalDepthBufferTbl.at(i) = mDevice->CreateTexture2D(
+                    width, height, DXGI_FORMAT_R32G32B32A32_FLOAT,
                     D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
                     D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                     D3D12_HEAP_TYPE_DEFAULT,
@@ -193,18 +193,18 @@ void DxrPhotonMapper::CreateRegularBuffer()
                 srvDesc.Texture2D.MostDetailedMip = 0;
                 srvDesc.Texture2D.ResourceMinLODClamp = 0;
                 srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-                mDepthBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mDepthBufferTbl.at(i).Get(), &srvDesc);
+                mNormalDepthBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mNormalDepthBufferTbl.at(i).Get(), &srvDesc);
 
                 D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
                 uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-                mDepthBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mDepthBufferTbl.at(i).Get(), &uavDesc);
+                mNormalDepthBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mNormalDepthBufferTbl.at(i).Get(), &uavDesc);
             }
 
             //Normal
             {
                 wchar_t name[30];
-                swprintf(name, 30, L"NormalBufferTbl[%d]", i);
-                mNormalBufferTbl.at(i) = mDevice->CreateTexture2D(
+                swprintf(name, 30, L"IDRoughnessBufferTbl[%d]", i);
+                mIDRoughnessBufferTbl.at(i) = mDevice->CreateTexture2D(
                     width, height, DXGI_FORMAT_R16G16B16A16_FLOAT,
                     D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
                     D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
@@ -218,11 +218,11 @@ void DxrPhotonMapper::CreateRegularBuffer()
                 srvDesc.Texture2D.MostDetailedMip = 0;
                 srvDesc.Texture2D.ResourceMinLODClamp = 0;
                 srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-                mNormalBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mNormalBufferTbl.at(i).Get(), &srvDesc);
+                mIDRoughnessBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mIDRoughnessBufferTbl.at(i).Get(), &srvDesc);
 
                 D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
                 uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-                mNormalBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mNormalBufferTbl.at(i).Get(), &uavDesc);
+                mIDRoughnessBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mIDRoughnessBufferTbl.at(i).Get(), &uavDesc);
             }
         }
     }
