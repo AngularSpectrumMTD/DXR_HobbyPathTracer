@@ -2,24 +2,15 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-![movieGif](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/85db7b94-6a09-42b0-9b1d-df9f1e5f5c6c)
-
-![ReSTIRDI](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0e17407d-f343-46b3-8925-34ddb2c181f6)
-
-![ReSTIRDI2](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/1ea78419-94cc-4719-afcf-6ac914a0c1a5)
-
+![resultExt](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/ee53f0ea-6a3b-4a17-8344-e527c493a7ac)
+![resultSponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2ebaa9db-fc76-4a98-8d08-58c44d4afcf8)
+![resultInt](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/f43b6a0d-582a-435d-93df-aead936b932f)
 ![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
 
-"Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights.      
-Right : Uniform Sampling (from 400 lights. Not Accumulated) 
-Left : Streaming RIS (30 stream inputs from 400 lights. Not Accumulated)  
-![RIS_comparison](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/f047e569-1797-42ad-a579-40dd3b04ca70)
+"Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights. 
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 (Doing) ReSTIR DI is implemented for improving the quality RIS.   
-Left : Initial Sampling  
-Right : Spatial Reuse  
-![RIS_comparison_Spatial](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/a87be472-a398-4c6d-9d30-dd3a236d9aa6)
 
 ### Algorithm
 Photon Mapping : Hashed Grid  
@@ -29,7 +20,6 @@ Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal  / Velocity
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/78b0f245-0dc6-491e-80b3-cddab47daa15)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

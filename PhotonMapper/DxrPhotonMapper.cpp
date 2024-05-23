@@ -12,6 +12,8 @@
 #include <string>
 #include <sstream>
 
+#include <random>
+
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
 #define MAX_ACCUMULATION_RANGE 1000
@@ -55,7 +57,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -1255,11 +1257,14 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
 {
     XMFLOAT3 colorTbl[] = {
         XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
         XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
         XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.2f),/*
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.2f, mIntenceBoost * 1.0f),
-        XMFLOAT3(mIntenceBoost * 0.2f, mIntenceBoost * 1.0f, mIntenceBoost * 1.0f),*/
+        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 1.0f),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.8f, mIntenceBoost * 0.0f),
+        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.8f),
+        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
+        XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
     };
 
     const f32 scale = mLightRange;
@@ -1352,16 +1357,20 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     }
     count = 0;
     u32 colorOffset = 0;
+    std::mt19937 mt;
+    std::uniform_int_distribution rnd(0, 15);
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
-        if (i == (LightCount_Sphere / 2 - 1))
-        {
-            count = 0;
-            colorOffset = _countof(colorTbl) / 3;
-        }
+        u32 colorIndex = rnd(mt);
         if (mIsUseManySphereLightLighting)
         {
             f32 y = mLightPosY;
+            if (i == LightCount_Sphere / 2)
+            {
+                count = 0;
+                colorOffset++;
+            }
+
             if (i > LightCount_Sphere / 2)
             {
                 y = mLightPosY + 15;
@@ -1370,8 +1379,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
-            const u32 colorID = count + colorOffset;
-            param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[(colorID + count / STAGE_DIVISION_FOR_LIGHT_POSITION) % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);

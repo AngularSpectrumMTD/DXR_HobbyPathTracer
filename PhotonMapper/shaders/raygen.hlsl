@@ -213,10 +213,10 @@ void spatialReuse() {
             LightSample lightSample;
             sampleLightWithID(scatterPosition, nearDIReservoir.Y, lightSample);
 
-            if(!isVisible(scatterPosition, lightSample))
-            {
-                continue;
-            }
+            // if(!isVisible(scatterPosition, lightSample))
+            // {
+            //     continue;
+            // }
 
             const float nearUpdateW = nearDIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
             combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand2(nearIndex.xy));
