@@ -15,6 +15,8 @@ Texture2D<float4> PrevNormalDepthBuffer : register(t2);
 Texture2D<float2> VelocityBuffer : register(t3);
 Texture2D<float4> IDRoughnessBuffer : register(t4);
 Texture2D<float4> PrevIDRoughnessBuffer : register(t5);
+Texture2D<float4> PositionBuffer : register(t6);
+Texture2D<float4> PrevPositionBuffer : register(t7);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u0);
 
 static uint rseed;
@@ -106,6 +108,8 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float velocityL = sqrt(dot(velocity, velocity));
     const bool isSmallVelocity = (velocityL < 0.5);
 
+    float3 currPos = PositionBuffer[currID].xyz;
+
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
     {
@@ -120,14 +124,17 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
             float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
             float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
+            float3 prevPos = PrevPositionBuffer[prevID].xyz;
 
             const bool isNearDepth = ((currDepth * 0.7 < prevDepth) && (prevDepth < currDepth * 1.3)) && (currDepth > 0) && (prevDepth > 0);
             const bool isNearNormal = dot(currNormal, prevNormal) > 0.9;
             const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
             const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
             const bool isNearAlbedoLuminance = (abs(currAlbedoLuminance - prevAlbedoLuminance) < 0.05);
+            const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
+
             //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
-            const bool isTemporalReuseEnable = isNearDepth && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;// && (length(velocity) < 1.0);
+            const bool isTemporalReuseEnable = isNearPosition && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;// && (length(velocity) < 1.0);
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
