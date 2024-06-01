@@ -118,7 +118,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
         const uint serialPrevID = prevID.y * dims.x + prevID.x;
 
-        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isSerialWithinBounds(serialPrevID, dims))
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isSerialWithinBounds(serialPrevID, dims) && (currDepth != 0))
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
@@ -131,7 +131,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
             const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
             const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
-            const bool isNearPositionWithNormal = (abs(dot(currNormal, currPos - prevPos)) < 0.01f);
+            const bool isNearPositionWithNormal = (abs(dot(currNormal, currPos - prevPos)) < 0.001f);
 
             const bool isTemporalReuseEnable = isNearPositionWithNormal && !isHistoryResetRequested();
             if(isTemporalReuseEnable)

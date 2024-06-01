@@ -104,7 +104,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     float3 currGI = CurrentGIBuffer[currID].rgb;
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
 
-    if(isWithinBounds(prevID, dims))
+    if(isWithinBounds(prevID, dims) && (currDepth != 0))
     {
         float3 prevDI = HistoryDIBuffer[prevID].rgb;
         float3 prevGI = HistoryGIBuffer[prevID].rgb;
@@ -129,9 +129,9 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
         const bool isNearPositionWithNormal = (abs(dot(currNormal, currPos - prevPos)) < 0.01f);
 
-        const bool isAccumulationEnable = isNearPositionWithNormal && !isHistoryResetRequested();
+        //const bool isAccumulationEnable = isNearPositionWithNormal && !isHistoryResetRequested();
 
-        //const bool isAccumulationEnable = isAccumulationApply();
+        const bool isAccumulationEnable = isAccumulationApply();
         
         if (isAccumulationEnable)
         {

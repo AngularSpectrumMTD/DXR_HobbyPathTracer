@@ -140,11 +140,24 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
+    float hitT = -1;
+    float3 hitColor = 0.xxx;
+    float3 hitNormal = 0.xxx;
 
-    if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
+    const bool isFinish = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitT, hitColor, hitNormal, isIgnoreHit);
+    
+    if (isFinish)
     {
+        const bool isHitLight = (hitT > 0);
+        scatterPosition = isHitLight ? (WorldRayOrigin() + hitT * WorldRayDirection()) : scatterPosition;
+        float3 storeAlbedo = isHitLight ? hitColor : currentMaterial.albedo.xyz;
+        float3 storeNormal = isHitLight ? hitNormal : surfaceNormal;
+        storeGBuffer(payload, scatterPosition, storeAlbedo, storeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
         return;
+    }
+    else
+    {
+        storeGBuffer(payload, scatterPosition, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
     }
     
     RayDesc nextRay;

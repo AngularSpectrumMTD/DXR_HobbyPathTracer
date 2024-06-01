@@ -368,7 +368,7 @@ bool isNEEExecutable(in MaterialParams material)
     return (material.roughness > 0.001f) && (material.transRatio == 0) && isUseNEE();
 }
 
-bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, bool isIgnoreHit = false)
+bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float hitT, out float3 hitColor, out float3 hitNormal, bool isIgnoreHit)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
@@ -378,7 +378,11 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
     bool isIntersect = false;
     if (isDirectRay(payload))
     {
-        isIntersect = intersectAllLightWithCurrentRay(Le);
+        isIntersect = intersectAllLightWithCurrentRay(Le, hitT, hitNormal);
+        if(isIntersect)
+        {
+            hitColor = Le;
+        }
     }
     else
     {
