@@ -216,6 +216,7 @@ private:
         XMVECTOR viewVec;
         XMUINT4 additional;
         XMUINT4 additional1;
+        XMUINT4 additional2;
     };
 
     struct PhotonInfo
@@ -643,7 +644,7 @@ private:
     ComPtr<ID3D12PipelineState> mTemporalReusePSO;
 
     u32 mRenderFrame = 0;
-    u32 mMoveFrame = 0;
+    u32 mSeedFrame = 0;
 
     std::wstring mAssetPath;
 
@@ -731,6 +732,8 @@ private:
     bool mIsUseMetallicTest = false;
 
     bool mIsHistoryResetRequested = false;
+
+    bool mIsAlbedoOne = false;
 };
 
 #endif

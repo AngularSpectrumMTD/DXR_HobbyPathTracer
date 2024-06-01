@@ -6,8 +6,6 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "reservoir.hlsli"
 
 #define THREAD_NUM 16
-#define REINHARD_L 1000
-#define MAX_ACCUMULATION_RANGE 1000
 
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t0);
 Texture2D<float4> NormalDepthBuffer : register(t1);
@@ -25,6 +23,11 @@ static uint rseed;
 bool isWithinBounds(int2 id, int2 size)
 {
     return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
+}
+
+bool isSerialWithinBounds(int id, int2 size)
+{
+    return (0 <= id) && (id < (size.x * size.y));
 }
 
 float rand(in int2 indexXY)//0-1
@@ -98,15 +101,13 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float3 currNormal = NormalDepthBuffer[currID].xyz;
     uint currInstanceIndex = IDRoughnessBuffer[currID].y;
     float currRoughness = IDRoughnessBuffer[currID].z;
-    float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
 
-    float2 velocity = VelocityBuffer[currID];//-1 to 1
+    float2 velocity = VelocityBuffer[currID];
+    //velocity.y = 1.0f - velocity.y;
+    //velocity = velocity * 2.0f;// - 1.0f;
     float2 currUV = currID / dims;
     float2 prevUV = currUV + velocity;
-    int2 prevID = prevUV * dims;
-
-    float velocityL = sqrt(dot(velocity, velocity));
-    const bool isSmallVelocity = (velocityL < 0.5);
+    uint2 prevID = prevUV * dims;
 
     float3 currPos = PositionBuffer[currID].xyz;
 
@@ -114,27 +115,25 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     if(isUseNEE() && isUseWRS_RIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
-        const uint serialPrevID = prevID.y * dims.x + prevID.x;
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
+        const uint serialPrevID = prevID.y * dims.x + prevID.x;
 
-        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isSmallVelocity && !isHistoryResetRequested())
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isSerialWithinBounds(serialPrevID, dims))
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
             uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
             float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
-            float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
             float3 prevPos = PrevPositionBuffer[prevID].xyz;
 
             const bool isNearDepth = ((currDepth * 0.7 < prevDepth) && (prevDepth < currDepth * 1.3)) && (currDepth > 0) && (prevDepth > 0);
             const bool isNearNormal = dot(currNormal, prevNormal) > 0.9;
             const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
             const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
-            const bool isNearAlbedoLuminance = (abs(currAlbedoLuminance - prevAlbedoLuminance) < 0.05);
             const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
+            const bool isNearPositionWithNormal = (abs(dot(currNormal, currPos - prevPos)) < 0.01f);
 
-            //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
-            const bool isTemporalReuseEnable = isNearPosition && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;// && (length(velocity) < 1.0);
+            const bool isTemporalReuseEnable = isNearPositionWithNormal && !isHistoryResetRequested();
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];

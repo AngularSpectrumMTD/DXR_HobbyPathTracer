@@ -30,7 +30,7 @@ RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
 
 //restrict
-bool isWithinBounds(int2 id, int2 size)
+bool isWithinBounds(uint2 id, int2 size)
 {
     return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
 }
@@ -75,12 +75,16 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     float currDepth = NormalDepthBuffer[currID].w;
     float3 currNormal = NormalDepthBuffer[currID].xyz;
+    uint currInstanceIndex = IDRoughnessBuffer[currID].y;
+    float currRoughness = IDRoughnessBuffer[currID].z;
     uint accCount = AccumulationCountBuffer[currID];
 
     float2 velocity = VelocityBuffer[currID];
+    //velocity.y = 1.0f - velocity.y;
+    //velocity = velocity * 2.0f;// - 1.0f;
     float2 currUV = currID / dims;
     float2 prevUV = currUV + velocity;
-    int2 prevID = prevUV * dims;
+    uint2 prevID = prevUV * dims;
 
     float3 currPos = PositionBuffer[currID].xyz;
 
@@ -107,6 +111,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float3 prevCaustics = HistoryCausticsBuffer[prevID].rgb;
         float3 currDIGI = currDI + currGI;
 
+        uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
+        float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
         float prevDepth = PrevNormalDepthBuffer[prevID].w;
         float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
         float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
@@ -118,11 +124,16 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
         const bool isNearDepth = ((currDepth * 0.95 < prevDepth) && (prevDepth < currDepth * 1.05)) && (currDepth > 0) && (prevDepth > 0);
         const bool isNearNormal = dot(currNormal, prevNormal) > 0.8;
-        //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
-        const bool isAccumulationEnable = isNearDepth && isNearNormal;// && (length(velocity) < 1.0);
         const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
+        const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
+        const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
+        const bool isNearPositionWithNormal = (abs(dot(currNormal, currPos - prevPos)) < 0.01f);
+
+        const bool isAccumulationEnable = isNearPositionWithNormal && !isHistoryResetRequested();
+
+        //const bool isAccumulationEnable = isAccumulationApply();
         
-        if (isAccumulationApply())
+        if (isAccumulationEnable)
         {
             accCount++;
         }
@@ -135,7 +146,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         if (accCount < MAX_ACCUMULATION_RANGE)
         {
             const float tmpAccmuRatio = 1.f / accCount;
-
+            //const float DIAccumuRatio = isUseReservoirTemporalReuse() ? ((accCount > 100) ? tmpAccmuRatio : 1) : tmpAccmuRatio;
             float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
             float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
             float3 accumulatedDIGI = accumulatedDI + accumulatedGI;

@@ -93,7 +93,7 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseWRS_RIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = true;
+    mIsUseReservoirSpatialReuse = false;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -810,16 +810,16 @@ void DxrPhotonMapper::Draw()
         //feedback
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
         D3D12_RESOURCE_BARRIER copyReservoirBarrier2[] = {
-            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
+            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
             CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE)
         };
         mCommandList->ResourceBarrier(u32(_countof(copyReservoirBarrier2)), copyReservoirBarrier2);
-        mCommandList->CopyResource(mDIReservoirPingPongTbl[dst].Get(), mDISpatialReservoirPingPongTbl[finalSpatialID].Get());
+        mCommandList->CopyResource(mDIReservoirPingPongTbl[curr].Get(), mDISpatialReservoirPingPongTbl[finalSpatialID].Get());
 #endif
 
         D3D12_RESOURCE_BARRIER UAVToSRVReservoirBarrier[] = {
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
-           CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[dst].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
+           CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
  #endif
             CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         };
@@ -943,10 +943,9 @@ void DxrPhotonMapper::Update()
     if (mIsMoveModel)
     {
         mIsUseAccumulation = false;
-        mMoveFrame++;
         for (auto& pos : mOBJ0sNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4f * mMoveFrame * ONE_RADIAN), 0);
+            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4f * mSeedFrame * ONE_RADIAN), 0);
         }
     }
 
@@ -964,7 +963,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.mtxViewInv = XMMatrixInverse(nullptr, mSceneParam.mtxView);
     mSceneParam.mtxProjInv = XMMatrixInverse(nullptr, mSceneParam.mtxProj);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, 0, (f32)mGatherBlockRange);
-    mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mRenderFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
+    mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mSeedFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
     mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1.0f : 0.0f, 0.0f, 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
     mSceneParam.flags.y = mIsUseTexture;
@@ -982,16 +981,21 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional1.y = mIsUseReservoirSpatialReuse ? 1 : 0;
     mSceneParam.additional1.z = mIsUseMetallicTest ? 1 : 0;
     mSceneParam.additional1.w = mIsHistoryResetRequested ? 1 : 0;
+    mSceneParam.additional2.x = mIsAlbedoOne ? 1 : 0;
+    mSceneParam.additional2.y = 0;
+    mSceneParam.additional2.z = 0;
+    mSceneParam.additional2.w = 0;
 
     mRenderFrame++;
+    mSeedFrame++;
 
     if (mRenderFrame >= (UINT_MAX >> 1))
     {
         mRenderFrame = 0;
     }
-    if (mMoveFrame >= (UINT_MAX >> 1))
+    if (mSeedFrame >= (UINT_MAX >> 1))
     {
-        mMoveFrame = 0;
+        mSeedFrame = 0;
     }
 
     UpdateWindowText();
@@ -1164,6 +1168,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         break;
     case VK_F5:
         mIsUseMetallicTest = !mIsUseMetallicTest;
+        mIsUseAccumulation = false;
+        break;
+    case VK_F6:
+        mIsAlbedoOne = !mIsAlbedoOne;
         mIsUseAccumulation = false;
         break;
     }

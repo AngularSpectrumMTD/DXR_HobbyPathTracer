@@ -140,10 +140,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    if (!isIgnoreHit)
-    {
-        storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
-    }
+    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
 
     if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
     {
