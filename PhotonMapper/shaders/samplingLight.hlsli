@@ -233,18 +233,16 @@ bool intersectLightWithCurrentRay(out float3 Le)
     return false;
 }
 
-bool intersectAllLightWithCurrentRay(out float3 Le, out float hitT, out float3 hitNormal)
+bool intersectAllLightWithCurrentRay(out float3 Le)
 {
     const float3 rayOrigin = WorldRayOrigin();
     const float3 rayDiretion = WorldRayDirection();
     const float rayT = RayTCurrent();
-    hitT = -1;
 
     bool isIntersect = false;
     int mostNearIndex = -1;
     float currT = RAY_MAX_T;
     float3 mostNearLe = 0.xxx;
-    float3 currNormal = 0.xxx;
 
     for (int i = 0; i < getLightNum(); i++)
     {
@@ -265,7 +263,6 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float hitT, out float3 h
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    currNormal = normalize((rayOrigin + currT * rayDiretion) - param.position);
                 }
             }
         }
@@ -284,7 +281,6 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float hitT, out float3 h
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    currNormal = shapeForwardDir;
                 }
             }
         }
@@ -303,20 +299,12 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float hitT, out float3 h
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    currNormal = shapeForwardDir;
                 }
             }
         }
     }
 
     Le = mostNearLe;
-    if(mostNearIndex == -1)
-    {
-        hitT = -1;
-    }
-
-    hitT = currT;
-    hitNormal = currNormal;
 
     return (mostNearIndex != -1);
 }

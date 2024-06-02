@@ -93,7 +93,7 @@ void DxrPhotonMapper::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseWRS_RIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = false;
+    mIsUseReservoirSpatialReuse = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 

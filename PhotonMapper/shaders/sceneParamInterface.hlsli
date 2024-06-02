@@ -144,9 +144,4 @@ bool isHistoryResetRequested()
     return gSceneParam.additional1.w == 1;
 }
 
-bool isAlbedoOne()
-{
-    return gSceneParam.additional2.x == 1;
-}
-
 #endif//__SCENE_PARAM_INTERFACE_HLSLI__

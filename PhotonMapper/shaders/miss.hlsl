@@ -18,12 +18,11 @@ void miss(inout Payload payload) {
     }
 
     float3 hittedEmission = 0.xxx;
-    float hitT = -1;
-    float3 hitNormal = 0.xxx;
-    if (!isIndirectOnly() && intersectAllLightWithCurrentRay(hittedEmission, hitT, hitNormal))
+    if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hittedEmission))
     {
         payload.DI = hittedEmission;
         payload.throughput = 0.xxx;
+        return;
     }
 
     const bool isNEE_Prev_Executable = payload.flags & PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE;
@@ -43,6 +42,8 @@ void miss(inout Payload payload) {
         }
     }
 
+    storeGBuffer(payload, 0.xxx, 0.xxx, -1, -1, -1);
+
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
     float3 element = payload.throughput * cubemap.rgb;
@@ -55,13 +56,6 @@ void miss(inout Payload payload) {
         payload.GI += element;
     }
 #endif
-
-    const bool isHitLight = (hitT > 0);
-    float3 storePosition = isHitLight ? (WorldRayOrigin() + hitT * WorldRayDirection()) : 0.xxx;
-    float3 storeAlbedo = isHitLight ? hittedEmission : cubemap.rgb;
-    float3 storeNormal = isHitLight ? hitNormal : 0.xxx;
-    storeGBuffer(payload, storePosition, storeAlbedo, storeNormal, -1, -1, -1);
-
     payload.throughput = 0.xxx;
 }
 

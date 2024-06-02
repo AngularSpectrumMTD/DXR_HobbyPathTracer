@@ -137,6 +137,8 @@ void photonEmitting()
     TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
 }
 
+#define SPATIAL_REUSE_NUM 4
+
 float rand2(in int2 indexXY)//0-1
 {
     rseed += 1.0;
@@ -162,8 +164,6 @@ void spatialReuse() {
     DIReservoir currDIReservoir = gDISpatialReservoirBufferSrc[serialIndex];
     const float currUpdateW = currDIReservoir.W_sum;
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currUpdateW, rand());
-
-    const float3 cameraPos = mul(gSceneParam.mtxViewInv, float4(0, 0, 0, 1)).xyz;
 
     const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
     const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
@@ -213,8 +213,8 @@ void spatialReuse() {
                 continue;
             }
 
-            // LightSample lightSample;
-            // sampleLightWithID(scatterPosition, nearDIReservoir.Y, lightSample);
+            LightSample lightSample;
+            sampleLightWithID(scatterPosition, nearDIReservoir.Y, lightSample);
 
             // if(!isVisible(scatterPosition, lightSample))
             // {
@@ -226,15 +226,10 @@ void spatialReuse() {
         }
     }
 
-    //visibility re testing
     LightSample lightSample;
     sampleLightWithID(scatterPosition, spatDIReservoir.Y, lightSample);
-
-    const float3 toLight = lightSample.directionToLight;
-    const float bias = 0.01f * lightSample.distance;
-    const float3 biasedScatterPosition = scatterPosition + bias * toLight;
-
-    if(!isVisible(biasedScatterPosition, lightSample))
+    float3 biasedPosition = scatterPosition + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+    if(!isVisible(biasedPosition, lightSample))
     {
         recognizeAsShadowedReservoir(spatDIReservoir);
     }

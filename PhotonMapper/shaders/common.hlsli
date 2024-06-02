@@ -241,19 +241,21 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeGBuffer(inout Payload payload, in float3 worldPos, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
+void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
 {
-    if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
+    if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
     {
+        float3 wPosOrig = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+        float3 wPos = WorldRayOrigin() + WorldRayDirection() * 0.9f * RayTCurrent();//hack : for avoiding self occlusion at spatial reuse
         float2 writeIndex = payload.storeIndexXY;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
-        gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, ((payload.recursive == 0) || (primitiveIndex == -1)) ? 0 : compute01Depth(worldPos));
-        gPositionBuffer[writeIndex] = float4(worldPos.x, worldPos.y, worldPos.z, 0);
+        gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(wPosOrig));
+        gPositionBuffer[writeIndex] = float4(wPosOrig.x, wPosOrig.y, wPosOrig.z, 0);
         gIDRoughnessBuffer[writeIndex] = float4(primitiveIndex, instanceIndex, roughness, dot(float3(0.2126, 0.7152, 0.0722), albedo.rgb));
         matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
         matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
-        float4 currSvPosition = mul(mtxViewProj, float4(worldPos, 1));
-        float4 prevSvPosition = mul(mtxViewProjPrev, float4(worldPos, 1));
+        float4 currSvPosition = mul(mtxViewProj, float4(wPosOrig, 1));
+        float4 prevSvPosition = mul(mtxViewProjPrev, float4(wPosOrig, 1));
 
         float2 bufferSize = 0.xx;
         gNormalDepthBuffer.GetDimensions(bufferSize.x, bufferSize.y);
