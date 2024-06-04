@@ -514,9 +514,9 @@ private:
     ComPtr<ID3D12Resource> mAccumulationCountBuffer;
     dx12::Descriptor mAccumulationCountBufferDescriptorSRV;
     dx12::Descriptor mAccumulationCountBufferDescriptorUAV;
-    ComPtr<ID3D12Resource> mVelocityBuffer;
-    dx12::Descriptor mVelocityBufferDescriptorSRV;
-    dx12::Descriptor mVelocityBufferDescriptorUAV;
+    ComPtr<ID3D12Resource> mPrevIDBuffer;
+    dx12::Descriptor mPrevIDBufferDescriptorSRV;
+    dx12::Descriptor mPrevIDBufferDescriptorUAV;
 
     std::vector < ComPtr<ID3D12Resource>> mDIBufferPingPongTbl;
     std::vector < dx12::Descriptor> mDIBufferDescriptorSRVPingPongTbl;
@@ -727,7 +727,7 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 4;
+    u32 mSpatialReuseTap = 2;
 
     bool mIsUseMetallicTest = false;
 

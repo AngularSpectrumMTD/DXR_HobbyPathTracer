@@ -12,7 +12,7 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t0);
 Texture2D<float4> NormalDepthBuffer : register(t1);
 Texture2D<float4> PrevNormalDepthBuffer : register(t2);
-Texture2D<float2> VelocityBuffer : register(t3);
+Texture2D<float2> PrevIDBuffer : register(t3);
 Texture2D<float4> IDRoughnessBuffer : register(t4);
 Texture2D<float4> PrevIDRoughnessBuffer : register(t5);
 Texture2D<float4> PositionBuffer : register(t6);
@@ -89,7 +89,7 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
     rseed = getLightRandomSeed();
-    float2 dims;
+    int2 dims;
     NormalDepthBuffer.GetDimensions(dims.x, dims.y);
 
     uint2 currID = dtid.xy;
@@ -100,41 +100,52 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     float currRoughness = IDRoughnessBuffer[currID].z;
     float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
 
-    float2 velocity = VelocityBuffer[currID];//-1 to 1
-    float2 currUV = currID / dims;
-    float2 prevUV = currUV + velocity;
-    int2 prevID = prevUV * dims;
+    float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
-    float velocityL = sqrt(dot(velocity, velocity));
-    const bool isSmallVelocity = (velocityL < 0.5);
+    //reprojection test1
+    // const float3 prevCameraPos = mul(gSceneParam.mtxViewInvPrev, float4(0, 0, 0, 1));
+    // float3 pos = normalize(currObjectWorldPos - prevCameraPos) * (getNearPlaneDistance() + (getFarPlaneDistance() - getNearPlaneDistance())) + prevCameraPos;
+    // float3 toCam = pos;
+    // float camPosZ = toCam.z;
+    // float2 uv2;
+    // //uv2.x = (1 - (toCam.x + dims.x / 2) / dims.x);
+    // //uv2.y = (1 - (toCam.y + dims.y / 2) / dims.y);
+    // uv2.x = (toCam.x + dims.x / 2) / dims.x;
+    // uv2.y = (toCam.y + dims.y / 2) / dims.y;
+    //reprojection test1
 
-    float3 currPos = PositionBuffer[currID].xyz;
+    int2 prevID = PrevIDBuffer[currID];
+    // int2 prevID = velocity;
+
+    // //reprojection test2
+    // matrix mtxVPprev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
+    // float4 prevSV = mul(mtxVPprev, float4(currObjectWorldPos, 1));
+    // prevSV.xyz /= prevSV.w;
+    // float2 prevUV = (prevSV.xy * float2(0.5, -0.5)) + float2(0.5, 0.5);
+    //prevUV.y = 1 - prevUV.y;
+    //prevID = prevUV * dims;//tier1
+    //reprojection test2
+
+    //reprojection test3
+    //prevID = computeTemporalReprojectedID(currID, velocity, dims);
+    //reprojection test3
 
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
-        const uint serialPrevID = prevID.y * dims.x + prevID.x;
+        const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
 
-        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isSmallVelocity && !isHistoryResetRequested())
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && !isHistoryResetRequested())
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
             uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
             float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
             float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
-            float3 prevPos = PrevPositionBuffer[prevID].xyz;
-
-            const bool isNearDepth = ((currDepth * 0.7 < prevDepth) && (prevDepth < currDepth * 1.3)) && (currDepth > 0) && (prevDepth > 0);
-            const bool isNearNormal = dot(currNormal, prevNormal) > 0.9;
-            const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
-            const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
-            const bool isNearAlbedoLuminance = (abs(currAlbedoLuminance - prevAlbedoLuminance) < 0.05);
-            const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
-
-            //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
-            const bool isTemporalReuseEnable = isNearPosition && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;// && (length(velocity) < 1.0);
+            float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
+            const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevObjectWorldPos);
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];

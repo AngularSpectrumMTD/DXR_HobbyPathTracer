@@ -35,7 +35,7 @@ void Camera::OnMouseMove(f32 dx, f32 dy)
     }
     if (mButtonType == 0)
     {
-        TrackingRotation(dx, dy);
+        EyeVecRotation(dx, dy);
     }
     if (mButtonType == 1)
     {
@@ -83,14 +83,14 @@ bool Camera::OnKeyDown(UINT8  wparam)
     return flag;
 }
 
-void Camera::TrackingRotation(f32 dx, f32 dy)
+void Camera::EyeVecRotation(f32 dx, f32 dy)
 {
-    auto EyeVec = mEye - mTarget;
-    auto EyeVecLength = XMVectorGetX(XMVector3Length(EyeVec));
-    auto NormalizedEyeVec = XMVector3Normalize(EyeVec);
+    auto ToEye = mEye - mTarget;
+    auto L = XMVectorGetX(XMVector3Length(ToEye));
+    ToEye = XMVector3Normalize(ToEye);
 
-    auto phi = std::atan2(XMVectorGetX(NormalizedEyeVec), XMVectorGetZ(NormalizedEyeVec));//Azimuth
-    auto theta = std::acos(XMVectorGetY(NormalizedEyeVec));//Elevation Angle
+    auto phi = std::atan2(XMVectorGetX(ToEye), XMVectorGetZ(ToEye));//Azimuth
+    auto theta = std::acos(XMVectorGetY(ToEye));//Elevation Angle
         
     auto x = (XM_PI + phi) / XM_2PI;
     auto y = theta / XM_PI;
@@ -101,9 +101,9 @@ void Camera::TrackingRotation(f32 dx, f32 dy)
     phi = x * XM_2PI;
     theta = y * XM_PI;
 
-    auto NewEyeVec = XMVector3Normalize(XMVectorSet(-sin(theta) * sin(phi), cos(theta), -sin(theta) * cos(phi), 0.0f));
-    NewEyeVec *= EyeVecLength;
-    mEye = mTarget + NewEyeVec;
+    auto NewToEye = XMVector3Normalize(XMVectorSet(-sin(theta) * sin(phi), cos(theta), -sin(theta) * cos(phi), 0.0f));
+    NewToEye *= L;
+    mTarget = -NewToEye + mEye;
     mMtxView = XMMatrixLookAtRH(mEye, mTarget, mUp);
 }
 

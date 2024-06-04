@@ -118,14 +118,13 @@ void DxrPhotonMapper::CreateRegularBuffer()
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
         mAccumulationCountBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mAccumulationCountBuffer.Get(), &uavDesc);
     }
-    //Velocity
     {
-        mVelocityBuffer = mDevice->CreateTexture2D(
+        mPrevIDBuffer = mDevice->CreateTexture2D(
             width, height, DXGI_FORMAT_R16G16_FLOAT,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
             D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
             D3D12_HEAP_TYPE_DEFAULT,
-            L"VelocitylBuffer"
+            L"PrevIDBuffer"
         );
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -134,11 +133,11 @@ void DxrPhotonMapper::CreateRegularBuffer()
         srvDesc.Texture2D.MostDetailedMip = 0;
         srvDesc.Texture2D.ResourceMinLODClamp = 0;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        mVelocityBufferDescriptorSRV = mDevice->CreateShaderResourceView(mVelocityBuffer.Get(), &srvDesc);
+        mPrevIDBufferDescriptorSRV = mDevice->CreateShaderResourceView(mPrevIDBuffer.Get(), &srvDesc);
 
         D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        mVelocityBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mVelocityBuffer.Get(), &uavDesc);
+        mPrevIDBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mPrevIDBuffer.Get(), &uavDesc);
     }
     //Depth
     {

@@ -44,7 +44,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gDiffuseAlbedoBuffer"] = 8;
         mRegisterMapGlobalRootSig["gPositionBuffer"] = 9;
         mRegisterMapGlobalRootSig["gIDRoughnessBuffer"] = 10;
-        mRegisterMapGlobalRootSig["gVelocityBuffer"] = 11;
+        mRegisterMapGlobalRootSig["gPrevIDBuffer"] = 11;
         mRegisterMapGlobalRootSig["gDIBuffer"] = 12;
         mRegisterMapGlobalRootSig["gGIBuffer"] = 13;
         mRegisterMapGlobalRootSig["gCausticsBuffer"] = 14;
@@ -84,7 +84,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gDiffuseAlbedoBuffer"] = 8;
         mRegisterMapGlobalRootSigPhoton["gPositionBuffer"] = 9;
         mRegisterMapGlobalRootSigPhoton["gIDRoughnessBuffer"] = 10;
-        mRegisterMapGlobalRootSigPhoton["gVelocityBuffer"] = 11;
+        mRegisterMapGlobalRootSigPhoton["gPrevIDBuffer"] = 11;
         mRegisterMapGlobalRootSigPhoton["gDIBuffer"] = 12;
         mRegisterMapGlobalRootSigPhoton["gGIBuffer"] = 13;
         mRegisterMapGlobalRootSigPhoton["gCausticsBuffer"] = 14;
@@ -123,7 +123,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gDiffuseAlbedoBuffer"] = 8;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPositionBuffer"] = 9;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gIDRoughnessBuffer"] = 10;
-        mRegisterMapGlobalRootSigReservoirSpatialReuse["gVelocityBuffer"] = 11;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevIDBuffer"] = 11;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIBuffer"] = 12;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIBuffer"] = 13;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"] = 14;

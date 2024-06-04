@@ -135,6 +135,9 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         editMaterial(currentMaterial);
     }
 
+    //non color test
+    //currentMaterial.albedo = 1.xxxx;
+
     float3 Le = 0.xxx;
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());

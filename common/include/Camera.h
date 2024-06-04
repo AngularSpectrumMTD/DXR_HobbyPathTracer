@@ -36,7 +36,7 @@ public:
     void OnMouseWheel(f32 rotate);
 
 private:
-    void TrackingRotation(f32 dx, f32 dy);
+    void EyeVecRotation(f32 dx, f32 dy);
     void ForwardBackward(f32 d);
     void SwingRightLeft(f32 rotate);
 

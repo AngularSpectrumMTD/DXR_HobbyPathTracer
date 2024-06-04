@@ -169,14 +169,12 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
         CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
         mRegisterMapDebugView["diffuseAlbedoBuffer"] = 0;
         mRegisterMapDebugView["normalDepthBuffer"] = 1;
         mRegisterMapDebugView["idRoughnessBuffer"] = 2;
-        mRegisterMapDebugView["velocityBuffer"] = 3;
-        mRegisterMapDebugView["finalColor"] = 4;
+        mRegisterMapDebugView["finalColor"] = 3;
     }
 
     {
@@ -197,7 +195,7 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 1;
         mRegisterMapTemporalReuse["NormalDepthBuffer"] = 2;
         mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = 3;
-        mRegisterMapTemporalReuse["VelocityBuffer"] = 4;
+        mRegisterMapTemporalReuse["PrevIDBuffer"] = 4;
         mRegisterMapTemporalReuse["IDRoughnessBuffer"] = 5;
         mRegisterMapTemporalReuse["PrevIDRoughnessBuffer"] = 6;
         mRegisterMapTemporalReuse["PositionBuffer"] = 7;
@@ -234,7 +232,7 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["HistoryCausticsBuffer"] = 3;
         mRegisterMapTemporalAccumulation["NormalDepthBuffer"] = 4;
         mRegisterMapTemporalAccumulation["PrevNormalDepthBuffer"] = 5;
-        mRegisterMapTemporalAccumulation["VelocityBuffer"] = 6;
+        mRegisterMapTemporalAccumulation["PrevIDBuffer"] = 6;
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = 7;
         mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = 8;
         mRegisterMapTemporalAccumulation["IDRoughnessBuffer"] = 9;

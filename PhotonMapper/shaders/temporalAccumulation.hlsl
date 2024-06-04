@@ -14,7 +14,7 @@ Texture2D<float4> HistoryGIBuffer : register(t1);
 Texture2D<float4> HistoryCausticsBuffer : register(t2);
 Texture2D<float4> NormalDepthBuffer : register(t3);
 Texture2D<float4> PrevNormalDepthBuffer : register(t4);
-Texture2D<float2> VelocityBuffer : register(t5);
+Texture2D<float2> PrevIDBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
 Texture2D<float4> IDRoughnessBuffer : register(t8);
@@ -75,14 +75,14 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     float currDepth = NormalDepthBuffer[currID].w;
     float3 currNormal = NormalDepthBuffer[currID].xyz;
+    uint currInstanceIndex = IDRoughnessBuffer[currID].y;
+    float currRoughness = IDRoughnessBuffer[currID].z;
+    float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
     uint accCount = AccumulationCountBuffer[currID];
 
-    float2 velocity = VelocityBuffer[currID];
-    float2 currUV = currID / dims;
-    float2 prevUV = currUV + velocity;
-    int2 prevID = prevUV * dims;
+    float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
-    float3 currPos = PositionBuffer[currID].xyz;
+    int2 prevID = PrevIDBuffer[currID];
 
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())
@@ -109,20 +109,17 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
         float prevDepth = PrevNormalDepthBuffer[prevID].w;
         float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
+        uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
+        float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
+        float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
+        float3 prevWorldPos = PrevPositionBuffer[prevID].xyz;
         float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
 
         float luminance = computeLuminance(currDIGI);
         float2 currLuminanceMoment = float2(luminance, luminance * luminance);
 
-        float3 prevPos = PrevPositionBuffer[prevID].xyz;
-
-        const bool isNearDepth = ((currDepth * 0.95 < prevDepth) && (prevDepth < currDepth * 1.05)) && (currDepth > 0) && (prevDepth > 0);
-        const bool isNearNormal = dot(currNormal, prevNormal) > 0.8;
-        //const bool isNearDepth = (abs(currDepth - prevDepth) < 0.01f) && (currDepth > 0) && (prevDepth > 0);
-        const bool isAccumulationEnable = isNearDepth && isNearNormal;// && (length(velocity) < 1.0);
-        const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.3f);//30cm
-        
-        if (isAccumulationApply())
+        const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevWorldPos);
+        if (isTemporalReuseEnable)
         {
             accCount++;
         }
