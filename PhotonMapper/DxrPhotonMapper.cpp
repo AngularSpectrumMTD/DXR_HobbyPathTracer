@@ -59,7 +59,7 @@ void DxrPhotonMapper::Setup()
 {
     mSceneType = SceneType_Sponza;
 
-    mRecursionDepth = min(2, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 2;
@@ -1007,10 +1007,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
 {
     const f32 clampRange = (mStageType == StageType_Plane) ? 1.5f * PLANE_SIZE : 0.9f * PLANE_SIZE;
 
-    if (mCamera.OnKeyDown(wparam))
-    {
-        mIsUseAccumulation = false;
-    }
+    mCamera.OnKeyDown(wparam);
 
     switch (wparam)
     {

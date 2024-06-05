@@ -56,26 +56,27 @@ bool Camera::OnKeyDown(UINT8  wparam)
 {
     bool flag = false;
     XMVECTOR tmp = mEye - mTarget;
+    const f32 ratio = 0.1f;
     switch (wparam)
     {
     case VK_UP:
-        mEye += XMVector3Normalize(mUp);
-        mTarget += XMVector3Normalize(mUp);
+        mEye += ratio * XMVector3Normalize(mUp);
+        mTarget += ratio * XMVector3Normalize(mUp);
         flag =  true;
         break;
     case VK_DOWN:
-        mEye -= XMVector3Normalize(mUp);
-        mTarget -= XMVector3Normalize(mUp);
+        mEye -= ratio * XMVector3Normalize(mUp);
+        mTarget -= ratio * XMVector3Normalize(mUp);
         flag = true;
         break;
     case VK_RIGHT:
-        mEye -= XMVector3Normalize(XMVector3Cross(tmp, mUp));
-        mTarget -= XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mEye -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         flag = true;
         break;
     case VK_LEFT:
-        mEye += XMVector3Normalize(XMVector3Cross(tmp, mUp));
-        mTarget += XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mEye += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         flag = true;
         break;
     }
