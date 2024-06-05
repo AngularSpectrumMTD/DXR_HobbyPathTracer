@@ -28,6 +28,7 @@ RWTexture2D<float4> CurrentCausticsBuffer : register(u2);
 RWTexture2D<float4> DIGIBuffer : register(u3);
 RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
+RWTexture2D<uint> PrevAccumulationCountBuffer : register(u6);
 
 //restrict
 bool isWithinBounds(int2 id, int2 size)
@@ -78,7 +79,6 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     uint currInstanceIndex = IDRoughnessBuffer[currID].y;
     float currRoughness = IDRoughnessBuffer[currID].z;
     float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
-    uint accCount = AccumulationCountBuffer[currID];
 
     float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
@@ -118,7 +118,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float luminance = computeLuminance(currDIGI);
         float2 currLuminanceMoment = float2(luminance, luminance * luminance);
 
-        const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevWorldPos);
+        uint accCount = PrevAccumulationCountBuffer[prevID];
+        const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevWorldPos);
         if (isTemporalReuseEnable)
         {
             accCount++;

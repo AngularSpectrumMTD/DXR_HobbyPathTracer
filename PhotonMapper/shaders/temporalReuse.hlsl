@@ -145,7 +145,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
             float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
             float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
-            const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevObjectWorldPos);
+            const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevObjectWorldPos);
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];

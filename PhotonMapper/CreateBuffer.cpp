@@ -96,28 +96,6 @@ void DxrPhotonMapper::CreateRegularBuffer()
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
         mDiffuseAlbedoBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mDiffuseAlbedoBuffer.Get(), &uavDesc);
     }
-    //Accumulation Count
-    {
-        mAccumulationCountBuffer = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R32_UINT,
-            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-            D3D12_HEAP_TYPE_DEFAULT,
-            L"AccumulationCountBuffer"
-        );
-
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        mAccumulationCountBufferDescriptorSRV = mDevice->CreateShaderResourceView(mAccumulationCountBuffer.Get(), &srvDesc);
-
-        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        mAccumulationCountBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mAccumulationCountBuffer.Get(), &uavDesc);
-    }
     {
         mPrevIDBuffer = mDevice->CreateTexture2D(
             width, height, DXGI_FORMAT_R16G16_FLOAT,
@@ -139,7 +117,7 @@ void DxrPhotonMapper::CreateRegularBuffer()
         uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
         mPrevIDBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mPrevIDBuffer.Get(), &uavDesc);
     }
-    //Depth
+    //Ping Pong
     {
         const u32 size = 2;
 
@@ -155,8 +133,37 @@ void DxrPhotonMapper::CreateRegularBuffer()
         mPositionBufferDescriptorSRVTbl.resize(size);
         mPositionBufferDescriptorUAVTbl.resize(size);
 
+        mAccumulationCountBufferTbl.resize(size);
+        mAccumulationCountBufferDescriptorSRVTbl.resize(size);
+        mAccumulationCountBufferDescriptorUAVTbl.resize(size);
+
         for (u32 i = 0; i < size; i++)
         {
+             //Accumulation Count
+            { 
+                wchar_t name[30];
+                swprintf(name, 30, L"AccumulationCountBufferTbl[%d]", i);
+                mAccumulationCountBufferTbl.at(i) = mDevice->CreateTexture2D(
+                    width, height, DXGI_FORMAT_R32_UINT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    name
+                );
+
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mAccumulationCountBufferDescriptorSRVTbl.at(i) = mDevice->CreateShaderResourceView(mAccumulationCountBufferTbl.at(i).Get(), &srvDesc);
+
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mAccumulationCountBufferDescriptorUAVTbl.at(i) = mDevice->CreateUnorderedAccessView(mAccumulationCountBufferTbl.at(i).Get(), &uavDesc);
+            }
+            //Depth
             {
                 wchar_t name[30];
                 swprintf(name, 30, L"NormalDepthBufferTbl[%d]", i);

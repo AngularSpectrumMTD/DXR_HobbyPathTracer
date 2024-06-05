@@ -845,7 +845,8 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIGIBuffer"], mFinalRenderResultDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
@@ -1181,7 +1182,6 @@ void DxrPhotonMapper::OnMouseDown(MouseButton button, s32 x, s32 y)
     f32 fdx = f32(x) / GetWidth();
     f32 fdy = f32(y) / GetHeight();
     mCamera.OnMouseButtonDown(s32(button), fdx, fdy);
-    mIsUseAccumulation = false;
 }
 
 void DxrPhotonMapper::OnMouseUp(MouseButton button, s32 x, s32 y)
@@ -1194,7 +1194,6 @@ void DxrPhotonMapper::OnMouseMove(s32 dx, s32 dy)
     f32 fdx = f32(dx) / GetWidth();
     f32 fdy = f32(dy) / GetHeight();
     mCamera.OnMouseMove(-fdx, fdy);
-    mIsUseAccumulation = false;
 }
 
 void DxrPhotonMapper::OnMouseWheel(s32 rotate)
@@ -1209,7 +1208,6 @@ void DxrPhotonMapper::OnMouseWheel(s32 rotate)
         rotate = 120;
     }
     mCamera.OnMouseWheel(rotate / 8000.f);
-    //mIsUseAccumulation = false;
 }
 
 f32 DxrPhotonMapper::Clamp(f32 min, f32 max, f32 src)

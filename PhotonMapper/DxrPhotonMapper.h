@@ -504,6 +504,9 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mPositionBufferTbl;
     std::vector < dx12::Descriptor> mPositionBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mPositionBufferDescriptorUAVTbl;
+    std::vector < ComPtr<ID3D12Resource>> mAccumulationCountBufferTbl;
+    std::vector < dx12::Descriptor> mAccumulationCountBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mAccumulationCountBufferDescriptorUAVTbl;
     ComPtr<ID3D12Resource> mDenoisedColorBuffer;
     dx12::Descriptor mDenoisedColorBufferDescriptorSRV;
     dx12::Descriptor mDenoisedColorBufferDescriptorUAV;
@@ -511,9 +514,6 @@ private:
     ComPtr<ID3D12Resource> mDiffuseAlbedoBuffer;
     dx12::Descriptor mDiffuseAlbedoBufferDescriptorSRV;
     dx12::Descriptor mDiffuseAlbedoBufferDescriptorUAV;
-    ComPtr<ID3D12Resource> mAccumulationCountBuffer;
-    dx12::Descriptor mAccumulationCountBufferDescriptorSRV;
-    dx12::Descriptor mAccumulationCountBufferDescriptorUAV;
     ComPtr<ID3D12Resource> mPrevIDBuffer;
     dx12::Descriptor mPrevIDBufferDescriptorSRV;
     dx12::Descriptor mPrevIDBufferDescriptorUAV;

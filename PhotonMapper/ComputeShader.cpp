@@ -224,6 +224,7 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         mRsTemporalAccumulation = rsCreater.Create(mDevice, false, L"rsTemporalAccumulation");
         CreateComputeShaderStateObject(ComputeShaders::TemporalAccumulation, mTemporalAccumulationPSO, mRsTemporalAccumulation);
         mRegisterMapTemporalAccumulation["gSceneParam"] = 0;
@@ -245,5 +246,6 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["DIGIBuffer"] = 16;
         mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = 17;
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = 18;
+        mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = 19;
     }
 }
