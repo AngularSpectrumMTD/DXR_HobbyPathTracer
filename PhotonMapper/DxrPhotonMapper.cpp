@@ -49,7 +49,8 @@ void DxrPhotonMapper::UpdateWindowText()
         << L" <D> : Bounce : " << mRecursionDepth
         << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024
         //<< L"    " << getFrameRate() << L"[ms]"
-        << L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame);
+        //<< L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame)
+        ;
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
@@ -1385,8 +1386,8 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
             f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
             LightGenerateParam param;
-            param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);

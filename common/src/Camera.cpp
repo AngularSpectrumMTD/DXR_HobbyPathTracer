@@ -37,10 +37,10 @@ void Camera::OnMouseMove(f32 dx, f32 dy)
     {
         EyeVecRotation(dx, dy);
     }
-    if (mButtonType == 1)
+   /* if (mButtonType == 1)
     {
         ForwardBackward(dy);
-    }
+    }*/
 }
 void Camera::OnMouseButtonUp()
 {
@@ -56,24 +56,28 @@ bool Camera::OnKeyDown(UINT8  wparam)
 {
     bool flag = false;
     XMVECTOR tmp = mEye - mTarget;
-    const f32 ratio = 0.1f;
+    const f32 ratio = 0.2f;
     switch (wparam)
     {
+        //Foward
     case VK_UP:
-        mEye += ratio * XMVector3Normalize(mUp);
-        mTarget += ratio * XMVector3Normalize(mUp);
+        mEye -= ratio * XMVector3Normalize(tmp);
+        mTarget -= ratio * XMVector3Normalize(tmp);
         flag =  true;
         break;
+        //Backward
     case VK_DOWN:
-        mEye -= ratio * XMVector3Normalize(mUp);
-        mTarget -= ratio * XMVector3Normalize(mUp);
+        mEye += ratio * XMVector3Normalize(tmp);
+        mTarget += ratio * XMVector3Normalize(tmp);
         flag = true;
         break;
+        //Right
     case VK_RIGHT:
         mEye -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         mTarget -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         flag = true;
         break;
+        //Left
     case VK_LEFT:
         mEye += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         mTarget += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));

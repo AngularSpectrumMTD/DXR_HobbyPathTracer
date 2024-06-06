@@ -2,10 +2,19 @@
 Hybrid Photon Mapper By Use Of DirectX Raytracing  
 (Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
 
-![resultExt](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/ee53f0ea-6a3b-4a17-8344-e527c493a7ac)
-![resultSponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2ebaa9db-fc76-4a98-8d08-58c44d4afcf8)
-![resultInt](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/f43b6a0d-582a-435d-93df-aead936b932f)
-![Caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0d450f8b-279a-494e-b640-0cad271a81f4)
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/4738c605-4417-4b22-8420-ec832669de16
+
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/85f4b87e-f8ab-4d1c-8af6-ffa16001e003
+
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/57af1313-5706-44ed-836c-823dae074d24
+
+https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/c1b2fe5b-2f82-4c92-8794-5da0e1d33171
+
+![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/6957a52f-8343-4314-aa0e-581fe0d528d1)
+
+![bistro](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0ce13c49-a835-456b-b12f-a2f278e05641)
+
+![caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/805716d4-50cd-414c-9979-08731e25b3b0)
 
 "Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights. 
 
@@ -72,9 +81,8 @@ DirectX12
 - C : change photon emitter type (spot light/rectangular light)
 - V : enable / disable debug view
 - F : enable / disable lighting by use of many sphere lights
-- MOUSE_RIGHT : rotate the camera around the gazing point
-- MOUSE_LEFT : move the camera back and forth
-- ↑↓→← : move the camera up, down, left, or right
+- MOUSE_RIGHT : rotate the camera around the camera position
+- ↑↓→← : move the camera forward, backward, left, or right
 - SPACE : change the target to edit the material
 - CTRL : enable / disable Streaming RIS
 - TAB : enable / disable Temporal Accumulation  
