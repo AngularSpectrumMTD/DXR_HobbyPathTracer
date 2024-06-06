@@ -10,7 +10,7 @@ https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/57a
 
 https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/c1b2fe5b-2f82-4c92-8794-5da0e1d33171
 
-![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/6957a52f-8343-4314-aa0e-581fe0d528d1)
+![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/213cc5f5-11c1-405f-9e14-9867398378cb)
 
 ![bistro](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/0ce13c49-a835-456b-b12f-a2f278e05641)
 
