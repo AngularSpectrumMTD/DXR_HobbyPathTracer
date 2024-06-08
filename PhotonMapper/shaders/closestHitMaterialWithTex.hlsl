@@ -138,17 +138,20 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     //non color test
     //currentMaterial.albedo = 1.xxxx;
 
-    float3 Le = 0.xxx;
-
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    //if (!isIgnoreHit)
-    {
-        storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
-    }
+    float3 hitLe = 0.xxx;
+    float3 hitNormal = 0.xxx;
+    float3 hitPosition = 0.xxx;
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal,  hitLe, hitPosition, hitNormal, isIgnoreHit);
+    const bool isAnaliticalLightHitted = (length(hitLe) > 0);
+    const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
+    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : surfaceNormal;
+    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : scatterPosition;
+    storeGBuffer(payload, writePosition, writeColor, writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
 
-    if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, isIgnoreHit))
+    if (isTerminate)
     {
         return;
     }

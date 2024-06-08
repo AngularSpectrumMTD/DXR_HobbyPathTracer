@@ -17,11 +17,18 @@ void miss(inout Payload payload) {
         return;
     }
 
-    float3 hittedEmission = 0.xxx;
-    if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hittedEmission))
+    float3 hitLe = 0.xxx;
+    float3 hitNormal = 0.xxx;
+    float3 hitPosition = 0.xxx;
+    if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hitLe, hitPosition, hitNormal))
     {
-        payload.DI = hittedEmission;
+        payload.DI = hitLe;
         payload.throughput = 0.xxx;
+        const bool isAnaliticalLightHitted = (length(hitLe) > 0);
+        const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
+        const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
+        const float3 writePosition = isAnaliticalLightHitted ? hitPosition : 0.xxx;
+        storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, 0, 0);
         return;
     }
 
@@ -42,7 +49,7 @@ void miss(inout Payload payload) {
         }
     }
 
-    storeGBuffer(payload, 0.xxx, 0.xxx, -1, -1, -1);
+    storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, -1, -1);
 
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);

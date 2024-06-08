@@ -241,21 +241,20 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeGBuffer(inout Payload payload, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
+void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
 {
-    if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive == 1))
+    if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
     {
-        float3 wPos = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         float2 writeIndex = payload.storeIndexXY;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
-        gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(wPos));
-        gPositionBuffer[writeIndex] = float4(wPos, 0);
+        gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(position));
+        gPositionBuffer[writeIndex] = float4(position, 0);
         gIDRoughnessBuffer[writeIndex] = float4(primitiveIndex, instanceIndex, roughness, dot(float3(0.2126, 0.7152, 0.0722), albedo.rgb));
         matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
         matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
-        float4 currVpPos = mul(mtxViewProj, float4(wPos, 1));
+        float4 currVpPos = mul(mtxViewProj, float4(position, 1));
         currVpPos.xy /= currVpPos.w;
-        float4 prevVpPos = mul(mtxViewProjPrev, float4(wPos, 1));
+        float4 prevVpPos = mul(mtxViewProjPrev, float4(position, 1));
         prevVpPos.xy /= prevVpPos.w;
         const float2 velocity = prevVpPos.xy - currVpPos.xy;
         //gVelocityBuffer[writeIndex] = velocity;

@@ -28,7 +28,8 @@ Shading : GGX
 Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
 
 ### Debug View
-Enable to check (Diffuse)Albedo / Depth / Normal  / Velocity
+Enable to check (Diffuse)Albedo / Depth / Normal  / Velocity  
+![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/cde24f39-521b-4674-8715-393c9ec5379f)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

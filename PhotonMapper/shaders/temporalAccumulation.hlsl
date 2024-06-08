@@ -130,26 +130,24 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         }
         AccumulationCountBuffer[currID] = accCount;
 
-        if (accCount < MAX_ACCUMULATION_RANGE)
-        {
-            const float tmpAccmuRatio = 1.f / accCount;
+        accCount = min(accCount, MAX_ACCUMULATION_RANGE);
+        const float tmpAccmuRatio = 1.f / accCount;
 
-            float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
-            float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
-            float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
-            float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
+        float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
+        float3 accumulatedGI = lerp(prevGI, currGI, tmpAccmuRatio);
+        float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
+        float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
 
-            currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
-            currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
+        currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
+        currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
 
-            float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
-            DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(accumulatedCaustics, XYZtoRGB2);
-            CurrentDIBuffer[currID].rgb = accumulatedDI;
-            CurrentGIBuffer[currID].rgb = accumulatedGI;
-            CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
-            LuminanceMomentBufferDst[currID] = currLuminanceMoment;
-        }
-    }
+        float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
+        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(accumulatedCaustics, XYZtoRGB2);
+        CurrentDIBuffer[currID].rgb = accumulatedDI;
+        CurrentGIBuffer[currID].rgb = accumulatedGI;
+        CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
+        LuminanceMomentBufferDst[currID] = currLuminanceMoment;
+}
     else
     {
         AccumulationCountBuffer[currID] = 1;

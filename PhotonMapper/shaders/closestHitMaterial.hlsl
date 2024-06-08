@@ -46,12 +46,21 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     uint instanceIndex = InstanceIndex();
 
     MaterialParams currentMaterial = constantBuffer;
-    storeGBuffer(payload, currentMaterial.albedo.xyz, surfaceNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
 
-    if (applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal))
+    float3 hitLe = 0.xxx;
+    float3 hitNormal = 0.xxx;
+    float3 hitPosition = 0.xxx;
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, false);
+    const bool isAnaliticalLightHitted = (length(hitLe) > 0);
+    const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
+    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : surfaceNormal;
+    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : scatterPosition;
+    storeGBuffer(payload, writePosition, writeColor, writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
+
+    if (isTerminate)
     {
         return;
     }
