@@ -283,7 +283,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    hitNormal = normalize(rayOrigin + currT * rayDiretion - param.position);
+                    hitNormal = shapeForwardDir;
                 }
             }
         }
@@ -302,7 +302,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    hitNormal = normalize(rayOrigin + currT * rayDiretion - param.position);
+                    hitNormal = shapeForwardDir;
                 }
             }
         }
