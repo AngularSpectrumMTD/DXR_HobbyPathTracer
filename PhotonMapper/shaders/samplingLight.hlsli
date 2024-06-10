@@ -17,7 +17,7 @@ struct LightSample
 #define DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN 5 * PI / 180
 
 //ok
-void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+float3 sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     float u = rand();
     float v = rand();
@@ -33,9 +33,24 @@ void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
     lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (4 * PI * lightGen.sphereRadius * lightGen.sphereRadius);
+
+    return pos;
 }
 
-void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleSphereLightWithPresampledLightSurfacePositison(in LightGenerateParam lightGen, in float3 scatterPosition, in float3 preSampledLightSurfacePos, inout LightSample lightSample)
+{
+    float3 pos = preSampledLightSurfacePos;
+    float3 xyz = (preSampledLightSurfacePos - lightGen.position) / lightGen.sphereRadius;
+    lightSample.type = LIGHT_TYPE_SPHERE;
+    lightSample.directionToLight = pos - scatterPosition;
+    lightSample.normal = normalize(xyz);
+    lightSample.emission = lightGen.emission;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
+    lightSample.pdf = 1 / (4 * PI * lightGen.sphereRadius * lightGen.sphereRadius);
+}
+
+float3 sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     float u = rand();
     float v = rand();
@@ -50,9 +65,26 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
     lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (4 * lenU * lenV);
+
+    return pos;
 }
 
-void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+void sampleRectLightWithPresampledLightSurfacePosition(in LightGenerateParam lightGen, in float3 scatterPosition, in float3 preSampledLightSurfacePos, inout LightSample lightSample)
+{
+    float lenU = sqrt(dot(lightGen.U, lightGen.U));
+    float lenV = sqrt(dot(lightGen.V, lightGen.V));
+
+    float3 pos = preSampledLightSurfacePos;
+    lightSample.type = LIGHT_TYPE_RECT;
+    lightSample.directionToLight = pos - scatterPosition;
+    lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
+    lightSample.emission = lightGen.emission;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
+    lightSample.pdf = 1 / (4 * lenU * lenV);
+}
+
+float3 sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     float u = rand();
     float v = rand();
@@ -72,6 +104,23 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
     lightSample.directionToLight /= lightSample.distance;
     lightSample.pdf = 1 / (PI * lenU * lenV);
+
+    return pos;
+}
+
+void sampleSpotLightWithPresampledLightSurfacePosition(in LightGenerateParam lightGen, in float3 scatterPosition, in float3 preSampledLightSurfacePos, inout LightSample lightSample)
+{
+    float lenU = sqrt(dot(lightGen.U, lightGen.U));
+    float lenV = sqrt(dot(lightGen.V, lightGen.V));
+    
+    float3 pos = preSampledLightSurfacePos;
+    lightSample.type = LIGHT_TYPE_SPOT;
+    lightSample.directionToLight = pos - scatterPosition;
+    lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
+    lightSample.emission = lightGen.emission;
+    lightSample.distance = sqrt(dot(lightSample.directionToLight, lightSample.directionToLight));
+    lightSample.directionToLight /= lightSample.distance;
+    lightSample.pdf = 1 / (PI * lenU * lenV);
 }
 
 float3 coneSample(float3 N, float cosMax)
@@ -84,7 +133,7 @@ float3 coneSample(float3 N, float cosMax)
     return tangentToWorld(N, float3(st * csp.x, st * csp.y, ct));
 }
 
-void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
+float3 sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPosition, inout LightSample lightSample)
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
 
@@ -97,7 +146,22 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.emission = lightGen.emission;
     lightSample.distance = RAY_MAX_T;
     lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
-    //lightSample.pdf = 1 / (2 * PI * (1 - cos(2 * DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN)));//sr is "2 * pi * (1 - cos(halfAngle))" but currently my conputation is failed...?
+
+    return lightSample.directionToLight;
+}
+
+void sampleDirectionalLightWithPresampledLightDirectionToLight(in LightGenerateParam lightGen, in float3 scatterPosition, in float3 preSampledLightDirectionToLight, inout LightSample lightSample)
+{
+    const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
+
+    float3 fromLight = normalize(lightGen.position);
+    
+    lightSample.type = LIGHT_TYPE_DIRECTIONAL;
+    lightSample.directionToLight = preSampledLightDirectionToLight;
+    lightSample.normal = fromLight;
+    lightSample.emission = lightGen.emission;
+    lightSample.distance = RAY_MAX_T;
+    lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
 }
 
 void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
@@ -156,25 +220,48 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     lightSample.pdf *= 1.0f / getLightNum();
 }
 
-void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
+float3 sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample lightSample)
 {
     LightGenerateParam param = gLightGenerateParams[ID];
     
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        sampleSphereLight(param, scatterPosition, lightSample);
+        return sampleSphereLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        sampleRectLight(param, scatterPosition, lightSample);
+        return sampleRectLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        sampleSpotLight(param, scatterPosition, lightSample);
+        return sampleSpotLight(param, scatterPosition, lightSample);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        sampleDirectionalLight(param, scatterPosition, lightSample);
+        return sampleDirectionalLight(param, scatterPosition, lightSample);
+    }
+    return -1.xxx;
+}
+
+void sampleLightWithIDAndPreSampledLightInfo(in float3 scatterPosition, in int ID, in float3 preSampledLightInfo, inout LightSample lightSample)
+{
+    LightGenerateParam param = gLightGenerateParams[ID];
+    
+    if (param.type == LIGHT_TYPE_SPHERE)
+    {
+        sampleSphereLightWithPresampledLightSurfacePositison(param, scatterPosition, preSampledLightInfo, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_RECT)
+    {
+        sampleRectLightWithPresampledLightSurfacePosition(param, scatterPosition, preSampledLightInfo, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_SPOT)
+    {
+        sampleSpotLightWithPresampledLightSurfacePosition(param, scatterPosition, preSampledLightInfo, lightSample);
+    }
+    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    {
+        sampleDirectionalLightWithPresampledLightDirectionToLight(param, scatterPosition, preSampledLightInfo, lightSample);
     }
 }
 

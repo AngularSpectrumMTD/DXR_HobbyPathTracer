@@ -149,7 +149,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
     const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : surfaceNormal;
     const float3 writePosition = isAnaliticalLightHitted ? hitPosition : scatterPosition;
-    storeGBuffer(payload, writePosition, writeColor, writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
+    storeGBuffer(payload, writePosition, isIgnoreHit ? 0.xxx : writeColor, isIgnoreHit ? 0.xxx : writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness);
 
     if (isTerminate)
     {

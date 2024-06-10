@@ -175,11 +175,11 @@ void spatialReuse() {
     const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse())
+    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_TEMPORAL_REUSE_M * 2 / 3)))
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
-            const float r = rand() * gReSTIRParam.data.x;
+            const float r = rand() * ((currDIReservoir.M > (MAX_TEMPORAL_REUSE_M / 2)) ? 1 : gReSTIRParam.data.x);
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
@@ -209,30 +209,28 @@ void spatialReuse() {
             const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
 
             const bool isSimilar = isNearPosition && isNearNormal && isSameInstance && isNearRoughness && isNearAlbedoLuminance;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
-            if(!isSimilar)
+            if(!isSimilar || (length(nearNormal) < 0.01))
             {
                 continue;
             }
-
-            LightSample lightSample;
-            sampleLightWithID(scatterPosition, nearDIReservoir.Y, lightSample);
-
-            // if(!isVisible(scatterPosition, lightSample))
-            // {
-            //     continue;
-            // }
-
             const float nearUpdateW = nearDIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
             combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand2(nearIndex.xy));
         }
     }
 
     LightSample lightSample;
-    sampleLightWithID(scatterPosition, spatDIReservoir.Y, lightSample);
+    sampleLightWithIDAndPreSampledLightInfo(scatterPosition, spatDIReservoir.lightID, spatDIReservoir.preSampledLightInfo, lightSample);
     float3 biasedPosition = scatterPosition + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
     if(!isVisible(biasedPosition, lightSample))
     {
         recognizeAsShadowedReservoir(spatDIReservoir);
+    }
+
+    if(spatDIReservoir.M > MAX_SPATIAL_REUSE_M)
+    {
+        float r = max(0, ((float)MAX_SPATIAL_REUSE_M / spatDIReservoir.M));
+        spatDIReservoir.W_sum *= r;
+        spatDIReservoir.M = MAX_SPATIAL_REUSE_M;
     }
 
     gDIReservoirBuffer[serialIndex] = spatDIReservoir;

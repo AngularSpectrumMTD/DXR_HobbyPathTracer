@@ -163,7 +163,8 @@ private:
 
     struct DIReservoir
     {
-        u32 Y; //index of most important light
+        u32 lightID; //light ID of most important light
+        float3 preSampledLightInfo;//light surface position / directionallight direction to light
         f32 targetPDF; //weight of light
         float3 targetPDF_3f; //weight of light(float 3)
         f32 W_sum; //sum of all weight
@@ -727,7 +728,7 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 2;
+    u32 mSpatialReuseTap = 4;
 
     bool mIsUseMetallicTest = false;
 

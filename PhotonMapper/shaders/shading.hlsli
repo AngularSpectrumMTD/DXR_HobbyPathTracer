@@ -301,7 +301,7 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
     for (int i = 0; i < M; i++)
     {
         const uint lightID = getRandomLightID();
-        sampleLightWithID(scatterPosition, lightID, lightSample);
+        float3 preSampledInfo = sampleLightWithID(scatterPosition, lightID, lightSample);
 
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
@@ -314,9 +314,10 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
         float3 p_hat_3F = FGL;
         p_hat = computeLuminance(FGL);
         float updateW = p_hat / pdf;
-        updateDIReservoir(reservoir, lightID, updateW, p_hat, p_hat_3F, 1u, rand());
+
+        updateDIReservoir(reservoir, lightID, preSampledInfo, updateW, p_hat, p_hat_3F, 1u, rand());
     }
-    sampleLightWithID(scatterPosition, reservoir.Y, lightSample);
+    sampleLightWithIDAndPreSampledLightInfo(scatterPosition, reservoir.lightID, reservoir.preSampledLightInfo, lightSample);
 }
 
 float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)

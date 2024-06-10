@@ -153,7 +153,7 @@ bool isTemporalReprojectionEnable(
 {
     const float3 cameraPos = mul(gSceneParam.mtxViewInv, float4(0, 0, 0, 1)).xyz;
     const bool isNearDepth = ((currDepth * 0.9 < prevDepth) && (prevDepth < currDepth * 1.1)) && (currDepth > 0) && (prevDepth > 0);
-    const bool isNearNormal = dot(currNormal, prevNormal) > 0.9;
+    const bool isNearNormal = dot(currNormal, prevNormal) > 0.9 || ((length(currNormal) == 0) && (length(prevNormal) == 0));
     const bool isSameInstance = (currInstanceIndex == prevInstanceIndex);
     const bool isNearRoughness = (abs(currRoughness - prevRoughness) < 0.05);
     const bool isNearPosition = (sqrt(dot(currPos - prevPos, currPos - prevPos)) < 0.1f);

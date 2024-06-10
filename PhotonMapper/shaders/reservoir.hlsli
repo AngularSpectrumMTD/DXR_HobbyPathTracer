@@ -6,7 +6,8 @@
 
 struct DIReservoir
 {
-    uint Y; //index of most important light
+    uint lightID;//light ID of most important light
+    float3 preSampledLightInfo;//light surface position / directionallight direction to light
     float targetPDF; //weight of light
     float3 targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
@@ -14,33 +15,26 @@ struct DIReservoir
 
     void initialize()
     {
-        Y = 0;
+        lightID = 0;
         targetPDF = 0;
         targetPDF_3f = 0.xxx;
         W_sum = 0;
         M = 0;
-    }
-
-    void debugInitialize()
-    {
-        Y = 1;
-        targetPDF = 2;
-        targetPDF_3f = 3.xxx;
-        W_sum = 4;
-        M = 5;
+        preSampledLightInfo = 0.xxx;
     }
 };
 
-bool updateDIReservoir(inout DIReservoir reservoir, in uint X, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)
+bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in float3 preSampledInfo, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
 
     if ((rnd01 < (w / reservoir.W_sum)) || reservoir.M == 0)
     {
-        reservoir.Y = X;
+        reservoir.lightID = inLightID;
         reservoir.targetPDF = p_hat;
         reservoir.targetPDF_3f = p_hat_3f;
+        reservoir.preSampledLightInfo = preSampledInfo;
         return true;
     }
     return false;
@@ -48,7 +42,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint X, in float w, in fl
 
 bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateDIReservoir(reservoir, reservoirCombineElem.Y, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
+    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.preSampledLightInfo, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)
