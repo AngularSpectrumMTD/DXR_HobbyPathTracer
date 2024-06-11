@@ -102,33 +102,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 
     float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
-    //reprojection test1
-    // const float3 prevCameraPos = mul(gSceneParam.mtxViewInvPrev, float4(0, 0, 0, 1));
-    // float3 pos = normalize(currObjectWorldPos - prevCameraPos) * (getNearPlaneDistance() + (getFarPlaneDistance() - getNearPlaneDistance())) + prevCameraPos;
-    // float3 toCam = pos;
-    // float camPosZ = toCam.z;
-    // float2 uv2;
-    // //uv2.x = (1 - (toCam.x + dims.x / 2) / dims.x);
-    // //uv2.y = (1 - (toCam.y + dims.y / 2) / dims.y);
-    // uv2.x = (toCam.x + dims.x / 2) / dims.x;
-    // uv2.y = (toCam.y + dims.y / 2) / dims.y;
-    //reprojection test1
-
     int2 prevID = PrevIDBuffer[currID];
-    // int2 prevID = velocity;
-
-    // //reprojection test2
-    // matrix mtxVPprev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
-    // float4 prevSV = mul(mtxVPprev, float4(currObjectWorldPos, 1));
-    // prevSV.xyz /= prevSV.w;
-    // float2 prevUV = (prevSV.xy * float2(0.5, -0.5)) + float2(0.5, 0.5);
-    //prevUV.y = 1 - prevUV.y;
-    //prevID = prevUV * dims;//tier1
-    //reprojection test2
-
-    //reprojection test3
-    //prevID = computeTemporalReprojectedID(currID, velocity, dims);
-    //reprojection test3
 
     float3 currDI = 0.xxx;
     if(isUseNEE() && isUseWRS_RIS())

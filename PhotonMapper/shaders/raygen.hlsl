@@ -175,11 +175,11 @@ void spatialReuse() {
     const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_TEMPORAL_REUSE_M * 2 / 3)))
+    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_TEMPORAL_REUSE_M / 2)))
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
-            const float r = rand() * ((currDIReservoir.M > (MAX_TEMPORAL_REUSE_M / 2)) ? 1 : gReSTIRParam.data.x);
+            const float r = rand() * ((currDIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : gReSTIRParam.data.x);
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
