@@ -1,22 +1,17 @@
-# DXRHybridPhotonMapper
-Hybrid Photon Mapper By Use Of DirectX Raytracing  
-(Pathtracing[NEE + Streaming RIS(DI = ReSTIR)] + Photon Mapping[Spectral Rendered Caustics)  
+# DXR_HobbyPathTracer
+Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Caustics)]  
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/56718bc0-9fd0-4928-b9a5-c146c2d5c378
+https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b
 
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/9c1972e2-22f5-46f0-978e-ab886efb68de
-
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/3a07f68b-4b39-4c23-a21b-e42018c6e48a
-
-https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/339c5d8f-eef4-40a3-b3ec-35fabfce88b0
+https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/21496e6b-b5b2-42a3-a249-9b26f1c61344
 
 ![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/213cc5f5-11c1-405f-9e14-9867398378cb)
 
-![bistro](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/2d373d85-7128-4249-8e70-c51c10fcb542)
+![bistro](https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/50c81e1a-8c5d-40b3-a467-8d7fbaf1337f)
 
 ![caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/805716d4-50cd-414c-9979-08731e25b3b0)
 
-"Next Event Estimation" and Weighted Reservoir Sampling based Resampled Importance Sampling is implemented for many lights. 
+"Next Event Estimation" and Streaming RIS is implemented for many lights. 
 
 This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
 (Doing) ReSTIR DI is implemented for improving the quality RIS.   
