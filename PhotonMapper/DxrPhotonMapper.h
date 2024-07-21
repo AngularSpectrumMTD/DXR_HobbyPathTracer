@@ -138,11 +138,8 @@ private:
     struct Payload
     {
         float3 throughput;
-        float3 caustics;
         int recursive;
         unsigned int flags;
-        float3 DI;
-        float3 GI;
     };
 
     struct PhotonPayload

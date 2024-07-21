@@ -20,11 +20,8 @@
 struct Payload
 {
     float3 throughput;
-    float3 caustics;
     int recursive;
     uint flags;
-    float3 DI;
-    float3 GI;
 };
 
 struct PhotonPayload

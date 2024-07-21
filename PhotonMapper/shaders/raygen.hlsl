@@ -33,10 +33,6 @@ void rayGen() {
     gDIReservoirBuffer[serialIndex] = dummyReservoir;
     gDISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
 
-    float3 accumCaustics = 0.xxx;
-    float3 accumDI = 0.xxx;
-    float3 accumGI = 0.xxx;
-
     //random
     float LightSeed = getLightRandomSeed();
     uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
@@ -45,9 +41,10 @@ void rayGen() {
 
     const float energyBoost = 1.0f;
 
-    for(int i = 0; i < SPP ; i++)
+    //for(int i = 0; i < SPP ; i++)
     {
-        float2 IJ = int2(i / (SPP / 2.f), i % (SPP / 2.f)) - 0.5.xx;
+        //float2 IJ = int2(i / (SPP / 2.f), i % (SPP / 2.f)) - 0.5.xx;
+        float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
 
         float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
         RayDesc nextRay;
@@ -61,29 +58,15 @@ void rayGen() {
 
         Payload payload;
         payload.throughput = energyBoost * float3(1, 1, 1);
-        payload.caustics = float3(0, 0, 0);
         payload.recursive = 0;
         payload.flags = 0;//empty
-        payload.DI = 0.xxx;
-        payload.GI = 0.xxx;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
         uint rayMask = 0xFF;
 
         TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
-
-        accumCaustics += payload.caustics;
-        accumDI += payload.DI;
-        accumGI += payload.GI;
     }
-    float3 finalDI = max(0.xxx, accumDI / SPP);
-    float3 finalGI = max(0.xxx, accumGI / SPP);
-    float3 finalCaustics = max(0.xxx, accumCaustics / SPP);
-
-    gDIBuffer[launchIndex.xy] = float4(finalDI, 0);
-    gGIBuffer[launchIndex.xy] = float4(finalGI, 0);
-    gCausticsBuffer[launchIndex.xy] = float4(finalCaustics, 0);
 }
 
 //
