@@ -292,7 +292,7 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
 
 void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir)
 {
-    const uint M = min(getLightNum(), 30);
+    const uint M = min(getLightNum(), 10);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
 
