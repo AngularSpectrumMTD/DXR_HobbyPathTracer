@@ -140,7 +140,6 @@ private:
         float3 throughput;
         float3 caustics;
         uint2 storeIndexXY;
-        float3 eyeDir;
         int recursive;
         unsigned int flags;
         float3 DI;
@@ -722,7 +721,7 @@ private:
 
     bool mIsUseManySphereLightLighting;
     bool isPrimalLightSRVUpdate = true;
-    bool mIsUseWRS_RIS = false;
+    bool mIsUseStreamingRIS = false;
     bool mIsTemporalAccumulationForceDisable = false;
 
     bool mIsUseReservoirTemporalReuse = false;

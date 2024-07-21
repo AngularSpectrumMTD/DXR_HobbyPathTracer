@@ -39,7 +39,7 @@ bool isUseNEE()
     return gSceneParam.additional.z == 1;
 }
 
-bool isUseWRS_RIS()
+bool isUseStreamingRIS()
 {
     return gSceneParam.additional.w == 1;
 }

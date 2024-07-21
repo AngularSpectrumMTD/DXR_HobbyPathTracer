@@ -85,7 +85,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     int2 prevID = PrevIDBuffer[currID];
 
     float3 currDI = 0.xxx;
-    if(isUseNEE() && isUseWRS_RIS())
+    if(isUseNEE() && isUseStreamingRIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
         DIReservoir currDIReservoir = DIReservoirBufferSrc[serialCurrID];

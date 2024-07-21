@@ -65,7 +65,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
         return;
     }
 
-    const float3 photon = accumulatePhoton(scatterPosition, payload.eyeDir, bestFitWorldNormal);
+    const float3 photon = accumulatePhoton(scatterPosition, bestFitWorldNormal);
 
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;

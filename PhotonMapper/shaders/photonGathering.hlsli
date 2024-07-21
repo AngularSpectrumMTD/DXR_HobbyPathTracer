@@ -54,7 +54,7 @@ float poly6Kernel2D(float distance, float maxd)
     return alpha * tmp;
 }
 
-float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
+float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDebug = false)
 {
     float gatherRadius = getGatherRadius();
     float sharp = getGatherSharpness();
@@ -74,8 +74,6 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
     float3 accumulateXYZ = float3(0, 0, 0);
 
     float3 normWN = normalize(worldNormal);
-    float3 normEYE = normalize(eyeDir);
-    bool isEyeFlag = dot(normEYE, normWN) > 0;
 
     //Search Near Cell
     for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
@@ -112,9 +110,9 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 eyeDir, float3 worldNo
     return accumulateXYZ;
 }
 
-float3 accumulatePhoton(float3 gatherCenterPos, float3 eyeDir, float3 worldNormal, bool isDebug = false)
+float3 accumulatePhoton(float3 gatherCenterPos, float3 worldNormal, bool isDebug = false)
 {
-    return accumulatePhotonHGC(gatherCenterPos, eyeDir, worldNormal, isDebug);
+    return accumulatePhotonHGC(gatherCenterPos, worldNormal, isDebug);
 }
 
 #endif//__PHOTONGATHERING_HLSLI__

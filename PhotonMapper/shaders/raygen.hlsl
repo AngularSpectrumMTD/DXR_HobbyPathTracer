@@ -65,7 +65,6 @@ void rayGen() {
         payload.recursive = 0;
         payload.storeIndexXY = launchIndex.xy;
         payload.flags = 0;//empty
-        payload.eyeDir = nextRay.Direction;
         payload.DI = 0.xxx;
         payload.GI = 0.xxx;
 
@@ -225,6 +224,8 @@ void spatialReuse() {
     {
         recognizeAsShadowedReservoir(spatDIReservoir);
     }
+
+    //The term "FGL" must be recalculated and the loading of MaterialParams must be prepared..... very cumbersome...
 
     if(spatDIReservoir.M > MAX_SPATIAL_REUSE_M)
     {

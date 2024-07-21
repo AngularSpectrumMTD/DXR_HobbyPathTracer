@@ -22,7 +22,6 @@ struct Payload
     float3 throughput;
     float3 caustics;
     uint2 storeIndexXY;
-    float3 eyeDir;
     int recursive;
     uint flags;
     float3 DI;

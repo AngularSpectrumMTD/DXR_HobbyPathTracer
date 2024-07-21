@@ -290,7 +290,7 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
     return BSDF_PDF;
 }
 
-void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir)
 {
     const uint M = min(getLightNum(), 30);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
@@ -323,10 +323,10 @@ void sampleLightWRSbasedRIS(in MaterialParams material, in float3 scatterPositio
 float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)
 {
     float3 estimatedColor = 0.xxx;
-    if (isUseWRS_RIS())
+    if (isUseStreamingRIS())
     {
         LightSample lightSample;
-        sampleLightWRSbasedRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir);
+        sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir);
         if (isVisible(scatterPosition, lightSample))
         {
            estimatedColor = shadeDIReservoir(reservoir);
@@ -431,7 +431,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
                 float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal, reservoir) * payload.throughput;
                 if(isDirectRay(payload))
                 {
-                    if(isUseWRS_RIS())
+                    if(isUseStreamingRIS())
                     {
                         storeDIReservoir(reservoir, payload);
                     }

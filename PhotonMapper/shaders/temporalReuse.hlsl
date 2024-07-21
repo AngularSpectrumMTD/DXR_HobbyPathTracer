@@ -105,7 +105,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     int2 prevID = PrevIDBuffer[currID];
 
     float3 currDI = 0.xxx;
-    if(isUseNEE() && isUseWRS_RIS())
+    if(isUseNEE() && isUseStreamingRIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
