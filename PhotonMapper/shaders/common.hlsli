@@ -21,7 +21,6 @@ struct Payload
 {
     float3 throughput;
     float3 caustics;
-    uint2 storeIndexXY;
     int recursive;
     uint flags;
     float3 DI;
@@ -244,7 +243,7 @@ void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, i
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
     {
-        float2 writeIndex = payload.storeIndexXY;
+        float2 writeIndex = DispatchRaysIndex().xy;
         gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
         gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(position));
         gPositionBuffer[writeIndex] = float4(position, 0);

@@ -139,7 +139,6 @@ private:
     {
         float3 throughput;
         float3 caustics;
-        uint2 storeIndexXY;
         int recursive;
         unsigned int flags;
         float3 DI;

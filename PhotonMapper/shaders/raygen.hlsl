@@ -63,7 +63,6 @@ void rayGen() {
         payload.throughput = energyBoost * float3(1, 1, 1);
         payload.caustics = float3(0, 0, 0);
         payload.recursive = 0;
-        payload.storeIndexXY = launchIndex.xy;
         payload.flags = 0;//empty
         payload.DI = 0.xxx;
         payload.GI = 0.xxx;
