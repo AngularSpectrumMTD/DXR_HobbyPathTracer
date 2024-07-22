@@ -147,7 +147,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         CurrentGIBuffer[currID].rgb = accumulatedGI;
         CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
         LuminanceMomentBufferDst[currID] = currLuminanceMoment;
-}
+    }
     else
     {
         AccumulationCountBuffer[currID] = 1;

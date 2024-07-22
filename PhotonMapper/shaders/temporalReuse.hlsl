@@ -33,36 +33,6 @@ float rand(in int2 indexXY)//0-1
     return frac(sin(dot(indexXY.xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
 }
 
-float computeLuminance(const float3 linearRGB)
-{
-    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
-}
-
-float reinhard(float x, float L)
-{
-    return (x / (1 + x)) * (1 + x / L / L);
-}
-
-float3 reinhard3f(float3 v, float L)
-{
-    return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
-}
-
-float ACESFilmicTonemapping(float x)
-{
-    const float a = 2.51;
-    const float b = 0.03;
-    const float c = 2.43;
-    const float d = 0.59;
-    const float e = 0.14;
-    return saturate(x * (a * x + b) / (x * (c * x + d) + c));
-}
-
-float3 ACESFilmicTonemapping3f(float3 v)
-{
-    return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
-}
-
 void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, in uint2 currID)
 {
     //Limitting
