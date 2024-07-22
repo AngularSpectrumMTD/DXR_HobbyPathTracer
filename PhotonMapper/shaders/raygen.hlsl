@@ -199,7 +199,8 @@ void spatialReuse() {
     }
 
     LightSample lightSample;
-    sampleLightWithIDAndPreSampledLightInfo(scatterPosition, spatDIReservoir.lightID, spatDIReservoir.preSampledLightInfo, lightSample);
+    rseed = spatDIReservoir.randomSeed;
+    sampleLightWithID(scatterPosition, spatDIReservoir.lightID, lightSample);
     float3 biasedPosition = scatterPosition + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
     if(!isVisible(biasedPosition, lightSample))
     {

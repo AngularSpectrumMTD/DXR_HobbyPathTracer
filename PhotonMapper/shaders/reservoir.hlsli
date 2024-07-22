@@ -7,7 +7,7 @@
 struct DIReservoir
 {
     uint lightID;//light ID of most important light
-    float3 preSampledLightInfo;//light surface position / directionallight direction to light
+    uint randomSeed;//replay
     float targetPDF; //weight of light
     float3 targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
@@ -16,15 +16,15 @@ struct DIReservoir
     void initialize()
     {
         lightID = 0;
+        randomSeed = 0;
         targetPDF = 0;
         targetPDF_3f = 0.xxx;
         W_sum = 0;
         M = 0;
-        preSampledLightInfo = 0.xxx;
     }
 };
 
-bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in float3 preSampledInfo, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)
+bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint randomSeed, in float w, in float p_hat, in float3 p_hat_3f, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
@@ -34,7 +34,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in float3
         reservoir.lightID = inLightID;
         reservoir.targetPDF = p_hat;
         reservoir.targetPDF_3f = p_hat_3f;
-        reservoir.preSampledLightInfo = preSampledInfo;
+        reservoir.randomSeed = randomSeed;
         return true;
     }
     return false;
@@ -42,7 +42,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in float3
 
 bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.preSampledLightInfo, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
+    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)

@@ -35,8 +35,8 @@ float3 HemisphereORCosineSampling(float3 N, bool isHemi)
 float3 GGX_ImportanceSampling(float3 N, float roughness)
 {
     float alpha = roughness * roughness;
-    float randX = randXorshift();
-    float randY = randXorshift();
+    float randX = rand();
+    float randY = rand();
 
     float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
     float sinT = sqrt(1 - cosT * cosT);

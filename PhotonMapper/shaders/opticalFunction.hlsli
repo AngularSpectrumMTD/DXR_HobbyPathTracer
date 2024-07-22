@@ -16,14 +16,6 @@ struct MaterialParams
     float4 emission;
 };
 
-static uint rseed;
-
-float rand()//0-1
-{
-    rseed += 1.0;
-    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() % 100 + 1) * 0.001 + rseed + getLightRandomSeed()) * 43758.5453);
-}
-
 bool isPhotonStoreRequired(in MaterialParams params)
 {
     return rand() < params.roughness;

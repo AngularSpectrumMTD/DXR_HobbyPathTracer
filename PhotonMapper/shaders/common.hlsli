@@ -93,38 +93,20 @@ ConstantBuffer<ReSTIRParam> gReSTIRParam : register(b2);
 ////////////////////////////////////
 //Random
 ////////////////////////////////////
+
+static uint rseed;
+float rand()//0-1
+{
+    rseed += 1.0;
+    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() % 100 + 1) * 0.001 + rseed + getLightRandomSeed()) * 43758.5453);
+}
+
 static uint randGenState;
-static const float rnd01Converter = (1.0f / 4294967296.0f);
-float randXorshift()
-{
-    randGenState ^= uint(randGenState << 13);
-    randGenState ^= uint(randGenState >> 17);
-    randGenState ^= uint(randGenState << 5);
-    return randGenState * rnd01Converter;
-}
-
-uint wangHash(uint seed)
-{
-    seed = (seed ^ 61) ^ (seed >> 16);
-    seed *= 9;
-    seed = seed ^ (seed >> 4);
-    seed *= 0x27d4eb2d;
-    seed = seed ^ (seed >> 15);
-    return seed;
-}
-
 uint pcgHash(uint seed)
 {
     uint state = seed * 747796405u + 2891336453u;
     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u; 
     return (word >> 22u) ^ word;
-}
-
-float pcgHashState()
-{
-    randGenState = randGenState * 747796405u + 2891336453u;
-    uint word = ((randGenState >> ((randGenState >> 28u) + 4u)) ^ randGenState) * 277803737u; 
-    return ((word >> 22u) ^ word) * rnd01Converter;
 }
 
 ////////////////////////////////////
@@ -207,8 +189,8 @@ float3 getConeSample(float randSeed, float3 direction, float coneAngle)
 {
     float cosAngle = cos(coneAngle);
 
-    float z = pcgHashState() * (1.0f - cosAngle) + cosAngle;
-    float phi = pcgHashState() * 2.0f * PI;
+    float z = rand() * (1.0f - cosAngle) + cosAngle;
+    float phi = rand() * 2.0f * PI;
 
     float x = sqrt(1.0f - z * z) * cos(phi);
     float y = sqrt(1.0f - z * z) * sin(phi);

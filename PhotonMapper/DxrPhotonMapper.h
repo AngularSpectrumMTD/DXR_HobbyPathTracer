@@ -158,7 +158,7 @@ private:
     struct DIReservoir
     {
         u32 lightID; //light ID of most important light
-        float3 preSampledLightInfo;//light surface position / directionallight direction to light
+        u32 randomSeed;//replay
         f32 targetPDF; //weight of light
         float3 targetPDF_3f; //weight of light(float 3)
         f32 W_sum; //sum of all weight
