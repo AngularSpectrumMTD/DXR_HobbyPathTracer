@@ -58,7 +58,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -74,7 +74,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 8;
-    mCausticsBoost = 0.1f;
+    mCausticsBoost = 0.17f;
     mIsMoveModel = false;
     mIsApplyCaustics = false;
     mIsUseDenoise = false;
@@ -93,7 +93,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
-    mIsUseReservoirTemporalReuse = true;
+    mIsUseReservoirTemporalReuse = false;
     mIsUseReservoirSpatialReuse = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
@@ -171,8 +171,8 @@ void DxrPhotonMapper::Setup()
                 }
                 else
                 {
-                    mLightPosX = 1.7f; mLightPosY = 5.79f; mLightPosZ = 2.2f;
-                    mPhi = 417.0f; mTheta = 231.0f;
+                    mLightPosX = 0.1f; mLightPosY = 6.59f; mLightPosZ = 3.4f;
+                    mPhi = 447.0f; mTheta = 206.0f;
                     mGlassModelType = ModelType_Diamond;
                     mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
                 }

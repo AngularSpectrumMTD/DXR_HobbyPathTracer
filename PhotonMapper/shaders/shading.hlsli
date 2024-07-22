@@ -341,22 +341,16 @@ float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition
         //explicitly connect to light source
         LightSample lightSample;
         sampleLight(scatterPosition, lightSample);
-        if (isVisible(scatterPosition, lightSample))
+        float3 lightNormal = lightSample.normal;
+        float3 wi = lightSample.directionToLight;
+        float receiverCos = dot(surfaceNormal, wi);
+        float emitterCos = dot(lightNormal, -wi);
+        if (isVisible(scatterPosition, lightSample) && (receiverCos > 0) && (emitterCos > 0))
         {
-            float3 lightNormal = lightSample.normal;
-            float3 wi = lightSample.directionToLight;
-            float receiverCos = dot(surfaceNormal, wi);
-            if (receiverCos > 0)
-            {
-                float emitterCos = dot(lightNormal, -wi);
-                if (emitterCos > 0)
-                {
-                    float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
-                    float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
-                    float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
-                    estimatedColor = FGL;
-                }
-            }
+            float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+            float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+            float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+            estimatedColor = FGL;
         }
     }
     return estimatedColor;
@@ -406,7 +400,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         }
 
         //ray hitted the emissive material
-        if (length(material.emission.xyz) > 0)
+        if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
             float3 element = payload.throughput * material.emission.xyz;
             if(isDirectRay(payload))
@@ -472,7 +466,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         }
 
         //ray hitted the emissive material
-        if (length(material.emission.xyz) > 0)
+        if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
             float3 element = payload.throughput * material.emission.xyz;
             if(isDirectRay(payload))

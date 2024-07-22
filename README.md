@@ -9,7 +9,7 @@ https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/21496e
 
 ![bistro](https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/50c81e1a-8c5d-40b3-a467-8d7fbaf1337f)
 
-![caustics](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/805716d4-50cd-414c-9979-08731e25b3b0)
+![caustics](https://github.com/user-attachments/assets/405100af-01ee-4cff-a1a4-0b7d96a11b51)
 
 "Next Event Estimation" and Streaming RIS is implemented for many lights. 
 

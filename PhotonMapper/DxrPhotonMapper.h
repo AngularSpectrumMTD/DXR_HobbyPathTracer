@@ -146,7 +146,6 @@ private:
     {
         float3 throughput;
         s32 recursive;
-        s32 storeIndex;
         s32 stored;
         f32 lambdaNM;
     };

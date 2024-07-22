@@ -28,7 +28,6 @@ struct PhotonPayload
 {
     float3 throughput;
     int recursive;
-    int storeIndex;
     int stored;
     float lambdaNM;
 };

@@ -106,9 +106,8 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.throughput = getBaseLightXYZ(LAMBDA_NM);
+    payload.throughput = 1.xxx;//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
-    payload.storeIndex = serialIndex;
     payload.stored = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
 

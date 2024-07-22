@@ -23,7 +23,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.throughput = float3(0, 0, 0);
         photon.position = float3(0, 0, 0);
         //photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex] = photon;
+        gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
         payload.stored = 1;
     }
     else
@@ -32,7 +32,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.throughput = payload.throughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         //photon.inDir = WorldRayDirection();
-        gPhotonMap[payload.storeIndex] = photon;
+        gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
         payload.stored = 1;
     }
 

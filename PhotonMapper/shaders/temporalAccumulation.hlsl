@@ -142,7 +142,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
 
         float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
-        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(accumulatedCaustics, XYZtoRGB2);
+        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * accumulatedCaustics;// * mul(accumulatedCaustics, XYZtoRGB2);
         CurrentDIBuffer[currID].rgb = accumulatedDI;
         CurrentGIBuffer[currID].rgb = accumulatedGI;
         CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
@@ -153,7 +153,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         AccumulationCountBuffer[currID] = 1;
         float3 currDIGI = currDI + currGI;
         float3 toneMappedDIGI = float3(currDIGI * reinhard(computeLuminance(currDIGI), REINHARD_L) / computeLuminance(currDIGI));//luminance based tone mapping
-        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * mul(currCaustics, XYZtoRGB2);
+        DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * currCaustics;// * mul(currCaustics, XYZtoRGB2);
         CurrentDIBuffer[currID].rgb = currDI;
         CurrentGIBuffer[currID].rgb = currGI;
         CurrentCausticsBuffer[currID].rgb = currCaustics;
