@@ -58,14 +58,14 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_BistroExterior;
 
     mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 2;
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightRange = 1.0f;
