@@ -21,7 +21,7 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
-#define USE_SPATIAL_RESERVOIR_FEEDBACK
+//#define USE_SPATIAL_RESERVOIR_FEEDBACK
 
 //#define CUBE_TEST
 
@@ -58,7 +58,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_BistroInterior;
 
     mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;

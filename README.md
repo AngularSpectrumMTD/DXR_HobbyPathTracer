@@ -1,6 +1,8 @@
 # DXR_HobbyPathTracer
 Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Caustics)]  
 
+![bistroMain](https://github.com/user-attachments/assets/0ec6e127-b96e-4d3f-b0da-8d8793923dc9)
+
 https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b
 
 https://github.com/user-attachments/assets/391d9295-703f-40b2-b192-c342f403265c
@@ -25,7 +27,7 @@ Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
 
 ### Debug View
 Enable to check (Diffuse)Albedo / Depth / Normal   
-![debugView](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/cde24f39-521b-4674-8715-393c9ec5379f)
+![debugView](https://github.com/user-attachments/assets/82653053-4d25-47c1-97aa-4dd178e401d6)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
