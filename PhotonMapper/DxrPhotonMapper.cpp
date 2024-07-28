@@ -64,8 +64,8 @@ void DxrPhotonMapper::Setup()
     mIntenceBoost = 300;
     mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
     mGatherBlockRange = 2;
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightRange = 1.0f;
@@ -178,6 +178,7 @@ void DxrPhotonMapper::Setup()
                 }
             }
             mIsSpotLightPhotonMapper = false;
+            mCausticsBoost = 0.5f;
         }
         break;
         case SceneType_BistroExterior:
@@ -205,7 +206,7 @@ void DxrPhotonMapper::Setup()
                 mLightRange = 2.29f;
 #else
                 mInitEyePos = XMFLOAT3(16.8f, 9.77f, 31.4f);
-                mLightRange = 0.77f;
+                mLightRange = 0.56f;
                 mLightPosX = -2.38f; mLightPosY = 7.8f; mLightPosZ = -2.9f;
 #endif
                 mGatherRadius = 0.08f;

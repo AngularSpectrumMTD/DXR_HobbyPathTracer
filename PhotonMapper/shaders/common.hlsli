@@ -91,6 +91,39 @@ ConstantBuffer<ReSTIRParam> gReSTIRParam : register(b2);
 #include "sceneParamInterface.hlsli"
 
 ////////////////////////////////////
+//Irradiance
+////////////////////////////////////
+void addDI(in float3 color)
+{
+    gDIBuffer[DispatchRaysIndex().xy] += float4(color, 0);
+}
+
+void setDI(in float3 color)
+{
+    gDIBuffer[DispatchRaysIndex().xy] = float4(color, 0);
+}
+
+void addGI(in float3 color)
+{
+    gGIBuffer[DispatchRaysIndex().xy] += float4(color, 0);
+}
+
+void setGI(in float3 color)
+{
+    gGIBuffer[DispatchRaysIndex().xy] = float4(color, 0);
+}
+
+void addCaustics(in float3 color)
+{
+    gCausticsBuffer[DispatchRaysIndex().xy] += float4(color, 0);
+}
+
+void setCaustics(in float3 color)
+{
+    gCausticsBuffer[DispatchRaysIndex().xy] = float4(color, 0);
+}
+
+////////////////////////////////////
 //Random
 ////////////////////////////////////
 

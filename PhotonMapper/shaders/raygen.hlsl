@@ -18,12 +18,11 @@ void rayGen() {
     gIDRoughnessBuffer[launchIndex.xy] = 0.xxxx;
     gPrevIDBuffer[launchIndex.xy] = 0.xx;
 
-    //clear DI / GI buffer
-    gDIBuffer[launchIndex.xy] = 0.xxxx;
-    gGIBuffer[launchIndex.xy] = 0.xxxx;
-
-    //clear caustics buffer
-    gCausticsBuffer[launchIndex.xy] = 0.xxxx;
+    //clear DI / GI / caustics buffer
+    setDI(0.xxx);
+    setGI(0.xxx);
+    setCaustics(0.xxx);
+    
     gPrevIDBuffer[launchIndex.xy] = 0.xx;
 
     //clear reservoir buffer

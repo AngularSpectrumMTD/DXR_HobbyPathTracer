@@ -22,7 +22,7 @@ void miss(inout Payload payload) {
     float3 hitPosition = 0.xxx;
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hitLe, hitPosition, hitNormal))
     {
-        gDIBuffer[DispatchRaysIndex().xy] = float4(hitLe, 0);
+        setDI(hitLe);
         payload.throughput = 0.xxx;
         const bool isAnaliticalLightHitted = (length(hitLe) > 0);
         const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
@@ -41,11 +41,11 @@ void miss(inout Payload payload) {
 
         if(isDirectRay(payload) || isCompletelyMissRay(payload))
         {
-            gDIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+            addDI(element);
         }
         if(isIndirectRay(payload))
         {
-            gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+            addGI(element);
         }
     }
 
@@ -56,11 +56,11 @@ void miss(inout Payload payload) {
     float3 element = payload.throughput * cubemap.rgb;
     if(isDirectRay(payload) || isCompletelyMissRay(payload))
     {
-        gDIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+        addDI(element);
     }
     if(isIndirectRay(payload))
     {
-        gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+        addGI(element);
     }
 #endif
     payload.throughput = 0.xxx;

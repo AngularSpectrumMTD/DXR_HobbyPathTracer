@@ -71,7 +71,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
     const float3 element = payload.throughput * photon;
-    gCausticsBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+    addCaustics(element);
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
 
     RAY_FLAG flags = RAY_FLAG_NONE;

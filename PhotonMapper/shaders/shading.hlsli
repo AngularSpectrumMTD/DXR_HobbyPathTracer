@@ -396,7 +396,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
             float3 element = payload.throughput * Le;
-            gDIBuffer[DispatchRaysIndex().xy] = float4(element, 0);
+            setDI(element);
             isFinish = true;
             return isFinish;
         }
@@ -407,11 +407,11 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             float3 element = payload.throughput * material.emission.xyz;
             if(isDirectRay(payload))
             {
-                gDIBuffer[DispatchRaysIndex().xy] = float4(element, 0);
+                setDI(element);
             }
             if(isIndirectRay(payload))
             {
-                gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+                addGI(element);
             }
 
             isFinish = false;
@@ -433,12 +433,12 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
                     }
                     else
                     {
-                        gDIBuffer[DispatchRaysIndex().xy] = float4(element, 0);
+                        setDI(element);
                     }
                 }
                 if(isIndirectRay(payload))
                 {
-                    gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+                    addGI(element);
                 }
             }
         }
@@ -456,11 +456,11 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
                 float3 element = payload.throughput * Le;
                 if(isDirectRay(payload))
                 {
-                    gDIBuffer[DispatchRaysIndex().xy] = float4(element, 0);
+                    setDI(element);
                 }
                 if(isIndirectRay(payload))
                 {
-                    gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+                    addGI(element);
                 }
             }
             isFinish = true;
@@ -473,11 +473,11 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             float3 element = payload.throughput * material.emission.xyz;
             if(isDirectRay(payload))
             {
-                gDIBuffer[DispatchRaysIndex().xy] = float4(element, 0);
+                setDI(element);
             }
             if(isIndirectRay(payload))
             {
-                gGIBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+                addGI(element);
             }
             isFinish = false;
             return isFinish;

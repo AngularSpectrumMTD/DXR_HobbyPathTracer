@@ -93,30 +93,13 @@ void editMaterial(inout MaterialParams mat)
     }
 }
 
-[shader("closesthit")]
-void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
+MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout VertexPNT vtx, inout bool isIgnoreHit)
 {
-    if (isShadowRay(payload))
-    {
-        setVisibility(payload, false);
-        return;
-    }
-
-    if (isReachedRecursiveLimitPayload(payload))
-    {
-        return;
-    }
-
     bool isNoTexture = false;
-    VertexPNT vtx = getVertex(attrib, isNoTexture);
-    float3 surfaceNormal = vtx.Normal;
-
-    uint primitiveIndex = PrimitiveIndex();
-    uint instanceIndex = InstanceIndex();
+    vtx = getVertex(attrib, isNoTexture);
     
     float4 diffuseTexColor = 1.xxxx;
 
-    bool isIgnoreHit = false;
     getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
 
     MaterialParams currentMaterial = constantBuffer;
@@ -134,6 +117,30 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         editMaterial(currentMaterial);
     }
+
+    return currentMaterial;
+}
+
+[shader("closesthit")]
+void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
+{
+    if (isShadowRay(payload))
+    {
+        setVisibility(payload, false);
+        return;
+    }
+
+    if (isReachedRecursiveLimitPayload(payload))
+    {
+        return;
+    }
+    uint primitiveIndex = PrimitiveIndex();
+    uint instanceIndex = InstanceIndex();
+
+    VertexPNT vtx;
+    bool isIgnoreHit = false;
+    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHit);
+    float3 surfaceNormal = vtx.Normal;
 
     //non color test
     //currentMaterial.albedo = 1.xxxx;
@@ -164,7 +171,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         nextRay.Direction = 0.xxx;
         const float3 photon = accumulatePhoton(scatterPosition, bestFitWorldNormal);
         const float3 element = payload.throughput * photon;
-        gCausticsBuffer[DispatchRaysIndex().xy] += float4(element, 0);
+        addCaustics(element);
         updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
     }
     else
@@ -185,24 +192,13 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
+    uint primitiveIndex = PrimitiveIndex();
+    uint instanceIndex = InstanceIndex();
 
-    bool isNoTexture = false;
-    VertexPNT vtx = getVertex(attrib, isNoTexture);
-    float3 surfaceNormal = vtx.Normal;
-    
-    float4 diffuseTexColor = 1.xxxx;
-
+    VertexPNT vtx;
     bool isIgnoreHit = false;
-    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
-
-    MaterialParams currentMaterial = constantBuffer;
-    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
-
-    //recognize as glass
-    if (length(currentMaterial.albedo) == 0 && !isNoTexture)
-    {
-        editMaterial(currentMaterial);
-    }
+    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHit);
+    float3 surfaceNormal = vtx.Normal;
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
 

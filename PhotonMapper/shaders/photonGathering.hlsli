@@ -70,10 +70,16 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
         return float3(0, 0, 0);
     }
 
+    const uint CurrGridID = GridHash(GridXYZ);
+
     int X = 0, Y = 0, Z = 0, G = 0;
     float3 accumulateXYZ = float3(0, 0, 0);
-
-    float3 normWN = normalize(worldNormal);
+    
+    uint2 IDstardEnd = gPhotonGridIdBuffer[CurrGridID];
+    if ((IDstardEnd.x == UINT32_MAX) || (IDstardEnd.y == UINT32_MAX) || (IDstardEnd.y == IDstardEnd.x))
+    {
+        return float3(0, 0, 0);
+    }
 
     //Search Near Cell
     for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
