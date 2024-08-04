@@ -18,7 +18,7 @@ struct MaterialParams
 
 bool isPhotonStoreRequired(in MaterialParams params)
 {
-    return rand() < params.roughness;
+    return (rand() < params.roughness) && (params.transRatio == 0);
 }
 
 void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
