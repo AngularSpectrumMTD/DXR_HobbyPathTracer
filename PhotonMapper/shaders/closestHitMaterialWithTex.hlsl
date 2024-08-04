@@ -169,7 +169,12 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     if (!isIgnoreHit)
     {
         nextRay.Direction = 0.xxx;
-        const float3 photon = accumulatePhoton(scatterPosition, bestFitWorldNormal);
+        float3 photon = 0.xxx;
+        if(payload.recursive < 3)
+        {
+            photon = accumulatePhoton(scatterPosition, bestFitWorldNormal);
+        }
+        
         const float3 element = payload.throughput * photon;
         addCaustics(element);
         updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);

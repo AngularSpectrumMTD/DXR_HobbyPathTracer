@@ -60,12 +60,12 @@ void DxrPhotonMapper::Setup()
 {
     mSceneType = SceneType_BistroExterior;
 
-    mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(7, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
-    mGatherRadius = min(0.1f, (2.f * PLANE_SIZE) / GRID_DIMENSION);
-    mGatherBlockRange = 2;
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
+    mGatherRadius = 0.031f;
+    mGatherBlockRange = 1;
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = 6;
     mLightRange = 1.0f;
@@ -208,7 +208,6 @@ void DxrPhotonMapper::Setup()
                 mLightRange = 0.36f;
                 mLightPosX = -3.18f; mLightPosY = 8.2f; mLightPosZ = 0.3f;
 #endif
-                mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;
             }
             else
@@ -237,7 +236,6 @@ void DxrPhotonMapper::Setup()
             mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
-            mGatherRadius = 0.021f;
             mCausticsBoost = 0.001f;
         }
         break;
@@ -259,7 +257,6 @@ void DxrPhotonMapper::Setup()
             mLightRange = 3.68f;
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
-            mGatherRadius = 0.021f;
         }
         break;
     }
