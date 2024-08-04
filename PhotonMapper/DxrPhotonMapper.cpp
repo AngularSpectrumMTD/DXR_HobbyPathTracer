@@ -74,7 +74,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 8;
-    mCausticsBoost = 0.17f;
+    mCausticsBoost = 0.05f;
     mIsMoveModel = false;
     mIsApplyCaustics = false;
     mIsUseDenoise = false;
@@ -178,7 +178,6 @@ void DxrPhotonMapper::Setup()
                 }
             }
             mIsSpotLightPhotonMapper = false;
-            mCausticsBoost = 0.5f;
         }
         break;
         case SceneType_BistroExterior:
@@ -198,16 +197,16 @@ void DxrPhotonMapper::Setup()
             const bool isDragonTest = true;
             if (isDragonTest)
             {
-                mPhi = 327; mTheta = 403;
+                mPhi = 299; mTheta = 395;
                 mLightPosX = -1.59f; mLightPosY = 21.0f; mLightPosZ = -4.2f;
-                mInitTargetPos = XMFLOAT3(0, 8, 0);
+                mInitTargetPos = XMFLOAT3(3.75, -1.03, -7.19);
 #ifdef CUBE_TEST
                 mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
-                mInitEyePos = XMFLOAT3(16.8f, 9.77f, 31.4f);
-                mLightRange = 0.56f;
-                mLightPosX = -2.38f; mLightPosY = 7.8f; mLightPosZ = -2.9f;
+                mInitEyePos = XMFLOAT3(15.2f,11.0f, 24.3f);
+                mLightRange = 0.36f;
+                mLightPosX = -3.18f; mLightPosY = 8.2f; mLightPosZ = 0.3f;
 #endif
                 mGatherRadius = 0.08f;
                 mGlassModelType = ModelType_Dragon;

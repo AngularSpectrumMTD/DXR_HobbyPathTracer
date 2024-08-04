@@ -331,7 +331,7 @@ float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition
         sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir);
         if (isVisible(scatterPosition, lightSample))
         {
-           estimatedColor = shadeDIReservoir(reservoir);
+            estimatedColor = shadeDIReservoir(reservoir);
         }
         else
         {
