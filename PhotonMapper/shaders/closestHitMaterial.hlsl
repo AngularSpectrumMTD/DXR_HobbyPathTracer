@@ -96,12 +96,14 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     MaterialParams currentMaterial = constantBuffer;
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
 
+    primarySurfaceHasHighPossibilityCausticsGenerate(currentMaterial, payload);
+
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 
-    if (isPhotonStoreRequired(currentMaterial))
+    if (isPhotonStoreRequired(currentMaterial, payload))
     {
         storePhoton(payload);
     }

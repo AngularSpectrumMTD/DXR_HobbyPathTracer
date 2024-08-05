@@ -9,13 +9,12 @@ static float3 AxisZ = float3(0, 0, 1);
 
 bool isPhotonStored(in PhotonPayload payload)
 {
-    return (payload.stored == 1);
+    return (payload.flags & PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED);
 }
 
-void storePhoton(inout PhotonPayload payload, bool isMiss = false)
+void storePhoton(inout PhotonPayload payload)
 {
-    bool ignore = isMiss || (isVisualizeLightRange() ? false : (payload.recursive <= 1));
-    uint3 dispatchDimensions = DispatchRaysDimensions();
+    const bool ignore = (isVisualizeLightRange() ? false : (payload.recursive <= 1));
 
     if (ignore)
     {
@@ -24,7 +23,7 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.position = float3(0, 0, 0);
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
-        payload.stored = 1;
+        payload.flags |= PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED;
     }
     else
     {
@@ -33,9 +32,16 @@ void storePhoton(inout PhotonPayload payload, bool isMiss = false)
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
-        payload.stored = 1;
-    }
+        payload.flags |= PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED;
 
+        //guiding
+        if(isPrimarySurfaceHasHighPossibilityCausticsGenerate(payload))
+        {
+            float2 counterMapSize = 0.xx;
+            gPhotonRandomCounterMap.GetDimensions(counterMapSize.x, counterMapSize.y);
+            gPhotonRandomCounterMap[clamp(counterMapSize * payload.randomUV, 0.xx, counterMapSize -1.xx)] = 1;
+        }
+    }
 }
 
 float weightFunction(float distance)

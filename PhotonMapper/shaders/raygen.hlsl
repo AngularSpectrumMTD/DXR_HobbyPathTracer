@@ -25,6 +25,14 @@ void rayGen() {
     
     gPrevIDBuffer[launchIndex.xy] = 0.xx;
 
+    //clear photon random counter map
+    float2 counterMapSize = 0.xx;
+    gPhotonRandomCounterMap.GetDimensions(counterMapSize.x, counterMapSize.y);
+    if((launchIndex.x < counterMapSize.x) && (launchIndex.y < counterMapSize.y) && (launchIndex.z == 0))
+    {
+        gPhotonRandomCounterMap[launchIndex.xy] = 0;
+    }
+
     //clear reservoir buffer
     DIReservoir dummyReservoir;
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
@@ -94,7 +102,8 @@ void photonEmitting()
     float3 emitOrigin = 0.xxx;
     float3 emitDir = 0.xxx;
 
-    sampleLightEmitDirAndPosition(emitDir, emitOrigin);
+    float2 randomUV = 0.xx;
+    sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV);
 
     const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
 
@@ -107,8 +116,9 @@ void photonEmitting()
     PhotonPayload payload;
     payload.throughput = 1.xxx;//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
-    payload.stored = 0;//empty
+    payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
+    payload.randomUV = randomUV;
 
     RAY_FLAG flags = RAY_FLAG_NONE;
 

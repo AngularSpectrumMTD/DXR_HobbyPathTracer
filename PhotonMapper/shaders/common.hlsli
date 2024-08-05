@@ -24,12 +24,16 @@ struct Payload
     uint flags;
 };
 
+#define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
+#define PHOTON_PAYLOAD_BIT_MASK_IS_PRIMARY_SURFACE_HAS_HIGH_POSSIBILITY_GENERATE_CAUSTICS 1 << 1
+
 struct PhotonPayload
 {
     float3 throughput;
     int recursive;
-    int stored;
     float lambdaNM;
+    float2 randomUV;
+    uint flags;
 };
 
 struct TriangleIntersectionAttributes
@@ -80,6 +84,8 @@ RWTexture2D<float4> gCausticsBuffer : register(u9);
 
 RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
 RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
+
+RWTexture2D<uint> gPhotonRandomCounterMap : register(u12);
 
 struct ReSTIRParam
 {
@@ -204,37 +210,6 @@ inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
     }
     payload.recursive++;
     return false;
-}
-
-float3x3 rodriguesRoatationFormula(float theta, float3 n)
-{
-    float cosT, sinT;
-    sincos(theta, sinT, cosT);
-
-    return float3x3(
-        cosT + n.x * n.x * (1 - cosT), n.x * n.y * (1 - cosT) - n.z * sinT, n.x * n.z * (1 - cosT) + n.y * sinT,
-        n.x * n.y * (1 - cosT) + n.z * sinT, cosT + n.y * n.y * (1 - cosT), n.y * n.z * (1 - cosT) - n.x * sinT,
-        n.z * n.x * (1 - cosT) - n.y * sinT, n.y * n.z * (1 - cosT) + n.x * sinT, cosT + n.z * n.z * (1 - cosT)
-        );
-}
-
-float3 getConeSample(float randSeed, float3 direction, float coneAngle)
-{
-    float cosAngle = cos(coneAngle);
-
-    float z = rand() * (1.0f - cosAngle) + cosAngle;
-    float phi = rand() * 2.0f * PI;
-
-    float x = sqrt(1.0f - z * z) * cos(phi);
-    float y = sqrt(1.0f - z * z) * sin(phi);
-    float3 north = float3(0.f, 0.f, 1.f);
-
-    float3 axis = normalize(cross(north, normalize(direction)));
-    float angle = acos(dot(normalize(direction), north));
-
-    float3x3 R = rodriguesRoatationFormula(angle, axis);
-
-    return mul(R, float3(x, y, z));
 }
 
 ////////////////////////////////////

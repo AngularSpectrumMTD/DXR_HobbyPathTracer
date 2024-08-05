@@ -40,6 +40,8 @@
 
 #define MAX_SPATIAL_REUSE_TAP 8
 
+#define PHOTON_RANDOM_COUNTER_MAP_SIZE_1D 256
+
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
     static const wchar_t* ReflectReflactMaterialBox = L"hgReflectReflactBoxes";
@@ -138,16 +140,17 @@ private:
     struct Payload
     {
         float3 throughput;
-        int recursive;
-        unsigned int flags;
+        s32 recursive;
+        u32 flags;
     };
 
     struct PhotonPayload
     {
         float3 throughput;
         s32 recursive;
-        s32 stored;
         f32 lambdaNM;
+        float2 randomUV;
+        u32 flags;
     };
 
     struct TriangleIntersectionAttributes
@@ -552,6 +555,11 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mDISpatialReservoirPingPongTbl;
     std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorSRVPingPongTbl;
     std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorUAVPingPongTbl;
+
+    //photon guiding (PHOTON_RANDOM_COUNTER_MAP_SIZE_1D x PHOTON_RANDOM_COUNTER_MAP_SIZE_1D)
+    ComPtr<ID3D12Resource> mPhotonRandomCounterMap;
+    dx12::Descriptor mPhotonRandomCounterMapDescriptorSRV;
+    dx12::Descriptor mPhotonRandomCounterMapDescriptorUAV;
 
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;

@@ -16,7 +16,20 @@ struct MaterialParams
     float4 emission;
 };
 
-bool isPhotonStoreRequired(in MaterialParams params)
+void primarySurfaceHasHighPossibilityCausticsGenerate(in MaterialParams params, inout PhotonPayload payload)
+{
+    if((payload.recursive == 1) && ((params.transRatio > 0) || (params.metallic > 0.5)))
+    {
+        payload.flags |= PHOTON_PAYLOAD_BIT_MASK_IS_PRIMARY_SURFACE_HAS_HIGH_POSSIBILITY_GENERATE_CAUSTICS;
+    }
+}
+
+bool isPrimarySurfaceHasHighPossibilityCausticsGenerate(in PhotonPayload payload)
+{
+    return (payload.flags & PHOTON_PAYLOAD_BIT_MASK_IS_PRIMARY_SURFACE_HAS_HIGH_POSSIBILITY_GENERATE_CAUSTICS);
+}
+
+bool isPhotonStoreRequired(in MaterialParams params, PhotonPayload payload)
 {
     return (rand() < params.roughness) && (params.transRatio == 0);
 }

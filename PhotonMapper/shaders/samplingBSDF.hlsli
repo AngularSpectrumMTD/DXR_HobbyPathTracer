@@ -22,12 +22,15 @@ float3 worldToTangent(float3 N, float3 worldSpaceVec)
     return normalize(float3(dot(tangent, worldSpaceVec), dot(bitangent, worldSpaceVec), dot(N, worldSpaceVec)));
 }
 
-float3 HemisphereORCosineSampling(float3 N, bool isHemi)
+float3 HemisphereORCosineSampling(float3 N, bool isHemi, out float2 randomUV)
 {
-    float cosT = isHemi ? rand() : sqrt(rand());
+    float u = rand();
+    float v = rand();
+    float cosT = isHemi ? u : sqrt(u);
     float sinT = sqrt(1 - cosT * cosT);
-    float P = 2 * PI * rand();
+    float P = 2 * PI * v;
     float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+    randomUV = float2(u, v);
 
     return tangentToWorld(N, tangentDir);
 }

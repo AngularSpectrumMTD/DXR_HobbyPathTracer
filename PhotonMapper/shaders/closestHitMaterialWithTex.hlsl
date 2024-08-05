@@ -203,6 +203,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     VertexPNT vtx;
     bool isIgnoreHit = false;
     MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHit);
+    primarySurfaceHasHighPossibilityCausticsGenerate(currentMaterial, payload);
     float3 surfaceNormal = vtx.Normal;
 
     float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
@@ -215,7 +216,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.Direction = WorldRayDirection();
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 
-    if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial))
+    if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial, payload))
     {
         storePhoton(payload);
     }

@@ -74,8 +74,11 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.pdf = 1 / (PI * lenU * lenV);
 }
 
-float3 coneSample(float3 N, float cosMax)
+float3 coneSample(float3 N, float cosMax, float2 randomUV)
 {
+    float u = rand();
+    float v = rand();
+    randomUV = float2(u, v);
     float ct = 1 - rand() * (1 - cosMax);
     float st = sqrt(1 - ct * ct);
     float phi = 2 * PI * rand();
@@ -89,7 +92,8 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
 
     float3 fromLight = normalize(lightGen.position);
-    float3 emit = coneSample(fromLight, cosMax);
+    float2 dummy = 0.xx;
+    float3 emit = coneSample(fromLight, cosMax, dummy);
     
     lightSample.type = LIGHT_TYPE_DIRECTIONAL;
     lightSample.directionToLight = -normalize(emit);
@@ -99,34 +103,37 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     lightSample.pdf = 1 / (2 * PI * (1 - cosMax));
 }
 
-void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
-    emitDir = HemisphereORCosineSampling(float3(1, 0, 0), false);
+    emitDir = HemisphereORCosineSampling(float3(1, 0, 0), false, randomUV);
     position = lightGen.position;
 }
 
-void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
-    float rnd0 = (rand() - 0.5) * 2; //-1 to 1
-    float rnd1 = (rand() - 0.5) * 2; //-1 to 1
+    float u = rand();
+    float v = rand();
+    randomUV = float2(u, v);
+    float rnd0 = (u - 0.5) * 2; //-1 to 1
+    float rnd1 = (v - 0.5) * 2; //-1 to 1
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     emitDir = normalize(dominantDir * LIGHT_BASE_LENGTH + rnd0 * lightGen.U + rnd1 * lightGen.V);
     position = lightGen.position;
 }
 
-void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
-    const float spotLightHalfAngle = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
-    emitDir = getConeSample(rseed, dominantDir, spotLightHalfAngle);
+    const float cosMax = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
+    emitDir = coneSample(dominantDir, cosMax, randomUV);
     position = lightGen.position;
 }
 
-void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position)
+void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
     float3 fromLight = normalize(lightGen.position);
-    emitDir = coneSample(fromLight, cosMax);
+    emitDir = coneSample(fromLight, cosMax, randomUV);
     position = 100 * -emitDir;
 }
 
@@ -365,7 +372,7 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
     return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }
 
-void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
+void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out float2 randomUV)
 {
     const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[0];
@@ -373,19 +380,19 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position)
 
     if (param.type == LIGHT_TYPE_SPHERE)
     {
-        sampleSphereLightEmitDirAndPosition(param, dir, position);
+        sampleSphereLightEmitDirAndPosition(param, dir, position, randomUV);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
-        sampleRectLightEmitDirAndPosition(param, dir, position);
+        sampleRectLightEmitDirAndPosition(param, dir, position, randomUV);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
-        sampleSpotLightEmitDirAndPosition(param, dir, position);
+        sampleSpotLightEmitDirAndPosition(param, dir, position, randomUV);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
-        sampleDirectionalLightEmitDirAndPosition(param, dir, position);
+        sampleDirectionalLightEmitDirAndPosition(param, dir, position, randomUV);
     }
 }
 

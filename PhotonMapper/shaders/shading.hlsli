@@ -163,7 +163,8 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         
         if (roulette < diffRatio)//diffuse
         {
-            L_local = HemisphereORCosineSampling(Z_AXIS, false);
+            float2 randomUV = 0.xx;
+            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
         }
         else //specular
         {
