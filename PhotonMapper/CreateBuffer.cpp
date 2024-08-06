@@ -413,25 +413,51 @@ void DxrPhotonMapper::CreateRegularBuffer()
 
         //photon guiding
         {
-            mPhotonRandomCounterMap = mDevice->CreateTexture2D(
-                PHOTON_RANDOM_COUNTER_MAP_SIZE_1D, PHOTON_RANDOM_COUNTER_MAP_SIZE_1D, DXGI_FORMAT_R16_UINT,
-                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-                D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-                D3D12_HEAP_TYPE_DEFAULT,
-                L"PhotonRandomCounterMap"
-            );
+            //counter map
+            {
+                mPhotonRandomCounterMap = mDevice->CreateTexture2D(
+                    PHOTON_RANDOM_COUNTER_MAP_SIZE_1D, PHOTON_RANDOM_COUNTER_MAP_SIZE_1D, DXGI_FORMAT_R16_UINT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    L"PhotonRandomCounterMap"
+                );
 
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Texture2D.MipLevels = 1;
-            srvDesc.Texture2D.MostDetailedMip = 0;
-            srvDesc.Texture2D.ResourceMinLODClamp = 0;
-            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            mPhotonRandomCounterMapDescriptorSRV = mDevice->CreateShaderResourceView(mPhotonRandomCounterMap.Get(), &srvDesc);
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mPhotonRandomCounterMapDescriptorSRV = mDevice->CreateShaderResourceView(mPhotonRandomCounterMap.Get(), &srvDesc);
 
-            D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-            uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-            mPhotonRandomCounterMapDescriptorUAV = mDevice->CreateUnorderedAccessView(mPhotonRandomCounterMap.Get(), &uavDesc);
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mPhotonRandomCounterMapDescriptorUAV = mDevice->CreateUnorderedAccessView(mPhotonRandomCounterMap.Get(), &uavDesc);
+            }
+
+            //guide map
+            {
+                mPhotonEmissionGuideMap = mDevice->CreateTexture2D(
+                    PHOTON_EMISSION_GUIDE_MAP_SIZE_1D, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D, DXGI_FORMAT_R16_FLOAT,
+                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                    D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_HEAP_TYPE_DEFAULT,
+                    L"PhotonEmissionGuideMap"
+                );
+
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                mPhotonEmissionGuideMapDescriptorSRV = mDevice->CreateShaderResourceView(mPhotonEmissionGuideMap.Get(), &srvDesc);
+
+                D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+                uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+                mPhotonEmissionGuideMapDescriptorUAV = mDevice->CreateUnorderedAccessView(mPhotonEmissionGuideMap.Get(), &uavDesc);
+            }
         }
     }
     // DI Gi

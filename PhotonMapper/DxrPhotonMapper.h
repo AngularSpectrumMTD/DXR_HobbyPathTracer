@@ -41,6 +41,7 @@
 #define MAX_SPATIAL_REUSE_TAP 8
 
 #define PHOTON_RANDOM_COUNTER_MAP_SIZE_1D 256
+#define PHOTON_EMISSION_GUIDE_MAP_SIZE_1D 256
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -95,6 +96,8 @@ namespace ComputeShaders {
 
     const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
     const LPCWSTR TemporalReuse = L"temporalReuse.cso";
+
+    const LPCWSTR GeneratePhotonEmissionGuideMap = L"generatePhotonEmissionGuideMap.cso";
 }
 
 template<class T>
@@ -561,6 +564,10 @@ private:
     dx12::Descriptor mPhotonRandomCounterMapDescriptorSRV;
     dx12::Descriptor mPhotonRandomCounterMapDescriptorUAV;
 
+    ComPtr<ID3D12Resource> mPhotonEmissionGuideMap;
+    dx12::Descriptor mPhotonEmissionGuideMapDescriptorSRV;
+    dx12::Descriptor mPhotonEmissionGuideMapDescriptorUAV;
+
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB1Tbl;
@@ -645,6 +652,10 @@ private:
     ComPtr<ID3D12RootSignature> mRsTemporalReuse;
     std::unordered_map < std::string, u32> mRegisterMapTemporalReuse;
     ComPtr<ID3D12PipelineState> mTemporalReusePSO;
+
+    ComPtr<ID3D12RootSignature> mRsGenerateEmissionGuideMap;
+    std::unordered_map < std::string, u32> mRegisterMapGenerateEmissionGuideMap;
+    ComPtr<ID3D12PipelineState> mGenerateEmissionGuideMapPSO;
 
     u32 mRenderFrame = 0;
     u32 mSeedFrame = 0;

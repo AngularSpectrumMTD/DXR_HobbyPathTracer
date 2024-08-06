@@ -211,6 +211,9 @@
     <FxCompile Include="shaders\temporalAccumulation.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\generatePhotonEmissionGuideMap.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxrPhotonMapper.rc">

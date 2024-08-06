@@ -86,6 +86,7 @@ RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
 RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
 
 RWTexture2D<uint> gPhotonRandomCounterMap : register(u12);
+RWTexture2D<float> gPhotonEmissionGuideMap : register(u13);
 
 struct ReSTIRParam
 {

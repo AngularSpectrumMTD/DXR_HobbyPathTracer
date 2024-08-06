@@ -205,6 +205,16 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
 
     {
         utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        mRsGenerateEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGenerateEmissionGuideMap");
+        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMap, mGenerateEmissionGuideMapPSO, mRsGenerateEmissionGuideMap);
+        mRegisterMapGenerateEmissionGuideMap["gPhotonRandomCounterMap"] = 0;
+        mRegisterMapGenerateEmissionGuideMap["gPhotonEmissionGuideMap"] = 1;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
