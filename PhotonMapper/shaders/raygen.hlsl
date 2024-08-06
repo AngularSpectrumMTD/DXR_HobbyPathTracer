@@ -76,6 +76,67 @@ void rayGen() {
     }
 }
 
+float2 emissionGuiding(inout float2 randomXY)
+{
+    float2 dims;
+    gPhotonEmissionGuideMap.GetDimensions(dims.x, dims.y);
+
+    int2 pos = randomXY * dims;
+
+    //for(int i = mip - 2; i >= 0; i--)
+    {
+        pos *= 2;
+
+        float lt = gPhotonEmissionGuideMap[pos + int2(0, 0)];
+        float rt = gPhotonEmissionGuideMap[pos + int2(1, 0)];
+        float lb = gPhotonEmissionGuideMap[pos + int2(0, 1)];
+        float rb = gPhotonEmissionGuideMap[pos + int2(1, 1)];
+
+        float left = lt + lb;
+        float right = rt + rb;
+        float probLeft = left / (left + right);
+
+        if((left == 0) && (right == 0))
+        {
+            return randomXY;
+        }
+
+        if(randomXY.x < probLeft)
+        {
+            randomXY /= probLeft;
+            float probTop = lt / left;
+
+            if(randomXY.y < probTop)
+            {
+                randomXY.y /= probTop;
+            }
+            else
+            {
+                pos.y++;
+                randomXY.y = (randomXY.y - probTop) / (1 - probTop);
+            }
+        }
+        else
+        {
+            pos.x++;
+            randomXY.x = (randomXY.x - probLeft) / (1 - probLeft);
+            float probTop = rt / right;
+
+            if(randomXY.y < probTop)
+            {
+                randomXY.y /= probTop;
+            }
+            else
+            {
+                pos.y++;
+                randomXY.y = (randomXY.y - probTop) / (1 - probTop);
+            }
+        }
+    }
+
+    return (pos + randomXY) / dims;
+}
+
 //
 //DispatchRays By Photon Size2D
 //
@@ -105,7 +166,13 @@ void photonEmitting()
     float2 randomUV = 0.xx;
     sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV);
 
+    float2 origRandomUV = randomUV;
+
     const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
+    const float flutter = 0.2f;
+    const float2 guidedUV = (emissionGuiding(randomUV) + rand() * flutter) / (1 + flutter);
+
+    sampleLightEmitDirAndPositionWithRandom(emitDir, emitOrigin, guidedUV);
 
     RayDesc nextRay;
     nextRay.Origin = emitOrigin;
@@ -118,7 +185,7 @@ void photonEmitting()
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
-    payload.randomUV = randomUV;
+    payload.randomUV = origRandomUV;
 
     RAY_FLAG flags = RAY_FLAG_NONE;
 

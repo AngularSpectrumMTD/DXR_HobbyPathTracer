@@ -49,7 +49,7 @@ void DxrPhotonMapper::UpdateWindowText()
         << L" <D> : Bounce : " << mRecursionDepth
         << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024
         //<< L"    " << getFrameRate() << L"[ms]"
-        //<< L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame)
+        << L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame)
         ;
 
     std::wstring finalWindowText = std::wstring(GetTitle()) + windowText.str().c_str();
@@ -62,7 +62,7 @@ void DxrPhotonMapper::Setup()
 
     mRecursionDepth = min(7, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
-    mGatherRadius = 0.031f;
+    mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
@@ -74,7 +74,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 8;
-    mCausticsBoost = 0.05f;
+    mCausticsBoost = 0.02f;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -165,7 +165,6 @@ void DxrPhotonMapper::Setup()
                 mLightPosX = 1.59f; mLightPosY = 9.8f; mLightPosZ = 3.19f;
                 mPhi = 413.0f; mTheta = 242.0f;
                 mLightRange = 0.79f;
-                mLightRange = 5.0f;//test
                 if (isDebugMeshTest)
                 {
                     mGlassModelType = ModelType_DebugMesh;
@@ -230,14 +229,27 @@ void DxrPhotonMapper::Setup()
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
-            mLightPosX = 53; mLightPosY = 11.3f; mLightPosZ = -5.1f;
-            mPhi = 376; mTheta = 107;
-            mInitEyePos = XMFLOAT3(30, 12, 9);
-            mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
-            mLightRange = 3.68f;
+            if (mIsApplyCaustics)
+            {
+                mLightPosX = 52.1; mLightPosY = 7.7f; mLightPosZ = -1.09f;
+                mPhi = 222; mTheta = 87;
+                mInitEyePos = XMFLOAT3(43.6, 11, 0.34);
+                mInitTargetPos = XMFLOAT3(81.6, -1.9, -10.0f);
+                mLightRange = 0.58f;
+            }
+            else
+            {
+                mLightPosX = 53; mLightPosY = 11.3f; mLightPosZ = -5.1f;
+                mPhi = 376; mTheta = 107;
+                mInitEyePos = XMFLOAT3(30, 12, 9);
+                mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
+                mLightRange = 3.68f;
+            }
+            
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
-            mCausticsBoost = 0.001f;
+            mCausticsBoost = 0.0002f;
+            mGatherRadius = 0.031f;
         }
         break;
         case SceneType_SanMiguel:
@@ -1123,7 +1135,7 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(0.001f, 20.0f, mCausticsBoost + (mInverseMove ? -0.001f : 0.001f));
+        mCausticsBoost = Clamp(0.0001f, 20.0f, mCausticsBoost + (mInverseMove ? -0.0001f : 0.0001f));
         mIsUseAccumulation = false;
         break;
     case 'U':

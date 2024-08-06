@@ -239,6 +239,114 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
     }
 }
 
+void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout float3 throughput, in float wavelength = 0)
+{
+    nextRay.TMin = 0.0001;
+    nextRay.TMax = 10000;
+    
+    const float eps = 0.001;
+    const float3 wo_global = -WorldRayDirection();
+    const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+
+    const float roulette = rand();
+    const float blending = rand();
+    const float probability = 1 - material.transRatio;
+
+    float3 wo_local = worldToTangent(N_global, wo_global);
+
+    if (blending < probability)
+    {
+        if (wo_local.z < 0)
+        {
+            N_global *= -1;
+        }
+
+        wo_local = worldToTangent(N_global, wo_global);
+
+        //sample direction
+        float3 L_local = 0.xxx;
+        
+        const float diffRatio = 1.0 - material.metallic;
+        const float3 V_local = normalize(wo_local);
+        
+        if (roulette < diffRatio)//diffuse
+        {
+            float2 randomUV = 0.xx;
+            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
+        }
+        else //specular
+        {
+            //const float3 H = GGX_ImportanceSampling(N, material.roughness);
+            //const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+            //L_local = normalize(2.0f * dot(V_local, H_local) * H_local - V_local);
+
+            const float a = material.roughness * material.roughness;
+            float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
+            float phi = 2 * PI * rand();
+            float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
+            float R = sqrt(saturate(1 - z * z));
+            float2 sincosXY = 0.xx;
+            sincos(phi, sincosXY.x, sincosXY.y);
+            float x = R * sincosXY.y;
+            float y = R * sincosXY.x;
+            float3 Nh_local = float3(x, y, z) + Vh_local;
+            float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
+            L_local = reflect(-V_local, Ne_local);
+        }
+
+        nextRay.Origin = currentRayOrigin + N_global * eps;
+        nextRay.Direction = tangentToWorld(N_global, L_local);
+        
+        //compute bsdf    V : wo   L : wi(sample)
+        float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
+        const float cosine = max(0, abs(L_local.z));
+        throughput *= BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+    }
+    else
+    {
+        //sample direction
+        bool isFromOutside = wo_local.z > 0;
+
+        //change the normal direction to the incident direction side
+        if (!isFromOutside)
+        {
+            N_global *= -1;
+        }
+
+        wo_local = worldToTangent(N_global, wo_global);
+        
+        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
+
+        float3 V_local = normalize(wo_local);
+        const float3 H_local = Z_AXIS;//ImportanceSampling(Z_AXIS, material.roughness);
+
+        float3 L_local = 0.xxx;
+
+        bool isRefractSampled = true;
+        {
+            float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
+            float3 refractVec = refract(-V_local, H_local, eta);
+            if (length(refractVec) < 0.001f)
+            {
+                L_local = reflect(-V_local, H_local); //handle as total reflection
+                isRefractSampled = false;
+            }
+            else
+            {
+                L_local = normalize(refractVec);
+                isRefractSampled = true;
+            }
+            nextRay.Origin = currentRayOrigin - N_global * eps;
+            nextRay.Direction = tangentToWorld(N_global, L_local);
+        }
+
+        //compute bsdf    V : wo   L : wi(sample)
+        float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+        const float cosine = max(0, abs(L_local.z));
+        throughput *= BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+    }
+}
+
 float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;

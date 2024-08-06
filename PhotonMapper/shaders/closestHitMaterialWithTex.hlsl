@@ -214,7 +214,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 
     if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial, payload))
     {

@@ -35,6 +35,18 @@ float3 HemisphereORCosineSampling(float3 N, bool isHemi, out float2 randomUV)
     return tangentToWorld(N, tangentDir);
 }
 
+float3 HemisphereORCosineSamplingWithRandom(float3 N, bool isHemi, in float2 randomUV)
+{
+    float u = randomUV.x;
+    float v = randomUV.y;
+    float cosT = isHemi ? u : sqrt(u);
+    float sinT = sqrt(1 - cosT * cosT);
+    float P = 2 * PI * v;
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+
+    return tangentToWorld(N, tangentDir);
+}
+
 float3 GGX_ImportanceSampling(float3 N, float roughness)
 {
     float alpha = roughness * roughness;

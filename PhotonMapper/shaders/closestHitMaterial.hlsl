@@ -101,7 +101,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {
