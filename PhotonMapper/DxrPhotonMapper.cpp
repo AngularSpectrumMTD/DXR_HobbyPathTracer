@@ -182,31 +182,27 @@ void DxrPhotonMapper::Setup()
         break;
         case SceneType_BistroExterior:
         {
-            mPhiDirectional = 480; mThetaDirectional = 280;
+            mCausticsBoost = 0.014f;
+            mPhiDirectional = 480; mThetaDirectional = 263;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
-            mLightPosX = -2.3f; mLightPosY = 7.8f; mLightPosZ = -2.9f;
-            mPhi = 327; mTheta = 403;
+            mLightPosX = -3.18f; mLightPosY = 8.2f; mLightPosZ = -2.08f;
+            mPhi = 299; mTheta = 395;
             mInitEyePos = XMFLOAT3(-32, 16, -29);
             mInitTargetPos = XMFLOAT3(0, 8, 0);
-            mLightRange = 6.0f;
             const bool isDragonTest = true;
             if (isDragonTest)
             {
-                mPhi = 299; mTheta = 395;
-                mLightPosX = -1.59f; mLightPosY = 21.0f; mLightPosZ = -4.2f;
                 mInitTargetPos = XMFLOAT3(3.75, -1.03, -7.19);
 #ifdef CUBE_TEST
                 mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
                 mInitEyePos = XMFLOAT3(15.2f,11.0f, 24.3f);
-                mLightRange = 0.36f;
-                mLightPosX = -3.18f; mLightPosY = 8.2f; mLightPosZ = 0.3f;
 #endif
                 mGlassModelType = ModelType_Dragon;
             }
