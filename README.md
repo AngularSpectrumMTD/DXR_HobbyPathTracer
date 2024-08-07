@@ -3,6 +3,8 @@ Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Stre
 
 ![bistroMain](https://github.com/user-attachments/assets/32f7c946-4480-4e22-a90d-52cb9cfa0099)
 
+![sponzaMain](https://github.com/user-attachments/assets/b8475e8b-9d15-4e95-bc61-7c5047658261)
+
 ![caustics](https://github.com/user-attachments/assets/c064b5af-2ac1-4ad7-917d-c5a0f804aa17)
 
 https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b

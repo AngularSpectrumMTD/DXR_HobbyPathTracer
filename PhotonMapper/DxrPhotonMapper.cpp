@@ -47,7 +47,7 @@ void DxrPhotonMapper::UpdateWindowText()
         << L" <F3> : Spatial " << (mIsUseReservoirSpatialReuse ? L"ON" : L"OFF")
         << L" <SPACE> : Target <R> : Rough <S> : Trans <M> : Metal"
         << L" <D> : Bounce : " << mRecursionDepth
-        << L" Photon[K] : " << mPhotonMapSize1D * mPhotonMapSize1D / 1024
+        << L" Photon[K] : " << (mIsApplyCaustics ? mPhotonMapSize1D * mPhotonMapSize1D / 1024 : 0)
         //<< L"    " << getFrameRate() << L"[ms]"
         << L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame)
         ;
@@ -130,6 +130,7 @@ void DxrPhotonMapper::Setup()
         {
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
             mPhiDirectional = 100.0f; mThetaDirectional = 280.0f;
             mInitEyePos = XMFLOAT3(-27.9f, 15.0f, 5.54f);
 
@@ -175,6 +176,17 @@ void DxrPhotonMapper::Setup()
                     mPhi = 447.0f; mTheta = 206.0f;
                     mGlassModelType = ModelType_Diamond;
                     mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
+                    if (isAfrodytaTest)
+                    {
+                        mLightPosX = -3.1f; mLightPosY = 12.19f; mLightPosZ = 1.79f;
+                        mPhi = 334.0f; mTheta = 111.0f;
+                        mGlassModelType = ModelType_Afrodyta;
+                        mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
+                        mInitEyePos = XMFLOAT3(-18.1f, 23.89, -11.18f);
+                        mInitTargetPos = XMFLOAT3(4.14f, 10.433, -1.77f);
+                        mCausticsBoost = 0.02;
+                        mLightRange = 0.38f;
+                    }
                 }
             }
             mIsSpotLightPhotonMapper = false;
