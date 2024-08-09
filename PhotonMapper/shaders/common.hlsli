@@ -14,6 +14,9 @@
 #define PAYLOAD_BIT_MASK_IS_SHADOW_MISS 1 << 2
 #define PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE 1 << 3
 
+//MIP 0 == 64 x 64
+#define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
+
 #define RAY_MIN_T 0.001f
 #define RAY_MAX_T 1000000.0f
 
@@ -86,7 +89,13 @@ RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
 RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
 
 RWTexture2D<uint> gPhotonRandomCounterMap : register(u12);
-RWTexture2D<float> gPhotonEmissionGuideMap : register(u13);
+RWTexture2D<float> gPhotonEmissionGuideMap0 : register(u13);
+RWTexture2D<float> gPhotonEmissionGuideMap1 : register(u14);
+RWTexture2D<float> gPhotonEmissionGuideMap2 : register(u15);
+RWTexture2D<float> gPhotonEmissionGuideMap3 : register(u16);
+RWTexture2D<float> gPhotonEmissionGuideMap4 : register(u17);
+RWTexture2D<float> gPhotonEmissionGuideMap5 : register(u18);
+RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u19);
 
 struct ReSTIRParam
 {

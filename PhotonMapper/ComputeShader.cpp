@@ -207,10 +207,66 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
-        mRsGenerateEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGenerateEmissionGuideMap");
-        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMap, mGenerateEmissionGuideMapPSO, mRsGenerateEmissionGuideMap);
-        mRegisterMapGenerateEmissionGuideMap["gPhotonRandomCounterMap"] = 0;
-        mRegisterMapGenerateEmissionGuideMap["gPhotonEmissionGuideMap"] = 1;
+        mRsGeneratePhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMap");
+        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMap, mGeneratePhotonEmissionGuideMapPSO, mRsGeneratePhotonEmissionGuideMap);
+        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonRandomCounterMap"] = 0;
+        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonEmissionGuideMap"] = 1;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
+        mRsClearPhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsClearPhotonEmissionGuideMipMap");
+        CreateComputeShaderStateObject(ComputeShaders::ClearPhotonEmissionGuideMap, mClearPhotonEmissionGuideMapPSO, mRsClearPhotonEmissionGuideMap);
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap0"] = 0;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap1"] = 1;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap2"] = 2;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap3"] = 3;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap4"] = 4;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap5"] = 5;
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap6"] = 6;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        mRsGeneratePhotonEmissionGuideMipMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap");
+        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap, mGeneratePhotonEmissionGuideMipMapPSO, mRsGeneratePhotonEmissionGuideMipMap);
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap0"] = 0;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap1"] = 1;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap2"] = 2;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap3"] = 3;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        mRsGeneratePhotonEmissionGuideMipMap2x2 = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap2x2");
+        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap2x2, mGeneratePhotonEmissionGuideMipMap2x2PSO, mRsGeneratePhotonEmissionGuideMipMap2x2);
+        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap0"] = 0;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap1"] = 1;
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        mRsGeneratePhotonEmissionGuideMipMap4x4 = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap4x4");
+        CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap4x4, mGeneratePhotonEmissionGuideMipMap4x4PSO, mRsGeneratePhotonEmissionGuideMipMap4x4);
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap0"] = 0;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap1"] = 1;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap2"] = 2;
     }
 
     {

@@ -40,8 +40,9 @@
 
 #define MAX_SPATIAL_REUSE_TAP 8
 
-#define PHOTON_RANDOM_COUNTER_MAP_SIZE_1D 256
-#define PHOTON_EMISSION_GUIDE_MAP_SIZE_1D 256
+#define PHOTON_RANDOM_COUNTER_MAP_SIZE_1D 64
+#define PHOTON_EMISSION_GUIDE_MAP_SIZE_1D 64
+#define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
 
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
@@ -97,7 +98,11 @@ namespace ComputeShaders {
     const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
     const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 
+    const LPCWSTR ClearPhotonEmissionGuideMap = L"clearPhotonEmissionGuideMap.cso";
     const LPCWSTR GeneratePhotonEmissionGuideMap = L"generatePhotonEmissionGuideMap.cso";
+    const LPCWSTR GeneratePhotonEmissionGuideMipMap = L"generatePhotonEmissionGuideMipMap.cso";
+    const LPCWSTR GeneratePhotonEmissionGuideMipMap2x2 = L"generatePhotonEmissionGuideMipMap2x2.cso";
+    const LPCWSTR GeneratePhotonEmissionGuideMipMap4x4 = L"generatePhotonEmissionGuideMipMap4x4.cso";
 }
 
 template<class T>
@@ -564,9 +569,9 @@ private:
     dx12::Descriptor mPhotonRandomCounterMapDescriptorSRV;
     dx12::Descriptor mPhotonRandomCounterMapDescriptorUAV;
 
-    ComPtr<ID3D12Resource> mPhotonEmissionGuideMap;
-    dx12::Descriptor mPhotonEmissionGuideMapDescriptorSRV;
-    dx12::Descriptor mPhotonEmissionGuideMapDescriptorUAV;
+    ComPtr<ID3D12Resource> mPhotonEmissionGuideMipMapTbl[PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL];
+    dx12::Descriptor mPhotonEmissionGuideMipMapDescriptorSRVTbl[PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL];
+    dx12::Descriptor mPhotonEmissionGuideMipMapDescriptorUAVTbl[PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL];
 
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;
@@ -653,9 +658,26 @@ private:
     std::unordered_map < std::string, u32> mRegisterMapTemporalReuse;
     ComPtr<ID3D12PipelineState> mTemporalReusePSO;
 
-    ComPtr<ID3D12RootSignature> mRsGenerateEmissionGuideMap;
-    std::unordered_map < std::string, u32> mRegisterMapGenerateEmissionGuideMap;
-    ComPtr<ID3D12PipelineState> mGenerateEmissionGuideMapPSO;
+    //Emission Guiding
+    ComPtr<ID3D12RootSignature> mRsClearPhotonEmissionGuideMap;
+    std::unordered_map < std::string, u32> mRegisterMapClearPhotonEmissionGuideMap;
+    ComPtr<ID3D12PipelineState> mClearPhotonEmissionGuideMapPSO;
+
+    ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMap;
+    std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMap;
+    ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMapPSO;
+
+    ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMipMap;
+    std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMipMap;
+    ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMipMapPSO;
+
+    ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMipMap2x2;
+    std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMipMap2x2;
+    ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMipMap2x2PSO;
+
+    ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMipMap4x4;
+    std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMipMap4x4;
+    ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMipMap4x4PSO;
 
     u32 mRenderFrame = 0;
     u32 mSeedFrame = 0;

@@ -2,6 +2,58 @@
 
 #define SPP 1
 
+void clearEmissionGuideMap(int3 launchIndex)
+{
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap0.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap0[launchIndex.xy] = 0;
+        }
+    }
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap1.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap1[launchIndex.xy] = 0;
+        }
+    }
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap2.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap2[launchIndex.xy] = 0;
+        }
+    }
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap3.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap3[launchIndex.xy] = 0;
+        }
+    }
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap4.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap4[launchIndex.xy] = 0;
+        }
+    }
+    {
+        float2 size = 0.xx;
+        gPhotonEmissionGuideMap5.GetDimensions(size.x, size.y);
+        if((launchIndex.x < size.x) && (launchIndex.y < size.y) && (launchIndex.z == 0))
+        {
+            gPhotonEmissionGuideMap5[launchIndex.xy] = 0;
+        }
+    }
+}
+
 //
 //DispatchRays By Screen Size2D
 //
@@ -32,7 +84,7 @@ void rayGen() {
     {
         gPhotonRandomCounterMap[launchIndex.xy] = 0;
     }
-
+    
     //clear reservoir buffer
     DIReservoir dummyReservoir;
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
@@ -76,21 +128,52 @@ void rayGen() {
     }
 }
 
+float getPhotonEmissionGuideMap(int2 pos, int mip)
+{
+    switch (mip)
+    {
+        case 0 :
+            return gPhotonEmissionGuideMap0[pos];
+            break;
+        case 1:
+            return gPhotonEmissionGuideMap1[pos];
+            break;
+        case 2:
+            return gPhotonEmissionGuideMap2[pos];
+            break;
+        case 3:
+            return gPhotonEmissionGuideMap3[pos];
+            break;
+        case 4:
+            return gPhotonEmissionGuideMap4[pos];
+            break;
+        case 5:
+            return gPhotonEmissionGuideMap5[pos];
+            break;
+        case 6:
+            return gPhotonEmissionGuideMap6[pos];
+            break;
+        default:
+            return gPhotonEmissionGuideMap0[pos];
+            break;
+    }
+}
+
 float2 emissionGuiding(inout float2 randomXY)
 {
     float2 dims;
-    gPhotonEmissionGuideMap.GetDimensions(dims.x, dims.y);
+    gPhotonEmissionGuideMap0.GetDimensions(dims.x, dims.y);
 
-    int2 pos = randomXY * dims;
+    int2 pos = int2(0, 0);
 
-    //for(int i = mip - 2; i >= 0; i--)
+    for(int i = PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL - 2; i >= 0; i--)
     {
         pos *= 2;
 
-        float lt = gPhotonEmissionGuideMap[pos + int2(0, 0)];
-        float rt = gPhotonEmissionGuideMap[pos + int2(1, 0)];
-        float lb = gPhotonEmissionGuideMap[pos + int2(0, 1)];
-        float rb = gPhotonEmissionGuideMap[pos + int2(1, 1)];
+        float lt = getPhotonEmissionGuideMap(pos + int2(0, 0), i);
+        float rt = getPhotonEmissionGuideMap(pos + int2(1, 0), i);
+        float lb = getPhotonEmissionGuideMap(pos + int2(0, 1), i);
+        float rb = getPhotonEmissionGuideMap(pos + int2(1, 1), i);
 
         float left = lt + lb;
         float right = rt + rb;
@@ -103,7 +186,7 @@ float2 emissionGuiding(inout float2 randomXY)
 
         if(randomXY.x < probLeft)
         {
-            randomXY /= probLeft;
+            randomXY.x /= probLeft;
             float probTop = lt / left;
 
             if(randomXY.y < probTop)
@@ -164,7 +247,8 @@ void photonEmitting()
     float3 emitDir = 0.xxx;
 
     float2 randomUV = 0.xx;
-    sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV);
+    float pdf = 0;
+    sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV,  pdf);
 
     float2 origRandomUV = randomUV;
 
@@ -181,7 +265,7 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.throughput = 1.xxx;//getBaseLightXYZ(LAMBDA_NM);
+    payload.throughput = 1.xxx / pdf;//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;

@@ -12,7 +12,7 @@ bool isWithinBounds(int2 id, int2 size)
 }
 
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
-void generateEmissionGuideMap(uint3 dtid : SV_DispatchThreadID)
+void generatePhotonEmissionGuideMap(uint3 dtid : SV_DispatchThreadID)
 {
     int2 dims;
     gPhotonRandomCounterMap.GetDimensions(dims.x, dims.y);

@@ -74,7 +74,7 @@ void DxrPhotonMapper::Setup()
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
     mGlassRotateRange = 8;
-    mCausticsBoost = 0.02f;
+    mCausticsBoost = 0.005f;
     mIsMoveModel = false;
     mIsApplyCaustics = true;
     mIsUseDenoise = false;
@@ -182,10 +182,10 @@ void DxrPhotonMapper::Setup()
                         mPhi = 334.0f; mTheta = 111.0f;
                         mGlassModelType = ModelType_Afrodyta;
                         mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
-                        mInitEyePos = XMFLOAT3(-18.1f, 23.89, -11.18f);
-                        mInitTargetPos = XMFLOAT3(4.14f, 10.433, -1.77f);
-                        mCausticsBoost = 0.02;
-                        mLightRange = 0.38f;
+                        mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
+                        mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
+                        mCausticsBoost = 0.014;
+                        mLightRange = 0.29f;
                     }
                 }
             }
@@ -194,7 +194,7 @@ void DxrPhotonMapper::Setup()
         break;
         case SceneType_BistroExterior:
         {
-            mCausticsBoost = 0.014f;
+            mCausticsBoost = 0.004f;
             mPhiDirectional = 480; mThetaDirectional = 263;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
@@ -257,7 +257,7 @@ void DxrPhotonMapper::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mCausticsBoost = 0.0002f;
-            mGatherRadius = 0.031f;
+            mGatherRadius = 0.011f;
         }
         break;
         case SceneType_SanMiguel:
@@ -680,7 +680,13 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDIReservoirBuffer"], mDIReservoirDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMapDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[1].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[2].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap3"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[3].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -692,13 +698,77 @@ void DxrPhotonMapper::Draw()
 
         mCommandList->ResourceBarrier(u32(_countof(uavBarrierRandomCounter)), uavBarrierRandomCounter);
 
-        mCommandList->SetComputeRootSignature(mRsGenerateEmissionGuideMap.Get());
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGenerateEmissionGuideMap["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGenerateEmissionGuideMap["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMapDescriptorUAV.hGpu);
-        mCommandList->SetPipelineState(mGenerateEmissionGuideMapPSO.Get());
-        PIXBeginEvent(mCommandList.Get(), 0, "GenerateEmissionGuideMap");
+        mCommandList->SetComputeRootSignature(mRsClearPhotonEmissionGuideMap.Get());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[1].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[2].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap3"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[3].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
+        mCommandList->SetPipelineState(mClearPhotonEmissionGuideMapPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "ClearPhotonEmissionGuideMap");
         mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
         PIXEndEvent(mCommandList.Get());
+
+        mCommandList->SetComputeRootSignature(mRsGeneratePhotonEmissionGuideMap.Get());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+        mCommandList->SetPipelineState(mGeneratePhotonEmissionGuideMapPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "GeneratePhotonEmissionGuideMap");
+        mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
+        PIXEndEvent(mCommandList.Get());
+
+        vector<CD3DX12_RESOURCE_BARRIER> uavBarrierGuideMap;
+        for (u32 i = 0; i < PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL; i++)
+        {
+            uavBarrierGuideMap.push_back(CD3DX12_RESOURCE_BARRIER::UAV(mPhotonEmissionGuideMipMapTbl[i].Get()));
+        }
+
+        for (u32 i = 0; i + 1 < PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL; i += 3)
+        {
+            mCommandList->ResourceBarrier(PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL, uavBarrierGuideMap.data());
+
+            switch (PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL - i)
+            {
+                case 2 : 
+                {
+                    mCommandList->SetComputeRootSignature(mRsGeneratePhotonEmissionGuideMipMap2x2.Get());
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 0].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 1].hGpu);
+                    mCommandList->SetPipelineState(mGeneratePhotonEmissionGuideMipMap2x2PSO.Get());
+                    PIXBeginEvent(mCommandList.Get(), 0, "GeneratePhotonEmissionGuideMipMap2x2");
+                    mCommandList->Dispatch(1, 1, 1);
+                    PIXEndEvent(mCommandList.Get());
+                }
+                break;
+                case 3:
+                {
+                    mCommandList->SetComputeRootSignature(mRsGeneratePhotonEmissionGuideMipMap4x4.Get());
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 0].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 1].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[min(i + 2, PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL - 1)].hGpu);
+                    mCommandList->SetPipelineState(mGeneratePhotonEmissionGuideMipMap4x4PSO.Get());
+                    PIXBeginEvent(mCommandList.Get(), 0, "GeneratePhotonEmissionGuideMipMap4x4");
+                    mCommandList->Dispatch(1, 1, 1);
+                    PIXEndEvent(mCommandList.Get());
+                }
+                break;
+                default:
+                {
+                    mCommandList->SetComputeRootSignature(mRsGeneratePhotonEmissionGuideMipMap.Get());
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 0].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[i + 1].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[min(i + 2, PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL - 1)].hGpu);
+                    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap3"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[min(i + 3, PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL - 1)].hGpu);
+                    mCommandList->SetPipelineState(mGeneratePhotonEmissionGuideMipMapPSO.Get());
+                    PIXBeginEvent(mCommandList.Get(), 0, "GeneratePhotonEmissionGuideMipMap");
+                    mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 8, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 8, 1);
+                    PIXEndEvent(mCommandList.Get());
+                }
+                break;
+            }
+        }
 
         Grid3DSort();
     }
@@ -729,7 +799,13 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDIReservoirBuffer"], mDIReservoirDescriptorUAVPingPongTbl[curr].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[curr].hGpu);//clear
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
-    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMapDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[1].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[2].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap3"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[3].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -836,7 +912,13 @@ void DxrPhotonMapper::Draw()
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPing].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"], mDISpatialReservoirDescriptorUAVPingPongTbl[spatialIDPong].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
-            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMapDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap0"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap1"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[1].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap2"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[2].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap3"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[3].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");

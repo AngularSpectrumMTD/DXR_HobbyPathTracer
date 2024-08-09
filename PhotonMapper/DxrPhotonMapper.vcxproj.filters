@@ -214,6 +214,18 @@
     <FxCompile Include="shaders\generatePhotonEmissionGuideMap.hlsl">
       <Filter>ソース ファイル\shaders\PhotonMap</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\generatePhotonEmissionGuideMipMap.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\generatePhotonEmissionGuideMipMap2x2.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\generatePhotonEmissionGuideMipMap4x4.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\clearPhotonEmissionGuideMap.hlsl">
+      <Filter>ソース ファイル\shaders\PhotonMap</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxrPhotonMapper.rc">

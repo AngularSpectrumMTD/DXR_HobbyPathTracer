@@ -1,19 +1,15 @@
 # DXR_HobbyPathTracer
-Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Caustics)]  
+Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Emission Guided Caustics)]  
 
-![bistroMain](https://github.com/user-attachments/assets/32f7c946-4480-4e22-a90d-52cb9cfa0099)
-
-![sponzaMain](https://github.com/user-attachments/assets/b8475e8b-9d15-4e95-bc61-7c5047658261)
-
-![caustics](https://github.com/user-attachments/assets/c064b5af-2ac1-4ad7-917d-c5a0f804aa17)
-
-https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b
-
-https://github.com/user-attachments/assets/391d9295-703f-40b2-b192-c342f403265c
+![Main](https://github.com/user-attachments/assets/704db6d9-a7ac-4d57-9f77-3a1b0a8ff7b8)
 
 ![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/213cc5f5-11c1-405f-9e14-9867398378cb)
 
 ![bistro](https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/50c81e1a-8c5d-40b3-a467-8d7fbaf1337f)
+
+https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b
+
+https://github.com/user-attachments/assets/391d9295-703f-40b2-b192-c342f403265c
 
 "Next Event Estimation" and Streaming RIS is implemented for many lights. 
 

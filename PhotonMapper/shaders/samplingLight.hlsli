@@ -417,7 +417,7 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
     return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }
 
-void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out float2 randomUV)
+void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out float2 randomUV, out float pdf)
 {
     const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[0];
@@ -426,18 +426,27 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out 
     if (param.type == LIGHT_TYPE_SPHERE)
     {
         sampleSphereLightEmitDirAndPosition(param, dir, position, randomUV);
+        pdf = 1 / (4 * PI * param.sphereRadius * param.sphereRadius);
     }
     if (param.type == LIGHT_TYPE_RECT)
     {
         sampleRectLightEmitDirAndPosition(param, dir, position, randomUV);
+        float lenU = sqrt(dot(param.U, param.U));
+        float lenV = sqrt(dot(param.V, param.V));
+        pdf = 1 / (4 * lenU * lenV);
     }
     if (param.type == LIGHT_TYPE_SPOT)
     {
         sampleSpotLightEmitDirAndPosition(param, dir, position, randomUV);
+        float lenU = sqrt(dot(param.U, param.U));
+        float lenV = sqrt(dot(param.V, param.V));
+        pdf = 1 / (PI * lenU * lenV);
     }
     if (param.type == LIGHT_TYPE_DIRECTIONAL)
     {
         sampleDirectionalLightEmitDirAndPosition(param, dir, position, randomUV);
+        const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
+        pdf = 1 / (2 * PI * (1 - cosMax));
     }
 }
 
