@@ -181,6 +181,7 @@ void DxrPhotonMapper::Setup()
                         mLightPosX = -3.1f; mLightPosY = 12.19f; mLightPosZ = 1.79f;
                         mPhi = 334.0f; mTheta = 111.0f;
                         mGlassModelType = ModelType_Afrodyta;
+                        //mGlassModelType = ModelType_Dragon;
                         mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
                         mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
                         mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);

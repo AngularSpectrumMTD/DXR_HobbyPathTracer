@@ -1,7 +1,7 @@
 # DXR_HobbyPathTracer
-Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Emission Guided Caustics)]  
+Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Emission Guided Refraction / Reflection Caustics)]  
 
-![Main](https://github.com/user-attachments/assets/704db6d9-a7ac-4d57-9f77-3a1b0a8ff7b8)
+![Main](https://github.com/user-attachments/assets/e6ff7939-a447-44da-9c83-d1ef9b51f2ae)
 
 ![sponza](https://github.com/AngularSpectrumMTD/DXR_HybridPhotonMapper/assets/65929274/213cc5f5-11c1-405f-9e14-9867398378cb)
 
