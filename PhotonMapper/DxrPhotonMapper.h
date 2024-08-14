@@ -171,7 +171,7 @@ private:
         u32 lightID; //light ID of most important light
         u32 randomSeed;//replay
         f32 targetPDF; //weight of light
-        float3 targetPDF_3f; //weight of light(float 3)
+        u32 targetPDF_3f; //weight of light(float 3, compressed)
         f32 W_sum; //sum of all weight
         f32 M; //number of ligts processed for this reservoir
     };

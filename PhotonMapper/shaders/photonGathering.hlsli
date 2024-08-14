@@ -62,12 +62,6 @@ float poly6Kernel2D(float distance, float maxd)
 
 float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDebug = false)
 {
-    float gatherRadius = getGatherRadius();
-    float sharp = getGatherSharpness();
-    const int range = getGatherBlockRange();
-    int rangeX = range;
-    int rangeY = range;
-    int rangeZ = range;
     bool isOutside = false;
     const int3 GridXYZ = (int3) ComputeGridCell(gatherCenterPos, isOutside);
 
@@ -88,11 +82,11 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
     }
 
     //Search Near Cell
-    for (Z = max(GridXYZ.z - rangeZ, 0); Z <= min(GridXYZ.z + rangeZ, gGridParam.gridDimensions.z - 1); Z++)
+    for (Z = max(GridXYZ.z - getGatherBlockRange(), 0); Z <= min(GridXYZ.z + getGatherBlockRange(), gGridParam.gridDimensions.z - 1); Z++)
     {
-        for (Y = max(GridXYZ.y - rangeY, 0); Y <= min(GridXYZ.y + rangeY, gGridParam.gridDimensions.y - 1); Y++)
+        for (Y = max(GridXYZ.y - getGatherBlockRange(), 0); Y <= min(GridXYZ.y + getGatherBlockRange(), gGridParam.gridDimensions.y - 1); Y++)
         {
-            for (X = max(GridXYZ.x - rangeX, 0); X <= min(GridXYZ.x + rangeX, gGridParam.gridDimensions.x - 1); X++)
+            for (X = max(GridXYZ.x - getGatherBlockRange(), 0); X <= min(GridXYZ.x + getGatherBlockRange(), gGridParam.gridDimensions.x - 1); X++)
             {
                 uint3 XYZ = uint3(X, Y, Z);
                 uint GridID = GridHash(XYZ);
@@ -105,17 +99,17 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
                 {
                     PhotonInfo comparePhoton = gPhotonMap[G];
                     float distanceSqr = dot(gatherCenterPos - comparePhoton.position, gatherCenterPos - comparePhoton.position);
-                    if ((distanceSqr < gatherRadius * gatherRadius))
+                    if ((distanceSqr < getGatherRadius() * getGatherRadius()))
                     {
-                        accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), gatherRadius);
+                        accumulateXYZ += comparePhoton.throughput * poly6Kernel2D(sqrt(distanceSqr), getGatherRadius());
                     }
                 }
 
-                if (isDebug)
-                {
-                    float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
-                    accumulateXYZ = float3(db, db, 0); //debug
-                }
+                // if (isDebug)
+                // {
+                //     float db = 10 * (photonIDstardEnd.y - photonIDstardEnd.x + 1);
+                //     accumulateXYZ = float3(db, db, 0); //debug
+                // }
             }
         }
     }

@@ -132,6 +132,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
     <None Include="shaders\common.hlsli">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\compressionUtility.hlsli" />
     <None Include="shaders\Grid3D_Header.hlsli" />
     <None Include="shaders\opticalFunction.hlsli" />
     <None Include="shaders\photonGathering.hlsli" />

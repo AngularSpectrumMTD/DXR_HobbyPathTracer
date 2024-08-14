@@ -158,6 +158,9 @@
     <None Include="shaders\photonGathering.hlsli">
       <Filter>ソース ファイル\shaders\Lighting</Filter>
     </None>
+    <None Include="shaders\compressionUtility.hlsli">
+      <Filter>ソース ファイル\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\A-trous.hlsl">

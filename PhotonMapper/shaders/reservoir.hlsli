@@ -4,12 +4,14 @@
 #define MAX_TEMPORAL_REUSE_M 200
 #define MAX_SPATIAL_REUSE_M 100
 
+#include "compressionUtility.hlsli"
+
 struct DIReservoir
 {
     uint lightID;//light ID of most important light
     uint randomSeed;//replay
     float targetPDF; //weight of light
-    float3 targetPDF_3f; //weight of light(float 3)
+    uint targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
     float M; //number of ligts processed for this reservoir
 
@@ -18,7 +20,7 @@ struct DIReservoir
         lightID = 0;
         randomSeed = 0;
         targetPDF = 0;
-        targetPDF_3f = 0.xxx;
+        targetPDF_3f = 0;
         W_sum = 0;
         M = 0;
     }
@@ -33,7 +35,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
     {
         reservoir.lightID = inLightID;
         reservoir.targetPDF = p_hat;
-        reservoir.targetPDF_3f = p_hat_3f;
+        reservoir.targetPDF_3f = convertF32x3toU32_R11G11B10(p_hat_3f);
         reservoir.randomSeed = randomSeed;
         return true;
     }
@@ -42,7 +44,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
 
 bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
+    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, convertU32toF32x3_R11G11B10(reservoirCombineElem.targetPDF_3f), reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)
@@ -53,7 +55,7 @@ float3 shadeDIReservoir(in DIReservoir reservoir)
     }
 
     const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-    return reservoir.targetPDF_3f * invPDF;
+    return convertU32toF32x3_R11G11B10(reservoir.targetPDF_3f) * invPDF;
 }
 
 bool isValidReservoir(in DIReservoir reservoir)
@@ -63,7 +65,7 @@ bool isValidReservoir(in DIReservoir reservoir)
 
 void recognizeAsShadowedReservoir(inout DIReservoir reservoir)
 {
-    reservoir.targetPDF_3f = 0.xxx;
+    reservoir.targetPDF_3f = 0;
 }
 
 #endif//__RESERVOIR_HLSLI__
