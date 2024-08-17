@@ -116,7 +116,7 @@ void rayGen() {
         nextRay.TMax = 100000;
 
         Payload payload;
-        payload.throughput = energyBoost * float3(1, 1, 1);
+        payload.throughput = convertF32x3toU32_R11G11B10(energyBoost * float3(1, 1, 1));
         payload.recursive = 0;
         payload.flags = 0;//empty
 
@@ -265,7 +265,7 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.throughput = 1.xxx / pdf;//getBaseLightXYZ(LAMBDA_NM);
+    payload.throughput = convertF32x3toU32_R11G11B10(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;

@@ -22,7 +22,7 @@
 
 struct Payload
 {
-    float3 throughput;
+    uint throughput;
     int recursive;
     uint flags;
 };
@@ -32,7 +32,7 @@ struct Payload
 
 struct PhotonPayload
 {
-    float3 throughput;
+    uint throughput;
     int recursive;
     float lambdaNM;
     float2 randomUV;
@@ -187,7 +187,7 @@ float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum() || length(payload.throughput) < 1e-2)
+    if (payload.recursive >= getMaxBounceNum() || length(convertU32toF32x3_R11G11B10(payload.throughput)) < 1e-2)
     {
         return true;
     }
@@ -215,7 +215,7 @@ inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
-        payload.throughput = float3(0, 0, 0);
+        payload.throughput = convertF32x3toU32_R11G11B10(float3(0, 0, 0));
         return true;
     }
     payload.recursive++;

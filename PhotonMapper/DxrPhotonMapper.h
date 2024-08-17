@@ -147,14 +147,14 @@ private:
 
     struct Payload
     {
-        float3 throughput;
+        u32 throughput;
         s32 recursive;
         u32 flags;
     };
 
     struct PhotonPayload
     {
-        float3 throughput;
+        u32 throughput;
         s32 recursive;
         f32 lambdaNM;
         float2 randomUV;

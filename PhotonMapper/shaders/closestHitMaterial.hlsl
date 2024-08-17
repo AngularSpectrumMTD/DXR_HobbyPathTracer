@@ -74,7 +74,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    const float3 element = payload.throughput * photon;
+    const float3 element = convertU32toF32x3_R11G11B10(payload.throughput) * photon;
     addCaustics(element);
     updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
 

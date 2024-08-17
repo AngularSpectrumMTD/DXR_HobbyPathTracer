@@ -182,9 +182,7 @@ void DxrPhotonMapper::CreateStateObject()
 
     //Photon
     {
-        const u32 photonPayloadSize = sizeof(PhotonPayload);
-        const u32 payloadSize = sizeof(Payload);
-        const u32 MaxPayloadSize = max(photonPayloadSize, payloadSize);
+        const u32 MaxPayloadSize = sizeof(PhotonPayload);
         const u32 MaxAttributeSize = sizeof(TriangleIntersectionAttributes);
         const u32 MaxRecursionDepth = MAX_RECURSION_DEPTH;
 
