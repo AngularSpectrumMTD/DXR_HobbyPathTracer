@@ -227,7 +227,7 @@ private:
 
     struct PhotonInfo
     {
-        XMFLOAT3 throughput;
+        u32 throughput;
         XMFLOAT3 position;
         //XMFLOAT3 inDir;
     };

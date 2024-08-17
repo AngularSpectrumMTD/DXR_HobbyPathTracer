@@ -192,7 +192,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
-        throughput = convertF32x3toU32_R11G11B10(convertU32toF32x3_R11G11B10(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
     }
     else
     {
@@ -235,7 +235,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
-        throughput = convertF32x3toU32_R11G11B10(convertU32toF32x3_R11G11B10(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
     }
 }
 
@@ -300,7 +300,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
-        throughput = convertF32x3toU32_R11G11B10(convertU32toF32x3_R11G11B10(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
     }
     else
     {
@@ -343,7 +343,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
-        throughput = convertF32x3toU32_R11G11B10(convertU32toF32x3_R11G11B10(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
     }
 }
 
@@ -504,7 +504,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            float3 element = convertU32toF32x3_R11G11B10(payload.throughput) * Le;
+            float3 element = U32toF32x3(payload.throughput) * Le;
             setDI(element);
             isFinish = true;
             return isFinish;
@@ -513,7 +513,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = convertU32toF32x3_R11G11B10(payload.throughput) * material.emission.xyz;
+            float3 element = U32toF32x3(payload.throughput) * material.emission.xyz;
             if(isDirectRay(payload))
             {
                 setDI(element);
@@ -533,7 +533,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             if (isNEELightingRequired)
             {
                 DIReservoir reservoir;
-                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal, reservoir) * convertU32toF32x3_R11G11B10(payload.throughput);
+                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal, reservoir) * U32toF32x3(payload.throughput);
                 if(isDirectRay(payload))
                 {
                     if(isUseStreamingRIS())
@@ -562,7 +562,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
-                float3 element = convertU32toF32x3_R11G11B10(payload.throughput) * Le;
+                float3 element = U32toF32x3(payload.throughput) * Le;
                 if(isDirectRay(payload))
                 {
                     setDI(element);
@@ -579,7 +579,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = convertU32toF32x3_R11G11B10(payload.throughput) * material.emission.xyz;
+            float3 element = U32toF32x3(payload.throughput) * material.emission.xyz;
             if(isDirectRay(payload))
             {
                 setDI(element);

@@ -35,7 +35,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
     {
         reservoir.lightID = inLightID;
         reservoir.targetPDF = p_hat;
-        reservoir.targetPDF_3f = convertF32x3toU32_R11G11B10(p_hat_3f);
+        reservoir.targetPDF_3f = F32x3toU32(p_hat_3f);
         reservoir.randomSeed = randomSeed;
         return true;
     }
@@ -44,7 +44,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
 
 bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, convertU32toF32x3_R11G11B10(reservoirCombineElem.targetPDF_3f), reservoirCombineElem.M, rnd01);
+    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, U32toF32x3(reservoirCombineElem.targetPDF_3f), reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)
@@ -55,7 +55,7 @@ float3 shadeDIReservoir(in DIReservoir reservoir)
     }
 
     const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-    return convertU32toF32x3_R11G11B10(reservoir.targetPDF_3f) * invPDF;
+    return U32toF32x3(reservoir.targetPDF_3f) * invPDF;
 }
 
 bool isValidReservoir(in DIReservoir reservoir)

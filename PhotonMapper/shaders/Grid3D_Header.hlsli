@@ -12,7 +12,7 @@ struct GridCB
 
 struct PhotonInfo
 {
-    float3 throughput;
+    uint throughput;
     float3 position;
     //float3 inDir;
 };
