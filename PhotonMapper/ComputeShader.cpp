@@ -168,13 +168,11 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
         CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
-        mRegisterMapDebugView["diffuseAlbedoBuffer"] = 0;
+        mRegisterMapDebugView["screenSpaceMaterial"] = 0;
         mRegisterMapDebugView["normalDepthBuffer"] = 1;
-        mRegisterMapDebugView["idRoughnessBuffer"] = 2;
-        mRegisterMapDebugView["finalColor"] = 3;
+        mRegisterMapDebugView["finalColor"] = 2;
     }
 
     {
@@ -186,8 +184,6 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
@@ -196,11 +192,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalReuse["NormalDepthBuffer"] = 2;
         mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = 3;
         mRegisterMapTemporalReuse["PrevIDBuffer"] = 4;
-        mRegisterMapTemporalReuse["IDRoughnessBuffer"] = 5;
-        mRegisterMapTemporalReuse["PrevIDRoughnessBuffer"] = 6;
-        mRegisterMapTemporalReuse["PositionBuffer"] = 7;
-        mRegisterMapTemporalReuse["PrevPositionBuffer"] = 8;
-        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 9;
+        mRegisterMapTemporalReuse["PositionBuffer"] = 5;
+        mRegisterMapTemporalReuse["PrevPositionBuffer"] = 6;
+        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 7;
     }
 
     {
@@ -282,8 +276,6 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 8);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 9);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 10);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 11);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
@@ -302,16 +294,14 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["PrevIDBuffer"] = 6;
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = 7;
         mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = 8;
-        mRegisterMapTemporalAccumulation["IDRoughnessBuffer"] = 9;
-        mRegisterMapTemporalAccumulation["PrevIDRoughnessBuffer"] = 10;
-        mRegisterMapTemporalAccumulation["PositionBuffer"] = 11;
-        mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = 12;
-        mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = 13;
-        mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = 14;
-        mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = 15;
-        mRegisterMapTemporalAccumulation["DIGIBuffer"] = 16;
-        mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = 17;
-        mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = 18;
-        mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = 19;
+        mRegisterMapTemporalAccumulation["PositionBuffer"] = 9;
+        mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = 10;
+        mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = 11;
+        mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = 12;
+        mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = 13;
+        mRegisterMapTemporalAccumulation["DIGIBuffer"] = 14;
+        mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = 15;
+        mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = 16;
+        mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = 17;
     }
 }

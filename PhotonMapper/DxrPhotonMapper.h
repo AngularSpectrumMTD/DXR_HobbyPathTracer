@@ -515,9 +515,6 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mNormalDepthBufferTbl;
     std::vector < dx12::Descriptor> mNormalDepthBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mNormalDepthBufferDescriptorUAVTbl;
-    std::vector < ComPtr<ID3D12Resource>> mIDRoughnessBufferTbl;
-    std::vector < dx12::Descriptor> mIDRoughnessBufferDescriptorSRVTbl;
-    std::vector < dx12::Descriptor> mIDRoughnessBufferDescriptorUAVTbl;
     std::vector < ComPtr<ID3D12Resource>> mPositionBufferTbl;
     std::vector < dx12::Descriptor> mPositionBufferDescriptorSRVTbl;
     std::vector < dx12::Descriptor> mPositionBufferDescriptorUAVTbl;
@@ -528,9 +525,6 @@ private:
     dx12::Descriptor mDenoisedColorBufferDescriptorSRV;
     dx12::Descriptor mDenoisedColorBufferDescriptorUAV;
 
-    ComPtr<ID3D12Resource> mDiffuseAlbedoBuffer;
-    dx12::Descriptor mDiffuseAlbedoBufferDescriptorSRV;
-    dx12::Descriptor mDiffuseAlbedoBufferDescriptorUAV;
     ComPtr<ID3D12Resource> mPrevIDBuffer;
     dx12::Descriptor mPrevIDBufferDescriptorSRV;
     dx12::Descriptor mPrevIDBufferDescriptorUAV;

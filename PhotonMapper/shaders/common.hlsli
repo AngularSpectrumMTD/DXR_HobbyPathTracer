@@ -55,55 +55,7 @@ struct LightGenerateParam
     uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 };
 
-struct MaterialParams
-{
-    float4 albedo;
-    float metallic;
-    float roughness;
-    float specular;
-    float transRatio;
-    float4 transColor;
-    float4 emission;
-};
-
-struct CompressedMaterialParams
-{
-    uint albedo;
-    float metallic;
-    float roughness;
-    float specular;
-    float transRatio;
-    uint transColor;
-    uint emission;
-};
-
-MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
-{
-    MaterialParams decompressed = (MaterialParams)0;
-    decompressed.albedo = float4(U32toF32x3(compressed.albedo), 0);
-    decompressed.metallic = compressed.metallic;
-    decompressed.roughness = compressed.roughness;
-    decompressed.specular = compressed.specular;
-    decompressed.transRatio = compressed.transRatio;
-    decompressed.transColor = float4(U32toF32x3(compressed.transColor), 0);
-    decompressed.emission = float4(U32toF32x3(compressed.emission), 0);
-
-    return decompressed;
-}
-
-CompressedMaterialParams compressMaterialParams(in MaterialParams original)
-{
-    CompressedMaterialParams compressed = (CompressedMaterialParams)0;
-    compressed.albedo = F32x3toU32(original.albedo.xyz);
-    compressed.metallic = original.metallic;
-    compressed.roughness = original.roughness;
-    compressed.specular = original.specular;
-    compressed.transRatio = original.transRatio;
-    compressed.transColor = F32x3toU32(original.transColor.xyz);
-    compressed.emission = F32x3toU32(original.emission.xyz);
-
-    return compressed;
-}
+#include "materialParams.hlsli"
 
 #define LIGHT_TYPE_SPHERE 0
 #define LIGHT_TYPE_RECT 1
@@ -126,29 +78,27 @@ SamplerState gSampler : register(s0);
 RWStructuredBuffer<PhotonInfo> gPhotonMap : register(u0);
 RWTexture2D<float4> gNormalDepthBuffer : register(u1);
 RWStructuredBuffer<uint2> gPhotonGridIdBuffer : register(u2);
-RWTexture2D<float4> gDiffuseAlbedoBuffer : register(u3);
-RWTexture2D<float4> gPositionBuffer : register(u4);
-RWTexture2D<float4> gIDRoughnessBuffer : register(u5);
-RWTexture2D<float2> gPrevIDBuffer : register(u6);
+RWTexture2D<float4> gPositionBuffer : register(u3);
+RWTexture2D<float2> gPrevIDBuffer : register(u4);
 
-RWTexture2D<float4> gDIBuffer : register(u7);
-RWTexture2D<float4> gGIBuffer : register(u8);
+RWTexture2D<float4> gDIBuffer : register(u5);
+RWTexture2D<float4> gGIBuffer : register(u6);
 
-RWTexture2D<float4> gCausticsBuffer : register(u9);
+RWTexture2D<float4> gCausticsBuffer : register(u7);
 
-RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u10);
-RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u11);//for reservoir spatial reuse
+RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u8);
+RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u9);//for reservoir spatial reuse
 
-RWTexture2D<uint> gPhotonRandomCounterMap : register(u12);
-RWTexture2D<float> gPhotonEmissionGuideMap0 : register(u13);
-RWTexture2D<float> gPhotonEmissionGuideMap1 : register(u14);
-RWTexture2D<float> gPhotonEmissionGuideMap2 : register(u15);
-RWTexture2D<float> gPhotonEmissionGuideMap3 : register(u16);
-RWTexture2D<float> gPhotonEmissionGuideMap4 : register(u17);
-RWTexture2D<float> gPhotonEmissionGuideMap5 : register(u18);
-RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u19);
+RWTexture2D<uint> gPhotonRandomCounterMap : register(u10);
+RWTexture2D<float> gPhotonEmissionGuideMap0 : register(u11);
+RWTexture2D<float> gPhotonEmissionGuideMap1 : register(u12);
+RWTexture2D<float> gPhotonEmissionGuideMap2 : register(u13);
+RWTexture2D<float> gPhotonEmissionGuideMap3 : register(u14);
+RWTexture2D<float> gPhotonEmissionGuideMap4 : register(u15);
+RWTexture2D<float> gPhotonEmissionGuideMap5 : register(u16);
+RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u17);
 
-RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u20);
+RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u18);
 
 struct ReSTIRParam
 {
@@ -293,10 +243,8 @@ void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, i
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
     {
         float2 writeIndex = DispatchRaysIndex().xy;
-        gDiffuseAlbedoBuffer[writeIndex] = float4(albedo.x, albedo.y, albedo.z, 0);
         gNormalDepthBuffer[writeIndex] = float4(normal.x, normal.y, normal.z, (payload.recursive == 0) ? 0 : compute01Depth(position));
         gPositionBuffer[writeIndex] = float4(position, 0);
-        gIDRoughnessBuffer[writeIndex] = float4(primitiveIndex, instanceIndex, roughness, dot(float3(0.2126, 0.7152, 0.0722), albedo.rgb));
         matrix mtxViewProj = mul(gSceneParam.mtxProj, gSceneParam.mtxView);
         matrix mtxViewProjPrev = mul(gSceneParam.mtxProjPrev, gSceneParam.mtxViewPrev);
         float4 currVpPos = mul(mtxViewProj, float4(position, 1));

@@ -1,10 +1,11 @@
 #define THREAD_NUM 16
 
-RWTexture2D<float4> diffuseAlbedoBuffer : register(u0);
-RWTexture2D<float4> normalDepthBuffer : register(u1);
-RWTexture2D<float4> idRoughnessBuffer : register(u2);
+#include "compressionUtility.hlsli"
+#include "materialParams.hlsli"
 
-RWTexture2D<float4> finalColor : register(u3);
+RWStructuredBuffer<CompressedMaterialParams> screenSpaceMaterial : register(u0);
+RWTexture2D<float4> normalDepthBuffer : register(u1);
+RWTexture2D<float4> finalColor : register(u2);
 
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void debugView(uint3 dtid : SV_DispatchThreadID)
@@ -14,7 +15,6 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
     finalColor.GetDimensions(bufferSize.x, bufferSize.y);
     
     float3 finalColorSrc = finalColor[computePix].xyz;
-    float3 diffuseAlbedo = diffuseAlbedoBuffer[computePix].xyz;
 
     const float sizeRatio = 1.0f / 4;
 
@@ -25,7 +25,9 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
     {
         if (0 < computePix.y && computePix.y < 1 * offsetY)
         {
-            finalColorSrc = diffuseAlbedoBuffer[(computePix - int2(offsetX, 0)) / sizeRatio].xyz;
+            int2 readIndex = (computePix - int2(offsetX, 0)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.albedo.xyz;
         }
         else if (1 * offsetY <= computePix.y && computePix.y < 2 * offsetY)
         {

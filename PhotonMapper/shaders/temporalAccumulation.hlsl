@@ -17,10 +17,8 @@ Texture2D<float4> PrevNormalDepthBuffer : register(t4);
 Texture2D<float2> PrevIDBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
-Texture2D<float4> IDRoughnessBuffer : register(t8);
-Texture2D<float4> PrevIDRoughnessBuffer : register(t9);
-Texture2D<float4> PositionBuffer : register(t10);
-Texture2D<float4> PrevPositionBuffer : register(t11);
+Texture2D<float4> PositionBuffer : register(t8);
+Texture2D<float4> PrevPositionBuffer : register(t9);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -76,9 +74,6 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     float currDepth = NormalDepthBuffer[currID].w;
     float3 currNormal = NormalDepthBuffer[currID].xyz;
-    uint currInstanceIndex = IDRoughnessBuffer[currID].y;
-    float currRoughness = IDRoughnessBuffer[currID].z;
-    float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
 
     float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
@@ -109,9 +104,6 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
         float prevDepth = PrevNormalDepthBuffer[prevID].w;
         float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
-        uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
-        float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
-        float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
         float3 prevWorldPos = PrevPositionBuffer[prevID].xyz;
         float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
 
@@ -119,7 +111,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float2 currLuminanceMoment = float2(luminance, luminance * luminance);
 
         uint accCount = PrevAccumulationCountBuffer[prevID];
-        const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevWorldPos);
+        const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevWorldPos);
         if (isTemporalReuseEnable)
         {
             accCount++;

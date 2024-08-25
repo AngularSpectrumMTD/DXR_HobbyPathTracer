@@ -13,10 +13,8 @@ StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t0);
 Texture2D<float4> NormalDepthBuffer : register(t1);
 Texture2D<float4> PrevNormalDepthBuffer : register(t2);
 Texture2D<float2> PrevIDBuffer : register(t3);
-Texture2D<float4> IDRoughnessBuffer : register(t4);
-Texture2D<float4> PrevIDRoughnessBuffer : register(t5);
-Texture2D<float4> PositionBuffer : register(t6);
-Texture2D<float4> PrevPositionBuffer : register(t7);
+Texture2D<float4> PositionBuffer : register(t4);
+Texture2D<float4> PrevPositionBuffer : register(t5);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u0);
 
 static uint rseed;
@@ -66,9 +64,6 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 
     float currDepth = NormalDepthBuffer[currID].w;
     float3 currNormal = NormalDepthBuffer[currID].xyz;
-    uint currInstanceIndex = IDRoughnessBuffer[currID].y;
-    float currRoughness = IDRoughnessBuffer[currID].z;
-    float currAlbedoLuminance = IDRoughnessBuffer[currID].w;
 
     float3 currObjectWorldPos = PositionBuffer[currID].xyz;
 
@@ -85,11 +80,8 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
-            uint prevInstanceIndex = PrevIDRoughnessBuffer[prevID].y;
-            float prevRoughness = PrevIDRoughnessBuffer[prevID].z;
-            float prevAlbedoLuminance = PrevIDRoughnessBuffer[prevID].w;
             float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
-            const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currInstanceIndex, prevInstanceIndex, currRoughness, prevRoughness, currObjectWorldPos, prevObjectWorldPos);
+            const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
