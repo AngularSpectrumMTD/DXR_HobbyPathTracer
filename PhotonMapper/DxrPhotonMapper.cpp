@@ -688,6 +688,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -807,6 +808,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -826,7 +828,8 @@ void DxrPhotonMapper::Draw()
             CD3DX12_RESOURCE_BARRIER::UAV(mCausticsBufferPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mDIReservoirPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[prev].Get()),
-            CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[curr].Get())
+            CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[curr].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mScreenSpaceMaterialBuffer.Get())
         };
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
@@ -920,6 +923,7 @@ void DxrPhotonMapper::Draw()
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");

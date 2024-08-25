@@ -5,17 +5,6 @@
 
 #define Z_AXIS float3(0, 0, 1)
 
-struct MaterialParams
-{
-    float4 albedo;
-    float metallic;
-    float roughness;
-    float specular;
-    float transRatio;
-    float4 transColor;
-    float4 emission;
-};
-
 void primarySurfaceHasHighPossibilityCausticsGenerate(in MaterialParams params, inout PhotonPayload payload)
 {
     if((payload.recursive == 1) && ((params.transRatio > 0) || (params.metallic > 0.5)))

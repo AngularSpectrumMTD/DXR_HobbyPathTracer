@@ -8,6 +8,7 @@
 #define DEFAULT_GEOM_CONT_MUL 1
 
 #include "sceneCBDefinition.hlsli"
+#include "compressionUtility.hlsli"
 
 #define PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED 1 << 0
 #define PAYLOAD_BIT_MASK_IS_SHADOW_RAY 1 << 1
@@ -54,6 +55,56 @@ struct LightGenerateParam
     uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 };
 
+struct MaterialParams
+{
+    float4 albedo;
+    float metallic;
+    float roughness;
+    float specular;
+    float transRatio;
+    float4 transColor;
+    float4 emission;
+};
+
+struct CompressedMaterialParams
+{
+    uint albedo;
+    float metallic;
+    float roughness;
+    float specular;
+    float transRatio;
+    uint transColor;
+    uint emission;
+};
+
+MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
+{
+    MaterialParams decompressed = (MaterialParams)0;
+    decompressed.albedo = float4(U32toF32x3(compressed.albedo), 0);
+    decompressed.metallic = compressed.metallic;
+    decompressed.roughness = compressed.roughness;
+    decompressed.specular = compressed.specular;
+    decompressed.transRatio = compressed.transRatio;
+    decompressed.transColor = float4(U32toF32x3(compressed.transColor), 0);
+    decompressed.emission = float4(U32toF32x3(compressed.emission), 0);
+
+    return decompressed;
+}
+
+CompressedMaterialParams compressMaterialParams(in MaterialParams original)
+{
+    CompressedMaterialParams compressed = (CompressedMaterialParams)0;
+    compressed.albedo = F32x3toU32(original.albedo.xyz);
+    compressed.metallic = original.metallic;
+    compressed.roughness = original.roughness;
+    compressed.specular = original.specular;
+    compressed.transRatio = original.transRatio;
+    compressed.transColor = F32x3toU32(original.transColor.xyz);
+    compressed.emission = F32x3toU32(original.emission.xyz);
+
+    return compressed;
+}
+
 #define LIGHT_TYPE_SPHERE 0
 #define LIGHT_TYPE_RECT 1
 #define LIGHT_TYPE_SPOT 2
@@ -96,6 +147,8 @@ RWTexture2D<float> gPhotonEmissionGuideMap3 : register(u16);
 RWTexture2D<float> gPhotonEmissionGuideMap4 : register(u17);
 RWTexture2D<float> gPhotonEmissionGuideMap5 : register(u18);
 RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u19);
+
+RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u20);
 
 struct ReSTIRParam
 {
@@ -235,7 +288,7 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness)
+void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness, in MaterialParams material)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
     {
@@ -252,10 +305,14 @@ void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, i
         prevVpPos.xy /= prevVpPos.w;
         const float2 velocity = prevVpPos.xy - currVpPos.xy;
         //gVelocityBuffer[writeIndex] = velocity;
-
-        float2 dims = 0.xx;
-        gPrevIDBuffer.GetDimensions(dims.x, dims.y);
+        
+        float2 dims = float2(DispatchRaysDimensions().xy);
         gPrevIDBuffer[writeIndex] = (prevVpPos.xy * float2(0.5, -0.5) + 0.5.xx) * dims;
+
+        uint3 launchIndex = DispatchRaysIndex();
+        uint3 dispatchDimensions = DispatchRaysDimensions();
+        int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+        gScreenSpaceMaterial[serialIndex] = compressMaterialParams(material);
 
         payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }

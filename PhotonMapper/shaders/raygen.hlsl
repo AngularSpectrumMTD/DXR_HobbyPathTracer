@@ -362,12 +362,29 @@ void spatialReuse() {
     rseed = spatDIReservoir.randomSeed;
     sampleLightWithID(scatterPosition, spatDIReservoir.lightID, lightSample);
     float3 biasedPosition = scatterPosition + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+
+    //The term "FGL" must be recalculated
+    float3 lightNormal = lightSample.normal;
+    float3 wi = lightSample.directionToLight;
+    float receiverCos = dot(centerNormal, wi);
+    float emitterCos = dot(lightNormal, -wi);
+    const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
+    const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
+    const float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
+    const float3 wo = -normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
+    if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
+    {
+        MaterialParams material = decompressMaterialParams(gScreenSpaceMaterial[serialIndex]);
+        float4 bsdfPDF = sampleBSDF_PDF(material, centerNormal, wo, wi);
+        float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+        float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+        spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
+    }
+
     if(!isVisible(biasedPosition, lightSample))
     {
         recognizeAsShadowedReservoir(spatDIReservoir);
     }
-
-    //The term "FGL" must be recalculated and the loading of MaterialParams must be prepared..... very cumbersome...
 
     if(spatDIReservoir.M > MAX_SPATIAL_REUSE_M)
     {

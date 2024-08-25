@@ -39,6 +39,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 17);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 18);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig["gGridParam"] = 0;
@@ -66,6 +67,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap4"] = 22;
         mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap5"] = 23;
         mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap6"] = 24;
+        mRegisterMapGlobalRootSig["gScreenSpaceMaterial"] = 25;
     }
 
     //PhotonMapping
@@ -96,6 +98,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 17);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 18);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton["gGridParam"] = 0;
@@ -123,6 +126,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap4"] = 22;
         mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap5"] = 23;
         mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap6"] = 24;
+        mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"] = 25;
     }
     {
         utility::RootSignatureCreater rsCreater;
@@ -151,6 +155,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 17);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 18);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 2);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigReservoirSpatialReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirSpatialReuse");
@@ -179,7 +184,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap4"] = 22;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap5"] = 23;
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap6"] = 24;
-        mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"] = 25;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"] = 25;
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"] = 26;
     }
 }
 

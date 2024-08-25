@@ -1,11 +1,7 @@
 # DXR_HobbyPathTracer
 Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Emission Guided Refraction / Reflection Caustics)]  
 
-![Main](https://github.com/user-attachments/assets/5ede4816-82a9-4bdc-9a78-76b33b199df3)
-
-https://github.com/AngularSpectrumMTD/DXR_HobbyPathTracer/assets/65929274/28305448-f99d-44b9-a762-6a0551789d7b
-
-https://github.com/user-attachments/assets/391d9295-703f-40b2-b192-c342f403265c
+![Main](https://github.com/user-attachments/assets/cbfadc76-6844-410e-9bd3-c53374ba0026)
 
 "Next Event Estimation" and Streaming RIS is implemented for many lights. 
 

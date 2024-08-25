@@ -28,7 +28,9 @@ void miss(inout Payload payload) {
         const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
         const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
         const float3 writePosition = isAnaliticalLightHitted ? hitPosition : 0.xxx;
-        storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, 0, 0);
+        MaterialParams material = (MaterialParams)0;
+        material.albedo = float4(writeColor, 0);
+        storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, 0, 0, material);
         return;
     }
 
@@ -49,7 +51,8 @@ void miss(inout Payload payload) {
         }
     }
 
-    storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, -1, -1);
+    MaterialParams material = (MaterialParams)0;
+    storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, -1, -1, material);
 
 #ifdef ENABLE_IBL
     float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);

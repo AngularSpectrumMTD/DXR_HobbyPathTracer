@@ -280,6 +280,17 @@ private:
         XMUINT4 data;
     };
 
+    struct CompressedMaterialParams
+    {
+        u32 albedo;
+        f32 metallic;
+        f32 roughness;
+        f32 specular;
+        f32 transRatio;
+        u32 transColor;
+        u32 emission;
+    };
+
     struct LightGenerateParam
     {
         XMFLOAT3 position = XMFLOAT3(0, 0, 0);
@@ -678,6 +689,11 @@ private:
     ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMipMap4x4;
     std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMipMap4x4;
     ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMipMap4x4PSO;
+
+    //Screen Space Material
+    ComPtr<ID3D12Resource> mScreenSpaceMaterialBuffer;
+    dx12::Descriptor mScreenSpaceMaterialBufferDescriptorSRV;
+    dx12::Descriptor mScreenSpaceMaterialBufferDescriptorUAV;
 
     u32 mRenderFrame = 0;
     u32 mSeedFrame = 0;
