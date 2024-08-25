@@ -560,6 +560,7 @@ namespace utility {
 				mparams.roughness = 1 - mparams.metallic;
 				mparams.transRatio = 0;
 				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+				mparams.transColor = XMVectorSet(0, 0, 0, 0);
 				m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 				device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
 

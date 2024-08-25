@@ -15,8 +15,8 @@ Shading : GGX
 Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
 
 ### Debug View
-Enable to check (Diffuse)Albedo / Depth / Normal   
-![debugView](https://github.com/user-attachments/assets/82653053-4d25-47c1-97aa-4dd178e401d6)
+Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
+![debugView](https://github.com/user-attachments/assets/434db9e3-f851-4316-a90e-8ffa2710aed3)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**

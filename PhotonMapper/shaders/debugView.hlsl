@@ -37,6 +37,41 @@ void debugView(uint3 dtid : SV_DispatchThreadID)
         {
             finalColorSrc = (normalDepthBuffer[(computePix - int2(offsetX, 2 * offsetY)) / sizeRatio].xyz + 1.xxx) * 0.5;
         }
+        else if (3 * offsetY <= computePix.y && computePix.y < 4 * offsetY)
+        {
+            int2 readIndex = (computePix - int2(offsetX, 3 * offsetY)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.roughness.xxx;
+        }
     }
+
+    if (computePix.x < bufferSize.x * sizeRatio)
+    {
+        if (0 < computePix.y && computePix.y < 1 * offsetY)
+        {
+            int2 readIndex = (computePix - int2(0, 0)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.metallic.xxx;
+        }
+        else if (1 * offsetY <= computePix.y && computePix.y < 2 * offsetY)
+        {
+            int2 readIndex = (computePix - int2(0, 1 * offsetY)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.specular.xxx;
+        }
+        else if (2 * offsetY <= computePix.y && computePix.y < 3 * offsetY)
+        {
+            int2 readIndex = (computePix - int2(0, 2 * offsetY)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.transColor.rgb;
+        }
+        else if (3 * offsetY <= computePix.y && computePix.y < 4 * offsetY)
+        {
+           int2 readIndex = (computePix - int2(0, 3 * offsetY)) / sizeRatio;
+            MaterialParams material = decompressMaterialParams(screenSpaceMaterial[readIndex.x + bufferSize.x * readIndex.y]);
+            finalColorSrc = material.emission.rgb;
+        }
+    }
+
     finalColor[computePix].xyz = finalColorSrc;
 }
