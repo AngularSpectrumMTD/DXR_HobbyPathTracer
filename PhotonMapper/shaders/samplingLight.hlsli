@@ -25,7 +25,7 @@ void sampleSphereLight(in LightGenerateParam lightGen, in float3 scatterPosition
     float y = sqrt(max(0, 1 - z * z)) * sin(2.0f * PI * v);
     float x = sqrt(max(0, 1 - z * z)) * cos(2.0f * PI * v);
 
-    float3 pos = lightGen.position + lightGen.sphereRadius * float3(x, y, z);
+    float3 pos = lightGen.positionORDirection + lightGen.sphereRadius * float3(x, y, z);
     lightSample.type = LIGHT_TYPE_SPHERE;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(float3(x, y, z));
@@ -42,7 +42,7 @@ void sampleRectLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float lenU = sqrt(dot(lightGen.U, lightGen.U));
     float lenV = sqrt(dot(lightGen.V, lightGen.V));
 
-    float3 pos = lightGen.position + 2 * (u - 0.5) * lightGen.U + 2 * (v - 0.5) * lightGen.V;
+    float3 pos = lightGen.positionORDirection + 2 * (u - 0.5) * lightGen.U + 2 * (v - 0.5) * lightGen.V;
     lightSample.type = LIGHT_TYPE_RECT;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
@@ -64,7 +64,7 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     float y = r * sin(theta);
     y *= lenV / lenU;
     
-    float3 pos = lightGen.position + x * normalize(lightGen.U) + y * normalize(lightGen.V);
+    float3 pos = lightGen.positionORDirection + x * normalize(lightGen.U) + y * normalize(lightGen.V);
     lightSample.type = LIGHT_TYPE_SPOT;
     lightSample.directionToLight = pos - scatterPosition;
     lightSample.normal = normalize(cross(lightGen.U, lightGen.V));
@@ -103,7 +103,7 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
 
-    float3 fromLight = normalize(lightGen.position);
+    float3 fromLight = normalize(lightGen.positionORDirection);
     float2 dummy = 0.xx;
     float3 emit = coneSample(fromLight, cosMax, dummy);
     
@@ -118,13 +118,13 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
 void sampleSphereLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
     emitDir = HemisphereORCosineSampling(float3(1, 0, 0), false, randomUV);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleSphereLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, in float2 randomUV)
 {
     emitDir = HemisphereORCosineSamplingWithRandom(float3(1, 0, 0), false, randomUV);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
@@ -136,7 +136,7 @@ void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
     float rnd1 = (v - 0.5) * 2; //-1 to 1
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     emitDir = normalize(dominantDir * LIGHT_BASE_LENGTH + rnd0 * lightGen.U + rnd1 * lightGen.V);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleRectLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, in float2 randomUV)
@@ -147,7 +147,7 @@ void sampleRectLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen,
     float rnd1 = (v - 0.5) * 2; //-1 to 1
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     emitDir = normalize(dominantDir * LIGHT_BASE_LENGTH + rnd0 * lightGen.U + rnd1 * lightGen.V);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
@@ -155,7 +155,7 @@ void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     const float cosMax = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
     emitDir = coneSample(dominantDir, cosMax, randomUV);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleSpotLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, in float2 randomUV)
@@ -163,13 +163,13 @@ void sampleSpotLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen,
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     const float cosMax = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
     emitDir = coneSampleWithRandom(dominantDir, cosMax, randomUV);
-    position = lightGen.position;
+    position = lightGen.positionORDirection;
 }
 
 void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, out float2 randomUV)
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
-    float3 fromLight = normalize(lightGen.position);
+    float3 fromLight = normalize(lightGen.positionORDirection);
     emitDir = coneSample(fromLight, cosMax, randomUV);
     position = 100 * -emitDir;
 }
@@ -177,7 +177,7 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 void sampleDirectionalLightEmitDirAndPositionWithRandom(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, in float2 randomUV)
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
-    float3 fromLight = normalize(lightGen.position);
+    float3 fromLight = normalize(lightGen.positionORDirection);
     emitDir = coneSampleWithRandom(fromLight, cosMax, randomUV);
     position = 100 * -emitDir;
 }
@@ -256,7 +256,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         //float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
         //shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
         //float frontT = tt.x >= 0 ? tt.x : tt.y;
-        float t = intersectSphere(rayOrigin, rayDiretion, param.position,
+        float t = intersectSphere(rayOrigin, rayDiretion, param.positionORDirection,
         shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
 
         Le = param.emission * max(1, getLightNum() - 1);
@@ -265,7 +265,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
     else if (param.type == LIGHT_TYPE_RECT)
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+        float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
         Le = param.emission * max(1, getLightNum() - 1);
@@ -274,7 +274,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
     else if (param.type == LIGHT_TYPE_SPOT)
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
+        float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
         Le = param.emission * max(1, getLightNum() - 1);
@@ -303,7 +303,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
         if (param.type == LIGHT_TYPE_SPHERE)
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectSphere(rayOrigin, rayDiretion, param.position,
+            float hittedT = intersectSphere(rayOrigin, rayDiretion, param.positionORDirection,
             shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
 
             Le = param.emission * max(1, getLightNum() - 1);
@@ -315,14 +315,14 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
                     mostNearIndex = i;
                     currT = hittedT;
                     mostNearLe = Le;
-                    hitNormal = normalize(rayOrigin + currT * rayDiretion - param.position);
+                    hitNormal = normalize(rayOrigin + currT * rayDiretion - param.positionORDirection);
                 }
             }
         }
         else if (param.type == LIGHT_TYPE_RECT)
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.position, param.U, param.V);
+            float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
             const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
             Le = param.emission * max(1, getLightNum() - 1);
@@ -341,7 +341,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
         else if (param.type == LIGHT_TYPE_SPOT)
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.position, param.U, param.V);
+            float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
             const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
             Le = param.emission * max(1, getLightNum() - 1);
@@ -381,7 +381,7 @@ float3 directionalLightingOnMissShader(Payload payload)
         {
             isDirectionalLightFinded = true;
             emis = lightGen.emission;
-            dominantDir = normalize(lightGen.position);
+            dominantDir = normalize(lightGen.positionORDirection);
         }
     }
     

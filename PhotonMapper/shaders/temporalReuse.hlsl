@@ -76,12 +76,12 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
 
-        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && !isHistoryResetRequested())
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
             float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
-            const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
+            const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];

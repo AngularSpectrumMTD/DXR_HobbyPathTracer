@@ -294,7 +294,7 @@ private:
 
     struct LightGenerateParam
     {
-        XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+        XMFLOAT3 positionORDirection = XMFLOAT3(0, 0, 0);
         XMFLOAT3 emission = XMFLOAT3(0, 0, 0);
         XMFLOAT3 U = XMFLOAT3(0, 0, 0); //u vector for rectangle or spot light
         XMFLOAT3 V = XMFLOAT3(0, 0, 0); //v vector for rectangle or spot light
@@ -304,7 +304,7 @@ private:
         void setParamAsSphereLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const f32 radius)
         {
             type = LightType_Sphere;
-            position = pos;
+            positionORDirection = pos;
             emission = emi;
             sphereRadius = radius;
         }
@@ -312,7 +312,7 @@ private:
         void setParamAsRectLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v)
         {
             type = LightType_Rect;
-            position = pos;
+            positionORDirection = pos;
             emission = emi;
             U = u;
             V = v;
@@ -321,16 +321,16 @@ private:
         void setParamAsSpotLight(const XMFLOAT3 pos, const XMFLOAT3 emi, const XMFLOAT3 u, const XMFLOAT3 v)
         {
             type = LightType_Spot;
-            position = pos;
+            positionORDirection = pos;
             emission = emi;
             U = u;
             V = v;
         }
 
-        void setParamAsDirectionalLight(const XMFLOAT3 pos, const XMFLOAT3 emi)
+        void setParamAsDirectionalLight(const XMFLOAT3 dir, const XMFLOAT3 emi)
         {
             type = LightType_Directional;
-            position = pos;
+            positionORDirection = dir;
             emission = emi;
         }
     };

@@ -51,7 +51,7 @@ struct TriangleIntersectionAttributes
 
 struct LightGenerateParam
 {
-    float3 position;
+    float3 positionORDirection;
     float3 emission;
     float3 U; //u vector for rectangle or spot light
     float3 V; //v vector for rectangle or spot light
