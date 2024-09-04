@@ -1,19 +1,9 @@
 # DXR_HobbyPathTracer
-Hybrid Path Tracer By Use Of DirectX Raytracing [Path Tracing (DI:ReSTIR GI:Streaming RIS) + Photon Mapping(Emission Guided Refraction / Reflection Caustics)]  
+Basic Path Tracer (Implemented in DirectX Raytracing)
+- ReSTIR
+- Emission Guided Photon Mapping
 
 ![Main](https://github.com/user-attachments/assets/82f8f09f-71e6-44c7-8e84-73476313e7c9)
-
-"Next Event Estimation" and Streaming RIS is implemented for many lights. 
-
-This sampling technique can easily generate beautiful rendering images of scenes with many light sources.  
-(Doing) ReSTIR DI is implemented for improving the quality RIS.   
-
-### Algorithm
-Photon Mapping : Hashed Grid  
-Denoiser : SVGF (Currently Disabled)  
-Shading : GGX  
-Sampling : Next Event Estimation / ReSTIR(DI) / Streaming RIS
-
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
 ![debugView](https://github.com/user-attachments/assets/434db9e3-f851-4316-a90e-8ffa2710aed3)
@@ -42,9 +32,6 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 5. Set "SceneType_BistroExterior" / "SceneType_BistroInterior" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 6. Build and Execute  
 ---
-
-### Graphics API
-DirectX12
 
 ### Action
 
