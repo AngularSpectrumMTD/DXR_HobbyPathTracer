@@ -53,8 +53,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsBitonicSortLDS = rsCreater.Create(mDevice, false, L"rsBitonic");
         CreateComputeShaderStateObject(ComputeShaders::BitonicSort, mBitonicSortLDSPSO, mRsBitonicSortLDS);
-        mRegisterMapBitonicSortLDS["gBitonicParam"] = 0;
-        mRegisterMapBitonicSortLDS["gOutput"] = 1;
+        mRegisterMapBitonicSortLDS.clear();
+        mRegisterMapBitonicSortLDS["gBitonicParam"] = mRegisterMapBitonicSortLDS.size();
+        mRegisterMapBitonicSortLDS["gOutput"] = mRegisterMapBitonicSortLDS.size();
 
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
@@ -62,9 +63,10 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsTranspose = rsCreater.Create(mDevice, false, L"rsTranspose");
         CreateComputeShaderStateObject(ComputeShaders::Transpose, mTransposePSO, mRsTranspose);
-        mRegisterMapTranspose["gBitonicParam"] = 0;
-        mRegisterMapTranspose["gInput"] = 1;
-        mRegisterMapTranspose["gOutput"] = 2;
+        mRegisterMapTranspose.clear();
+        mRegisterMapTranspose["gBitonicParam"] = mRegisterMapTranspose.size();
+        mRegisterMapTranspose["gInput"] = mRegisterMapTranspose.size();
+        mRegisterMapTranspose["gOutput"] = mRegisterMapTranspose.size();
     }
 
     {
@@ -73,8 +75,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsBitonicSortSimple = rsCreater.Create(mDevice, false, L"rsBitonic2");
         CreateComputeShaderStateObject(ComputeShaders::BitonicSort2, mBitonicSortSimplePSO, mRsBitonicSortSimple);
-        mRegisterMapBitonicSortSimple["gBitonicParam"] = 0;
-        mRegisterMapBitonicSortSimple["data"] = 1;
+        mRegisterMapBitonicSortSimple.clear();
+        mRegisterMapBitonicSortSimple["gBitonicParam"] = mRegisterMapBitonicSortSimple.size();
+        mRegisterMapBitonicSortSimple["data"] = mRegisterMapBitonicSortSimple.size();
     }
 
     {
@@ -84,9 +87,10 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsBuildGrid = rsCreater.Create(mDevice, false, L"rsBuildGrid");
         CreateComputeShaderStateObject(ComputeShaders::BuildGrid, mBuildGridPSO, mRsBuildGrid);
-        mRegisterMapBuildGrid["gGridParam"] = 0;
-        mRegisterMapBuildGrid["gPhotonMapRead"] = 1;
-        mRegisterMapBuildGrid["gPhotonGridBufferWrite"] = 2;
+        mRegisterMapBuildGrid.clear();
+        mRegisterMapBuildGrid["gGridParam"] = mRegisterMapBuildGrid.size();
+        mRegisterMapBuildGrid["gPhotonMapRead"] = mRegisterMapBuildGrid.size();
+        mRegisterMapBuildGrid["gPhotonGridBufferWrite"] = mRegisterMapBuildGrid.size();
 
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
@@ -94,9 +98,10 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsBuildGridIndices = rsCreater.Create(mDevice, false, L"rsBuildGridIndices");
         CreateComputeShaderStateObject(ComputeShaders::BuildGridIndices, mBuildGridIndicesPSO, mRsBuildGridIndices);
-        mRegisterMapBuildGridIndices["gGridParam"] = 0;
-        mRegisterMapBuildGridIndices["gPhotonGridBufferRead"] = 1;
-        mRegisterMapBuildGridIndices["gPhotonGridBufferWrite"] = 2;
+        mRegisterMapBuildGridIndices.clear();
+        mRegisterMapBuildGridIndices["gGridParam"] = mRegisterMapBuildGridIndices.size();
+        mRegisterMapBuildGridIndices["gPhotonGridBufferRead"] = mRegisterMapBuildGridIndices.size();
+        mRegisterMapBuildGridIndices["gPhotonGridBufferWrite"] = mRegisterMapBuildGridIndices.size();
 
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
@@ -104,17 +109,19 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsCopy = rsCreater.Create(mDevice, false, L"rsCopy");
         CreateComputeShaderStateObject(ComputeShaders::Copy, mCopyPSO, mRsCopy);
-        mRegisterMapCopy["gGridParam"] = 0;
-        mRegisterMapCopy["gPhotonGridBufferRead"] = 1;
-        mRegisterMapCopy["gPhotonGridBufferWrite"] = 2;
+        mRegisterMapCopy.clear();
+        mRegisterMapCopy["gGridParam"] = mRegisterMapCopy.size();
+        mRegisterMapCopy["gPhotonGridBufferRead"] = mRegisterMapCopy.size();
+        mRegisterMapCopy["gPhotonGridBufferWrite"] = mRegisterMapCopy.size();
 
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsClearGridIndices = rsCreater.Create(mDevice, false, L"rsClearGridIndices");
         CreateComputeShaderStateObject(ComputeShaders::ClearGridIndices, mClearGridIndicesPSO, mRsClearGridIndices);
-        mRegisterMapClearGridIndices["gGridParam"] = 0;
-        mRegisterMapClearGridIndices["gPhotonGridIdBufferWrite"] = 1;
+        mRegisterMapClearGridIndices.clear();
+        mRegisterMapClearGridIndices["gGridParam"] = mRegisterMapClearGridIndices.size();
+        mRegisterMapClearGridIndices["gPhotonGridIdBufferWrite"] = mRegisterMapClearGridIndices.size();
 
         rsCreater.Clear();
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
@@ -123,10 +130,11 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         mRsRearrangePhoton = rsCreater.Create(mDevice, false, L"rsRearrangePhoton");
         CreateComputeShaderStateObject(ComputeShaders::RearrangePhoton, mRearrangePhotonPSO, mRsRearrangePhoton);
-        mRegisterMapRearrangePhoton["gGridParam"] = 0;
-        mRegisterMapRearrangePhoton["gPhotonMapRead"] = 1;
-        mRegisterMapRearrangePhoton["gPhotonMapWrite"] = 2;
-        mRegisterMapRearrangePhoton["gPhotonGridBufferRead"] = 3;
+        mRegisterMapRearrangePhoton.clear();
+        mRegisterMapRearrangePhoton["gGridParam"] = mRegisterMapRearrangePhoton.size();
+        mRegisterMapRearrangePhoton["gPhotonMapRead"] = mRegisterMapRearrangePhoton.size();
+        mRegisterMapRearrangePhoton["gPhotonMapWrite"] = mRegisterMapRearrangePhoton.size();
+        mRegisterMapRearrangePhoton["gPhotonGridBufferRead"] = mRegisterMapRearrangePhoton.size();
     }
 
     {
@@ -137,10 +145,11 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsComputeVariance = rsCreater.Create(mDevice, false, L"rsComputeVariance");
         CreateComputeShaderStateObject(ComputeShaders::ComputeVariance, mComputeVariancePSO, mRsComputeVariance);
-        mRegisterMapComputeVariance["depthBuffer"] = 0;
-        mRegisterMapComputeVariance["normalBuffer"] = 1;
-        mRegisterMapComputeVariance["luminanceMomentBuffer"] = 2;
-        mRegisterMapComputeVariance["varianceBuffer"] = 3;
+        mRegisterMapComputeVariance.clear();
+        mRegisterMapComputeVariance["depthBuffer"] = mRegisterMapComputeVariance.size();
+        mRegisterMapComputeVariance["normalBuffer"] = mRegisterMapComputeVariance.size();
+        mRegisterMapComputeVariance["luminanceMomentBuffer"] = mRegisterMapComputeVariance.size();
+        mRegisterMapComputeVariance["varianceBuffer"] = mRegisterMapComputeVariance.size();
     }
 
     {
@@ -154,13 +163,14 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsA_TrousWaveletFilter = rsCreater.Create(mDevice, false, L"rsA_TrousWaveletFilter");
         CreateComputeShaderStateObject(ComputeShaders::A_Trous, mA_TrousWaveletFilterPSO, mRsA_TrousWaveletFilter);
-        mRegisterMapA_TrousWaveletFilter["gWaveletParam"] = 0;
-        mRegisterMapA_TrousWaveletFilter["colorBufferSrc"] = 1;
-        mRegisterMapA_TrousWaveletFilter["depthBuffer"] = 2;
-        mRegisterMapA_TrousWaveletFilter["normalBuffer"] = 3;
-        mRegisterMapA_TrousWaveletFilter["varianceBufferSrc"] = 4;
-        mRegisterMapA_TrousWaveletFilter["colorBufferDst"] = 5;
-        mRegisterMapA_TrousWaveletFilter["varianceBufferDst"] = 6;
+        mRegisterMapA_TrousWaveletFilter.clear();
+        mRegisterMapA_TrousWaveletFilter["gWaveletParam"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["colorBufferSrc"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["depthBuffer"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["normalBuffer"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["varianceBufferSrc"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["colorBufferDst"] = mRegisterMapA_TrousWaveletFilter.size();
+        mRegisterMapA_TrousWaveletFilter["varianceBufferDst"] = mRegisterMapA_TrousWaveletFilter.size();
     }
 
     {
@@ -170,9 +180,10 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         mRsDebugView = rsCreater.Create(mDevice, false, L"rsDebugView");
         CreateComputeShaderStateObject(ComputeShaders::DebugView, mDebugViewPSO, mRsDebugView);
-        mRegisterMapDebugView["screenSpaceMaterial"] = 0;
-        mRegisterMapDebugView["normalDepthBuffer"] = 1;
-        mRegisterMapDebugView["finalColor"] = 2;
+        mRegisterMapDebugView.clear();
+        mRegisterMapDebugView["screenSpaceMaterial"] = mRegisterMapDebugView.size();
+        mRegisterMapDebugView["normalDepthBuffer"] = mRegisterMapDebugView.size();
+        mRegisterMapDebugView["finalColor"] = mRegisterMapDebugView.size();
     }
 
     {
@@ -187,14 +198,15 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
-        mRegisterMapTemporalReuse["gSceneParam"] = 0;
-        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = 1;
-        mRegisterMapTemporalReuse["NormalDepthBuffer"] = 2;
-        mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = 3;
-        mRegisterMapTemporalReuse["PrevIDBuffer"] = 4;
-        mRegisterMapTemporalReuse["PositionBuffer"] = 5;
-        mRegisterMapTemporalReuse["PrevPositionBuffer"] = 6;
-        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = 7;
+        mRegisterMapTemporalReuse.clear();
+        mRegisterMapTemporalReuse["gSceneParam"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["NormalDepthBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["PrevIDBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["PositionBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["PrevPositionBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = mRegisterMapTemporalReuse.size();
     }
 
     {
@@ -203,8 +215,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsGeneratePhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMap");
         CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMap, mGeneratePhotonEmissionGuideMapPSO, mRsGeneratePhotonEmissionGuideMap);
-        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonRandomCounterMap"] = 0;
-        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonEmissionGuideMap"] = 1;
+        mRegisterMapGeneratePhotonEmissionGuideMap.clear();
+        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonRandomCounterMap"] = mRegisterMapGeneratePhotonEmissionGuideMap.size();
+        mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonEmissionGuideMap"] = mRegisterMapGeneratePhotonEmissionGuideMap.size();
     }
 
     {
@@ -218,13 +231,14 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         mRsClearPhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsClearPhotonEmissionGuideMipMap");
         CreateComputeShaderStateObject(ComputeShaders::ClearPhotonEmissionGuideMap, mClearPhotonEmissionGuideMapPSO, mRsClearPhotonEmissionGuideMap);
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap0"] = 0;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap1"] = 1;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap2"] = 2;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap3"] = 3;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap4"] = 4;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap5"] = 5;
-        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap6"] = 6;
+        mRegisterMapClearPhotonEmissionGuideMap.clear();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap0"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap1"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap2"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap3"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap4"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap5"] = mRegisterMapClearPhotonEmissionGuideMap.size();
+        mRegisterMapClearPhotonEmissionGuideMap["gPhotonEmissionGuideMap6"] = mRegisterMapClearPhotonEmissionGuideMap.size();
     }
 
     {
@@ -235,10 +249,11 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
         mRsGeneratePhotonEmissionGuideMipMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap");
         CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap, mGeneratePhotonEmissionGuideMipMapPSO, mRsGeneratePhotonEmissionGuideMipMap);
-        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap0"] = 0;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap1"] = 1;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap2"] = 2;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap3"] = 3;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap.clear();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap0"] = mRegisterMapGeneratePhotonEmissionGuideMipMap.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap1"] = mRegisterMapGeneratePhotonEmissionGuideMipMap.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap2"] = mRegisterMapGeneratePhotonEmissionGuideMipMap.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap["gPhotonEmissionGuideMap3"] = mRegisterMapGeneratePhotonEmissionGuideMipMap.size();
     }
 
     {
@@ -247,8 +262,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsGeneratePhotonEmissionGuideMipMap2x2 = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap2x2");
         CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap2x2, mGeneratePhotonEmissionGuideMipMap2x2PSO, mRsGeneratePhotonEmissionGuideMipMap2x2);
-        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap0"] = 0;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap1"] = 1;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2.clear();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap0"] = mRegisterMapGeneratePhotonEmissionGuideMipMap2x2.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap2x2["gPhotonEmissionGuideMap1"] = mRegisterMapGeneratePhotonEmissionGuideMipMap2x2.size();
     }
 
     {
@@ -258,9 +274,10 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
         mRsGeneratePhotonEmissionGuideMipMap4x4 = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMipMap4x4");
         CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMipMap4x4, mGeneratePhotonEmissionGuideMipMap4x4PSO, mRsGeneratePhotonEmissionGuideMipMap4x4);
-        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap0"] = 0;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap1"] = 1;
-        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap2"] = 2;
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4.clear();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap0"] = mRegisterMapGeneratePhotonEmissionGuideMipMap4x4.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap1"] = mRegisterMapGeneratePhotonEmissionGuideMipMap4x4.size();
+        mRegisterMapGeneratePhotonEmissionGuideMipMap4x4["gPhotonEmissionGuideMap2"] = mRegisterMapGeneratePhotonEmissionGuideMipMap4x4.size();
     }
 
     {
@@ -285,23 +302,24 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
         mRsTemporalAccumulation = rsCreater.Create(mDevice, false, L"rsTemporalAccumulation");
         CreateComputeShaderStateObject(ComputeShaders::TemporalAccumulation, mTemporalAccumulationPSO, mRsTemporalAccumulation);
-        mRegisterMapTemporalAccumulation["gSceneParam"] = 0;
-        mRegisterMapTemporalAccumulation["HistoryDIBuffer"] = 1;
-        mRegisterMapTemporalAccumulation["HistoryGIBuffer"] = 2;
-        mRegisterMapTemporalAccumulation["HistoryCausticsBuffer"] = 3;
-        mRegisterMapTemporalAccumulation["NormalDepthBuffer"] = 4;
-        mRegisterMapTemporalAccumulation["PrevNormalDepthBuffer"] = 5;
-        mRegisterMapTemporalAccumulation["PrevIDBuffer"] = 6;
-        mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = 7;
-        mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = 8;
-        mRegisterMapTemporalAccumulation["PositionBuffer"] = 9;
-        mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = 10;
-        mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = 11;
-        mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = 12;
-        mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = 13;
-        mRegisterMapTemporalAccumulation["DIGIBuffer"] = 14;
-        mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = 15;
-        mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = 16;
-        mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = 17;
+        mRegisterMapTemporalAccumulation.clear();
+        mRegisterMapTemporalAccumulation["gSceneParam"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["HistoryDIBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["HistoryGIBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["HistoryCausticsBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["NormalDepthBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["PrevNormalDepthBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["PrevIDBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["PositionBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["DIGIBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
     }
 }
