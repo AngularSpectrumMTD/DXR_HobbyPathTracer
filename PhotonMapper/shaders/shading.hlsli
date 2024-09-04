@@ -399,9 +399,9 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum)
 {
-    const uint M = min(getLightNum(), 10);
+    const uint M = min(getLightNum(), maxCandidatesNum);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
 
@@ -431,13 +431,22 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample);
 }
 
-float3 NextEventEstimation(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)
+float3 performNEE(in Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseStreamingRIS())
     {
         LightSample lightSample;
-        sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir);
+        uint maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_L;
+        if(payload.recursive > 4)
+        {
+            maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_M;
+        }
+        else if(payload.recursive > 2)
+        {
+            maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_S;
+        }
+        sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
         if (isVisible(scatterPosition, lightSample))
         {
             estimatedColor = shadeDIReservoir(reservoir);
@@ -533,7 +542,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             if (isNEELightingRequired)
             {
                 DIReservoir reservoir;
-                float3 element = NextEventEstimation(material, scatterPosition, surfaceNormal, reservoir) * U32toF32x3(payload.throughput);
+                float3 element = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir) * U32toF32x3(payload.throughput);
                 if(isDirectRay(payload))
                 {
                     if(isUseStreamingRIS())

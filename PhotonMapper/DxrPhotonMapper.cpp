@@ -67,7 +67,7 @@ void DxrPhotonMapper::Setup()
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
-    mSceneParam.photonParams.w = 6;
+    mSceneParam.photonParams.w = PHOTON_RECURSION_DEPTH;
     mLightRange = 1.0f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
     mPhiDirectional = 70; mThetaDirectional = 280;
