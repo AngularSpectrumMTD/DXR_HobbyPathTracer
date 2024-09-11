@@ -144,6 +144,11 @@ bool isHistoryResetRequested()
     return gSceneParam.additional1.w == 1;
 }
 
+float meanFreePath()
+{
+    return gSceneParam.sssParam.x;
+}
+
 bool isTemporalReprojectionEnable(
     in float currDepth, in float prevDepth, 
     in float3 currNormal, in float3 prevNormal,

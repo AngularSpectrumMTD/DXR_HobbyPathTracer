@@ -1,7 +1,10 @@
 #ifndef __SHADING_HLSLI__
 #define __SHADING_HLSLI__
 
+#include "subSurfaceScattering.hlsli"
+
 #define ETA_AIR 1.0f
+#define MEAN_FREE_PATH 1e-5f
 
 struct OpticalGlass
 {
@@ -131,118 +134,123 @@ float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
     }
 }
 
-void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughput, in float wavelength = 0)
+void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, in float wavelength = 0)
 {
-    nextRay.TMin = 0.0001;
-    nextRay.TMax = 10000;
-    
-    const float eps = 0.001;
-    const float3 wo_global = -WorldRayDirection();
-    const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+    float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
-    const float roulette = rand();
-    const float blending = rand();
-    const float probability = 1 - material.transRatio;
-
-    float3 wo_local = worldToTangent(N_global, wo_global);
-
-    if (blending < probability)
     {
-        if (wo_local.z < 0)
-        {
-            N_global *= -1;
-        }
-
-        wo_local = worldToTangent(N_global, wo_global);
-
-        //sample direction
-        float3 L_local = 0.xxx;
+        nextRay.TMin = RAY_MIN_T;
+        nextRay.TMax = RAY_MAX_T;
         
-        const float diffRatio = 1.0 - material.metallic;
-        const float3 V_local = normalize(wo_local);
-        
-        if (roulette < diffRatio)//diffuse
+        const float eps = 0.001;
+        const float3 wo_global = -WorldRayDirection();
+
+        const float roulette = rand();
+        const float blending = rand();
+        const float probability = 1 - material.transRatio;
+
+        float3 wo_local = worldToTangent(N_global, wo_global);
+
+        if (blending < probability)
         {
-            float2 randomUV = 0.xx;
-            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
-        }
-        else //specular
-        {
-            //const float3 H = GGX_ImportanceSampling(N, material.roughness);
-            //const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
-            //L_local = normalize(2.0f * dot(V_local, H_local) * H_local - V_local);
-
-            const float a = material.roughness * material.roughness;
-            float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
-            float phi = 2 * PI * rand();
-            float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
-            float R = sqrt(saturate(1 - z * z));
-            float2 sincosXY = 0.xx;
-            sincos(phi, sincosXY.x, sincosXY.y);
-            float x = R * sincosXY.y;
-            float y = R * sincosXY.x;
-            float3 Nh_local = float3(x, y, z) + Vh_local;
-            float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
-            L_local = reflect(-V_local, Ne_local);
-        }
-
-        nextRay.Origin = currentRayOrigin + N_global * eps;
-        nextRay.Direction = tangentToWorld(N_global, L_local);
-        
-        //compute bsdf    V : wo   L : wi(sample)
-        float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
-        const float cosine = max(0, abs(L_local.z));
-        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
-    }
-    else
-    {
-        //sample direction
-        bool isFromOutside = wo_local.z > 0;
-
-        //change the normal direction to the incident direction side
-        if (!isFromOutside)
-        {
-            N_global *= -1;
-        }
-
-        wo_local = worldToTangent(N_global, wo_global);
-        
-        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
-
-        float3 V_local = normalize(wo_local);
-        const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
-
-        float3 L_local = 0.xxx;
-
-        bool isRefractSampled = true;
-        {
-            float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
-            float3 refractVec = refract(-V_local, H_local, eta);
-            if (length(refractVec) < 0.001f)
+            if (wo_local.z < 0)
             {
-                L_local = reflect(-V_local, H_local); //handle as total reflection
-                isRefractSampled = false;
+                N_global *= -1;
             }
-            else
+
+            wo_local = worldToTangent(N_global, wo_global);
+
+            //sample direction
+            float3 L_local = 0.xxx;
+            
+            const float diffRatio = 1.0 - material.metallic;
+            const float3 V_local = normalize(wo_local);
+            
+            if (roulette < diffRatio)//diffuse
             {
-                L_local = normalize(refractVec);
-                isRefractSampled = true;
+                float2 randomUV = 0.xx;
+                L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
             }
-            nextRay.Origin = currentRayOrigin - N_global * eps;
+            else //specular
+            {
+                //const float3 H = GGX_ImportanceSampling(N, material.roughness);
+                //const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+                //L_local = normalize(2.0f * dot(V_local, H_local) * H_local - V_local);
+
+                const float a = material.roughness * material.roughness;
+                float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
+                float phi = 2 * PI * rand();
+                float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
+                float R = sqrt(saturate(1 - z * z));
+                float2 sincosXY = 0.xx;
+                sincos(phi, sincosXY.x, sincosXY.y);
+                float x = R * sincosXY.y;
+                float y = R * sincosXY.x;
+                float3 Nh_local = float3(x, y, z) + Vh_local;
+                float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
+                L_local = reflect(-V_local, Ne_local);
+            }
+
+            nextRay.Origin = currentRayOrigin + N_global * eps;
             nextRay.Direction = tangentToWorld(N_global, L_local);
+            
+            //compute bsdf    V : wo   L : wi(sample)
+            float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
+            const float cosine = max(0, abs(L_local.z));
+            const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+            compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
         }
+        else
+        {
+            //sample direction
+            bool isFromOutside = wo_local.z > 0;
 
-        //compute bsdf    V : wo   L : wi(sample)
-        float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
-        const float cosine = max(0, abs(L_local.z));
-        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+            //change the normal direction to the incident direction side
+            if (!isFromOutside)
+            {
+                N_global *= -1;
+            }
+
+            wo_local = worldToTangent(N_global, wo_global);
+            
+            const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
+
+            float3 V_local = normalize(wo_local);
+            const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+
+            float3 L_local = 0.xxx;
+
+            bool isRefractSampled = true;
+            {
+                float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
+                float3 refractVec = refract(-V_local, H_local, eta);
+                if (length(refractVec) < 0.001f)
+                {
+                    L_local = reflect(-V_local, H_local); //handle as total reflection
+                    isRefractSampled = false;
+                }
+                else
+                {
+                    L_local = normalize(refractVec);
+                    isRefractSampled = true;
+                }
+                nextRay.Origin = currentRayOrigin - N_global * eps;
+                nextRay.Direction = tangentToWorld(N_global, L_local);
+            }
+
+            //compute bsdf    V : wo   L : wi(sample)
+            float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+            const float cosine = max(0, abs(L_local.z));
+            const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+            compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
+        }
     }
 }
 
-void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughput, in float wavelength = 0)
+void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, in float wavelength = 0)
 {
-    nextRay.TMin = 0.0001;
-    nextRay.TMax = 10000;
+    nextRay.TMin = RAY_MIN_T;
+    nextRay.TMax = RAY_MAX_T;
     
     const float eps = 0.001;
     const float3 wo_global = -WorldRayDirection();
@@ -300,7 +308,8 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
-        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+        compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
     }
     else
     {
@@ -343,7 +352,8 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
-        throughput = F32x3toU32(U32toF32x3(throughput) * BSDF_PDF.xyz * cosine / BSDF_PDF.w);
+        const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+        compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
     }
 }
 
@@ -431,7 +441,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample);
 }
 
-float3 performNEE(in Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir)
+float3 performNEE(in Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseStreamingRIS())
@@ -446,8 +456,38 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
         {
             maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_S;
         }
-        sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
-        if (isVisible(scatterPosition, lightSample))
+
+        bool vis = false;
+
+        if(isSSSExecutable(material))
+        {
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            vis = isVisible(scatterPosition, lightSample);
+
+            if(!vis)
+            {
+                rseed = reservoir.randomSeed;
+                sampleLightWithID(originalScatterPositionForSSS, reservoir.lightID, lightSample);
+
+                //recomputation
+                float3 lightNormal = lightSample.normal;
+                float3 wi = lightSample.directionToLight;
+                float receiverCos = dot(surfaceNormal, wi);
+                float emitterCos = dot(lightNormal, -wi);
+                float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+                float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
+                float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+
+                return isVisible(originalScatterPositionForSSS, lightSample) ? FGL : 0.xxx;
+            }
+        }
+        else
+        {
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            vis = isVisible(scatterPosition, lightSample);
+        }
+
+        if (vis)
         {
             estimatedColor = shadeDIReservoir(reservoir);
         }
@@ -476,18 +516,11 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
     return estimatedColor;
 }
 
-bool isNEEExecutable(in MaterialParams material)
-{
-    //return (material.roughness > 0.5f) && (material.transRatio == 0) && (material.metallic == 0)  && isUseNEE();
-    //return isUseNEE();
-    return (material.roughness > 0.001f) && (material.transRatio == 0) && isUseNEE();
-}
-
-bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, bool isIgnoreHit)
+bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
-    const bool isNEE_Exec = isNEEExecutable(material);
+    const bool isNEE_Exec = isNEEExecutable(material) && isUseNEE();
     setNEEFlag(payload, isNEE_Exec);
 
     bool isIntersect = false;
@@ -513,7 +546,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            float3 element = U32toF32x3(payload.throughput) * Le;
+            float3 element = U32toF32x3(payload.compressedThroughput) * Le;
             setDI(element);
             isFinish = true;
             return isFinish;
@@ -522,7 +555,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = U32toF32x3(payload.throughput) * material.emission.xyz;
+            float3 element = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
             if(isDirectRay(payload))
             {
                 setDI(element);
@@ -536,28 +569,33 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             return isFinish;
         }
 
-        if(!isIgnoreHit)
+        const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
+        if (isNEELightingRequired)
         {
-            const bool isNEELightingRequired = isIndirectOnly() ? isIndirectRay(payload) : true;
-            if (isNEELightingRequired)
+            DIReservoir reservoir;
+            float3 element = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * U32toF32x3(payload.compressedThroughput);
+            if(isDirectRay(payload))
             {
-                DIReservoir reservoir;
-                float3 element = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir) * U32toF32x3(payload.throughput);
-                if(isDirectRay(payload))
+                if(isUseStreamingRIS())
                 {
-                    if(isUseStreamingRIS())
-                    {
-                        storeDIReservoir(reservoir, payload);
-                    }
-                    else
+                    //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
+                    if(isSSSExecutable(material))
                     {
                         setDI(element);
                     }
+                    else
+                    {
+                        storeDIReservoir(reservoir, payload);
+                    }
                 }
-                if(isIndirectRay(payload))
+                else
                 {
-                    addGI(element);
+                    setDI(element);
                 }
+            }
+            if(isIndirectRay(payload))
+            {
+                addGI(element);
             }
         }
         isFinish = false;
@@ -571,7 +609,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
-                float3 element = U32toF32x3(payload.throughput) * Le;
+                float3 element = U32toF32x3(payload.compressedThroughput) * Le;
                 if(isDirectRay(payload))
                 {
                     setDI(element);
@@ -588,7 +626,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = U32toF32x3(payload.throughput) * material.emission.xyz;
+            float3 element = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
             if(isDirectRay(payload))
             {
                 setDI(element);

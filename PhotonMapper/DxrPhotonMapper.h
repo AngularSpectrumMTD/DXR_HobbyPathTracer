@@ -67,6 +67,8 @@ namespace RayTracingDxlibs {
 namespace RayTracingEntryPoints {
     static const wchar_t* RayGen = L"rayGen";
     static const wchar_t* Miss = L"miss";
+    static const wchar_t* AnyHit = L"anyHit";
+    static const wchar_t* AnyHitWithTex = L"anyHitWithTex";
     static const wchar_t* ClosestHitMaterial = L"materialClosestHit";
     static const wchar_t* ClosestHitMaterialWithTex = L"materialWithTexClosestHit";
     static const wchar_t* ClosestHitLight = L"lightClosestHit";    
@@ -151,6 +153,9 @@ private:
         u32 throughput;
         s32 recursive;
         u32 flags;
+        f32 T;//for SSS
+        u32 hittedCount;//for SSS
+        float3 SSSnormal;//for SSS
     };
 
     struct PhotonPayload
@@ -223,7 +228,7 @@ private:
         XMVECTOR viewVec;
         XMUINT4 additional;
         XMUINT4 additional1;
-        XMUINT4 additional2;
+        XMVECTOR sssParam;
     };
 
     struct PhotonInfo
@@ -290,6 +295,7 @@ private:
         f32 transRatio;
         u32 transColor;
         u32 emission;
+        u32 isSSSExecutable = 0;
     };
 
     struct LightGenerateParam
@@ -360,7 +366,8 @@ private:
         ModelType_Afrodyta,
         ModelType_Rock,
         ModelType_CurvedMesh,
-        ModelType_DebugMesh
+        ModelType_DebugMesh,
+        ModelType_Buddha
     };
 
     enum SceneType
@@ -781,6 +788,9 @@ private:
     bool mIsHistoryResetRequested = false;
 
     bool mIsAlbedoOne = false;
+
+    f32 mMeanFreePath = 10e-3f;//mMeanFreePathRatio * mMeanFreePath must be 1[mm] - 10[mm]
+    f32 mMeanFreePathRatio = 0.5;
 };
 
 #endif

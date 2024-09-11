@@ -47,6 +47,7 @@ void DxrPhotonMapper::UpdateWindowText()
         << L" <F3> : Spatial " << (mIsUseReservoirSpatialReuse ? L"ON" : L"OFF")
         << L" <SPACE> : Target <R> : Rough <S> : Trans <M> : Metal"
         << L" <D> : Bounce : " << mRecursionDepth
+        //<< L" <F8> : SSS " << (mMaterialParam0.isSSSExecutable ? L"ON" : L"OFF")
         << L" Photon[K] : " << (mIsApplyCaustics ? mPhotonMapSize1D * mPhotonMapSize1D / 1024 : 0)
         //<< L"    " << getFrameRate() << L"[ms]"
         << L" Frame : " << min(MAX_ACCUMULATION_RANGE, mRenderFrame)
@@ -60,7 +61,7 @@ void DxrPhotonMapper::Setup()
 {
     mSceneType = SceneType_Sponza;
 
-    mRecursionDepth = min(7, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(3, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
@@ -180,13 +181,17 @@ void DxrPhotonMapper::Setup()
                     {
                         mLightPosX = -3.1f; mLightPosY = 12.19f; mLightPosZ = 1.79f;
                         mPhi = 334.0f; mTheta = 111.0f;
-                        mGlassModelType = ModelType_Afrodyta;
-                        //mGlassModelType = ModelType_Dragon;
+                        //mGlassModelType = ModelType_Afrodyta;
+                        mGlassModelType = ModelType_Dragon;
+                        //mGlassModelType = ModelType_SimpleCube;
                         mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
                         mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
                         mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
                         mCausticsBoost = 0.014;
                         mLightRange = 0.29f;
+
+                        mGlassModelType = ModelType_Buddha;
+                        mLightRange = 2.00f;
                     }
                 }
             }
@@ -304,6 +309,13 @@ void DxrPhotonMapper::Setup()
         mOBJ0FileName = L"model/simpleCube.obj";
         mGlassObjYOfsset = 5;
         mGlassObjScale = XMFLOAT3(5, 5, 5);
+    }
+    break;
+    case ModelType::ModelType_Buddha:
+    {
+        mOBJ0FileName = L"model/buddha/deciBuddha.obj";//test
+        mGlassObjYOfsset = 5;
+        mGlassObjScale = XMFLOAT3(15, 15, 15);//test
     }
     break;
     case ModelType::ModelType_Teapot:
@@ -687,6 +699,7 @@ void DxrPhotonMapper::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -805,6 +818,7 @@ void DxrPhotonMapper::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -916,6 +930,7 @@ void DxrPhotonMapper::Draw()
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
@@ -1102,10 +1117,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional1.y = mIsUseReservoirSpatialReuse ? 1 : 0;
     mSceneParam.additional1.z = mIsUseMetallicTest ? 1 : 0;
     mSceneParam.additional1.w = mIsHistoryResetRequested ? 1 : 0;
-    mSceneParam.additional2.x = mIsAlbedoOne ? 1 : 0;
-    mSceneParam.additional2.y = 0;
-    mSceneParam.additional2.z = 0;
-    mSceneParam.additional2.w = 0;
+    mSceneParam.sssParam = XMVectorSet(mMeanFreePathRatio * mMeanFreePath, 0, 0, 0);
 
     mRenderFrame++;
     mSeedFrame++;
@@ -1288,9 +1300,47 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
         mIsUseMetallicTest = !mIsUseMetallicTest;
         mIsUseAccumulation = false;
         break;
-    case VK_F6:
+    /*case VK_F6:
         mIsAlbedoOne = !mIsAlbedoOne;
         mIsUseAccumulation = false;
+        break;
+    case VK_F7:
+        if (mInverseMove)
+        {
+            mMeanFreePathRatio -= 1;
+        }
+        else
+        {
+            mMeanFreePathRatio += 1;
+        }
+        mMeanFreePathRatio = Clamp(1, 100, mMeanFreePathRatio);
+        mIsUseAccumulation = false;
+        break;*/
+    case VK_F6:
+        if (mIsTargetGlass)
+        {
+            if (mMaterialParam0.isSSSExecutable > 0)
+            {
+                mMaterialParam0.isSSSExecutable = 0;
+            }
+            else
+            {
+                mMaterialParam0.isSSSExecutable = 1;
+            }
+            mIsUseAccumulation = false;
+        }
+        else
+        {
+            if (mMaterialParam1.isSSSExecutable > 0)
+            {
+                mMaterialParam1.isSSSExecutable = 0;
+            }
+            else
+            {
+                mMaterialParam1.isSSSExecutable = 1;
+            }
+            mIsUseAccumulation = false;
+        }
         break;
     }
 }

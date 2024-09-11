@@ -193,7 +193,8 @@ namespace utility {
 
             D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
             geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-            geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
+            //AnyHit Shaders are called on BVH which is not constructed with  the flag "D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE"
+            geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
             {
                 auto& triangles = geomDesc.Triangles;
                 triangles.VertexBuffer.StartAddress = vertexBuffer->GetGPUVirtualAddress();

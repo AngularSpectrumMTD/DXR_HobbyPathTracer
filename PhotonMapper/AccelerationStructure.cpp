@@ -264,6 +264,17 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     defaultMaterial.transRatio = 1;//0:diffuse  1:trans
     defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     defaultMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+    defaultMaterial.isSSSExecutable = 0u;
+
+    utility::MaterialParam defaultSSSMaterial{};
+    defaultSSSMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultSSSMaterial.metallic = 0.0;//blend diffuse specular at specTrans == 0
+    defaultSSSMaterial.roughness = 1.0f;
+    defaultSSSMaterial.specular = 1.0;//spec power
+    defaultSSSMaterial.transRatio = 0;//0:diffuse  1:trans
+    defaultSSSMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+    defaultSSSMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+    defaultSSSMaterial.isSSSExecutable = 1u;
 
     std::uniform_int_distribution rndID(0, 4);
     std::uniform_real_distribution rndF(0.f, 1.f);
@@ -350,6 +361,10 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         {
             material.transRatio = 0;
         }
+
+        //sss test
+        material = defaultSSSMaterial;
+
         albedoIndex++;
         transIndex++;
         //material.emission = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
@@ -363,6 +378,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mStageMaterial.transRatio = 0;
     mStageMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     mStageMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+    mStageMaterial.isSSSExecutable = 0u;
 
     auto bufferSize = sizeof(utility::MaterialParam) * mNormalSphereMaterialTbl.size();
     mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);

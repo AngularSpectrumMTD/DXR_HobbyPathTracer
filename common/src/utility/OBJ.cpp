@@ -561,6 +561,7 @@ namespace utility {
 				mparams.transRatio = 0;
 				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
 				mparams.transColor = XMVectorSet(0, 0, 0, 0);
+				mparams.isSSSExecutable = 0;
 				m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 				device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
 
@@ -594,7 +595,8 @@ namespace utility {
 
 		D3D12_RAYTRACING_GEOMETRY_DESC geomDesc{};
 		geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-		geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
+		//AnyHit Shaders are called on BVH which is not constructed with  the flag "D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE"
+		geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
 		{
 			auto& triangles = geomDesc.Triangles;
 			triangles.VertexBuffer.StartAddress = mat.TriangleVertexBuffer->GetGPUVirtualAddress();

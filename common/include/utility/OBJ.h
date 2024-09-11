@@ -24,6 +24,7 @@ namespace utility {
 		f32 transRatio;
 		DirectX::XMVECTOR transColor;
 		DirectX::XMVECTOR emission;
+		u32 isSSSExecutable = 0;
 	};
 
 	struct UV {

@@ -20,6 +20,7 @@ struct SceneCB
     float4 viewVec;
     uint4 additional;
     uint4 additional1;
+    float4 sssParam;
 };
 
 #endif//__SCENE_CB_DEFINITION_HLSLI__

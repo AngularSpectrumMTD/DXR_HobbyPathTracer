@@ -63,6 +63,9 @@ void rayGen() {
     uint3 dispatchDimensions = DispatchRaysDimensions();
     float2 dims = float2(DispatchRaysDimensions().xy);
 
+    //test
+    gDebugTexture[DispatchRaysIndex().xy] = float4(0, 10, 0, 0);
+
     //clear gbuffer
     gNormalDepthBuffer[launchIndex.xy] = 0.xxxx;
     gPositionBuffer[launchIndex.xy] = 0.xxxx;
@@ -114,15 +117,16 @@ void rayGen() {
         nextRay.TMax = 100000;
 
         Payload payload;
-        payload.throughput = F32x3toU32(energyBoost * float3(1, 1, 1));
+        payload.compressedThroughput = F32x3toU32(energyBoost * float3(1, 1, 1));
         payload.recursive = 0;
         payload.flags = 0;//empty
+        payload.T = 0;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
         uint rayMask = 0xFF;
 
-        TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+        TraceDefaultRay(flags, rayMask, nextRay, payload);
     }
 }
 
@@ -233,7 +237,7 @@ void photonEmitting()
     randGenState = uint(pcgHash(seed));
 
     PhotonInfo photon;
-    photon.throughput = F32x3toU32(float3(0,0,0));
+    photon.compressedThroughput = F32x3toU32(float3(0,0,0));
     photon.position = float3(0,0,0);
 
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
@@ -263,7 +267,7 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.throughput = F32x3toU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
+    payload.compressedThroughput = F32x3toU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
@@ -273,7 +277,7 @@ void photonEmitting()
 
     uint rayMask = ~(LIGHT_INSTANCE_MASK); //ignore your self!! lightsource model
 
-    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+    TraceDefaultPhoton(flags, rayMask, nextRay, payload);
 }
 
 #define SPATIAL_REUSE_NUM 4

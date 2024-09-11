@@ -14,6 +14,7 @@
 #define PAYLOAD_BIT_MASK_IS_SHADOW_RAY 1 << 1
 #define PAYLOAD_BIT_MASK_IS_SHADOW_MISS 1 << 2
 #define PAYLOAD_BIT_MASK_IS_PREV_NEE_EXECUTABLE 1 << 3
+#define PAYLOAD_BIT_MASK_IS_SSS_RAY 1 << 4
 
 //MIP 0 == 64 x 64
 #define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
@@ -27,9 +28,12 @@
 
 struct Payload
 {
-    uint throughput;
+    uint compressedThroughput;
     int recursive;
     uint flags;
+    float T;//for SSS
+    uint hittedCount;//for SSS
+    float3 SSSnormal;//for SSS
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
@@ -37,7 +41,7 @@ struct Payload
 
 struct PhotonPayload
 {
-    uint throughput;
+    uint compressedThroughput;
     int recursive;
     float lambdaNM;
     float2 randomUV;
@@ -103,6 +107,7 @@ RWTexture2D<float> gPhotonEmissionGuideMap5 : register(u16);
 RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u17);
 
 RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u18);
+RWTexture2D<float4> gDebugTexture : register(u19);
 
 struct ReSTIRParam
 {
@@ -194,7 +199,7 @@ float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum() || length(U32toF32x3(payload.throughput)) < 1e-2)
+    if (payload.recursive >= getMaxBounceNum() || length(U32toF32x3(payload.compressedThroughput)) < 1e-2)
     {
         return true;
     }
@@ -204,6 +209,11 @@ inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 inline bool isShadowRay(inout Payload payload)
 {
     return payload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
+}
+
+inline bool isSSSRay(inout Payload payload)
+{
+    return payload.flags & PAYLOAD_BIT_MASK_IS_SSS_RAY;
 }
 
 inline void setVisibility(inout Payload payload, in bool visibility)
@@ -218,11 +228,16 @@ inline void setVisibility(inout Payload payload, in bool visibility)
     }
 }
 
+inline bool isSSSRayHitted(in Payload payload)
+{
+    return payload.hittedCount > 0;
+}
+
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
-        payload.throughput = F32x3toU32(float3(0, 0, 0));
+        payload.compressedThroughput = F32x3toU32(float3(0, 0, 0));
         return true;
     }
     payload.recursive++;
@@ -330,6 +345,17 @@ void setNEEFlag(inout Payload payload, in bool isNEE_Exec)
 bool isWithinBounds(int2 id, int2 size)
 {
     return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
+}
+
+//utility
+void TraceDefaultRay(in bool flags, in uint rayMask, inout RayDesc ray, inout Payload payload)
+{
+    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, ray, payload);
+}
+
+void TraceDefaultPhoton(in bool flags, in uint rayMask, inout RayDesc ray, inout PhotonPayload payload)
+{
+    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, ray, payload);
 }
 
 #endif//__COMMON_HLSLI__

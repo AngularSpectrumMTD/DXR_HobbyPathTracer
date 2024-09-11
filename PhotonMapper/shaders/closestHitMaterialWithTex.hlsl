@@ -41,6 +41,22 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
     return v;
 }
 
+float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
+{
+    VertexPNT v = (VertexPNT)0;
+    uint start = PrimitiveIndex() * 3;
+    
+    float3 positionTbl[3], normalTbl[3];
+    for (int i = 0; i < 3; ++i) {
+        uint index = indexBuffer[start + i];
+        positionTbl[i] = vertexBuffer[index].Position;
+        normalTbl[i] = vertexBuffer[index].Normal;
+    }
+    
+    v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
+    return normalize(cross(positionTbl[1] - positionTbl[0], positionTbl[2] - positionTbl[0]));
+}
+
 void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoTexture, in float2 UV)
 {
     diffuseTexColor = 0.xxxx;
@@ -121,12 +137,43 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout V
     return currentMaterial;
 }
 
+[shader("anyhit")]
+void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib) {
+    bool isNoTexture = false;
+    float4 diffuseTexColor = 0.xxxx;
+    bool isIgnoreHit = false;
+    VertexPNT vtx = getVertex(attrib, isNoTexture);
+    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
+
+    if(isIgnoreHit)
+    {
+        IgnoreHit();
+    }
+
+    if(isSSSRay(payload))
+    {
+        payload.hittedCount++;
+        payload.SSSnormal = vtx.Normal;
+        //payload.SSSnormal = getGeometricNormal(attrib);
+        payload.T = RayTCurrent();
+        IgnoreHit();
+    }
+}
+
 [shader("closesthit")]
 void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttributes attrib)
 {
     if (isShadowRay(payload))
     {
         setVisibility(payload, false);
+        return;
+    }
+
+    if(isSSSRay(payload))
+    {
+        bool isNoTexture = false;
+        payload.SSSnormal = getVertex(attrib, isNoTexture).Normal;
+        payload.T = RayTCurrent();
         return;
     }
 
@@ -138,25 +185,32 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     uint instanceIndex = InstanceIndex();
 
     VertexPNT vtx;
-    bool isIgnoreHit = false;
-    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHit);
+    bool isIgnoreHitDummy = false;
+    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHitDummy);
     float3 surfaceNormal = vtx.Normal;
+    float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
+    float3 originalSurfaceNormal = surfaceNormal;
+    float3 originalScatterPosition = scatterPosition;
 
     //non color test
     //currentMaterial.albedo = 1.xxxx;
 
-    float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
-
     float3 hitLe = 0.xxx;
     float3 hitNormal = 0.xxx;
     float3 hitPosition = 0.xxx;
-    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal,  hitLe, hitPosition, hitNormal, isIgnoreHit);
+
+    if(isSSSExecutable(currentMaterial))
+    {
+        computeSSSPosition(payload, scatterPosition, surfaceNormal, getGeometricNormal(attrib));
+    }
+
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal,  hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition);
     const bool isAnaliticalLightHitted = (length(hitLe) > 0);
     const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
-    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : surfaceNormal;
-    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : scatterPosition;
-    storeGBuffer(payload, writePosition, isIgnoreHit ? 0.xxx : writeColor, isIgnoreHit ? 0.xxx : writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness, currentMaterial);
+    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
+    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
+    storeGBuffer(payload, writePosition, writeColor, writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness, currentMaterial);
 
     if (isTerminate)
     {
@@ -166,29 +220,20 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
 
-    if (!isIgnoreHit)
+    nextRay.Direction = 0.xxx;
+    float3 photon = 0.xxx;
+    if(payload.recursive < 3)
     {
-        nextRay.Direction = 0.xxx;
-        float3 photon = 0.xxx;
-        if(payload.recursive < 3)
-        {
-            photon = accumulatePhoton(scatterPosition, bestFitWorldNormal);
-        }
-        
-        const float3 element = U32toF32x3(payload.throughput) * photon;
-        addCaustics(element);
-        updateRay(currentMaterial, surfaceNormal, nextRay, payload.throughput);
+        photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal);
     }
-    else
-    {
-        nextRay.TMin = RAY_MIN_T;
-        nextRay.TMax = RAY_MAX_T;
-        nextRay.Direction = WorldRayDirection();
-    }
+    
+    const float3 element = U32toF32x3(payload.compressedThroughput) * photon;
+    addCaustics(element);
+    updateRay(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput);
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
-    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+    TraceDefaultRay(flags, rayMask, nextRay, payload);
 }
 
 [shader("closesthit")]
@@ -201,8 +246,8 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     uint instanceIndex = InstanceIndex();
 
     VertexPNT vtx;
-    bool isIgnoreHit = false;
-    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHit);
+    bool isIgnoreHitDummy = false;
+    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHitDummy);
     primarySurfaceHasHighPossibilityCausticsGenerate(currentMaterial, payload);
     float3 surfaceNormal = vtx.Normal;
 
@@ -214,9 +259,9 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughput, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.lambdaNM);
 
-    if (!isIgnoreHit && isPhotonStoreRequired(currentMaterial, payload))
+    if (isPhotonStoreRequired(currentMaterial, payload))
     {
         storePhoton(payload);
     }
@@ -224,7 +269,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     {
         RAY_FLAG flags = RAY_FLAG_NONE;
         uint rayMask = 0xff;
-        TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, nextRay, payload);
+        TraceDefaultPhoton(flags, rayMask, nextRay, payload);
     }
 }
 

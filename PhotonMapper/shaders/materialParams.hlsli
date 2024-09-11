@@ -10,7 +10,18 @@ struct MaterialParams
     float transRatio;
     float4 transColor;
     float4 emission;
+    uint isSSSExecutable;
 };
+
+bool isSSSExecutable(in MaterialParams material)
+{
+    return material.isSSSExecutable && (material.transRatio < 0.1f) && (material.roughness > 0.2f);
+}
+
+bool isNEEExecutable(in MaterialParams material)
+{
+    return (material.roughness > 0.1f) && (material.transRatio == 0);
+}
 
 struct CompressedMaterialParams
 {
@@ -21,6 +32,7 @@ struct CompressedMaterialParams
     float transRatio;
     uint transColor;
     uint emission;
+    uint isSSSExecutable;
 };
 
 MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
@@ -33,6 +45,7 @@ MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
     decompressed.transRatio = compressed.transRatio;
     decompressed.transColor = float4(U32toF32x3(compressed.transColor), 0);
     decompressed.emission = float4(U32toF32x3(compressed.emission), 0);
+    decompressed.isSSSExecutable = compressed.isSSSExecutable;
 
     return decompressed;
 }
@@ -47,6 +60,7 @@ CompressedMaterialParams compressMaterialParams(in MaterialParams original)
     compressed.transRatio = original.transRatio;
     compressed.transColor = F32x3toU32(original.transColor.xyz);
     compressed.emission = F32x3toU32(original.emission.xyz);
+    compressed.isSSSExecutable = original.isSSSExecutable;
 
     return compressed;
 }

@@ -388,7 +388,7 @@ float3 directionalLightingOnMissShader(Payload payload)
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
     if (payload.recursive > 0 && isDirectionalLightFinded && dot(dominantDir, -WorldRayDirection()) > cosMax)
     {
-        val = U32toF32x3(payload.throughput) * emis;
+        val = U32toF32x3(payload.compressedThroughput) * emis;
     }
 
     return val;
@@ -399,8 +399,9 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
     Payload shadowPayload;
     shadowPayload.flags = 0;
     shadowPayload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
+    shadowPayload.T = 0;
 
-    const float eps = 0.001;
+    const float eps = 0.005;
     RayDesc shadowRay;
     shadowRay.TMin = eps;
     shadowRay.TMax = lightSample.distance - eps;
@@ -412,7 +413,7 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
 
     uint rayMask = ~(LIGHT_INSTANCE_MASK);
 
-    TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, shadowRay, shadowPayload);
+    TraceDefaultRay(flags, rayMask, shadowRay, shadowPayload);
 
     return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }

@@ -41,6 +41,17 @@ void DxrPhotonMapper::CreateStateObject()
             dxilMiss->DefineExport(RayTracingEntryPoints::Miss);
         }
 
+        //AnyHit
+        {
+            auto dxilAnyHit = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+            dxilAnyHit->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialClosestHit]);
+            dxilAnyHit->DefineExport(RayTracingEntryPoints::AnyHit);
+
+            auto dxilAnyHitWithTex = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+            dxilAnyHitWithTex->SetDXILLibrary(&shaders[RayTracingDxlibs::DefaultMaterialWithTexClosestHit]);
+            dxilAnyHitWithTex->DefineExport(RayTracingEntryPoints::AnyHitWithTex);
+        }
+
         //Closest Hit
         {
             auto dxilChsMaterial = subobjects.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
@@ -66,46 +77,54 @@ void DxrPhotonMapper::CreateStateObject()
             auto hitgroupGlass = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupGlass->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupGlass->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupGlass->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupGlass->SetHitGroupExport(HitGroups::Obj0);
 
             auto hitgroupMetal = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupMetal->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupMetal->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupMetal->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupMetal->SetHitGroupExport(HitGroups::Obj1);
 
             auto hitgroupDefault = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefault->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupDefault->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupDefault->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupDefault->SetHitGroupExport(HitGroups::DefaultMaterialSphere);
 
             auto hitgroupReflectReflact = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflact->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupReflectReflact->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupReflectReflact->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupReflectReflact->SetHitGroupExport(HitGroups::ReflectReflactMaterialSphere);
 
             auto hitgroupDefaultBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupDefaultBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupDefaultBox->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupDefaultBox->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupDefaultBox->SetHitGroupExport(HitGroups::DefaultMaterialBox);
 
             auto hitgroupReflectReflactBox = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupReflectReflactBox->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupReflectReflactBox->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterial);
+            hitgroupReflectReflactBox->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHit);
             hitgroupReflectReflactBox->SetHitGroupExport(HitGroups::ReflectReflactMaterialBox);
 
             auto hitgroupFloor = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
             hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
             hitgroupFloor->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
+            hitgroupFloor->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHitWithTex);
             hitgroupFloor->SetHitGroupExport(HitGroups::Floor);
 
             for (const auto& instances : mOBJModel.getMaterialList())
             {
                 wchar_t nameHitGroup[60];
                 swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
-                auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-                hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-                hitgroupLight->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
-                hitgroupLight->SetHitGroupExport(nameHitGroup);
+                auto hitgroupInstances = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                hitgroupInstances->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                hitgroupInstances->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
+                hitgroupInstances->SetAnyHitShaderImport(RayTracingEntryPoints::AnyHitWithTex);
+                hitgroupInstances->SetHitGroupExport(nameHitGroup);
             }
         }
 
@@ -255,10 +274,10 @@ void DxrPhotonMapper::CreateStateObject()
             {
                 wchar_t nameHitGroup[60];
                 swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
-                auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-                hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-                hitgroupLight->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
-                hitgroupLight->SetHitGroupExport(nameHitGroup);
+                auto hitgroupInstances = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                hitgroupInstances->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                hitgroupInstances->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
+                hitgroupInstances->SetHitGroupExport(nameHitGroup);
             }
         }
 
@@ -417,10 +436,10 @@ void DxrPhotonMapper::CreateStateObject()
             {
                 wchar_t nameHitGroup[60];
                 swprintf(nameHitGroup, 60, L"%ls", utility::StringToWString(instances.MaterialName).c_str());
-                auto hitgroupLight = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-                hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-                hitgroupLight->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
-                hitgroupLight->SetHitGroupExport(nameHitGroup);
+                auto hitgroupInstances = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                hitgroupInstances->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                hitgroupInstances->SetClosestHitShaderImport(RayTracingEntryPoints::ClosestHitMaterialWithTex);
+                hitgroupInstances->SetHitGroupExport(nameHitGroup);
             }
         }
 

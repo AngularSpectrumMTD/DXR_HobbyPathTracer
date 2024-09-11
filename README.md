@@ -1,9 +1,10 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR
-- Emission Guided Photon Mapping
+- Emission Guided Photon Mapping  
 
-![Main](https://github.com/user-attachments/assets/82f8f09f-71e6-44c7-8e84-73476313e7c9)
+![Main](https://github.com/user-attachments/assets/59de7dc8-1218-4a72-88e5-23b878c3e19f)
+
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
 ![debugView](https://github.com/user-attachments/assets/434db9e3-f851-4316-a90e-8ffa2710aed3)
@@ -65,3 +66,4 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F3 : enable / disable Spatial Reuse of Reservoir
 - F4 : increase / decrease the number of taps for Spatial Reuse of Reservoir
 - F5 : enable / disable Metal Test
+- F6 : enable / disable SSS

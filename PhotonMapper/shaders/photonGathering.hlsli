@@ -19,7 +19,7 @@ void storePhoton(inout PhotonPayload payload)
     if (ignore)
     {
         PhotonInfo photon;
-        photon.throughput = F32x3toU32(float3(0, 0, 0));
+        photon.compressedThroughput = F32x3toU32(0.xxx);
         photon.position = float3(0, 0, 0);
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
@@ -28,7 +28,7 @@ void storePhoton(inout PhotonPayload payload)
     else
     {
         PhotonInfo photon;
-        photon.throughput = payload.throughput;
+        photon.compressedThroughput = payload.compressedThroughput;
         photon.position = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
@@ -101,7 +101,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
                     float distanceSqr = dot(gatherCenterPos - comparePhoton.position, gatherCenterPos - comparePhoton.position);
                     if ((distanceSqr < getGatherRadius() * getGatherRadius()))
                     {
-                        accumulateXYZ += U32toF32x3(comparePhoton.throughput) * poly6Kernel2D(sqrt(distanceSqr), getGatherRadius());
+                        accumulateXYZ += U32toF32x3(comparePhoton.compressedThroughput) * poly6Kernel2D(sqrt(distanceSqr), getGatherRadius());
                     }
                 }
 
