@@ -61,7 +61,7 @@ void DxrPhotonMapper::Setup()
 {
     mSceneType = SceneType_Sponza;
 
-    mRecursionDepth = min(3, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;

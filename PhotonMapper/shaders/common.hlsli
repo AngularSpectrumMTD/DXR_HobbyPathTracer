@@ -237,7 +237,7 @@ inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
-        payload.compressedThroughput = F32x3toU32(float3(0, 0, 0));
+        payload.compressedThroughput = 0u;
         return true;
     }
     payload.recursive++;

@@ -237,7 +237,7 @@ void photonEmitting()
     randGenState = uint(pcgHash(seed));
 
     PhotonInfo photon;
-    photon.compressedThroughput = F32x3toU32(float3(0,0,0));
+    photon.compressedThroughput = 0u;
     photon.position = float3(0,0,0);
 
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);

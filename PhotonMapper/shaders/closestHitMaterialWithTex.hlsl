@@ -222,9 +222,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     nextRay.Direction = 0.xxx;
     float3 photon = 0.xxx;
-    if(payload.recursive < 3)
+    const float select = 0.25f / (max(1, payload.recursive));
+    if((payload.recursive < 3) && (rand() < select))
     {
-        photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal);
+        const float pdf = select;
+        photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal) / pdf;
     }
     
     const float3 element = U32toF32x3(payload.compressedThroughput) * photon;

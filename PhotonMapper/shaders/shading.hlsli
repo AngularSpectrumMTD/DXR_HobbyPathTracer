@@ -409,7 +409,7 @@ float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum, in bool isPrimaryBounce)
 {
     const uint M = min(getLightNum(), maxCandidatesNum);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
@@ -430,6 +430,11 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+
+        if(isPrimaryBounce && isDirectionalLight(lightSample) && !isVisible(scatterPosition, lightSample))
+        {
+            FGL *= 0;
+        }
 
         float3 p_hat_3F = FGL;
         p_hat = computeLuminance(FGL);
@@ -459,9 +464,10 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
 
         bool vis = false;
 
+        const bool isPrimaryBounce = payload.recursive == 1;
         if(isSSSExecutable(material))
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isPrimaryBounce);
             vis = isVisible(scatterPosition, lightSample);
 
             if(!vis)
@@ -483,7 +489,7 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isPrimaryBounce);
             vis = isVisible(scatterPosition, lightSample);
         }
 

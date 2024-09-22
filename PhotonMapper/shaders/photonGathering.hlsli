@@ -19,7 +19,7 @@ void storePhoton(inout PhotonPayload payload)
     if (ignore)
     {
         PhotonInfo photon;
-        photon.compressedThroughput = F32x3toU32(0.xxx);
+        photon.compressedThroughput = 0u;
         photon.position = float3(0, 0, 0);
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;
@@ -54,10 +54,10 @@ float poly6Kernel2D(float distance, float maxd)
     float alpha = 1 / maxd;
     alpha *= alpha;
     alpha *= alpha;
-    alpha *= 4 * alpha / PI;
+    alpha *= alpha;
     float tmp = maxd * maxd - distance * distance;
     tmp = tmp * tmp * tmp;
-    return alpha * tmp;
+    return alpha * tmp * 4 / PI;
 }
 
 float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDebug = false)

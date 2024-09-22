@@ -29,7 +29,7 @@ void miss(inout Payload payload) {
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hitLe, hitPosition, hitNormal))
     {
         setDI(hitLe);
-        payload.compressedThroughput = F32x3toU32(0.xxx);
+        payload.compressedThroughput = 0u;
         const bool isAnaliticalLightHitted = (length(hitLe) > 0);
         const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
         const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
@@ -72,13 +72,13 @@ void miss(inout Payload payload) {
         addGI(element);
     }
 #endif
-    payload.compressedThroughput = F32x3toU32(0.xxx);
+    payload.compressedThroughput = 0u;
 }
 
 [shader("miss")]
 void photonMiss(inout PhotonPayload payload)
 {
-    payload.compressedThroughput = F32x3toU32(0.xxx);
+    payload.compressedThroughput = 0u;
 }
 
 [shader("miss")]

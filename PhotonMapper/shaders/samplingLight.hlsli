@@ -14,6 +14,46 @@ struct LightSample
     float pdf;
 };
 
+bool isSphereLight(in LightSample lightSample)
+{
+    return (lightSample.type == LIGHT_TYPE_SPHERE);
+}
+
+bool isRectLight(in LightSample lightSample)
+{
+    return (lightSample.type == LIGHT_TYPE_RECT);
+}
+
+bool isSpotLight(in LightSample lightSample)
+{
+    return (lightSample.type == LIGHT_TYPE_SPOT);
+}
+
+bool isDirectionalLight(in LightSample lightSample)
+{
+    return (lightSample.type == LIGHT_TYPE_DIRECTIONAL);
+}
+
+bool isSphereLight(in LightGenerateParam lightParam)
+{
+    return (lightParam.type == LIGHT_TYPE_SPHERE);
+}
+
+bool isRectLight(in LightGenerateParam lightParam)
+{
+    return (lightParam.type == LIGHT_TYPE_RECT);
+}
+
+bool isSpotLight(in LightGenerateParam lightParam)
+{
+    return (lightParam.type == LIGHT_TYPE_SPOT);
+}
+
+bool isDirectionalLight(in LightGenerateParam lightParam)
+{
+    return (lightParam.type == LIGHT_TYPE_DIRECTIONAL);
+}
+
 #define DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN 5 * PI / 180
 
 //ok
@@ -187,19 +227,19 @@ void sampleLight(in float3 scatterPosition, inout LightSample lightSample)
     const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[lightID];
     
-    if (param.type == LIGHT_TYPE_SPHERE)
+    if (isSphereLight(param))
     {
         sampleSphereLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_RECT)
+    if (isRectLight(param))
     {
         sampleRectLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_SPOT)
+    if (isSpotLight(param))
     {
         sampleSpotLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    if (isDirectionalLight(param))
     {
         sampleDirectionalLight(param, scatterPosition, lightSample);
     }
@@ -211,19 +251,19 @@ void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample l
 {
     LightGenerateParam param = gLightGenerateParams[ID];
     
-    if (param.type == LIGHT_TYPE_SPHERE)
+    if (isSphereLight(param))
     {
         sampleSphereLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_RECT)
+    if (isRectLight(param))
     {
         sampleRectLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_SPOT)
+    if (isSpotLight(param))
     {
         sampleSpotLight(param, scatterPosition, lightSample);
     }
-    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    if (isDirectionalLight(param))
     {
         sampleDirectionalLight(param, scatterPosition, lightSample);
     }
@@ -231,7 +271,7 @@ void sampleLightWithID(in float3 scatterPosition, in int ID, inout LightSample l
 
 float getModifiedSquaredDistance(in LightSample lightSample)
 {
-    if (lightSample.type == LIGHT_TYPE_DIRECTIONAL)
+    if (isDirectionalLight(lightSample))
     {
         return 1;
     }
@@ -250,7 +290,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
     const uint lightID = getRandomLightID();
     LightGenerateParam param = gLightGenerateParams[lightID];
 
-    if (param.type == LIGHT_TYPE_SPHERE)
+    if (isSphereLight(param))
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
         //float2 tt = intersectEllipsoid(rayOrigin, rayDiretion, param.position,
@@ -262,7 +302,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         Le = param.emission * max(1, getLightNum() - 1);
         return (t >= 0 && t < rayT);
     }
-    else if (param.type == LIGHT_TYPE_RECT)
+    else if (isRectLight(param))
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
         float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
@@ -271,7 +311,7 @@ bool intersectLightWithCurrentRay(out float3 Le)
         Le = param.emission * max(1, getLightNum() - 1);
         return isFrontHit && (hittedT > 0 && hittedT < rayT);
     }
-    else if (param.type == LIGHT_TYPE_SPOT)
+    else if (isSpotLight(param))
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
         float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
@@ -300,7 +340,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
     {
         LightGenerateParam param = gLightGenerateParams[i];
 
-        if (param.type == LIGHT_TYPE_SPHERE)
+        if (isSphereLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
             float hittedT = intersectSphere(rayOrigin, rayDiretion, param.positionORDirection,
@@ -319,7 +359,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
                 }
             }
         }
-        else if (param.type == LIGHT_TYPE_RECT)
+        else if (isRectLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
             float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
@@ -338,7 +378,7 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
                 }
             }
         }
-        else if (param.type == LIGHT_TYPE_SPOT)
+        else if (isSpotLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
             float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
@@ -377,7 +417,7 @@ float3 directionalLightingOnMissShader(Payload payload)
     {
         LightGenerateParam lightGen = gLightGenerateParams[i];
 
-        if (isDirectionalLightFinded == false && lightGen.type == LIGHT_TYPE_DIRECTIONAL)
+        if (isDirectionalLightFinded == false && isDirectionalLight(lightGen))
         {
             isDirectionalLightFinded = true;
             emis = lightGen.emission;
@@ -424,26 +464,26 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out 
     LightGenerateParam param = gLightGenerateParams[0];
     //LightGenerateParam param = gLightGenerateParams[lightID];
 
-    if (param.type == LIGHT_TYPE_SPHERE)
+    if (isSphereLight(param))
     {
         sampleSphereLightEmitDirAndPosition(param, dir, position, randomUV);
         pdf = 1 / (4 * PI * param.sphereRadius * param.sphereRadius);
     }
-    if (param.type == LIGHT_TYPE_RECT)
+    if (isRectLight(param))
     {
         sampleRectLightEmitDirAndPosition(param, dir, position, randomUV);
         float lenU = sqrt(dot(param.U, param.U));
         float lenV = sqrt(dot(param.V, param.V));
         pdf = 1 / (4 * lenU * lenV);
     }
-    if (param.type == LIGHT_TYPE_SPOT)
+    if (isSpotLight(param))
     {
         sampleSpotLightEmitDirAndPosition(param, dir, position, randomUV);
         float lenU = sqrt(dot(param.U, param.U));
         float lenV = sqrt(dot(param.V, param.V));
         pdf = 1 / (PI * lenU * lenV);
     }
-    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    if (isDirectionalLight(param))
     {
         sampleDirectionalLightEmitDirAndPosition(param, dir, position, randomUV);
         const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
@@ -457,19 +497,19 @@ void sampleLightEmitDirAndPositionWithRandom(inout float3 dir, inout float3 posi
     LightGenerateParam param = gLightGenerateParams[0];
     //LightGenerateParam param = gLightGenerateParams[lightID];
 
-    if (param.type == LIGHT_TYPE_SPHERE)
+    if (isSphereLight(param))
     {
         sampleSphereLightEmitDirAndPositionWithRandom(param, dir, position, randomUV);
     }
-    if (param.type == LIGHT_TYPE_RECT)
+    if (isRectLight(param))
     {
         sampleRectLightEmitDirAndPositionWithRandom(param, dir, position, randomUV);
     }
-    if (param.type == LIGHT_TYPE_SPOT)
+    if (isSpotLight(param))
     {
         sampleSpotLightEmitDirAndPositionWithRandom(param, dir, position, randomUV);
     }
-    if (param.type == LIGHT_TYPE_DIRECTIONAL)
+    if (isDirectionalLight(param))
     {
         sampleDirectionalLightEmitDirAndPositionWithRandom(param, dir, position, randomUV);
     }
