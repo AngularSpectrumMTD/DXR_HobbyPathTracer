@@ -462,15 +462,14 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
             maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_S;
         }
 
-        bool vis = false;
+        bool visibility = false;
 
-        const bool isPrimaryBounce = payload.recursive == 1;
         if(isSSSExecutable(material))
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isPrimaryBounce);
-            vis = isVisible(scatterPosition, lightSample);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isDirectRay(payload));
+            visibility = isVisible(scatterPosition, lightSample);
 
-            if(!vis)
+            if(!visibility)
             {
                 rseed = reservoir.randomSeed;
                 sampleLightWithID(originalScatterPositionForSSS, reservoir.lightID, lightSample);
@@ -489,11 +488,11 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isPrimaryBounce);
-            vis = isVisible(scatterPosition, lightSample);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, isDirectRay(payload));
+            visibility = isVisible(scatterPosition, lightSample);
         }
 
-        if (vis)
+        if (visibility)
         {
             estimatedColor = shadeDIReservoir(reservoir);
         }

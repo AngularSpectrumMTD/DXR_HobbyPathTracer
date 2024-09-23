@@ -191,7 +191,7 @@ void DxrPhotonMapper::Setup()
                         mLightRange = 0.29f;
 
                         mGlassModelType = ModelType_Buddha;
-                        mLightRange = 2.00f;
+                        //mLightRange = 2.00f;
                     }
                 }
             }

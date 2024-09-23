@@ -363,7 +363,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         }
 
         //sss test
-        material = defaultSSSMaterial;
+        //material = defaultSSSMaterial;
 
         albedoIndex++;
         transIndex++;
