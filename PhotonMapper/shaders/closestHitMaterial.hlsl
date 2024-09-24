@@ -95,8 +95,16 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     {
         computeSSSPosition(payload, scatterPosition, surfaceNormal, getGeometricNormal(attrib));
     }
-
-    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition);
+    float3 DIGIelement = 0.xxx;
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement);
+    if(isDirectRay(payload))
+    {
+        setDI(DIGIelement);
+    }
+    if(isIndirectRay(payload))
+    {
+        addGI(DIGIelement);
+    }
     const bool isAnaliticalLightHitted = (length(hitLe) > 0);
     const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
     const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal wthe we execute SSS

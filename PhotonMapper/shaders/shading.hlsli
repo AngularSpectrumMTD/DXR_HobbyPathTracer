@@ -6,6 +6,11 @@
 #define ETA_AIR 1.0f
 #define MEAN_FREE_PATH 1e-5f
 
+bool isUseNEE(in MaterialParams material)
+{
+    return isNEEExecutable(material) && isUseNEE();
+}
+
 struct OpticalGlass
 {
     float A0;
@@ -516,38 +521,29 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
     return estimatedColor;
 }
 
-bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS)
+bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
-    const bool isNEE_Exec = isNEEExecutable(material) && isUseNEE();
-    setNEEFlag(payload, isNEE_Exec);
+    setNEEFlag(payload, isUseNEE(material));
 
     bool isIntersect = false;
     if (isDirectRay(payload))
     {
         isIntersect = intersectAllLightWithCurrentRay(Le, hitPosition, hitNormal);
-        if(isIntersect)
-        {
-            hitLe = Le;
-        }
-        else
-        {
-            hitLe = 0.xxx;
-        }
+        hitLe = isIntersect ? Le : 0.xxx;
     }
     else
     {
         isIntersect = intersectLightWithCurrentRay(Le);
     }
 
-    if (isNEE_Exec)
+    if (isUseNEE(material))
     {
         //ray hitted the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            float3 element = U32toF32x3(payload.compressedThroughput) * Le;
-            setDI(element);
+            DIGIelement = U32toF32x3(payload.compressedThroughput) * Le;
             isFinish = true;
             return isFinish;
         }
@@ -555,16 +551,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
-            if(isDirectRay(payload))
-            {
-                setDI(element);
-            }
-            if(isIndirectRay(payload))
-            {
-                addGI(element);
-            }
-
+            DIGIelement = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
             isFinish = false;
             return isFinish;
         }
@@ -573,29 +560,12 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (isNEELightingRequired)
         {
             DIReservoir reservoir;
-            float3 element = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * U32toF32x3(payload.compressedThroughput);
-            if(isDirectRay(payload))
+            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * U32toF32x3(payload.compressedThroughput);
+            if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(material))
             {
-                if(isUseStreamingRIS())
-                {
-                    //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
-                    if(isSSSExecutable(material))
-                    {
-                        setDI(element);
-                    }
-                    else
-                    {
-                        storeDIReservoir(reservoir, payload);
-                    }
-                }
-                else
-                {
-                    setDI(element);
-                }
-            }
-            if(isIndirectRay(payload))
-            {
-                addGI(element);
+                //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
+                DIGIelement = 0.xxx;
+                storeDIReservoir(reservoir, payload);
             }
         }
         isFinish = false;
@@ -609,15 +579,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
-                float3 element = U32toF32x3(payload.compressedThroughput) * Le;
-                if(isDirectRay(payload))
-                {
-                    setDI(element);
-                }
-                if(isIndirectRay(payload))
-                {
-                    addGI(element);
-                }
+                DIGIelement = U32toF32x3(payload.compressedThroughput) * Le;
             }
             isFinish = true;
             return isFinish;
@@ -626,15 +588,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            float3 element = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
-            if(isDirectRay(payload))
-            {
-                setDI(element);
-            }
-            if(isIndirectRay(payload))
-            {
-                addGI(element);
-            }
+            DIGIelement = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
             isFinish = false;
             return isFinish;
         }
