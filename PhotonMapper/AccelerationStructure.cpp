@@ -310,7 +310,12 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
 
         material.metallic = 0;// rndF(mt);
         material.roughness = 0.3;// rndF(mt);
+
+#ifdef GI_TEST
+        material.transRatio =0;// rndF(mt);
+#else
         material.transRatio = (mSceneType == SceneType_Sponza) ? 0 : 1;// rndF(mt);
+#endif
 
         albedoIndex++;
         transIndex++;
@@ -324,7 +329,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         material.metallic = 0.3;
         //material.roughness = 0.1;// rndF(mt);
         //material.roughness = 0.0;// rndF(mt);
-        material.roughness = 0.05;// rndF(mt);
+        material.roughness = 0.2;// rndF(mt);
         material.transColor = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[transIndex % _countof(colorTbl)];
         //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 0.8f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
         
@@ -361,6 +366,10 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
         {
             material.transRatio = 0;
         }
+
+#ifdef GI_TEST
+        material.transRatio = 0;// rndF(mt);
+#endif
 
         //sss test
         //material = defaultSSSMaterial;

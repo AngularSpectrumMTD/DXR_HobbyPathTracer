@@ -440,7 +440,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         p_hat = computeLuminance(FGL);
         float updateW = p_hat / pdf;
 
-        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, p_hat_3F, 1u, rand());
+        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, F32x3toU32(p_hat_3F), 1u, rand());
     }
     rseed = reservoir.randomSeed;
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample);

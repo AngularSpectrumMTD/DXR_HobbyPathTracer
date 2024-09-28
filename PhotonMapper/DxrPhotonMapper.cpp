@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -287,6 +287,27 @@ void DxrPhotonMapper::Setup()
         }
         break;
     }
+
+#ifdef GI_TEST
+    mIsApplyCaustics = false;
+    mPhiDirectional = 111; mThetaDirectional = 250;
+    mOBJFileName = "interior.obj";
+    mOBJFolderName = "model/bistro/Interior";
+    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+    mStageOffsetX = 20;
+    mStageOffsetY = 0;
+    mStageOffsetZ = 0;
+    mLightPosX = 53; mLightPosY = 3.7f; mLightPosZ = -5.9f;
+    mPhi = 283; mTheta = 107;
+    mInitEyePos = XMFLOAT3(30, 12, 9);
+    mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
+    mLightRange = 0.98f;
+
+    mGlassModelType = ModelType_Afrodyta;
+    mIsSpotLightPhotonMapper = false;
+    mCausticsBoost = 0.0002f;
+    mGatherRadius = 0.011f;
+#endif
 
     switch (mGlassModelType)
     {
