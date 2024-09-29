@@ -158,6 +158,8 @@ private:
         f32 T;//for SSS
         u32 hittedCount;//for SSS
         float3 SSSnormal;//for SSS
+        u32 compressedPrimaryBSDF;//for ReSTIR GI
+        f32 primaryPDF;//for ReSTIR GI
     };
 
     struct PhotonPayload

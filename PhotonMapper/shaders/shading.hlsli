@@ -139,7 +139,7 @@ float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
     }
 }
 
-void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, in float wavelength = 0)
+void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout Payload payload, in float wavelength = 0)
 {
     float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
@@ -203,7 +203,17 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
             const float cosine = max(0, abs(L_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-            compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
+
+            if(isDirectRay(payload))
+            {
+                //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
+                payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
+                payload.primaryPDF = BSDF_PDF.w;
+            }
+            else
+            {
+                payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+            }
         }
         else
         {
@@ -247,7 +257,18 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
             const float cosine = max(0, abs(L_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-            compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
+            payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+
+            if(isDirectRay(payload))
+            {
+                //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
+                payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
+                payload.primaryPDF = BSDF_PDF.w;
+            }
+            else
+            {
+                payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+            }
         }
     }
 }

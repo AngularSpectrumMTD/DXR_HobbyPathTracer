@@ -34,6 +34,8 @@ struct Payload
     float T;//for SSS
     uint hittedCount;//for SSS
     float3 SSSnormal;//for SSS
+    uint compressedPrimaryBSDF;//for ReSTIR GI
+    float primaryPDF;//for ReSTIR GI
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
@@ -139,6 +141,11 @@ void addGI(in float3 color)
 void setGI(in float3 color)
 {
     gGIBuffer[DispatchRaysIndex().xy] = float4(color, 0);
+}
+
+float3 getGI()
+{
+    return gGIBuffer[DispatchRaysIndex().xy].xyz;
 }
 
 void addCaustics(in float3 color)

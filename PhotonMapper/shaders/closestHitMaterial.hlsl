@@ -130,7 +130,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     const float3 element = U32toF32x3(payload.compressedThroughput) * photon;
     addCaustics(element);
 
-    updateRay(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput);
+    updateRay(currentMaterial, surfaceNormal, nextRay, payload);
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;

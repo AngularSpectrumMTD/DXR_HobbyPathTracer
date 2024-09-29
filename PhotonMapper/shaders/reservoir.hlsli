@@ -10,7 +10,7 @@
 struct DIReservoir
 {
     uint lightID;//light ID of most important light
-    uint randomSeed;//replay
+    uint randomSeed;//replay(must be setted before the invocation of sampleLightWithID())
     float targetPDF; //weight of light
     uint targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
@@ -69,17 +69,22 @@ void recognizeAsShadowedReservoir(inout DIReservoir reservoir)
     reservoir.targetPDF_3f = 0;
 }
 
+struct GISample
+{
+    uint Lo_2nd;
+    float3 pos_2nd;
+    float3 nml_2nd;
+};
+
 struct GIReservoir
 {
-    uint randomSeed;//replay
+    uint randomSeed;//replay(must be setted before the invocation of sampleBSDF_PDF())
     float targetPDF; //weight of light
     uint targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight
     float M; //number of ligts processed for this reservoir
 
-    uint Lo_2nd;
-    float3 pos_2nd;
-    float3 nml_2nd;
+    GISample giSample;
 
     void initialize()
     {
@@ -89,13 +94,11 @@ struct GIReservoir
         W_sum = 0;
         M = 0;
 
-        Lo_2nd = 0u;
-        pos_2nd = 0.xxx;
-        nml_2nd = 0.xxx;
+        giSample = (GISample)0;
     }
 };
 
-bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in uint Lo_2nd, in float3 pos_2nd, in float3 nml_2nd, in uint c, in float rnd01)
+bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in GISample giSample, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
@@ -105,9 +108,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
         reservoir.targetPDF = p_hat;
         reservoir.targetPDF_3f = p_hat_3f;
         reservoir.randomSeed = randomSeed;
-        reservoir.Lo_2nd = Lo_2nd;
-        reservoir.pos_2nd = pos_2nd;
-        reservoir.nml_2nd = nml_2nd;
+        reservoir.giSample = giSample;
         return true;
     }
     return false;
@@ -115,7 +116,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
 
 bool combineGIReservoirs(inout GIReservoir reservoir, in GIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.Lo_2nd, reservoirCombineElem.nml_2nd, reservoirCombineElem.pos_2nd, reservoirCombineElem.M, rnd01);
+    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.giSample, reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeGIReservoir(in GIReservoir reservoir)

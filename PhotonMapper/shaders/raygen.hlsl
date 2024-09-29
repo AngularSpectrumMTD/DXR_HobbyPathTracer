@@ -100,6 +100,8 @@ void rayGen() {
     rseed = LightSeed.x;
 
     const float energyBoost = 1.0f;
+    
+    Payload payload;
 
     //for(int i = 0; i < SPP ; i++)
     {
@@ -116,11 +118,12 @@ void rayGen() {
         nextRay.TMin = 0;
         nextRay.TMax = 100000;
 
-        Payload payload;
         payload.compressedThroughput = F32x3toU32(energyBoost * float3(1, 1, 1));
         payload.recursive = 0;
         payload.flags = 0;//empty
         payload.T = 0;
+        payload.compressedPrimaryBSDF = 0u;
+        payload.primaryPDF = 1;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -128,6 +131,12 @@ void rayGen() {
 
         TraceDefaultRay(flags, rayMask, nextRay, payload);
     }
+
+    //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
+    const float3 gi = getGI();
+    const float3 primaryBSDF = U32toF32x3(payload.compressedPrimaryBSDF);
+    const float primaryPDF = payload.primaryPDF;
+    setGI(gi * primaryBSDF / primaryPDF);
 }
 
 float getPhotonEmissionGuideMap(int2 pos, int mip)
