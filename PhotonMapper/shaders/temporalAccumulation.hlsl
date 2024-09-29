@@ -81,19 +81,23 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     int2 prevID = PrevIDBuffer[currID];
 
     float3 currDI = 0.xxx;
+    float3 currGI = 0.xxx;
     if(isUseNEE() && isUseStreamingRIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
         DIReservoir currDIReservoir = DIReservoirBufferSrc[serialCurrID];
+        GIReservoir currGIReservoir = GIReservoirBufferSrc[serialCurrID];
 
         float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
         currDI = shadeDIReservoir(currDIReservoir) + reservoirElementRemovedDI;
+
+        float3 reservoirElementRemovedGI = CurrentGIBuffer[currID].rgb;
+        currGI = shadeGIReservoir(currGIReservoir) + reservoirElementRemovedGI;
     }
     else
     {
         currDI = CurrentDIBuffer[currID].rgb;
     }
-    float3 currGI = CurrentGIBuffer[currID].rgb;
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
 
     if(isWithinBounds(prevID, dims))

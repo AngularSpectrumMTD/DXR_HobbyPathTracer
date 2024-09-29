@@ -864,6 +864,7 @@ void DxrPhotonMapper::Draw()
             CD3DX12_RESOURCE_BARRIER::UAV(mGIBufferPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mCausticsBufferPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mDIReservoirPingPongTbl[curr].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mGIReservoirPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[prev].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mScreenSpaceMaterialBuffer.Get())
@@ -892,6 +893,7 @@ void DxrPhotonMapper::Draw()
 
         D3D12_RESOURCE_BARRIER tempBarrier[] = {
         CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+        CD3DX12_RESOURCE_BARRIER::Transition(mGIReservoirPingPongTbl[curr].Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
         };
         mCommandList->ResourceBarrier(u32(_countof(tempBarrier)), tempBarrier);
     }
@@ -901,19 +903,25 @@ void DxrPhotonMapper::Draw()
     {
         D3D12_RESOURCE_BARRIER copyReservoirBarrier[] = {
         CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
-        CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST)
+        CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
+         CD3DX12_RESOURCE_BARRIER::Transition(mGIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
+        CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST)
         };
         mCommandList->ResourceBarrier(u32(_countof(copyReservoirBarrier)), copyReservoirBarrier);
         mCommandList->CopyResource(mDISpatialReservoirPingPongTbl[prev].Get(), mDIReservoirPingPongTbl[curr].Get());
+        mCommandList->CopyResource(mGISpatialReservoirPingPongTbl[prev].Get(), mGIReservoirPingPongTbl[curr].Get());
 
         D3D12_RESOURCE_BARRIER dstTouavReservoirBarrier[] = {
-          CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
+          CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+          CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
         };
         mCommandList->ResourceBarrier(u32(_countof(dstTouavReservoirBarrier)), dstTouavReservoirBarrier);
 
         CD3DX12_RESOURCE_BARRIER uavB[] = {
             CD3DX12_RESOURCE_BARRIER::UAV(mDISpatialReservoirPingPongTbl[prev].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mDISpatialReservoirPingPongTbl[curr].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mGISpatialReservoirPingPongTbl[prev].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mGISpatialReservoirPingPongTbl[curr].Get()),
         };
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
@@ -993,7 +1001,8 @@ void DxrPhotonMapper::Draw()
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
  #endif
-            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
         };
 
         mCommandList->ResourceBarrier(u32(_countof(UAVToSRVReservoirBarrier)), UAVToSRVReservoirBarrier);
@@ -1028,7 +1037,8 @@ void DxrPhotonMapper::Draw()
 
         {
             D3D12_RESOURCE_BARRIER SRVToUAVReservoirBarrier[] = {
-                 CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
+                 CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+                 CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
             };
             mCommandList->ResourceBarrier(u32(_countof(SRVToUAVReservoirBarrier)), SRVToUAVReservoirBarrier);
         }

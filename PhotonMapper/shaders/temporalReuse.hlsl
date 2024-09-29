@@ -55,6 +55,28 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
     currDIReservoir = tempDIReservoir;
 }
 
+void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, in uint2 currID)
+{
+    //Limitting
+    if(prevGIReservoir.M > MAX_TEMPORAL_REUSE_M)
+    {
+        float r = max(0, ((float)MAX_TEMPORAL_REUSE_M / prevGIReservoir.M));
+        prevGIReservoir.W_sum *= r;
+        prevGIReservoir.M = MAX_TEMPORAL_REUSE_M;
+    }
+
+    GIReservoir tempGIReservoir;
+    tempGIReservoir.initialize();
+    //combine reservoirs
+    {
+        const float currUpdateW = currGIReservoir.W_sum;
+        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(currID));
+        const float prevUpdateW = prevGIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
+        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(currID));
+    }
+    currGIReservoir = tempGIReservoir;
+}
+
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
@@ -77,6 +99,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
+        GIReservoir currGIReservoir = GIReservoirBufferDst[serialCurrID];
 
         if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
         {
@@ -88,9 +111,12 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
                 DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, currID);
+                GIReservoir prevGIReservoir = GIReservoirBufferSrc[serialPrevID];
+                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, currID);
             }
         }
 
         DIReservoirBufferDst[serialCurrID] = currDIReservoir;
+        GIReservoirBufferDst[serialCurrID] = currGIReservoir;
     }
 }

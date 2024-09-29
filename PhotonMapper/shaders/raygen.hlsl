@@ -167,7 +167,7 @@ void rayGen() {
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
     gGIReservoirBuffer[serialIndex] = giReservoir;
 
-    setGI(finalGI);
+    setGI(0.xxx);
 }
 
 float getPhotonEmissionGuideMap(int2 pos, int mip)
@@ -341,19 +341,19 @@ void spatialReuse() {
     randGenState = uint(pcgHash(seed));
     rseed = LightSeed.x;
 
+    //============================================= DI =============================================
     DIReservoir spatDIReservoir;
     spatDIReservoir.initialize();
 
     DIReservoir currDIReservoir = gDISpatialReservoirBufferSrc[serialIndex];
-    const float currUpdateW = currDIReservoir.W_sum;
-    combineDIReservoirs(spatDIReservoir, currDIReservoir, currUpdateW, rand());
+    combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand());
 
     const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
     const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
     const float3 scatterPosition = gPositionBuffer[launchIndex.xy].xyz;
     const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
 
-    //combine reservoirs
+    //combine reservoirs (DI)
     if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_TEMPORAL_REUSE_M / 2)))
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
@@ -427,4 +427,51 @@ void spatialReuse() {
     }
 
     gDIReservoirBuffer[serialIndex] = spatDIReservoir;
+    
+    //============================================= GI =============================================
+    GIReservoir spatGIReservoir;
+    spatGIReservoir.initialize();
+
+    GIReservoir currGIReservoir = gGISpatialReservoirBufferSrc[serialIndex];
+    combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand());
+
+    //combine reservoirs (GI)
+    if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_TEMPORAL_REUSE_M / 2)))
+    {
+        for(int s = 0; s < gReSTIRParam.data.x; s++)
+        {
+            const float r = rand() * ((currGIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : gReSTIRParam.data.x);
+            const float v = rand();
+            const float phi = 2.0f * PI * v;
+            float2 sc = 0.xx;
+            sincos(phi, sc.x, sc.y);
+            int3 nearIndex = launchIndex + int3(r * sc, 0);
+            
+            if(!isWithinBounds(nearIndex.xy, dims))
+            {
+                continue;
+            }
+
+            const uint serialNearID = serialRaysIndex(nearIndex, dispatchDimensions);
+
+            GIReservoir nearGIReservoir = gGISpatialReservoirBufferSrc[serialNearID];
+            const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
+            const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
+            const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
+
+            const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
+            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
+
+            const bool isSimilar = isNearPosition && isNearNormal;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            if(!isSimilar || (length(nearNormal) < 0.01))
+            {
+                continue;
+            }
+            const float nearUpdateW = nearGIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
+            combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand2(nearIndex.xy));
+        }
+    }
+
+    gGIReservoirBuffer[serialIndex] = spatGIReservoir;
 }
