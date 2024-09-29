@@ -19,6 +19,7 @@ Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
 StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
 Texture2D<float4> PositionBuffer : register(t8);
 Texture2D<float4> PrevPositionBuffer : register(t9);
+StructuredBuffer<GIReservoir> GIReservoirBufferSrc : register(t10);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);

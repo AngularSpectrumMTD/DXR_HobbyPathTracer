@@ -111,6 +111,9 @@ RWTexture2D<float> gPhotonEmissionGuideMap6 : register(u17);
 RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u18);
 RWTexture2D<float4> gDebugTexture : register(u19);
 
+RWStructuredBuffer<GIReservoir> gGIReservoirBuffer : register(u20);
+RWStructuredBuffer<GIReservoir> gGISpatialReservoirBufferSrc : register(u21);
+
 struct ReSTIRParam
 {
     uint4 data;

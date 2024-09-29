@@ -15,7 +15,9 @@ Texture2D<float4> PrevNormalDepthBuffer : register(t2);
 Texture2D<float2> PrevIDBuffer : register(t3);
 Texture2D<float4> PositionBuffer : register(t4);
 Texture2D<float4> PrevPositionBuffer : register(t5);
+StructuredBuffer<GIReservoir> GIReservoirBufferSrc : register(t6);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u0);
+RWStructuredBuffer<GIReservoir> GIReservoirBufferDst : register(u1);
 
 static uint rseed;
 

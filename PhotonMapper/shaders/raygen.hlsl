@@ -87,11 +87,20 @@ void rayGen() {
     }
     
     //clear reservoir buffer
-    DIReservoir dummyReservoir;
-    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
-    dummyReservoir.initialize();
-    gDIReservoirBuffer[serialIndex] = dummyReservoir;
-    gDISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
+    {
+        DIReservoir dummyReservoir;
+        int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+        dummyReservoir.initialize();
+        gDIReservoirBuffer[serialIndex] = dummyReservoir;
+        gDISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
+    }
+    {
+        GIReservoir dummyReservoir;
+        int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+        dummyReservoir.initialize();
+        gGIReservoirBuffer[serialIndex] = dummyReservoir;
+        gGISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
+    }
 
     //random
     float LightSeed = getLightRandomSeed();

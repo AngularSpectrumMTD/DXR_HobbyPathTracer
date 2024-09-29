@@ -186,6 +186,24 @@ private:
         f32 M; //number of ligts processed for this reservoir
     };
 
+    struct GISample
+    {
+        u32 Lo_2nd;
+        float3 pos_2nd;
+        float3 nml_2nd;
+    };
+
+    struct GIReservoir
+    {
+        u32 randomSeed;//replay(must be setted before the invocation of sampleBSDF_PDF())
+        f32 targetPDF; //weight of light
+        u32 targetPDF_3f; //weight of light(float 3)
+        f32 W_sum; //sum of all weight
+        f32 M; //number of ligts processed for this reservoir
+
+        GISample giSample;
+    };
+
     enum SphereTypeCount {
         NormalSpheres = 9
     };
@@ -580,6 +598,14 @@ private:
     std::vector < ComPtr<ID3D12Resource>> mDISpatialReservoirPingPongTbl;
     std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorSRVPingPongTbl;
     std::vector < dx12::Descriptor> mDISpatialReservoirDescriptorUAVPingPongTbl;
+
+    std::vector < ComPtr<ID3D12Resource>> mGIReservoirPingPongTbl;
+    std::vector < dx12::Descriptor> mGIReservoirDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mGIReservoirDescriptorUAVPingPongTbl;
+
+    std::vector < ComPtr<ID3D12Resource>> mGISpatialReservoirPingPongTbl;
+    std::vector < dx12::Descriptor> mGISpatialReservoirDescriptorSRVPingPongTbl;
+    std::vector < dx12::Descriptor> mGISpatialReservoirDescriptorUAVPingPongTbl;
 
     //photon guiding (PHOTON_RANDOM_COUNTER_MAP_SIZE_1D x PHOTON_RANDOM_COUNTER_MAP_SIZE_1D)
     ComPtr<ID3D12Resource> mPhotonRandomCounterMap;

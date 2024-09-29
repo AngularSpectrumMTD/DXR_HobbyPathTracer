@@ -195,7 +195,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
         CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
         mRegisterMapTemporalReuse.clear();
@@ -206,7 +208,9 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalReuse["PrevIDBuffer"] = mRegisterMapTemporalReuse.size();
         mRegisterMapTemporalReuse["PositionBuffer"] = mRegisterMapTemporalReuse.size();
         mRegisterMapTemporalReuse["PrevPositionBuffer"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["GIReservoirBufferSrc"] = mRegisterMapTemporalReuse.size();
         mRegisterMapTemporalReuse["DIReservoirBufferDst"] = mRegisterMapTemporalReuse.size();
+        mRegisterMapTemporalReuse["GIReservoirBufferDst"] = mRegisterMapTemporalReuse.size();
     }
 
     {
@@ -293,6 +297,7 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 8);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 9);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 10);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
@@ -314,6 +319,7 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PositionBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["GIReservoirBufferSrc"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = mRegisterMapTemporalAccumulation.size();
