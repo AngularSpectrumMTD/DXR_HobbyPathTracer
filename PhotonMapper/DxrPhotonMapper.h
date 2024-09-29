@@ -160,6 +160,9 @@ private:
         float3 SSSnormal;//for SSS
         u32 compressedPrimaryBSDF;//for ReSTIR GI
         f32 primaryPDF;//for ReSTIR GI
+        float3 pos_2nd;//for ReSTIR GI
+        float3 nml_2nd;//for ReSTIR GI
+        u32 bsdfRandomSeed;//for ReSTIR GI
     };
 
     struct PhotonPayload

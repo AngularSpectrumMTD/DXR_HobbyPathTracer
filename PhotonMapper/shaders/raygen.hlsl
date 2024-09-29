@@ -133,6 +133,8 @@ void rayGen() {
         payload.T = 0;
         payload.compressedPrimaryBSDF = 0u;
         payload.primaryPDF = 1;
+        payload.pos_2nd = 0.xxx;
+        payload.nml_2nd = 0.xxx;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -143,9 +145,29 @@ void rayGen() {
 
     //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
     const float3 gi = getGI();
+
+    GISample giSample = (GISample)0;
+    giSample.Lo_2nd = F32x3toU32(getGI());
+    giSample.pos_2nd = payload.pos_2nd;
+    giSample.nml_2nd = payload.nml_2nd;
+
+    GIReservoir giReservoir;
+    giReservoir.initialize();
+
     const float3 primaryBSDF = U32toF32x3(payload.compressedPrimaryBSDF);
     const float primaryPDF = payload.primaryPDF;
-    setGI(gi * primaryBSDF / primaryPDF);
+
+    const float3 elem = gi * primaryBSDF;
+    const float p_hat = computeLuminance(elem);
+    const float updateW = p_hat / primaryPDF;
+
+    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, F32x3toU32(elem), giSample, 1u, rand());
+    const float3 finalGI = shadeGIReservoir(giReservoir);
+
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    gGIReservoirBuffer[serialIndex] = giReservoir;
+
+    setGI(finalGI);
 }
 
 float getPhotonEmissionGuideMap(int2 pos, int mip)

@@ -143,6 +143,13 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
 {
     float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
+    if(payload.recursive == 2)
+    {
+        payload.pos_2nd = currentRayOrigin;
+        payload.nml_2nd = N_global;
+    }
+
+    const uint currentSeed = rseed;
     {
         nextRay.TMin = RAY_MIN_T;
         nextRay.TMax = RAY_MAX_T;
@@ -209,6 +216,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
                 //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
                 payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
+                payload.bsdfRandomSeed = currentSeed;
             }
             else
             {
@@ -264,6 +272,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
                 //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
                 payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
+                payload.bsdfRandomSeed = currentSeed;
             }
             else
             {

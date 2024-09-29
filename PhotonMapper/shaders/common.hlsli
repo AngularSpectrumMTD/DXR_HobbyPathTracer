@@ -36,6 +36,9 @@ struct Payload
     float3 SSSnormal;//for SSS
     uint compressedPrimaryBSDF;//for ReSTIR GI
     float primaryPDF;//for ReSTIR GI
+    float3 pos_2nd;//for ReSTIR GI
+    float3 nml_2nd;//for ReSTIR GI
+    uint bsdfRandomSeed;//for ReSTIR GI
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
