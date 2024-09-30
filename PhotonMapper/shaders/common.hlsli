@@ -198,6 +198,15 @@ GIReservoir getGIReservoir()
     return gGIReservoirBuffer[serialIndex];
 }
 
+CompressedMaterialParams getScreenSpaceMaterial()
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+
+    return gScreenSpaceMaterial[serialIndex];
+}
+
 void setGIReservoir(in GIReservoir giReservoir)
 {
     uint3 launchIndex = DispatchRaysIndex();

@@ -12,8 +12,8 @@ struct SceneCB
     matrix mtxViewInvPrev;
     matrix mtxProjInvPrev;
     uint4 flags;
-    float4 photonParams;
-    float4 cameraParams;
+    float4 photonParams;//x unused
+    float4 cameraParams;//near far reserved reserved
     float4 gatherParams;
     float4 gatherParams2;
     float4 spotLightParams;

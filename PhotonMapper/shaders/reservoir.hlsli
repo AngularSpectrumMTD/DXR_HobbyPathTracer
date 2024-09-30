@@ -78,7 +78,7 @@ struct GISample
 
 struct GIReservoir
 {
-    uint randomSeed;//replay(must be setted before the invocation of sampleBSDF_PDF())
+    uint randomSeed;//replay(must be setted before the invocation of computeBSDF_PDF())
     float targetPDF; //weight of light
     uint targetPDF_3f; //weight of light(float 3)
     float W_sum; //sum of all weight

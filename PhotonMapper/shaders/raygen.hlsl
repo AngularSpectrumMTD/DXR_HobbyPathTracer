@@ -147,7 +147,7 @@ void rayGen() {
     GIReservoir giInitialReservoir = getGIReservoir();
 
     GISample giSample = (GISample)0;
-    giSample.Lo_2nd = F32x3toU32(getGI());
+    giSample.Lo_2nd = F32x3toU32(gi);
     giSample.pos_2nd = giInitialReservoir.giSample.pos_2nd;
     giSample.nml_2nd = giInitialReservoir.giSample.nml_2nd;
 
@@ -409,7 +409,7 @@ void spatialReuse() {
     if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
     {
         MaterialParams material = decompressMaterialParams(gScreenSpaceMaterial[serialIndex]);
-        float4 bsdfPDF = sampleBSDF_PDF(material, centerNormal, wo, wi);
+        float4 bsdfPDF = computeBSDF_PDF(material, centerNormal, wo, wi);
         float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
         spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
@@ -472,6 +472,27 @@ void spatialReuse() {
             const float nearUpdateW = nearGIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
             combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand2(nearIndex.xy));
         }
+    }
+
+    MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
+    rseed = spatGIReservoir.randomSeed;
+    wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
+    float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
+
+    rseed = spatGIReservoir.randomSeed;
+    const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
+    const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
+    const bool isReEavuateValid = isSpecularDiffusePath && (diffRatio > 0.2); 
+
+    float cosine = abs(dot(wi, centerNormal));
+    float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
+
+    const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
+
+    //recalculated
+    if(isReEavuateValid && !isIBLSample)
+    {
+        spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
     }
 
     gGIReservoirBuffer[serialIndex] = spatGIReservoir;

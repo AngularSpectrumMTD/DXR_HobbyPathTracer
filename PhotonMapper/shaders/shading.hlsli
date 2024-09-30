@@ -396,7 +396,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
     }
 }
 
-float4 sampleBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
+float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
 
@@ -466,7 +466,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         float3 wi = lightSample.directionToLight;
         float receiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+        float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -513,7 +513,7 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
                 float3 wi = lightSample.directionToLight;
                 float receiverCos = dot(surfaceNormal, wi);
                 float emitterCos = dot(lightNormal, -wi);
-                float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+                float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
                 float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
                 float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -546,7 +546,7 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
         float emitterCos = dot(lightNormal, -wi);
         if (isVisible(scatterPosition, lightSample) && (receiverCos > 0) && (emitterCos > 0))
         {
-            float4 bsdfPDF = sampleBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+            float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
             float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
             float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
             estimatedColor = FGL;
