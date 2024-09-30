@@ -1,6 +1,7 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
-- ReSTIR
+- ReSTIR DI
+- ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
 ![Main](https://github.com/user-attachments/assets/59de7dc8-1218-4a72-88e5-23b878c3e19f)
