@@ -145,8 +145,12 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
 
     if(payload.recursive == 2)
     {
-        payload.pos_2nd = currentRayOrigin;
-        payload.nml_2nd = N_global;
+        GIReservoir giReservoir = getGIReservoir();
+        giReservoir.giSample.pos_2nd = currentRayOrigin;
+        giReservoir.giSample.nml_2nd = N_global;
+        giReservoir.compressedMaterial = compressMaterialParams(material);
+
+        setGIReservoir(giReservoir);
     }
 
     const uint currentSeed = rseed;

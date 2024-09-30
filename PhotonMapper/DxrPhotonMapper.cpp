@@ -290,6 +290,7 @@ void DxrPhotonMapper::Setup()
 
 #ifdef GI_TEST
     mIsApplyCaustics = false;
+    mIsIndirectOnly = true;
     mPhiDirectional = 111; mThetaDirectional = 250;
     mOBJFileName = "interior.obj";
     mOBJFolderName = "model/bistro/Interior";
@@ -307,6 +308,8 @@ void DxrPhotonMapper::Setup()
     mIsSpotLightPhotonMapper = false;
     mCausticsBoost = 0.0002f;
     mGatherRadius = 0.011f;
+
+    mIsTemporalAccumulationForceDisable = true;
 #endif
 
     switch (mGlassModelType)

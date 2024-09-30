@@ -150,6 +150,18 @@ private:
         u32 y;
     };
 
+    struct CompressedMaterialParams
+    {
+        u32 albedo;
+        f32 metallic;
+        f32 roughness;
+        f32 specular;
+        f32 transRatio;
+        u32 transColor;
+        u32 emission;
+        u32 isSSSExecutable = 0;
+    };
+
     struct Payload
     {
         u32 throughput;
@@ -160,8 +172,6 @@ private:
         float3 SSSnormal;//for SSS
         u32 compressedPrimaryBSDF;//for ReSTIR GI
         f32 primaryPDF;//for ReSTIR GI
-        float3 pos_2nd;//for ReSTIR GI
-        float3 nml_2nd;//for ReSTIR GI
         u32 bsdfRandomSeed;//for ReSTIR GI
     };
 
@@ -205,6 +215,7 @@ private:
         f32 M; //number of ligts processed for this reservoir
 
         GISample giSample;
+        CompressedMaterialParams compressedMaterial;
     };
 
     enum SphereTypeCount {
@@ -309,18 +320,6 @@ private:
     struct ReSTIRParam
     {
         XMUINT4 data;
-    };
-
-    struct CompressedMaterialParams
-    {
-        u32 albedo;
-        f32 metallic;
-        f32 roughness;
-        f32 specular;
-        f32 transRatio;
-        u32 transColor;
-        u32 emission;
-        u32 isSSSExecutable = 0;
     };
 
     struct LightGenerateParam

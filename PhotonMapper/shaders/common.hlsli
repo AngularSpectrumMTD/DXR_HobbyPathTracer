@@ -26,6 +26,8 @@
 #define RAY_MIN_T 0.001f
 #define RAY_MAX_T 1000000.0f
 
+#include "materialParams.hlsli"
+
 struct Payload
 {
     uint compressedThroughput;
@@ -36,8 +38,6 @@ struct Payload
     float3 SSSnormal;//for SSS
     uint compressedPrimaryBSDF;//for ReSTIR GI
     float primaryPDF;//for ReSTIR GI
-    float3 pos_2nd;//for ReSTIR GI
-    float3 nml_2nd;//for ReSTIR GI
     uint bsdfRandomSeed;//for ReSTIR GI
 };
 
@@ -67,8 +67,6 @@ struct LightGenerateParam
     float sphereRadius; //radius for sphere lightf
     uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 };
-
-#include "materialParams.hlsli"
 
 #define LIGHT_TYPE_SPHERE 0
 #define LIGHT_TYPE_RECT 1
@@ -189,6 +187,24 @@ uint pcgHash(uint seed)
 inline int serialRaysIndex(int3 dispatchRaysIndex, int3 dispatchRaysDimensions)
 {
     return (dispatchRaysIndex.x + dispatchRaysDimensions.x * dispatchRaysIndex.y) * dispatchRaysDimensions.z + dispatchRaysIndex.z;
+}
+
+GIReservoir getGIReservoir()
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+
+    return gGIReservoirBuffer[serialIndex];
+}
+
+void setGIReservoir(in GIReservoir giReservoir)
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+
+    gGIReservoirBuffer[serialIndex] = giReservoir;
 }
 
 inline float2 computeInterpolatedAttributeF2(float2 vertexAttributeTbl[3], float2 barycentrics)

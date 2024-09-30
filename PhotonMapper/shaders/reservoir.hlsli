@@ -85,6 +85,7 @@ struct GIReservoir
     float M; //number of ligts processed for this reservoir
 
     GISample giSample;
+    CompressedMaterialParams compressedMaterial;
 
     void initialize()
     {
@@ -95,10 +96,11 @@ struct GIReservoir
         M = 0;
 
         giSample = (GISample)0;
+        compressedMaterial = (CompressedMaterialParams)0;
     }
 };
 
-bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in GISample giSample, in uint c, in float rnd01)
+bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in GISample giSample, in CompressedMaterialParams compressedMaterial, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
@@ -109,6 +111,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
         reservoir.targetPDF_3f = p_hat_3f;
         reservoir.randomSeed = randomSeed;
         reservoir.giSample = giSample;
+        reservoir.compressedMaterial = compressedMaterial;
         return true;
     }
     return false;
@@ -116,7 +119,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
 
 bool combineGIReservoirs(inout GIReservoir reservoir, in GIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.giSample, reservoirCombineElem.M, rnd01);
+    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.giSample, reservoirCombineElem.compressedMaterial  , reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeGIReservoir(in GIReservoir reservoir)
