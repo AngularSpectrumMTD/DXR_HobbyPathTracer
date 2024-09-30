@@ -64,7 +64,7 @@ struct LightGenerateParam
     float3 emission;
     float3 U; //u vector for rectangle or spot light
     float3 V; //v vector for rectangle or spot light
-    float sphereRadius; //radius for sphere lightf
+    float sphereRadius; //radius for sphere light
     uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 };
 
