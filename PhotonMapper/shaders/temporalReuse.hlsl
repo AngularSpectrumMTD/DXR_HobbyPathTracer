@@ -101,7 +101,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
         DIReservoir currDIReservoir = DIReservoirBufferDst[serialCurrID];
         GIReservoir currGIReservoir = GIReservoirBufferDst[serialCurrID];
 
-        if (isAccumulationApply() && isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
         {
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
