@@ -355,11 +355,11 @@ void spatialReuse() {
     const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
 
     //combine reservoirs (DI)
-    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_TEMPORAL_REUSE_M / 2)))
+    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_REUSE_M_DI / 2)))
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
-            const float r = rand() * ((currDIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : gReSTIRParam.data.x);
+            const float r = rand() * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : gReSTIRParam.data.x);
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
@@ -420,11 +420,11 @@ void spatialReuse() {
         recognizeAsShadowedReservoir(spatDIReservoir);
     }
 
-    if(spatDIReservoir.M > MAX_SPATIAL_REUSE_M)
+    if(spatDIReservoir.M > MAX_REUSE_M_DI)
     {
-        float r = max(0, ((float)MAX_SPATIAL_REUSE_M / spatDIReservoir.M));
+        float r = max(0, ((float)MAX_REUSE_M_DI / spatDIReservoir.M));
         spatDIReservoir.W_sum *= r;
-        spatDIReservoir.M = MAX_SPATIAL_REUSE_M;
+        spatDIReservoir.M = MAX_REUSE_M_DI;
     }
 
     gDIReservoirBuffer[serialIndex] = spatDIReservoir;
@@ -437,11 +437,11 @@ void spatialReuse() {
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand());
 
     //combine reservoirs (GI)
-    if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_TEMPORAL_REUSE_M / 2)))
+    if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_REUSE_M_GI / 2)))
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
-            const float r = rand() * ((currGIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : 2);
+            const float r = rand() * ((currGIReservoir.M > (MAX_REUSE_M_GI / 4)) ? 1 : 2);
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
@@ -482,17 +482,24 @@ void spatialReuse() {
     rseed = spatGIReservoir.randomSeed;
     const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
     const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
-    const bool isReEavuateValid = isSpecularDiffusePath && (diffRatio > 0.2); 
+    const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 
 
     float cosine = abs(dot(wi, centerNormal));
     float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
 
     const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
 
-    //recalculated
-    if(isReEavuateValid && !isIBLSample)
+    if(spatGIReservoir.M > MAX_REUSE_M_GI)
     {
-        //spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
+        float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
+        spatGIReservoir.W_sum *= r;
+        spatGIReservoir.M = MAX_REUSE_M_GI;
+    }
+
+    //recalculated
+    if(isReEvaluateValid && !isIBLSample)
+    {
+        spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
     }
 
     gGIReservoirBuffer[serialIndex] = spatGIReservoir;

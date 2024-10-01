@@ -36,11 +36,11 @@ float rand(in int2 indexXY)//0-1
 void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, in uint2 currID)
 {
     //Limitting
-    if(prevDIReservoir.M > MAX_TEMPORAL_REUSE_M)
+    if(prevDIReservoir.M > MAX_REUSE_M_DI)
     {
-        float r = max(0, ((float)MAX_TEMPORAL_REUSE_M / prevDIReservoir.M));
+        float r = max(0, ((float)MAX_REUSE_M_DI / prevDIReservoir.M));
         prevDIReservoir.W_sum *= r;
-        prevDIReservoir.M = MAX_TEMPORAL_REUSE_M;
+        prevDIReservoir.M = MAX_REUSE_M_DI;
     }
 
     DIReservoir tempDIReservoir;
@@ -58,11 +58,11 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
 void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, in uint2 currID)
 {
     //Limitting
-    if(prevGIReservoir.M > MAX_TEMPORAL_REUSE_M)
+    if(prevGIReservoir.M > MAX_REUSE_M_GI)
     {
-        float r = max(0, ((float)MAX_TEMPORAL_REUSE_M / prevGIReservoir.M));
+        float r = max(0, ((float)MAX_REUSE_M_GI / prevGIReservoir.M));
         prevGIReservoir.W_sum *= r;
-        prevGIReservoir.M = MAX_TEMPORAL_REUSE_M;
+        prevGIReservoir.M = MAX_REUSE_M_GI;
     }
 
     GIReservoir tempGIReservoir;
