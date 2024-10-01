@@ -184,6 +184,11 @@ uint pcgHash(uint seed)
 ////////////////////////////////////
 // Common Function
 ////////////////////////////////////
+uint getReservoirSpatialReuseNum()
+{
+    return gReSTIRParam.data.x;
+}
+
 inline int serialRaysIndex(int3 dispatchRaysIndex, int3 dispatchRaysDimensions)
 {
     return (dispatchRaysIndex.x + dispatchRaysDimensions.x * dispatchRaysIndex.y) * dispatchRaysDimensions.z + dispatchRaysIndex.z;

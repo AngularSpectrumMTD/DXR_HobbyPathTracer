@@ -357,9 +357,9 @@ void spatialReuse() {
     //combine reservoirs (DI)
     if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_REUSE_M_DI / 2)))
     {
-        for(int s = 0; s < gReSTIRParam.data.x; s++)
+        for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
-            const float r = rand() * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : gReSTIRParam.data.x);
+            const float r = rand() * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : getReservoirSpatialReuseNum());
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
@@ -439,7 +439,7 @@ void spatialReuse() {
     //combine reservoirs (GI)
     if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_REUSE_M_GI / 2)))
     {
-        for(int s = 0; s < gReSTIRParam.data.x; s++)
+        for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
             const float r = rand() * ((currGIReservoir.M > (MAX_REUSE_M_GI / 4)) ? 1 : 2);
             const float v = rand();
