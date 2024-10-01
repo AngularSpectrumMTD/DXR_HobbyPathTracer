@@ -302,7 +302,7 @@ void DxrPhotonMapper::Setup()
     mPhi = 283; mTheta = 107;
     mInitEyePos = XMFLOAT3(30, 12, 9);
     mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
-    mLightRange = 0.98f;
+    mLightRange = 2.98f;
 
     mGlassModelType = ModelType_Afrodyta;
     mIsSpotLightPhotonMapper = false;
@@ -1128,11 +1128,6 @@ void DxrPhotonMapper::Update()
         {
             pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4f * mSeedFrame * ONE_RADIAN), 0);
         }
-    }
-
-    if (mIsUseAccumulation == false)
-    {
-        mRenderFrame = 0;
     }
 
     mSceneParam.mtxViewPrev = mSceneParam.mtxView;

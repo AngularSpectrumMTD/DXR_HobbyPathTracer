@@ -100,7 +100,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     }
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
 
-    if(isWithinBounds(prevID, dims))
+    if(isWithinBounds(prevID, dims) && isAccumulationApply())
     {
         float3 prevDI = HistoryDIBuffer[prevID].rgb;
         float3 prevGI = HistoryGIBuffer[prevID].rgb;
@@ -116,7 +116,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float2 currLuminanceMoment = float2(luminance, luminance * luminance);
 
         uint accCount = PrevAccumulationCountBuffer[prevID];
-        const bool isTemporalReuseEnable = isAccumulationApply() && isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevWorldPos);
+        const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevWorldPos);
         if (isTemporalReuseEnable)
         {
             accCount++;

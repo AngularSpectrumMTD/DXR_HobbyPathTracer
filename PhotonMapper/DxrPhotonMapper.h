@@ -19,7 +19,7 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-//#define GI_TEST
+#define GI_TEST
 
 #define STAGE_DIVISION 4
 #define STAGE_DIVISION_FOR_LIGHT_POSITION 20

@@ -441,7 +441,7 @@ void spatialReuse() {
     {
         for(int s = 0; s < gReSTIRParam.data.x; s++)
         {
-            const float r = rand() * ((currGIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : gReSTIRParam.data.x);
+            const float r = rand() * ((currGIReservoir.M > (MAX_TEMPORAL_REUSE_M / 4)) ? 1 : 2);
             const float v = rand();
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
@@ -492,7 +492,7 @@ void spatialReuse() {
     //recalculated
     if(isReEavuateValid && !isIBLSample)
     {
-        spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
+        //spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
     }
 
     gGIReservoirBuffer[serialIndex] = spatGIReservoir;
