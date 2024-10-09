@@ -4,6 +4,10 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+![ReSTIRDIcomp](https://github.com/user-attachments/assets/42e20aba-c1d9-4fe6-aa49-15bf2f36c0f5)
+
+![ReSTIRGIcomp](https://github.com/user-attachments/assets/f4ed1014-a6aa-4170-b577-8598b0246f19)
+
 ![Main](https://github.com/user-attachments/assets/59de7dc8-1218-4a72-88e5-23b878c3e19f)
 
 ### Debug View
@@ -35,7 +39,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 6. Build and Execute  
 ---
 
-### Action
+### Control
 
 - I : determine other button meaning (+ / -)
 - J : start / stop model

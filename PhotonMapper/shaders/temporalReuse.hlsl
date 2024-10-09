@@ -33,7 +33,7 @@ float rand(in int2 indexXY)//0-1
     return frac(sin(dot(indexXY.xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
 }
 
-void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, in uint2 currID)
+void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, in uint2 randID)
 {
     //Limitting
     if(prevDIReservoir.M > MAX_REUSE_M_DI)
@@ -48,14 +48,14 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
     //combine reservoirs
     {
         const float currUpdateW = currDIReservoir.W_sum;
-        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(currID));
+        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(randID));
         const float prevUpdateW = prevDIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
-        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(currID));
+        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(randID));
     }
     currDIReservoir = tempDIReservoir;
 }
 
-void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, in uint2 currID)
+void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, in uint2 randID)
 {
     //Limitting
     if(prevGIReservoir.M > MAX_REUSE_M_GI)
@@ -70,9 +70,9 @@ void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir 
     //combine reservoirs
     {
         const float currUpdateW = currGIReservoir.W_sum;
-        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(currID));
+        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(randID));
         const float prevUpdateW = prevGIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
-        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(currID));
+        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(randID));
     }
     currGIReservoir = tempGIReservoir;
 }
@@ -85,6 +85,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
     NormalDepthBuffer.GetDimensions(dims.x, dims.y);
 
     uint2 currID = dtid.xy;
+    uint2 randID = currID;
 
     float currDepth = NormalDepthBuffer[currID].w;
     float3 currNormal = NormalDepthBuffer[currID].xyz;
@@ -110,9 +111,9 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             if(isTemporalReuseEnable)
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
-                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, currID);
+                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, randID);
                 GIReservoir prevGIReservoir = GIReservoirBufferSrc[serialPrevID];
-                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, currID);
+                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, randID);
             }
         }
 

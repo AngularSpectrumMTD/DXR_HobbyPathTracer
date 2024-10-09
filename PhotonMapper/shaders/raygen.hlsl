@@ -323,38 +323,17 @@ void photonEmitting()
 
 #define SPATIAL_REUSE_NUM 4
 
-float rand2(in int2 indexXY)//0-1
+void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos)
 {
-    rseed += 1.0;
-    return frac(sin(dot(indexXY.xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
-}
-
-[shader("raygeneration")]
-void spatialReuse() {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
     float2 dims = float2(DispatchRaysDimensions().xy);
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
-    //random
-    float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
-    randGenState = uint(pcgHash(seed));
-    rseed = LightSeed.x;
-
-    //============================================= DI =============================================
-    DIReservoir spatDIReservoir;
-    spatDIReservoir.initialize();
-
     DIReservoir currDIReservoir = gDISpatialReservoirBufferSrc[serialIndex];
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand());
 
-    const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
-    const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
-    const float3 scatterPosition = gPositionBuffer[launchIndex.xy].xyz;
-    const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
-
-    //combine reservoirs (DI)
+    //combine reservoirs
     if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_REUSE_M_DI / 2)))
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
@@ -382,42 +361,14 @@ void spatialReuse() {
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
             const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
 
-            const bool isSimilar = isNearPosition && isNearNormal;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            const bool isSimilar = isNearPosition && isNearNormal;
             if(!isSimilar || (length(nearNormal) < 0.01))
             {
                 continue;
             }
-            const float nearUpdateW = nearDIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
-            combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand2(nearIndex.xy));
+            const float nearUpdateW = nearDIReservoir.W_sum;
+            combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand());
         }
-    }
-
-    LightSample lightSample;
-    rseed = spatDIReservoir.randomSeed;
-    sampleLightWithID(scatterPosition, spatDIReservoir.lightID, lightSample);
-    float3 biasedPosition = scatterPosition + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
-
-    //The term "FGL" must be recalculated
-    float3 lightNormal = lightSample.normal;
-    float3 wi = lightSample.directionToLight;
-    float receiverCos = dot(centerNormal, wi);
-    float emitterCos = dot(lightNormal, -wi);
-    const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
-    const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
-    const float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
-    const float3 wo = -normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
-    if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
-    {
-        MaterialParams material = decompressMaterialParams(gScreenSpaceMaterial[serialIndex]);
-        float4 bsdfPDF = computeBSDF_PDF(material, centerNormal, wo, wi);
-        float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
-        float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
-        spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
-    }
-
-    if(!isVisible(biasedPosition, lightSample))
-    {
-        recognizeAsShadowedReservoir(spatDIReservoir);
     }
 
     if(spatDIReservoir.M > MAX_REUSE_M_DI)
@@ -426,17 +377,19 @@ void spatialReuse() {
         spatDIReservoir.W_sum *= r;
         spatDIReservoir.M = MAX_REUSE_M_DI;
     }
+}
 
-    gDIReservoirBuffer[serialIndex] = spatDIReservoir;
-    
-    //============================================= GI =============================================
-    GIReservoir spatGIReservoir;
-    spatGIReservoir.initialize();
+void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos)
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    float2 dims = float2(DispatchRaysDimensions().xy);
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     GIReservoir currGIReservoir = gGISpatialReservoirBufferSrc[serialIndex];
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand());
 
-    //combine reservoirs (GI)
+    //combine reservoirs
     if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_REUSE_M_GI / 2)))
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
@@ -464,30 +417,15 @@ void spatialReuse() {
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
             const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
 
-            const bool isSimilar = isNearPosition && isNearNormal;//((nearDepth * 0.95 < centerDepth) && (centerDepth < nearDepth * 1.05));//5%
+            const bool isSimilar = isNearPosition && isNearNormal;
             if(!isSimilar || (length(nearNormal) < 0.01))
             {
                 continue;
             }
-            const float nearUpdateW = nearGIReservoir.W_sum;// * (spatDIReservoir.targetPDF / nearDIReservoir.targetPDF);
-            combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand2(nearIndex.xy));
+            const float nearUpdateW = nearGIReservoir.W_sum;
+            combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand());
         }
     }
-
-    MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
-    rseed = spatGIReservoir.randomSeed;
-    wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
-    float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
-
-    rseed = spatGIReservoir.randomSeed;
-    const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
-    const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
-    const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 
-
-    float cosine = abs(dot(wi, centerNormal));
-    float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
-
-    const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
 
     if(spatGIReservoir.M > MAX_REUSE_M_GI)
     {
@@ -495,11 +433,90 @@ void spatialReuse() {
         spatGIReservoir.W_sum *= r;
         spatGIReservoir.M = MAX_REUSE_M_GI;
     }
+}
 
-    //recalculated
-    if(isReEvaluateValid && !isIBLSample)
+[shader("raygeneration")]
+void spatialReuse() {
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    float2 dims = float2(DispatchRaysDimensions().xy);
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+
+    //random
+    float LightSeed = getLightRandomSeed();
+    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
+    randGenState = uint(pcgHash(seed));
+    rseed = LightSeed.x;
+
+    MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
+    const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
+    const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
+    const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
+
+    const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
+    const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
+    const float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
+    const float3 wo = -normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
+
+    //============================================= DI =============================================
+    DIReservoir spatDIReservoir;
+    spatDIReservoir.initialize();
+
+    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos);
+
+    //Reevaluation
     {
-        spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
+        LightSample lightSample;
+        rseed = spatDIReservoir.randomSeed;
+        sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample);
+        float3 biasedPosition = centerPos + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+
+        float3 lightNormal = lightSample.normal;
+        float3 wi = lightSample.directionToLight;
+        float receiverCos = dot(centerNormal, wi);
+        float emitterCos = dot(lightNormal, -wi);
+        if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
+        {
+            float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
+            float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+            float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+            spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
+        }
+
+        if(!isVisible(biasedPosition, lightSample))
+        {
+            recognizeAsShadowedReservoir(spatDIReservoir);
+        }
+    }
+
+    gDIReservoirBuffer[serialIndex] = spatDIReservoir;
+    
+    //============================================= GI =============================================
+    GIReservoir spatGIReservoir;
+    spatGIReservoir.initialize();
+
+    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos);
+
+    //Reevaluation
+    {
+        rseed = spatGIReservoir.randomSeed;
+        const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
+        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
+
+        rseed = spatGIReservoir.randomSeed;
+        const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
+        const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
+        const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 
+
+        float cosine = abs(dot(wi, centerNormal));
+        float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
+
+        const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
+
+        if(isReEvaluateValid && !isIBLSample)
+        {
+            spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
+        }
     }
 
     gGIReservoirBuffer[serialIndex] = spatGIReservoir;
