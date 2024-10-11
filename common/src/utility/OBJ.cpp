@@ -178,6 +178,9 @@ namespace utility {
 		//File Read End
 
 		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+			MaterialTbl[j].TriangleVertexTbl.reserve(MaterialTbl[j].TriangleVertexIDTbl.size());
+			MaterialTbl[j].QuadrangleVertexTbl.reserve(MaterialTbl[j].QuadrangleVertexIDTbl.size());
+
 			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
 				utility::VertexPNT Tri;
 				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
