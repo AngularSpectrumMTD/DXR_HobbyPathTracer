@@ -39,6 +39,7 @@ struct Payload
     uint compressedPrimaryBSDF;//for ReSTIR GI
     float primaryPDF;//for ReSTIR GI
     uint bsdfRandomSeed;//for ReSTIR GI
+    uint randomSeed;
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
@@ -51,6 +52,7 @@ struct PhotonPayload
     float lambdaNM;
     float2 randomUV;
     uint flags;
+    uint randomSeed;
 };
 
 struct TriangleIntersectionAttributes
@@ -166,19 +168,27 @@ void setCaustics(in float3 color)
 //Random
 ////////////////////////////////////
 
-static uint rseed;
-float rand()//0-1
-{
-    rseed += 1.0;
-    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() % 100 + 1) * 0.001 + rseed + getLightRandomSeed()) * 43758.5453);
-}
-
-static uint randGenState;
 uint pcgHash(uint seed)
 {
     uint state = seed * 747796405u + 2891336453u;
     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u; 
     return (word >> 22u) ^ word;
+}
+
+//this value must be determined by randomState only
+float rand(inout uint randomState)//0-1
+{
+    randomState += 1.0;
+    //return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() % 100 + 1) * 0.001 + randomState + getLightRandomSeed()) * 43758.5453);
+    return frac(sin(dot(uint2(randomState, randomState), float2(12.9898, 78.233)) * 0.0001 + randomState % 100) * 43758.5453);
+}
+
+uint generateRandomInitialRandomSeed(uint2 xy)
+{
+    const uint frameValue = 100000 * frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + getLightRandomSeed()) * 43758.5453);
+    const uint baseValue = pcgHash(frameValue) % 10000;
+    const uint compositeValue = pcgHash(getLightRandomSeed() + 100) % 1000;
+    return baseValue + compositeValue + getLightRandomSeed();
 }
 
 ////////////////////////////////////

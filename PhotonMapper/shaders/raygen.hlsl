@@ -103,10 +103,7 @@ void rayGen() {
     }
 
     //random
-    float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
-    randGenState = uint(pcgHash(seed));
-    rseed = LightSeed.x;
+    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy);
 
     const float energyBoost = 1.0f;
     
@@ -133,6 +130,7 @@ void rayGen() {
         payload.T = 0;
         payload.compressedPrimaryBSDF = 0u;
         payload.primaryPDF = 1;
+        payload.randomSeed = randomSeed;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -164,7 +162,7 @@ void rayGen() {
     const float p_hat = computeLuminance(elem);
     const float updateW = p_hat / primaryPDF;
 
-    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, F32x3toU32(elem), giSample, compressedMaterial, 1u, rand());
+    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, F32x3toU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
 
     setGIReservoir(giReservoir);
 
@@ -273,9 +271,7 @@ void photonEmitting()
     uint3 dispatchDimensions = DispatchRaysDimensions();
     
     //random
-    float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint)LightSeed.x) * launchIndex.y);
-    randGenState = uint(pcgHash(seed));
+    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy);
 
     PhotonInfo photon;
     photon.compressedThroughput = 0u;
@@ -291,15 +287,15 @@ void photonEmitting()
 
     float2 randomUV = 0.xx;
     float pdf = 0;
-    sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV,  pdf);
+    sampleLightEmitDirAndPosition(emitDir, emitOrigin, randomUV,  pdf, randomSeed);
 
     const float2 origRandomUV = randomUV;
 
-    const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randGenState % LAMBDA_NUM);
+    const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randomSeed % LAMBDA_NUM);
     const float flutter = 0.1f;
-    const float2 guidedUV = rand() < flutter ? origRandomUV : emissionGuiding(randomUV);
+    const float2 guidedUV = rand(randomSeed) < flutter ? origRandomUV : emissionGuiding(randomUV);
 
-    sampleLightEmitDirAndPositionWithRandom(emitDir, emitOrigin, guidedUV);
+    sampleLightEmitDirAndPositionWithRandom(emitDir, emitOrigin, guidedUV, randomSeed);
 
     RayDesc nextRay;
     nextRay.Origin = emitOrigin;
@@ -313,6 +309,7 @@ void photonEmitting()
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
     payload.randomUV = origRandomUV;
+    payload.randomSeed = randomSeed;
 
     RAY_FLAG flags = RAY_FLAG_NONE;
 
@@ -323,7 +320,7 @@ void photonEmitting()
 
 #define SPATIAL_REUSE_NUM 4
 
-void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos)
+void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -331,15 +328,15 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     DIReservoir currDIReservoir = gDISpatialReservoirBufferSrc[serialIndex];
-    combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand());
+    combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
     if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_REUSE_M_DI / 2)))
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
-            const float r = rand() * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : getReservoirSpatialReuseNum());
-            const float v = rand();
+            const float r = rand(randomSeed) * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : getReservoirSpatialReuseNum());
+            const float v = rand(randomSeed);
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
             sincos(phi, sc.x, sc.y);
@@ -367,7 +364,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
                 continue;
             }
             const float nearUpdateW = nearDIReservoir.W_sum;
-            combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand());
+            combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand(randomSeed));
         }
     }
 
@@ -379,7 +376,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     }
 }
 
-void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos)
+void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -387,15 +384,15 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     GIReservoir currGIReservoir = gGISpatialReservoirBufferSrc[serialIndex];
-    combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand());
+    combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
     if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_REUSE_M_GI / 2)))
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
-            const float r = rand() * ((currGIReservoir.M > (MAX_REUSE_M_GI / 4)) ? 1 : 2);
-            const float v = rand();
+            const float r = rand(randomSeed) * ((currGIReservoir.M > (MAX_REUSE_M_GI / 4)) ? 1 : 2);
+            const float v = rand(randomSeed);
             const float phi = 2.0f * PI * v;
             float2 sc = 0.xx;
             sincos(phi, sc.x, sc.y);
@@ -423,7 +420,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
                 continue;
             }
             const float nearUpdateW = nearGIReservoir.W_sum;
-            combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand());
+            combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand(randomSeed));
         }
     }
 
@@ -443,10 +440,7 @@ void spatialReuse() {
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     //random
-    float LightSeed = getLightRandomSeed();
-    uint seed = (launchIndex.x + (DispatchRaysDimensions().x + 100000 * (uint) LightSeed.x) * launchIndex.y);
-    randGenState = uint(pcgHash(seed));
-    rseed = LightSeed.x;
+    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy);
 
     MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
     const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
@@ -462,13 +456,13 @@ void spatialReuse() {
     DIReservoir spatDIReservoir;
     spatDIReservoir.initialize();
 
-    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos);
+    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed);
 
     //Reevaluation
     {
         LightSample lightSample;
-        rseed = spatDIReservoir.randomSeed;
-        sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample);
+        uint replayRandomSeed = spatDIReservoir.randomSeed;
+        sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample, replayRandomSeed);
         float3 biasedPosition = centerPos + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
 
         float3 lightNormal = lightSample.normal;
@@ -477,7 +471,7 @@ void spatialReuse() {
         float emitterCos = dot(lightNormal, -wi);
         if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
         {
-            float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
+            float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
             float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
             float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
             spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
@@ -495,15 +489,13 @@ void spatialReuse() {
     GIReservoir spatGIReservoir;
     spatGIReservoir.initialize();
 
-    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos);
+    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed);
 
     //Reevaluation
     {
-        rseed = spatGIReservoir.randomSeed;
         const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
-        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi);
+        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
 
-        rseed = spatGIReservoir.randomSeed;
         const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
         const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
         const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 

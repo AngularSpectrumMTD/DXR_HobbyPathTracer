@@ -62,10 +62,10 @@ void swapFloat3(inout float3 v0, inout float3 v1)
     v1 = tmp;
 }
 
-BSSRDFSample sampleBSSRDF(float3 position, float3 normal, float3 d, float rMax)
+BSSRDFSample sampleBSSRDF(float3 position, float3 normal, float3 d, float rMax, inout uint randomSeed)
 {
-    float u0 = rand();
-    float u1 = rand();
+    float u0 = rand(randomSeed);
+    float u1 = rand(randomSeed);
 
     float axisSelectionPMF[3] = { BSSRDF_PMF_AXIS };
     float3 axis[3];
@@ -102,8 +102,8 @@ BSSRDFSample sampleBSSRDF(float3 position, float3 normal, float3 d, float rMax)
         selectedD = d.z;
     }
 
-    float phi = 2 * PI * rand();
-    float r = sample_r_BSSRDF(rand(), selectedD);
+    float phi = 2 * PI * rand(randomSeed);
+    float r = sample_r_BSSRDF(rand(randomSeed), selectedD);
     float x = r * cos(phi);
     float y = r * sin(phi);
     float3 offset = rMax * axis[0] + x * axis[1] + y * axis[2];
@@ -163,7 +163,7 @@ void computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
     float rMax = sample_r_BSSRDF(1.0f, max(d.x, max(d.y, d.z)));
     
     BSSRDFSample bssrdfSample;
-    bssrdfSample = sampleBSSRDF(scatterPosition, normal, d, rMax);
+    bssrdfSample = sampleBSSRDF(scatterPosition, normal, d, rMax, payload.randomSeed);
 
     Payload sssPayload;
     sssPayload.flags = 0;

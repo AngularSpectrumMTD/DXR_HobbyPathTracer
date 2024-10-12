@@ -232,7 +232,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     nextRay.Direction = 0.xxx;
     float3 photon = 0.xxx;
     const float select = 0.25f / (max(1, payload.recursive));
-    if((payload.recursive < 3) && (rand() < select))
+    if((payload.recursive < 3) && (rand(payload.randomSeed) < select))
     {
         const float pdf = select;
         photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal) / pdf;
@@ -270,7 +270,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.randomSeed, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {

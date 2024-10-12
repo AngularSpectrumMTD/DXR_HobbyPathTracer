@@ -22,15 +22,14 @@ float3 worldToTangent(float3 N, float3 worldSpaceVec)
     return normalize(float3(dot(tangent, worldSpaceVec), dot(bitangent, worldSpaceVec), dot(N, worldSpaceVec)));
 }
 
-float3 HemisphereORCosineSampling(float3 N, bool isHemi, out float2 randomUV)
+float3 HemisphereORCosineSampling(float3 N, bool isHemi, inout uint randomSeed)
 {
-    float u = rand();
-    float v = rand();
+    float u = rand(randomSeed);
+    float v = rand(randomSeed);
     float cosT = isHemi ? u : sqrt(u);
     float sinT = sqrt(1 - cosT * cosT);
     float P = 2 * PI * v;
     float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
-    randomUV = float2(u, v);
 
     return tangentToWorld(N, tangentDir);
 }
@@ -47,11 +46,11 @@ float3 HemisphereORCosineSamplingWithRandom(float3 N, bool isHemi, in float2 ran
     return tangentToWorld(N, tangentDir);
 }
 
-float3 GGX_ImportanceSampling(float3 N, float roughness)
+float3 GGX_ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
 {
     float alpha = roughness * roughness;
-    float randX = rand();
-    float randY = rand();
+    float randX = rand(randomSeed);
+    float randY = rand(randomSeed);
 
     float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
     float sinT = sqrt(1 - cosT * cosT);
@@ -62,10 +61,10 @@ float3 GGX_ImportanceSampling(float3 N, float roughness)
     return tangentToWorld(N, tangentDir);
 }
 
-float3 ImportanceSampling(float3 N, float roughness)
+float3 ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
 {
-    float u = rand();
-    float v = rand();
+    float u = rand(randomSeed);
+    float v = rand(randomSeed);
     float a = roughness * roughness;
     float th = atan(a * sqrt(u) / sqrt(1 - u));
     float ph = 2 * PI * v;

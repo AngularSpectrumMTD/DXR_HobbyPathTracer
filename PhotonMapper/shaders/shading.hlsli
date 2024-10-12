@@ -153,7 +153,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         setGIReservoir(giReservoir);
     }
 
-    const uint currentSeed = rseed;
+    const uint currentSeed = payload.randomSeed;
     {
         nextRay.TMin = RAY_MIN_T;
         nextRay.TMax = RAY_MAX_T;
@@ -161,8 +161,8 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
         const float eps = 0.001;
         const float3 wo_global = -WorldRayDirection();
 
-        const float roulette = rand();
-        const float blending = rand();
+        const float roulette = rand(payload.randomSeed);
+        const float blending = rand(payload.randomSeed);
         const float probability = 1 - material.transRatio;
 
         float3 wo_local = worldToTangent(N_global, wo_global);
@@ -184,8 +184,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             
             if (roulette < diffRatio)//diffuse
             {
-                float2 randomUV = 0.xx;
-                L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
+                L_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed);
             }
             else //specular
             {
@@ -195,8 +194,8 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
 
                 const float a = material.roughness * material.roughness;
                 float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
-                float phi = 2 * PI * rand();
-                float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
+                float phi = 2 * PI * rand(payload.randomSeed);
+                float z = (1 - rand(payload.randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
                 float R = sqrt(saturate(1 - z * z));
                 float2 sincosXY = 0.xx;
                 sincos(phi, sincosXY.x, sincosXY.y);
@@ -243,7 +242,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
             float3 V_local = normalize(wo_local);
-            const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+            const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness, payload.randomSeed);
 
             float3 L_local = 0.xxx;
 
@@ -286,7 +285,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
     }
 }
 
-void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, in float wavelength = 0)
+void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, inout uint randomSeed, in float wavelength = 0)
 {
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
@@ -295,8 +294,8 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
     const float3 wo_global = -WorldRayDirection();
     const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
-    const float roulette = rand();
-    const float blending = rand();
+    const float roulette = rand(randomSeed);
+    const float blending = rand(randomSeed);
     const float probability = 1 - material.transRatio;
 
     float3 wo_local = worldToTangent(N_global, wo_global);
@@ -318,8 +317,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         
         if (roulette < diffRatio)//diffuse
         {
-            float2 randomUV = 0.xx;
-            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomUV);
+            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomSeed);
         }
         else //specular
         {
@@ -329,8 +327,8 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
 
             const float a = material.roughness * material.roughness;
             float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
-            float phi = 2 * PI * rand();
-            float z = (1 - rand()) * (1 + Vh_local.z) - Vh_local.z;
+            float phi = 2 * PI * rand(randomSeed);
+            float z = (1 - rand(randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
             float R = sqrt(saturate(1 - z * z));
             float2 sincosXY = 0.xx;
             sincos(phi, sincosXY.x, sincosXY.y);
@@ -396,14 +394,14 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
     }
 }
 
-float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, in float wavelength = 0)
+float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
 
     const float eps = 0.001;
 
-    const float roulette = rand();
-    const float blending = rand();
+    const float roulette = rand(randomSeed);
+    const float blending = rand(randomSeed);
     const float probability = 1 - material.transRatio;
 
     float3 wo_local = worldToTangent(N_global, wo_global);
@@ -439,7 +437,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
         float3 V_local = normalize(wo_local);
-        const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness);
+        const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
 
         //compute bsdf    V : wo   L : wi(sample)
         BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, true, isFromOutside);
@@ -448,7 +446,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum, inout uint randomSeed)
 {
     const uint M = min(getLightNum(), maxCandidatesNum);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
@@ -458,15 +456,15 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
 
     for (int i = 0; i < M; i++)
     {
-        const uint lightID = getRandomLightID();
-        const uint replayRandomSeed = rseed;
-        sampleLightWithID(scatterPosition, lightID, lightSample);
+        const uint lightID = getRandomLightID(randomSeed);
+        const uint replayRandomSeed = randomSeed;
+        sampleLightWithID(scatterPosition, lightID, lightSample, randomSeed);
 
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
         float receiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+        float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -474,13 +472,13 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         p_hat = computeLuminance(FGL);
         float updateW = p_hat / pdf;
 
-        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, F32x3toU32(p_hat_3F), 1u, rand());
+        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, F32x3toU32(p_hat_3F), 1u, rand(randomSeed));
     }
-    rseed = reservoir.randomSeed;
-    sampleLightWithID(scatterPosition, reservoir.lightID, lightSample);
+    uint replaySeed = reservoir.randomSeed;
+    sampleLightWithID(scatterPosition, reservoir.lightID, lightSample, replaySeed);
 }
 
-float3 performNEE(in Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS)
+float3 performNEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseStreamingRIS())
@@ -500,20 +498,20 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
 
         if(isSSSExecutable(material))
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, payload.randomSeed);
             visibility = isVisible(scatterPosition, lightSample);
 
             if(!visibility)
             {
-                rseed = reservoir.randomSeed;
-                sampleLightWithID(originalScatterPositionForSSS, reservoir.lightID, lightSample);
+                uint reservoirRandomSeed = reservoir.randomSeed;
+                sampleLightWithID(originalScatterPositionForSSS, reservoir.lightID, lightSample, reservoirRandomSeed);
 
                 //recomputation
                 float3 lightNormal = lightSample.normal;
                 float3 wi = lightSample.directionToLight;
                 float receiverCos = dot(surfaceNormal, wi);
                 float emitterCos = dot(lightNormal, -wi);
-                float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+                float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, reservoirRandomSeed);
                 float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
                 float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -522,7 +520,7 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, payload.randomSeed);
             visibility = isVisible(scatterPosition, lightSample);
         }
 
@@ -539,14 +537,14 @@ float3 performNEE(in Payload payload, in MaterialParams material, in float3 scat
     {
         //explicitly connect to light source
         LightSample lightSample;
-        sampleLight(scatterPosition, lightSample);
+        sampleLight(scatterPosition, lightSample, payload.randomSeed);
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
         float receiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
         if (isVisible(scatterPosition, lightSample) && (receiverCos > 0) && (emitterCos > 0))
         {
-            float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi);
+            float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, payload.randomSeed);
             float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
             float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
             estimatedColor = FGL;
@@ -569,7 +567,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
     }
     else
     {
-        isIntersect = intersectLightWithCurrentRay(Le);
+        isIntersect = intersectLightWithCurrentRay(Le, payload.randomSeed);
     }
 
     if (isUseNEE(material))

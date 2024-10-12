@@ -173,6 +173,7 @@ private:
         u32 compressedPrimaryBSDF;//for ReSTIR GI
         f32 primaryPDF;//for ReSTIR GI
         u32 bsdfRandomSeed;//for ReSTIR GI
+        u32 randomSeed;
     };
 
     struct PhotonPayload
@@ -182,6 +183,7 @@ private:
         f32 lambdaNM;
         float2 randomUV;
         u32 flags;
+        u32 randomSeed;
     };
 
     struct TriangleIntersectionAttributes

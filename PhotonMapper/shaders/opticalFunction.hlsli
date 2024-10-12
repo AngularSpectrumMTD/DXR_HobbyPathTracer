@@ -18,9 +18,9 @@ bool isPrimarySurfaceHasHighPossibilityCausticsGenerate(in PhotonPayload payload
     return (payload.flags & PHOTON_PAYLOAD_BIT_MASK_IS_PRIMARY_SURFACE_HAS_HIGH_POSSIBILITY_GENERATE_CAUSTICS);
 }
 
-bool isPhotonStoreRequired(in MaterialParams params, PhotonPayload payload)
+bool isPhotonStoreRequired(in MaterialParams params, inout PhotonPayload payload)
 {
-    return (rand() < params.roughness) && (params.transRatio == 0);
+    return (rand(payload.randomSeed) < params.roughness) && (params.transRatio == 0);
 }
 
 void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
@@ -30,9 +30,9 @@ void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
     bitangent = cross(normal, tangent);
 }
 
-uint getRandomLightID()
+uint getRandomLightID(inout uint randomSeed)
 {
-    return min(max(0, (uint) (rand() * (getLightNum()) + 0.5)), getLightNum() - 1);
+    return min(max(0, (uint) (rand(randomSeed) * (getLightNum()) + 0.5)), getLightNum() - 1);
 }
 
 #include "reservoir.hlsli"

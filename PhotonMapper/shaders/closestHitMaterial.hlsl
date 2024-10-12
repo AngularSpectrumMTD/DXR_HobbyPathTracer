@@ -118,7 +118,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     float3 photon = 0.xxx;
     const float select = 0.25f / (max(1, payload.recursive));
-    if((payload.recursive < 3) && (rand() < select))
+    if((payload.recursive < 3) && (rand(payload.randomSeed) < select))
     {
         const float pdf = select;
         photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal) / pdf;
@@ -155,7 +155,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.randomSeed, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {
