@@ -184,7 +184,8 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             
             if (roulette < diffRatio)//diffuse
             {
-                L_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed);
+                float2 dummy = 0.xx;
+                L_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed, dummy);
             }
             else //specular
             {
@@ -317,7 +318,8 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         
         if (roulette < diffRatio)//diffuse
         {
-            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomSeed);
+            float2 dummy = 0.xx;
+            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomSeed, dummy);
         }
         else //specular
         {

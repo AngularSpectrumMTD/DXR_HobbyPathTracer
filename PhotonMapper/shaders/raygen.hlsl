@@ -295,7 +295,7 @@ void photonEmitting()
     const float flutter = 0.1f;
     const float2 guidedUV = rand(randomSeed) < flutter ? origRandomUV : emissionGuiding(randomUV);
 
-    sampleLightEmitDirAndPositionWithRandom(emitDir, emitOrigin, guidedUV, randomSeed);
+    sampleLightEmitDirAndPositionWithUV(emitDir, emitOrigin, guidedUV, randomSeed);
 
     RayDesc nextRay;
     nextRay.Origin = emitOrigin;

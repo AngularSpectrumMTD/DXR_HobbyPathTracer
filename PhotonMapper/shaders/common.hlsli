@@ -183,6 +183,12 @@ float rand(inout uint randomState)//0-1
     return frac(sin(dot(uint2(randomState, randomState), float2(12.9898, 78.233)) * 0.0001 + randomState % 100) * 43758.5453);
 }
 
+float randHighFreq(inout uint randomState)//0-1
+{
+    randomState += 1.0;
+    return frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() % 100 + 1) * 0.001 + randomState + getLightRandomSeed()) * 43758.5453);
+}
+
 uint generateRandomInitialRandomSeed(uint2 xy)
 {
     const uint frameValue = 100000 * frac(sin(dot(DispatchRaysIndex().xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + getLightRandomSeed()) * 43758.5453);
