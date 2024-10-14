@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Room;
 
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -94,7 +94,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
-    mIsUseReservoirTemporalReuse = true;
+    mIsUseReservoirTemporalReuse = false;
     mIsUseReservoirSpatialReuse = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
@@ -148,8 +148,6 @@ void DxrPhotonMapper::Setup()
             {
                 mOBJFileName = "sponza.obj";
                 mOBJFolderName = "model/sponza";
-                //mOBJFileName = "roomTest.obj";
-                //mOBJFolderName = "model/roomTest";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
                 mStageOffsetX = 0.0f;
                 mStageOffsetY = 0.0f;
@@ -288,6 +286,29 @@ void DxrPhotonMapper::Setup()
             mIsSpotLightPhotonMapper = false;
         }
         break;
+        case SceneType_Room:
+        {
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 29.0f; mThetaDirectional = 280.0f;
+            mInitEyePos = XMFLOAT3(-19.869f, 11.952, 24.44f);
+            mInitTargetPos = XMFLOAT3(1.06, 3.59, -3.75f);
+
+            mOBJFileName = "roomTestExp.obj";
+            mOBJFolderName = "model/roomTestExp";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = 1.59f; mLightPosY = 9.8f; mLightPosZ = 3.19f;
+            mPhi = 413.0f; mTheta = 242.0f;
+            mLightRange = 0.79f;
+
+            mGlassModelType = ModelType_Afrodyta;
+        }
+        break;
     }
 
 #ifdef GI_TEST
@@ -341,7 +362,8 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/buddha/deciBuddha.obj";//test
         mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(15, 15, 15);//test
+        //mGlassObjScale = XMFLOAT3(15, 15, 15);//test
+        mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);//test
     }
     break;
     case ModelType::ModelType_Teapot:
@@ -422,6 +444,10 @@ void DxrPhotonMapper::Setup()
         mOBJ0FileName = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
         mGlassObjYOfsset = 8;
         mGlassObjScale = XMFLOAT3(0.1f, 0.1f, 0.1f);
+        if (mSceneType == SceneType_Room)
+        {
+            mGlassObjScale = XMFLOAT3(0.02f, 0.02f, 0.02f);
+        }
     }
     break;
     case  ModelType::ModelType_Rock:
