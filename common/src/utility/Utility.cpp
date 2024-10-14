@@ -147,6 +147,21 @@ namespace utility {
         ComPtr<ID3D12Device> device;
         rdevice->GetDevice().As(&device);
         CreateTexture(device.Get(), metadata, &texRes);
+
+        if (texRes == nullptr)
+        {
+            OutputDebugString(L"Texture Load Missed.\n");
+            if (!isNoExeption)
+            {
+                throw std::runtime_error("Texture Load Missed.");
+            }
+            else
+            {
+                utility::TextureResource nullRes;
+                return nullRes;
+            }
+        }
+
         texRes->SetName(fileName.c_str());
 
         ComPtr<ID3D12Resource> srcBuffer;

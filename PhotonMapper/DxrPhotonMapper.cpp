@@ -148,6 +148,8 @@ void DxrPhotonMapper::Setup()
             {
                 mOBJFileName = "sponza.obj";
                 mOBJFolderName = "model/sponza";
+                //mOBJFileName = "roomTest.obj";
+                //mOBJFolderName = "model/roomTest";
                 mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
                 mStageOffsetX = 0.0f;
                 mStageOffsetY = 0.0f;
