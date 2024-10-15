@@ -292,8 +292,8 @@ void DxrPhotonMapper::Setup()
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
             mPhiDirectional = 29.0f; mThetaDirectional = 280.0f;
-            mInitEyePos = XMFLOAT3(-19.869f, 11.952, 24.44f);
-            mInitTargetPos = XMFLOAT3(1.06, 3.59, -3.75f);
+            mInitEyePos = XMFLOAT3(-19.37f, 4.63, 23.92f);
+            mInitTargetPos = XMFLOAT3(0.085, 4.22, -6.42f);
 
             mOBJFileName = "roomTestExp.obj";
             mOBJFolderName = "model/roomTestExp";
