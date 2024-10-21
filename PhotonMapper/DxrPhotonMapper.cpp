@@ -21,7 +21,7 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
-//#define USE_SPATIAL_RESERVOIR_FEEDBACK
+#define USE_SPATIAL_RESERVOIR_FEEDBACK
 
 //#define CUBE_TEST
 
@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Room;
+    mSceneType = SceneType_Sponza;
 
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -94,7 +94,7 @@ void DxrPhotonMapper::Setup()
     mCubeMapTextureFileName = L"model/SkyEquirec.png";
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
-    mIsUseReservoirTemporalReuse = false;
+    mIsUseReservoirTemporalReuse = true;
     mIsUseReservoirSpatialReuse = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
@@ -291,9 +291,9 @@ void DxrPhotonMapper::Setup()
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
-            mPhiDirectional = 29.0f; mThetaDirectional = 280.0f;
-            mInitEyePos = XMFLOAT3(-19.37f, 4.63, 23.92f);
-            mInitTargetPos = XMFLOAT3(0.085, 4.22, -6.42f);
+            mPhiDirectional = 41.0f; mThetaDirectional = 245.0f;
+            mInitEyePos = XMFLOAT3(-7.69f, 4.48, 18.3f);
+            mInitTargetPos = XMFLOAT3(23.13, 3.66, -0.34f);
 
             mOBJFileName = "roomTestExp.obj";
             mOBJFolderName = "model/roomTestExp";
@@ -302,8 +302,9 @@ void DxrPhotonMapper::Setup()
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
 
-            mLightPosX = 1.59f; mLightPosY = 9.8f; mLightPosZ = 3.19f;
-            mPhi = 413.0f; mTheta = 242.0f;
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
             mLightRange = 0.79f;
 
             mGlassModelType = ModelType_Afrodyta;
@@ -1022,15 +1023,19 @@ void DxrPhotonMapper::Draw()
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
         D3D12_RESOURCE_BARRIER copyReservoirBarrier2[] = {
             CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
-            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE)
+            CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
+            CD3DX12_RESOURCE_BARRIER::Transition(mGIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
+            CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE)
         };
         mCommandList->ResourceBarrier(u32(_countof(copyReservoirBarrier2)), copyReservoirBarrier2);
         mCommandList->CopyResource(mDIReservoirPingPongTbl[curr].Get(), mDISpatialReservoirPingPongTbl[finalSpatialID].Get());
+        mCommandList->CopyResource(mGIReservoirPingPongTbl[curr].Get(), mGISpatialReservoirPingPongTbl[finalSpatialID].Get());
 #endif
 
         D3D12_RESOURCE_BARRIER UAVToSRVReservoirBarrier[] = {
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
            CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
+           CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS), //feedback
  #endif
             CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mGISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),

@@ -19,21 +19,15 @@ StructuredBuffer<GIReservoir> GIReservoirBufferSrc : register(t6);
 RWStructuredBuffer<DIReservoir> DIReservoirBufferDst : register(u0);
 RWStructuredBuffer<GIReservoir> GIReservoirBufferDst : register(u1);
 
-static uint rseed;
-
 //restrict
 bool isWithinBounds(int2 id, int2 size)
 {
     return ((0 <= id.x) && (id.x <= (size.x - 1))) && ((0 <= id.y) && (id.y <= (size.y - 1)));
 }
 
-float rand(in int2 indexXY)//0-1
-{
-    rseed += 1.0;
-    return frac(sin(dot(indexXY.xy, float2(12.9898, 78.233)) * (getLightRandomSeed() + 1) * 0.001 + rseed) * 43758.5453);
-}
+#include "randomUtility.hlsli"
 
-void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, in uint2 randID)
+void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, inout uint randomState)
 {
     //Limitting
     if(prevDIReservoir.M > MAX_REUSE_M_DI)
@@ -48,14 +42,14 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
     //combine reservoirs
     {
         const float currUpdateW = currDIReservoir.W_sum;
-        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(randID));
+        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(randomState));
         const float prevUpdateW = prevDIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
-        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(randID));
+        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(randomState));
     }
     currDIReservoir = tempDIReservoir;
 }
 
-void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, in uint2 randID)
+void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, inout uint randomState)
 {
     //Limitting
     if(prevGIReservoir.M > MAX_REUSE_M_GI)
@@ -70,9 +64,9 @@ void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir 
     //combine reservoirs
     {
         const float currUpdateW = currGIReservoir.W_sum;
-        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(randID));
+        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(randomState));
         const float prevUpdateW = prevGIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
-        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(randID));
+        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(randomState));
     }
     currGIReservoir = tempGIReservoir;
 }
@@ -80,7 +74,7 @@ void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir 
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
-    rseed = getLightRandomSeed();
+    uint randomState = generateRandomInitialRandomSeed(dtid.xy);
     int2 dims;
     NormalDepthBuffer.GetDimensions(dims.x, dims.y);
 
@@ -108,12 +102,12 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
             float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
             const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
-            if(isTemporalReuseEnable)
+            if(isTemporalReuseEnable && (abs(currID.x - prevID.x) <= 1) && (abs(currID.y - prevID.y) <= 1))
             {
                 DIReservoir prevDIReservoir = DIReservoirBufferSrc[serialPrevID];
-                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, randID);
+                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, randomState);
                 GIReservoir prevGIReservoir = GIReservoirBufferSrc[serialPrevID];
-                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, randID);
+                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, randomState);
             }
         }
 

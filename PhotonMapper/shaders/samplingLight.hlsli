@@ -114,22 +114,10 @@ void sampleSpotLight(in LightGenerateParam lightGen, in float3 scatterPosition, 
     lightSample.pdf = 1 / (PI * lenU * lenV);
 }
 
-float3 coneSample(float3 N, float cosMax, inout uint randomSeed)
+float3 coneSample(float3 N, float cosMax, inout uint randomSeed, inout float2 randomUV)
 {
     float u = rand(randomSeed);
     float v = rand(randomSeed);
-    float ct = 1 - u * (1 - cosMax);
-    float st = sqrt(1 - ct * ct);
-    float phi = 2 * PI * v;
-    float2 csp;
-    sincos(phi, csp.x, csp.y);
-    return tangentToWorld(N, float3(st * csp.x, st * csp.y, ct));
-}
-
-float3 coneSampleHighFreq(float3 N, float cosMax, inout uint randomSeed, out float2 randomUV)
-{
-    float u = randHighFreq(randomSeed);
-    float v = randHighFreq(randomSeed);
     randomUV = float2(u, v);
     float ct = 1 - u * (1 - cosMax);
     float st = sqrt(1 - ct * ct);
@@ -156,7 +144,8 @@ void sampleDirectionalLight(in LightGenerateParam lightGen, in float3 scatterPos
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
 
     float3 fromLight = normalize(lightGen.positionORDirection);
-    float3 emit = coneSample(fromLight, cosMax, randomSeed);
+    float2 dummy = 0.xx;
+    float3 emit = coneSample(fromLight, cosMax, randomSeed, dummy);
     
     lightSample.type = LIGHT_TYPE_DIRECTIONAL;
     lightSample.directionToLight = -normalize(emit);
@@ -180,8 +169,8 @@ void sampleSphereLightEmitDirAndPositionWithUV(in LightGenerateParam lightGen, o
 
 void sampleRectLightEmitDirAndPosition(in LightGenerateParam lightGen, out float3 emitDir, out float3 position, inout uint randomSeed, out float2 randomUV)
 {
-    float u = randHighFreq(randomSeed);
-    float v = randHighFreq(randomSeed);
+    float u = rand(randomSeed);
+    float v = rand(randomSeed);
     randomUV = float2(u, v);
     float rnd0 = (u - 0.5) * 2; //-1 to 1
     float rnd1 = (v - 0.5) * 2; //-1 to 1
@@ -205,7 +194,7 @@ void sampleSpotLightEmitDirAndPosition(in LightGenerateParam lightGen, out float
 {
     const float3 dominantDir = normalize(cross(lightGen.U, lightGen.V));
     const float cosMax = atan2(length(lightGen.U), LIGHT_BASE_LENGTH);
-    emitDir = coneSampleHighFreq(dominantDir, cosMax, randomSeed, randomUV);
+    emitDir = coneSample(dominantDir, cosMax, randomSeed, randomUV);
     position = lightGen.positionORDirection;
 }
 
@@ -221,7 +210,7 @@ void sampleDirectionalLightEmitDirAndPosition(in LightGenerateParam lightGen, ou
 {
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
     float3 fromLight = normalize(lightGen.positionORDirection);
-    emitDir = coneSampleHighFreq(fromLight, cosMax, randomSeed, randomUV);
+    emitDir = coneSample(fromLight, cosMax, randomSeed, randomUV);
     position = 100 * -emitDir;
 }
 

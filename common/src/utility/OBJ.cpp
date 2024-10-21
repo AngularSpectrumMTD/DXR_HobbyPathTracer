@@ -2,6 +2,9 @@
 #include <codecvt>
 
 #define PREPARE_ELEMENTS 10000
+#define REINTERPRET_GLASS_MATERIAL_NAME "ReinterpretGlass"
+#define REINTERPRET_MIRROR_MATERIAL_NAME "ReinterpretMirror"
+#define MIN_ROUGHNESS 0.05f
 
 namespace utility {
 	OBJ_MODEL::OBJ_MODEL() {
@@ -185,7 +188,7 @@ namespace utility {
 				utility::VertexPNT Tri;
 				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
 				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
-				if (uv.size() > 0)
+				if (uv.size() > 0 && (MaterialTbl[j].TriangleUVIDTbl.size() > 0))
 				{
 					Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
 				}
@@ -565,6 +568,21 @@ namespace utility {
 				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
 				mparams.transColor = XMVectorSet(0, 0, 0, 0);
 				mparams.isSSSExecutable = 0;
+
+				if (std::strcmp(m.MaterialName.c_str(), REINTERPRET_MIRROR_MATERIAL_NAME) == 0)
+				{
+					mparams.metallic = 1;
+					mparams.roughness = MIN_ROUGHNESS;
+				}
+				if (std::strcmp(m.MaterialName.c_str(), REINTERPRET_GLASS_MATERIAL_NAME) == 0)
+				{
+					mparams.transRatio = 1;
+					mparams.transColor = mparams.albedo;
+					mparams.roughness = MIN_ROUGHNESS;
+				}
+
+				mparams.roughness = max(mparams.roughness, MIN_ROUGHNESS);
+
 				m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 				device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
 

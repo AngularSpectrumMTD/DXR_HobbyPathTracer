@@ -161,6 +161,9 @@
     <None Include="shaders\compressionUtility.hlsli">
       <Filter>ソース ファイル\shaders</Filter>
     </None>
+    <None Include="shaders\randomUtility.hlsli">
+      <Filter>ソース ファイル\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\A-trous.hlsl">
