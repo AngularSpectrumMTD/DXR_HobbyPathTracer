@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Room;
 
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -363,8 +363,8 @@ void DxrPhotonMapper::Setup()
     {
         mOBJ0FileName = L"model/buddha/deciBuddha.obj";//test
         mGlassObjYOfsset = 5;
-        //mGlassObjScale = XMFLOAT3(15, 15, 15);//test
-        mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);//test
+        mGlassObjScale = XMFLOAT3(15, 15, 15);//test
+        //mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);//test
     }
     break;
     case ModelType::ModelType_Teapot:

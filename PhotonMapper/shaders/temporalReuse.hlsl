@@ -74,9 +74,9 @@ void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir 
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
-    uint randomState = generateRandomInitialRandomSeed(dtid.xy);
     int2 dims;
     NormalDepthBuffer.GetDimensions(dims.x, dims.y);
+    uint randomState = generateRandomInitialRandomSeed(dtid.xy, dims.x);
 
     uint2 currID = dtid.xy;
     uint2 randID = currID;
