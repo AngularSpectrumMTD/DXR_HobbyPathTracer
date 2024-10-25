@@ -269,7 +269,6 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
             const float cosine = max(0, abs(L_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-            payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
 
             if(isDirectRay(payload))
             {
