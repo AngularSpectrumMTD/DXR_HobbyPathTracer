@@ -293,7 +293,7 @@ void DxrPhotonMapper::Setup()
             const bool isAfrodytaTest = true;
             mPhiDirectional = 41.0f; mThetaDirectional = 245.0f;
             mInitEyePos = XMFLOAT3(-7.69f, 4.48, 18.3f);
-            mInitTargetPos = XMFLOAT3(23.13, 3.66, -0.34f);
+            mInitTargetPos = XMFLOAT3(23.13, 7.58, -0.12f);
 
             mOBJFileName = "roomTestExp.obj";
             mOBJFolderName = "model/roomTestExp";
@@ -447,6 +447,7 @@ void DxrPhotonMapper::Setup()
         mGlassObjScale = XMFLOAT3(0.1f, 0.1f, 0.1f);
         if (mSceneType == SceneType_Room)
         {
+            mGlassObjYOfsset = 16;
             mGlassObjScale = XMFLOAT3(0.02f, 0.02f, 0.02f);
         }
     }
