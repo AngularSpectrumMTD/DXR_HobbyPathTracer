@@ -404,6 +404,7 @@ private:
         SceneType_BistroInterior,
         SceneType_SanMiguel,
         SceneType_Room,
+        SceneType_GITest,
     };
 
     enum Spectrum

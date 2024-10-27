@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_Room;
+    mSceneType = SceneType_GITest;
 
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
@@ -298,6 +298,30 @@ void DxrPhotonMapper::Setup()
             mOBJFileName = "roomTestExp.obj";
             mOBJFolderName = "model/roomTestExp";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 0.79f;
+
+            mGlassModelType = ModelType_Afrodyta;
+        }
+        break;
+        case SceneType_GITest:
+        {
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 123.0f; mThetaDirectional = 326.0f;
+            mInitEyePos = XMFLOAT3(-41.15f, 8.03, 132.34f);
+            mInitTargetPos = XMFLOAT3(-21.62, 15.02, 102.87f);
+
+            mOBJFileName = "GITest.obj";
+            mOBJFolderName = "model/GITest";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
