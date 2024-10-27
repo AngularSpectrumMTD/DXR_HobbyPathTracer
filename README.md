@@ -6,8 +6,6 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 ![GItest](https://github.com/user-attachments/assets/9063109a-d1ca-4191-abea-bc60ab6cf458)
 
-![Top](https://github.com/user-attachments/assets/547e461a-5f8f-45e4-9a2e-8e9c9a1dfe93)
-
 ![ReSTIRDIcomp](https://github.com/user-attachments/assets/42e20aba-c1d9-4fe6-aa49-15bf2f36c0f5)
 
 ![ReSTIRGIcomp](https://github.com/user-attachments/assets/f4ed1014-a6aa-4170-b577-8598b0246f19)
@@ -23,7 +21,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy)
-1. Set "SceneType_GITest" or "SceneType_Room" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_GITest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza
