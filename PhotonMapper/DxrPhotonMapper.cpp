@@ -316,8 +316,8 @@ void DxrPhotonMapper::Setup()
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
             mPhiDirectional = 123.0f; mThetaDirectional = 326.0f;
-            mInitEyePos = XMFLOAT3(-41.15f, 8.03, 132.34f);
-            mInitTargetPos = XMFLOAT3(-21.62, 15.02, 102.87f);
+            mInitEyePos = XMFLOAT3(-45.85f, 46.655, 123.07f);
+            mInitTargetPos = XMFLOAT3(-25.78, 39.42, 94.028f);
 
             mOBJFileName = "GITest.obj";
             mOBJFolderName = "model/GITest";

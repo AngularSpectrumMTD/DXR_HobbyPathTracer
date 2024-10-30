@@ -4,11 +4,11 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-![GItest](https://github.com/user-attachments/assets/607df126-5f93-4ea4-9dd4-25e41cfaf186)
+![GItest](https://github.com/user-attachments/assets/2cbd3969-6917-4e80-8609-5d7aaeb4404c)
 
-![ReSTIRDIcomp](https://github.com/user-attachments/assets/42e20aba-c1d9-4fe6-aa49-15bf2f36c0f5)
+![ReSTIRDI](https://github.com/user-attachments/assets/ee7dde69-c0c1-405f-bda0-a6e92dc29ff0)
 
-![ReSTIRGIcomp](https://github.com/user-attachments/assets/f4ed1014-a6aa-4170-b577-8598b0246f19)
+![ReSTIRGI](https://github.com/user-attachments/assets/7caca8ec-83c5-4e3a-a0c0-75f65fa40bcd)
 
 ![Main](https://github.com/user-attachments/assets/59de7dc8-1218-4a72-88e5-23b878c3e19f)
 
