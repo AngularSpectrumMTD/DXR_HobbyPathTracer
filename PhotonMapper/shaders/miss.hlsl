@@ -1,8 +1,6 @@
 #include "common.hlsli"
 #include "opticalFunction.hlsli"
 
-#define ENABLE_IBL
-
 float2 EquirecFetchUV(float3 dir)
 {
     float2 uv = float2(atan2(dir.z , dir.x) / 2.0 / PI + 0.5, acos(dir.y) / PI);
@@ -60,18 +58,20 @@ void miss(inout Payload payload) {
     MaterialParams material = (MaterialParams)0;
     storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, -1, -1, material);
 
-#ifdef ENABLE_IBL
-    float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
-    float3 element = U32toF32x3(payload.compressedThroughput) * cubemap.rgb;
-    if(isDirectRay(payload) || isCompletelyMissRay(payload))
+    if(isUseIBL())
     {
-        addDI(element);
+        float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
+        float3 element = U32toF32x3(payload.compressedThroughput) * cubemap.rgb;
+        if(isDirectRay(payload) || isCompletelyMissRay(payload))
+        {
+            addDI(element);
+        }
+        if(isIndirectRay(payload))
+        {
+            addGI(element);
+        }
     }
-    if(isIndirectRay(payload))
-    {
-        addGI(element);
-    }
-#endif
+    
     payload.compressedThroughput = 0u;
 }
 

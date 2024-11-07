@@ -44,6 +44,11 @@ bool isUseStreamingRIS()
     return gSceneParam.additional.w == 1;
 }
 
+bool isUseIBL()
+{
+    return gSceneParam.additional2.x == 1;
+}
+
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;

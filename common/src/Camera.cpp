@@ -56,7 +56,7 @@ bool Camera::OnKeyDown(UINT8  wparam)
 {
     bool flag = false;
     XMVECTOR tmp = mEye - mTarget;
-    const f32 ratio = 0.5f;
+    const f32 ratio = 1.0f;
     switch (wparam)
     {
         //Foward

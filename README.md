@@ -4,6 +4,8 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+![Kitchen](https://github.com/user-attachments/assets/58b065cb-47c7-4568-998e-59fa32aa5a6f)
+
 ![GItest](https://github.com/user-attachments/assets/2cbd3969-6917-4e80-8609-5d7aaeb4404c)
 
 ![ReSTIRDI](https://github.com/user-attachments/assets/ee7dde69-c0c1-405f-bda0-a6e92dc29ff0)
@@ -21,7 +23,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy)
-1. Set "SceneType_GITest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza
@@ -74,3 +76,4 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F4 : increase / decrease the number of taps for Spatial Reuse of Reservoir
 - F5 : enable / disable Metal Test
 - F6 : enable / disable SSS
+- F7 : enable / disable IBL

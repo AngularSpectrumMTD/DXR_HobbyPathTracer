@@ -59,8 +59,9 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_GITest;
+    mSceneType = SceneType_Kitchen;
 
+    mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
     mIntenceBoost = 300;
     mGatherRadius = 0.061f;
@@ -96,6 +97,7 @@ void DxrPhotonMapper::Setup()
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
     mIsUseReservoirSpatialReuse = true;
+    mIsTemporalAccumulationForceDisable = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -332,6 +334,31 @@ void DxrPhotonMapper::Setup()
             mLightRange = 0.79f;
 
             mGlassModelType = ModelType_Afrodyta;
+        }
+        break; 
+        case SceneType_Kitchen:
+        {
+            const bool isDebugMeshTest = false; 
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 8.0f; mThetaDirectional = 215.0f;
+            mInitEyePos = XMFLOAT3(347, 46.51, -161.34f);
+            mInitTargetPos = XMFLOAT3(319.1, 46.58, -142.253f);
+
+            mOBJFileName = "Kitchen.obj";
+            mOBJFolderName = "model/Kitchen";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 0.79f;
+
+            mGlassModelType = ModelType_Afrodyta;
+            mIntenceBoost *= 3;
         }
         break;
     }
@@ -1216,6 +1243,7 @@ void DxrPhotonMapper::Update()
     mSceneParam.additional1.z = mIsUseMetallicTest ? 1 : 0;
     mSceneParam.additional1.w = mIsHistoryResetRequested ? 1 : 0;
     mSceneParam.sssParam = XMVectorSet(mMeanFreePathRatio * mMeanFreePath, 0, 0, 0);
+    mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
 
     mRenderFrame++;
     mSeedFrame++;
@@ -1439,6 +1467,10 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
             }
             mIsUseAccumulation = false;
         }
+        break;
+    case VK_F7:
+        mIsUseIBL = !mIsUseIBL;
+        mIsUseAccumulation = false;
         break;
     }
 }

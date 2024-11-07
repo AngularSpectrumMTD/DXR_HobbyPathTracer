@@ -266,6 +266,7 @@ private:
         XMVECTOR viewVec;
         XMUINT4 additional;
         XMUINT4 additional1;
+        XMUINT4 additional2;
         XMVECTOR sssParam;
     };
 
@@ -405,6 +406,7 @@ private:
         SceneType_SanMiguel,
         SceneType_Room,
         SceneType_GITest,
+        SceneType_Kitchen,
     };
 
     enum Spectrum
@@ -778,6 +780,7 @@ private:
     bool mIsUseTexture;
     bool mIsIndirectOnly;
     bool mIsUseDebugView;
+    bool mIsUseIBL;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;
