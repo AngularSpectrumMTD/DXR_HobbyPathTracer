@@ -188,33 +188,6 @@ void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
 
     {
         utility::RootSignatureCreater rsCreater;
-        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
-        mRsTemporalReuse = rsCreater.Create(mDevice, false, L"rsTemporalReuse");
-        CreateComputeShaderStateObject(ComputeShaders::TemporalReuse, mTemporalReusePSO, mRsTemporalReuse);
-        mRegisterMapTemporalReuse.clear();
-        mRegisterMapTemporalReuse["gSceneParam"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["DIReservoirBufferSrc"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["NormalDepthBuffer"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["PrevNormalDepthBuffer"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["PrevIDBuffer"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["PositionBuffer"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["PrevPositionBuffer"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["GIReservoirBufferSrc"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["DIReservoirBufferDst"] = mRegisterMapTemporalReuse.size();
-        mRegisterMapTemporalReuse["GIReservoirBufferDst"] = mRegisterMapTemporalReuse.size();
-    }
-
-    {
-        utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsGeneratePhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMap");

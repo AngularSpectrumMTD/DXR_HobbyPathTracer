@@ -79,6 +79,7 @@ namespace RayTracingEntryPoints {
     static const wchar_t* ClosestHitMaterialPhoton = L"materialStorePhotonClosestHit";
     static const wchar_t* ClosestHitMaterialWithTexPhoton = L"materialWithTexStorePhotonClosestHit";
     static const wchar_t* RayGenSpatialReuse = L"spatialReuse";
+    static const wchar_t* RayGenTemporalReuse = L"temporalReuse";
 }
 
 namespace ComputeShaders {
@@ -656,6 +657,13 @@ private:
     ComPtr<ID3D12RootSignature> mGlobalRootSigReservoirSpatialReuse;
     std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigReservoirSpatialReuse;
 
+    //--Reservoir Temporal Reuse
+    ComPtr<ID3D12StateObject> mRTPSOReservoirTemporalReuse;
+    ComPtr<ID3D12Resource> mShaderTableReservoirTemporalReuse;
+    D3D12_DISPATCH_RAYS_DESC mDispatchReservoirTemporalReuseRayDesc;
+    ComPtr<ID3D12RootSignature> mGlobalRootSigReservoirTemporalReuse;
+    std::unordered_map < std::string, u32> mRegisterMapGlobalRootSigReservoirTemporalReuse;
+
     //material binding
     ComPtr<ID3D12RootSignature> mLocalRootSigMaterial;
     std::unordered_map < std::string, u32> mRegisterMapGlobalLocalRootSigMaterial;
@@ -704,10 +712,6 @@ private:
     ComPtr<ID3D12RootSignature> mRsTemporalAccumulation;
     std::unordered_map < std::string, u32> mRegisterMapTemporalAccumulation;
     ComPtr<ID3D12PipelineState> mTemporalAccumulationPSO;
-
-    ComPtr<ID3D12RootSignature> mRsTemporalReuse;
-    std::unordered_map < std::string, u32> mRegisterMapTemporalReuse;
-    ComPtr<ID3D12PipelineState> mTemporalReusePSO;
 
     //Emission Guiding
     ComPtr<ID3D12RootSignature> mRsClearPhotonEmissionGuideMap;

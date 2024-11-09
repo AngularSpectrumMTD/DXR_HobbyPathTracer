@@ -41,6 +41,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig.clear();
@@ -58,7 +60,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gGIBuffer"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gCausticsBuffer"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gDIReservoirBuffer"] = mRegisterMapGlobalRootSig.size();
-        mRegisterMapGlobalRootSig["gDISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSig.size();
+        mRegisterMapGlobalRootSig["gDIReservoirBufferSrc"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gPhotonRandomCounterMap"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap0"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap1"] = mRegisterMapGlobalRootSig.size();
@@ -70,7 +72,9 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gScreenSpaceMaterial"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gDebugTexture"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gGIReservoirBuffer"] = mRegisterMapGlobalRootSig.size();
-        mRegisterMapGlobalRootSig["gGISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSig.size();
+        mRegisterMapGlobalRootSig["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSig.size();
+        mRegisterMapGlobalRootSig["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSig.size();
+        mRegisterMapGlobalRootSig["gPrevPositionBuffer"] = mRegisterMapGlobalRootSig.size();
     }
 
     //PhotonMapping
@@ -103,6 +107,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton.clear();
@@ -120,7 +126,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gGIBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gCausticsBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gDIReservoirBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
-        mRegisterMapGlobalRootSigPhoton["gDISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSigPhoton.size();
+        mRegisterMapGlobalRootSigPhoton["gDIReservoirBufferSrc"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gPhotonRandomCounterMap"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap0"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap1"] = mRegisterMapGlobalRootSigPhoton.size();
@@ -132,7 +138,9 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gDebugTexture"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gGIReservoirBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
-        mRegisterMapGlobalRootSigPhoton["gGISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSigPhoton.size();
+        mRegisterMapGlobalRootSigPhoton["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigPhoton.size();
+        mRegisterMapGlobalRootSigPhoton["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
+        mRegisterMapGlobalRootSigPhoton["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
     }
     {
         utility::RootSignatureCreater rsCreater;
@@ -163,6 +171,8 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 2);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigReservoirSpatialReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirSpatialReuse");
@@ -181,7 +191,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gCausticsBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
-        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gDIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonRandomCounterMap"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap0"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap1"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
@@ -193,8 +203,76 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gDebugTexture"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIReservoirBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
-        mRegisterMapGlobalRootSigReservoirSpatialReuse["gGISpatialReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+    }
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 8);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 9);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 10);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 11);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 12);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 13);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 14);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 15);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 16);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 17);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 18);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 19);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 20);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 2);
+        rsCreater.PushStaticSampler(0);
+        mGlobalRootSigReservoirTemporalReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirTemporalReuse");
+        mRegisterMapGlobalRootSigReservoirTemporalReuse.clear();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gGridParam"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gBVH"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gEquiRecEnvMap"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gLightGenerateParams"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gSceneParam"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonMap"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gNormalDepthBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonGridIdBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPositionBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevIDBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gDIBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gGIBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gCausticsBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gDIReservoirBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gDIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonRandomCounterMap"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap0"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap1"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap2"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap3"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap4"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap5"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap6"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gScreenSpaceMaterial"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gDebugTexture"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gGIReservoirBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gReSTIRParam"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
     }
 }
 

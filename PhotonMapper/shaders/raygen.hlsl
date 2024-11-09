@@ -92,14 +92,14 @@ void rayGen() {
         int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
         dummyReservoir.initialize();
         gDIReservoirBuffer[serialIndex] = dummyReservoir;
-        gDISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
+        gDIReservoirBufferSrc[serialIndex] = dummyReservoir;
     }
     {
         GIReservoir dummyReservoir;
         int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
         dummyReservoir.initialize();
         gGIReservoirBuffer[serialIndex] = dummyReservoir;
-        gGISpatialReservoirBufferSrc[serialIndex] = dummyReservoir;
+        gGIReservoirBufferSrc[serialIndex] = dummyReservoir;
     }
 
     //random
@@ -318,6 +318,99 @@ void photonEmitting()
     TraceDefaultPhoton(flags, rayMask, nextRay, payload);
 }
 
+void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, inout uint randomState)
+{
+    //Limitting
+    if(prevDIReservoir.M > MAX_REUSE_M_DI)
+    {
+        float r = max(0, ((float)MAX_REUSE_M_DI / prevDIReservoir.M));
+        prevDIReservoir.W_sum *= r;
+        prevDIReservoir.M = MAX_REUSE_M_DI;
+    }
+
+    DIReservoir tempDIReservoir;
+    tempDIReservoir.initialize();
+    //combine reservoirs
+    {
+        const float currUpdateW = currDIReservoir.W_sum;
+        combineDIReservoirs(tempDIReservoir, currDIReservoir, currUpdateW, rand(randomState));
+        const float prevUpdateW = prevDIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
+        combineDIReservoirs(tempDIReservoir, prevDIReservoir, prevUpdateW, rand(randomState));
+    }
+    currDIReservoir = tempDIReservoir;
+}
+
+void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, inout uint randomState)
+{
+    //Limitting
+    if(prevGIReservoir.M > MAX_REUSE_M_GI)
+    {
+        float r = max(0, ((float)MAX_REUSE_M_GI / prevGIReservoir.M));
+        prevGIReservoir.W_sum *= r;
+        prevGIReservoir.M = MAX_REUSE_M_GI;
+    }
+
+    GIReservoir tempGIReservoir;
+    tempGIReservoir.initialize();
+    //combine reservoirs
+    {
+        const float currUpdateW = currGIReservoir.W_sum;
+        combineGIReservoirs(tempGIReservoir, currGIReservoir, currUpdateW, rand(randomState));
+        const float prevUpdateW = prevGIReservoir.W_sum;// * (prevDIReservoir.targetPDF / currDIReservoir.targetPDF);
+        combineGIReservoirs(tempGIReservoir, prevGIReservoir, prevUpdateW, rand(randomState));
+    }
+    currGIReservoir = tempGIReservoir;
+}
+
+[shader("raygeneration")]
+void temporalReuse()
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    uint2 dims = DispatchRaysDimensions().xy;
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    
+    //random
+    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+
+    uint2 currID = launchIndex.xy;
+    uint2 randID = currID;
+
+    float currDepth = gNormalDepthBuffer[currID].w;
+    float3 currNormal = gNormalDepthBuffer[currID].xyz;
+
+    float3 currObjectWorldPos = gPositionBuffer[currID].xyz;
+
+    int2 prevID = gPrevIDBuffer[currID];
+
+    float3 currDI = 0.xxx;
+    if(isUseNEE() && isUseStreamingRIS())
+    {
+        const uint serialCurrID = currID.y * dims.x + currID.x;
+        const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
+        DIReservoir currDIReservoir = gDIReservoirBuffer[serialCurrID];
+        GIReservoir currGIReservoir = gGIReservoirBuffer[serialCurrID];
+
+        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
+        {
+            float prevDepth = gPrevNormalDepthBuffer[prevID].w;
+            float3 prevNormal = gPrevNormalDepthBuffer[prevID].xyz;
+            float3 prevObjectWorldPos = gPrevPositionBuffer[prevID].xyz;
+            const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
+            if(isTemporalReuseEnable && (abs(currID.x - prevID.x) <= 1) && (abs(currID.y - prevID.y) <= 1))
+            {
+                DIReservoir prevDIReservoir = gDIReservoirBufferSrc[serialPrevID];
+                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, randomSeed);
+                GIReservoir prevGIReservoir = gGIReservoirBufferSrc[serialPrevID];
+                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, randomSeed);
+            }
+        }
+
+        gDIReservoirBuffer[serialCurrID] = currDIReservoir;
+        gGIReservoirBuffer[serialCurrID] = currGIReservoir;
+    }
+}
+
 #define SPATIAL_REUSE_NUM 4
 
 void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
@@ -327,7 +420,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     float2 dims = float2(DispatchRaysDimensions().xy);
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
-    DIReservoir currDIReservoir = gDISpatialReservoirBufferSrc[serialIndex];
+    DIReservoir currDIReservoir = gDIReservoirBufferSrc[serialIndex];
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
@@ -349,7 +442,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
 
             const uint serialNearID = serialRaysIndex(nearIndex, dispatchDimensions);
 
-            DIReservoir nearDIReservoir = gDISpatialReservoirBufferSrc[serialNearID];
+            DIReservoir nearDIReservoir = gDIReservoirBufferSrc[serialNearID];
             const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
@@ -383,7 +476,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     float2 dims = float2(DispatchRaysDimensions().xy);
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
-    GIReservoir currGIReservoir = gGISpatialReservoirBufferSrc[serialIndex];
+    GIReservoir currGIReservoir = gGIReservoirBufferSrc[serialIndex];
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
@@ -405,7 +498,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
 
             const uint serialNearID = serialRaysIndex(nearIndex, dispatchDimensions);
 
-            GIReservoir nearGIReservoir = gGISpatialReservoirBufferSrc[serialNearID];
+            GIReservoir nearGIReservoir = gGIReservoirBufferSrc[serialNearID];
             const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
@@ -502,6 +595,12 @@ void spatialReuse() {
 
         float cosine = abs(dot(wi, centerNormal));
         float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
+
+        // float3 biasedPosition = centerPos + 0.1f * wi;
+        // if(!isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd))
+        // {
+        //     Lo = 0.xxx;
+        // }
 
         const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
 

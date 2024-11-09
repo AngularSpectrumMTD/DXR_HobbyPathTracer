@@ -100,7 +100,7 @@ RWTexture2D<float4> gGIBuffer : register(u6);
 RWTexture2D<float4> gCausticsBuffer : register(u7);
 
 RWStructuredBuffer<DIReservoir> gDIReservoirBuffer : register(u8);
-RWStructuredBuffer<DIReservoir> gDISpatialReservoirBufferSrc : register(u9);//for reservoir spatial reuse
+RWStructuredBuffer<DIReservoir> gDIReservoirBufferSrc : register(u9);
 
 RWTexture2D<uint> gPhotonRandomCounterMap : register(u10);
 RWTexture2D<float> gPhotonEmissionGuideMap0 : register(u11);
@@ -115,7 +115,10 @@ RWStructuredBuffer<CompressedMaterialParams> gScreenSpaceMaterial : register(u18
 RWTexture2D<float4> gDebugTexture : register(u19);
 
 RWStructuredBuffer<GIReservoir> gGIReservoirBuffer : register(u20);
-RWStructuredBuffer<GIReservoir> gGISpatialReservoirBufferSrc : register(u21);
+RWStructuredBuffer<GIReservoir> gGIReservoirBufferSrc : register(u21);
+
+RWTexture2D<float4> gPrevNormalDepthBuffer : register(u22);
+RWTexture2D<float4> gPrevPositionBuffer : register(u23);
 
 struct ReSTIRParam
 {

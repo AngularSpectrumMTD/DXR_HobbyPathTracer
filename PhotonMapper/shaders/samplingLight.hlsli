@@ -458,6 +458,30 @@ bool isVisible(in float3 scatterPosition, in LightSample lightSample)
     return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
 }
 
+bool isVisible(in float3 scatterPosition, in float3 targetPosition)
+{
+    Payload shadowPayload;
+    shadowPayload.flags = 0;
+    shadowPayload.flags |= PAYLOAD_BIT_MASK_IS_SHADOW_RAY;
+    shadowPayload.T = 0;
+
+    const float eps = 0.005;
+    RayDesc shadowRay;
+    shadowRay.TMin = eps;
+    shadowRay.TMax = length(targetPosition - scatterPosition) - eps;
+
+    shadowRay.Direction = normalize(targetPosition - scatterPosition);
+    shadowRay.Origin = scatterPosition;
+
+    RAY_FLAG flags = RAY_FLAG_NONE;
+
+    uint rayMask = ~(LIGHT_INSTANCE_MASK);
+
+    TraceDefaultRay(flags, rayMask, shadowRay, shadowPayload);
+
+    return (shadowPayload.flags & PAYLOAD_BIT_MASK_IS_SHADOW_MISS);
+}
+
 void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out float2 randomUV, out float pdf, inout uint randomSeed)
 {
     const uint lightID = getRandomLightID(randomSeed);
