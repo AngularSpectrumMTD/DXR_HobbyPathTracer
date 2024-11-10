@@ -58,9 +58,6 @@
     <Filter Include="ソース ファイル\shaders\Raygen">
       <UniqueIdentifier>{8891e5ed-c72a-4909-a130-8e338a9fbf34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\shaders\Reuse">
-      <UniqueIdentifier>{3adb1c03-02ea-45fe-b97a-d6d8c68d47b1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -210,9 +207,6 @@
     </FxCompile>
     <FxCompile Include="shaders\debugView.hlsl">
       <Filter>ソース ファイル\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\temporalReuse.hlsl">
-      <Filter>ソース ファイル\shaders\Reuse</Filter>
     </FxCompile>
     <FxCompile Include="shaders\temporalAccumulation.hlsl">
       <Filter>ソース ファイル\shaders</Filter>

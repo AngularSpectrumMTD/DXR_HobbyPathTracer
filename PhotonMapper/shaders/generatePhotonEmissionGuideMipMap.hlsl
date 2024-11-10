@@ -9,7 +9,7 @@ groupshared float sharedValueTbl1[8 * 8];
 [numthreads(8, 8, 1)]
 void generatePhotonEmissionGuideMipMap(int groupIndex : SV_GroupIndex, int3 groupId : SV_GroupID, int3 dispatchThreadID : SV_DispatchThreadID)
 {
-    sharedValueTbl0[groupIndex] = gPhotonEmissionGuideMap0.Load(dispatchThreadID);
+    sharedValueTbl0[groupIndex] = gPhotonEmissionGuideMap0.Load(dispatchThreadID.xy);
     AllMemoryBarrierWithGroupSync();
     if(groupIndex >= 16)
     {

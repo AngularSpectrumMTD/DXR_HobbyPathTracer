@@ -102,7 +102,7 @@ namespace ComputeShaders {
     const LPCWSTR DebugView = L"debugView.cso";
 
     const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
-    const LPCWSTR TemporalReuse = L"temporalReuse.cso";
+    //const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 
     const LPCWSTR ClearPhotonEmissionGuideMap = L"clearPhotonEmissionGuideMap.cso";
     const LPCWSTR GeneratePhotonEmissionGuideMap = L"generatePhotonEmissionGuideMap.cso";
