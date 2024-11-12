@@ -76,7 +76,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
 {
     int2 dims;
     NormalDepthBuffer.GetDimensions(dims.x, dims.y);
-    uint randomState = generateRandomInitialRandomSeed(dtid.xy, dims.x);
+    uint randomState = generateRandomSeed(dtid.xy, dims.x);
 
     uint2 currID = dtid.xy;
     uint2 randID = currID;

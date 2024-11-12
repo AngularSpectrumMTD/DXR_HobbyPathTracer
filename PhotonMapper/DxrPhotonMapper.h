@@ -436,7 +436,8 @@ private:
     void CreateLightGenerationBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
-    void CreateShaderTable();
+    void CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPtr<ID3D12StateObject>& stateObject, D3D12_DISPATCH_RAYS_DESC& dispatchRaysDesc, const u32 maxRootSigSizeRayGen, const u32 maxRootSigSizeMiss, const u32 maxRootSigSizeHitGroup, const wchar_t* shaderTableName, const wchar_t* rayGenShaderName, const wchar_t* missShaderName);
+    void CreateShaderTables();
     void CreateComputeRootSignatureAndPSO();
     void CreateComputeShaderStateObject(const LPCWSTR& compiledComputeShaderName, ComPtr<ID3D12PipelineState>& computePipelineState, ComPtr<ID3D12RootSignature> rootSig);
     //Å´ combine

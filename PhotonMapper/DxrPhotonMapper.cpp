@@ -59,7 +59,7 @@ void DxrPhotonMapper::UpdateWindowText()
 
 void DxrPhotonMapper::Setup()
 {
-    mSceneType = SceneType_GITest;
+    mSceneType = SceneType_BistroExterior;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -203,7 +203,7 @@ void DxrPhotonMapper::Setup()
         case SceneType_BistroExterior:
         {
             mCausticsBoost = 0.004f;
-            mPhiDirectional = 480; mThetaDirectional = 263;
+            mPhiDirectional = 414; mThetaDirectional = 282;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
@@ -212,17 +212,18 @@ void DxrPhotonMapper::Setup()
             mStageOffsetZ = 0;
             mLightPosX = -3.18f; mLightPosY = 8.2f; mLightPosZ = -2.08f;
             mPhi = 299; mTheta = 395;
-            mInitEyePos = XMFLOAT3(-32, 16, -29);
-            mInitTargetPos = XMFLOAT3(0, 8, 0);
+            mInitEyePos = XMFLOAT3(-20, 9.97, -5.73);
+            mInitTargetPos = XMFLOAT3(14.4, 7.5, -4.0);
             const bool isDragonTest = true;
             if (isDragonTest)
             {
-                mInitTargetPos = XMFLOAT3(3.75, -1.03, -7.19);
 #ifdef CUBE_TEST
+                mInitTargetPos = XMFLOAT3(3.75, -1.03, -7.19);
                 mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
-                mInitEyePos = XMFLOAT3(15.2f,11.0f, 24.3f);
+                mInitEyePos = XMFLOAT3(-20, 9.97, -5.73);
+                mInitTargetPos = XMFLOAT3(14.4, 7.5, -4.0);
 #endif
                 mGlassModelType = ModelType_Dragon;
             }
@@ -703,7 +704,7 @@ void DxrPhotonMapper::Initialize()
         CreateAccelerationStructure();
         CreateComputeRootSignatureAndPSO();
         CreateRaytracingRootSignatureAndPSO();
-        CreateShaderTable();
+        CreateShaderTables();
 
         mCommandList = mDevice->CreateCommandList();
         mCommandList->Close();

@@ -20,7 +20,7 @@ float rand(inout uint randomState)//0-1
     return rand1D(randomState);
 }
 
-uint generateRandomInitialRandomSeed(uint2 xy, uint dimX)
+uint generateRandomSeed(uint2 xy, uint dimX)
 {
     return generateHash(xy.x) % 10000 + generateHash(xy.y) * dimX % 10000 + getLightRandomSeed();
 }

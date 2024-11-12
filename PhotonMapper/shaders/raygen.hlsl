@@ -103,7 +103,7 @@ void rayGen() {
     }
 
     //random
-    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
 
     const float energyBoost = 1.0f;
     
@@ -271,7 +271,7 @@ void photonEmitting()
     uint3 dispatchDimensions = DispatchRaysDimensions();
     
     //random
-    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
 
     PhotonInfo photon;
     photon.compressedThroughput = 0u;
@@ -371,7 +371,7 @@ void temporalReuse()
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
     
     //random
-    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
 
     uint2 currID = launchIndex.xy;
     uint2 randID = currID;
@@ -533,7 +533,7 @@ void spatialReuse() {
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     //random
-    uint randomSeed = generateRandomInitialRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
 
     MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
     const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
