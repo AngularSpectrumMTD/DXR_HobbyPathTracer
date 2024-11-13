@@ -432,7 +432,8 @@ private:
     void SetupMeshMaterialAndPos();
     void CreateSceneBLAS();
     void CreateSceneTLAS();
-    void CreateStateObject();
+    void CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, ComPtr<ID3D12RootSignature>& globalRootSignature, const u32 maxPayloadSize, const u32 maxAttributeSize, const u32 maxRecursionDepth, const wchar_t* rayGenLibraryName, const wchar_t* rayGenShaderName, const wchar_t* missLibraryName, const wchar_t* missShaderName, const wchar_t* chLibraryName, const wchar_t* chShaderName, const wchar_t* chLibraryNameWithTex, const wchar_t* chShaderNameWithTex, const wchar_t* ahShaderName = nullptr, const wchar_t* ahShaderNameWithTex = nullptr);
+    void CreateStateObjects();
     void CreateLightGenerationBuffer();
     void CreateRootSignatureGlobal();
     void CreateRootSignatureLocal();
