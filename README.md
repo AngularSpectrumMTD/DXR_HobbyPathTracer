@@ -10,9 +10,7 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 ![GItest](https://github.com/user-attachments/assets/2cbd3969-6917-4e80-8609-5d7aaeb4404c)
 
-![ReSTIRDI](https://github.com/user-attachments/assets/ee7dde69-c0c1-405f-bda0-a6e92dc29ff0)
-
-![ReSTIRGI](https://github.com/user-attachments/assets/7caca8ec-83c5-4e3a-a0c0-75f65fa40bcd)
+![comparison](https://github.com/user-attachments/assets/2382640c-c347-40ba-a8e6-d204c95037f0)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
