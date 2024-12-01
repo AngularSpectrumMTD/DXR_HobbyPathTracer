@@ -11,7 +11,7 @@ void buildGrid( uint3 dtid : SV_DispatchThreadID )
     
     PhotonInfo photon = gPhotonMapRead[photonID];
     float3 photonPosition = photon.position;
-    bool isZero = (photon.compressedThroughput == 0);
+    bool isZero = (photon.throughputU32 == 0);
     bool isOutside = false;
     float3 gridIJK = ComputeGridCell(photonPosition, isOutside);
     

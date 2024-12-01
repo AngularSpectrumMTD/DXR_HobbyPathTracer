@@ -218,13 +218,13 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             if(isDirectRay(payload))
             {
                 //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
-                payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
+                payload.primaryBSDFU32 = compressRGBasU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
                 payload.bsdfRandomSeed = currentSeed;
             }
             else
             {
-                payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+                payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
             }
         }
         else
@@ -273,19 +273,19 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
             if(isDirectRay(payload))
             {
                 //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
-                payload.compressedPrimaryBSDF = F32x3toU32(BSDF_PDF.xyz * cosine);
+                payload.primaryBSDFU32 = compressRGBasU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
                 payload.bsdfRandomSeed = currentSeed;
             }
             else
             {
-                payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+                payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
             }
         }
     }
 }
 
-void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint compressedThroughput, inout uint randomSeed, in float wavelength = 0)
+void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughputU32, inout uint randomSeed, in float wavelength = 0)
 {
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
@@ -347,7 +347,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
         const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
+        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * weight);
     }
     else
     {
@@ -391,7 +391,7 @@ void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc 
         float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
         const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        compressedThroughput = F32x3toU32(U32toF32x3(compressedThroughput) * weight);
+        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * weight);
     }
 }
 
@@ -473,7 +473,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         p_hat = computeLuminance(FGL);
         float updateW = p_hat / pdf;
 
-        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, F32x3toU32(p_hat_3F), 1u, rand(randomSeed));
+        updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, compressRGBasU32(p_hat_3F), 1u, rand(randomSeed));
     }
     uint replaySeed = reservoir.randomSeed;
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample, replaySeed);
@@ -576,7 +576,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
-            DIGIelement = U32toF32x3(payload.compressedThroughput) * Le;
+            DIGIelement = decompressU32asRGB(payload.throughputU32) * Le;
             isFinish = true;
             return isFinish;
         }
@@ -584,7 +584,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            DIGIelement = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
+            DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
             isFinish = false;
             return isFinish;
         }
@@ -593,7 +593,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (isNEELightingRequired)
         {
             DIReservoir reservoir;
-            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * U32toF32x3(payload.compressedThroughput);
+            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * decompressU32asRGB(payload.throughputU32);
             if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(material))
             {
                 //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
@@ -612,7 +612,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
             if (isLighting)
             {
-                DIGIelement = U32toF32x3(payload.compressedThroughput) * Le;
+                DIGIelement = decompressU32asRGB(payload.throughputU32) * Le;
             }
             isFinish = true;
             return isFinish;
@@ -621,7 +621,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         //ray hitted the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
-            DIGIelement = U32toF32x3(payload.compressedThroughput) * material.emission.xyz;
+            DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
             isFinish = false;
             return isFinish;
         }

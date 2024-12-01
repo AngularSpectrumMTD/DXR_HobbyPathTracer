@@ -153,25 +153,25 @@ private:
 
     struct CompressedMaterialParams
     {
-        u32 albedo;
+        u32 albedoU32;
         f32 metallic;
         f32 roughness;
         f32 specular;
         f32 transRatio;
-        u32 transColor;
-        u32 emission;
+        u32 transColorU32;
+        u32 emissionU32;
         u32 isSSSExecutable = 0;
     };
 
     struct Payload
     {
-        u32 throughput;
+        u32 throughputU32;
         s32 recursive;
         u32 flags;
         f32 T;//for SSS
         u32 hittedCount;//for SSS
         float3 SSSnormal;//for SSS
-        u32 compressedPrimaryBSDF;//for ReSTIR GI
+        u32 primaryBSDFU32;//for ReSTIR GI
         f32 primaryPDF;//for ReSTIR GI
         u32 bsdfRandomSeed;//for ReSTIR GI
         u32 randomSeed;
@@ -179,7 +179,7 @@ private:
 
     struct PhotonPayload
     {
-        u32 throughput;
+        u32 throughputU32;
         s32 recursive;
         f32 lambdaNM;
         float2 randomUV;
@@ -197,14 +197,14 @@ private:
         u32 lightID; //light ID of most important light
         u32 randomSeed;//replay
         f32 targetPDF; //weight of light
-        u32 targetPDF_3f; //weight of light(float 3, compressed)
+        u32 targetPDF_3f_U32; //weight of light(float 3, compressed)
         f32 W_sum; //sum of all weight
         f32 M; //number of ligts processed for this reservoir
     };
 
     struct GISample
     {
-        u32 Lo_2nd;
+        u32 Lo_2nd_U32;
         float3 pos_2nd;
         float3 nml_2nd;
     };
@@ -213,7 +213,7 @@ private:
     {
         u32 randomSeed;//replay(must be setted before the invocation of sampleBSDF_PDF())
         f32 targetPDF; //weight of light
-        u32 targetPDF_3f; //weight of light(float 3)
+        u32 targetPDF_3f_U32; //weight of light(float 3)
         f32 W_sum; //sum of all weight
         f32 M; //number of ligts processed for this reservoir
 

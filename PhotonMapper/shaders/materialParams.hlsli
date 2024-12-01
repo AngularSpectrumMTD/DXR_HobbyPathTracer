@@ -25,26 +25,26 @@ bool isNEEExecutable(in MaterialParams material)
 
 struct CompressedMaterialParams
 {
-    uint albedo;
+    uint albedoU32;
     float metallic;
     float roughness;
     float specular;
     float transRatio;
-    uint transColor;
-    uint emission;
+    uint transColorU32;
+    uint emissionU32;
     uint isSSSExecutable;
 };
 
 MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
 {
     MaterialParams decompressed = (MaterialParams)0;
-    decompressed.albedo = float4(U32toF32x3(compressed.albedo), 0);
+    decompressed.albedo = float4(decompressU32asRGB(compressed.albedoU32), 0);
     decompressed.metallic = compressed.metallic;
     decompressed.roughness = compressed.roughness;
     decompressed.specular = compressed.specular;
     decompressed.transRatio = compressed.transRatio;
-    decompressed.transColor = float4(U32toF32x3(compressed.transColor), 0);
-    decompressed.emission = float4(U32toF32x3(compressed.emission), 0);
+    decompressed.transColor = float4(decompressU32asRGB(compressed.transColorU32), 0);
+    decompressed.emission = float4(decompressU32asRGB(compressed.emissionU32), 0);
     decompressed.isSSSExecutable = compressed.isSSSExecutable;
 
     return decompressed;
@@ -53,13 +53,13 @@ MaterialParams decompressMaterialParams(in CompressedMaterialParams compressed)
 CompressedMaterialParams compressMaterialParams(in MaterialParams original)
 {
     CompressedMaterialParams compressed = (CompressedMaterialParams)0;
-    compressed.albedo = F32x3toU32(original.albedo.xyz);
+    compressed.albedoU32 = compressRGBasU32(original.albedo.xyz);
     compressed.metallic = original.metallic;
     compressed.roughness = original.roughness;
     compressed.specular = original.specular;
     compressed.transRatio = original.transRatio;
-    compressed.transColor = F32x3toU32(original.transColor.xyz);
-    compressed.emission = F32x3toU32(original.emission.xyz);
+    compressed.transColorU32 = compressRGBasU32(original.transColor.xyz);
+    compressed.emissionU32 = compressRGBasU32(original.emission.xyz);
     compressed.isSSSExecutable = original.isSSSExecutable;
 
     return compressed;

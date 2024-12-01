@@ -124,11 +124,11 @@ void rayGen() {
         nextRay.TMin = 0;
         nextRay.TMax = 100000;
 
-        payload.compressedThroughput = F32x3toU32(energyBoost * float3(1, 1, 1));
+        payload.throughputU32 = compressRGBasU32(energyBoost * float3(1, 1, 1));
         payload.recursive = 0;
         payload.flags = 0;//empty
         payload.T = 0;
-        payload.compressedPrimaryBSDF = 0u;
+        payload.primaryBSDFU32 = 0u;
         payload.primaryPDF = 1;
         payload.randomSeed = randomSeed;
 
@@ -145,7 +145,7 @@ void rayGen() {
     GIReservoir giInitialReservoir = getGIReservoir();
 
     GISample giSample = (GISample)0;
-    giSample.Lo_2nd = F32x3toU32(gi);
+    giSample.Lo_2nd_U32 = compressRGBasU32(gi);
     giSample.pos_2nd = giInitialReservoir.giSample.pos_2nd;
     giSample.nml_2nd = giInitialReservoir.giSample.nml_2nd;
 
@@ -155,14 +155,14 @@ void rayGen() {
     CompressedMaterialParams compressedMaterial = (CompressedMaterialParams)0;
     compressedMaterial = giInitialReservoir.compressedMaterial;
 
-    const float3 primaryBSDF = U32toF32x3(payload.compressedPrimaryBSDF);
+    const float3 primaryBSDF = decompressU32asRGB(payload.primaryBSDFU32);
     const float primaryPDF = payload.primaryPDF;
 
     const float3 elem = gi * primaryBSDF;
     const float p_hat = computeLuminance(elem);
     const float updateW = p_hat / primaryPDF;
 
-    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, F32x3toU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
+    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, compressRGBasU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
 
     setGIReservoir(giReservoir);
 
@@ -274,7 +274,7 @@ void photonEmitting()
     uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
 
     PhotonInfo photon;
-    photon.compressedThroughput = 0u;
+    photon.throughputU32 = 0u;
     photon.position = float3(0,0,0);
 
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
@@ -304,7 +304,7 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.compressedThroughput = F32x3toU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
+    payload.throughputU32 = compressRGBasU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;
@@ -562,12 +562,12 @@ void spatialReuse() {
         float3 wi = lightSample.directionToLight;
         float receiverCos = dot(centerNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        if ((spatDIReservoir.targetPDF_3f > 0) && (receiverCos > 0) && (emitterCos > 0))
+        if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (receiverCos > 0) && (emitterCos > 0))
         {
             float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
             float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
             float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
-            spatDIReservoir.targetPDF_3f = F32x3toU32(FGL);
+            spatDIReservoir.targetPDF_3f_U32 = compressRGBasU32(FGL);
         }
 
         if(!isVisible(biasedPosition, lightSample))
@@ -594,7 +594,7 @@ void spatialReuse() {
         const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 
 
         float cosine = abs(dot(wi, centerNormal));
-        float3 Lo = U32toF32x3(spatGIReservoir.giSample.Lo_2nd);
+        float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);
 
         // float3 biasedPosition = centerPos + 0.1f * wi;
         // if(!isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd))
@@ -606,7 +606,7 @@ void spatialReuse() {
 
         if(isReEvaluateValid && !isIBLSample)
         {
-            spatGIReservoir.targetPDF_3f = F32x3toU32(bsdfPDF.xyz * cosine * Lo);
+            spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(bsdfPDF.xyz * cosine * Lo);
         }
     }
 

@@ -238,7 +238,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal) / pdf;
     }
     
-    const float3 element = U32toF32x3(payload.compressedThroughput) * photon;
+    const float3 element = decompressU32asRGB(payload.throughputU32) * photon;
     addCaustics(element);
     updateRay(currentMaterial, surfaceNormal, nextRay, payload);
 
@@ -270,7 +270,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.randomSeed, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {

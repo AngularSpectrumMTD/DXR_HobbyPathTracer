@@ -13,4 +13,14 @@ float3 U32toF32x3(in uint u_rgb)
     return float3(f16tof32((u_rgb >> 17) & 0x7FF0), f16tof32((u_rgb >> 6) & 0x7FF0), f16tof32((u_rgb << 5) & 0x7FE0));
 }
 
+uint compressRGBasU32(in float3 rgb)
+{
+    return F32x3toU32(rgb);
+}
+
+float3 decompressU32asRGB(in uint rgb)
+{
+    return U32toF32x3(rgb);
+}
+
 #endif//__COMPRESSION_UTILITY_HLSLI__

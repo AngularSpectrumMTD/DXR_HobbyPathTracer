@@ -1,5 +1,6 @@
 #include "utility/OBJ.h"
 #include <codecvt>
+#include <fstream>
 
 #define PREPARE_ELEMENTS 10000
 #define REINTERPRET_GLASS_MATERIAL_NAME "ReinterpretGlass"
@@ -14,7 +15,6 @@ namespace utility {
 	}
 
 	bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
-		vec4i Face[3];
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
 		vector <DirectX::XMFLOAT2> uv;
@@ -89,10 +89,6 @@ namespace utility {
 			}
 			//face id0=vertex 1=UV 2=normal
 			if (strcmp(key, "f") == 0) {
-				Face[0].x = -1; Face[0].y = -1; Face[0].z = -1; Face[0].w = -1;//VertexID
-				Face[1].x = -1; Face[1].y = -1; Face[1].z = -1; Face[1].w = -1;//UVID
-				Face[2].x = -1; Face[2].y = -1; Face[2].z = -1; Face[2].w = -1;//NormalID
-
 				const s32 LineBufferLength = 1024;
 				char buffer[LineBufferLength];
 
@@ -258,6 +254,244 @@ namespace utility {
 		uv.clear();
 		return true;
 	}
+
+	//bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
+	//	vec4i Face[3];
+	//	vector <DirectX::XMFLOAT3> Vertex;
+	//	vector <DirectX::XMFLOAT3> Normal;
+	//	vector <DirectX::XMFLOAT2> uv;
+
+	//	Vertex.reserve(PREPARE_ELEMENTS);
+	//	Normal.reserve(PREPARE_ELEMENTS);
+	//	uv.reserve(PREPARE_ELEMENTS);
+
+	//	s32 matID = 0;
+	//	char key[255] = { 0 };
+
+	//	char fileName[60];
+	//	sprintf_s(fileName, "%s/%s", folderPath, FileName);
+
+	//	ifstream ifs(fileName);
+	//	string str;
+
+	//	if (ifs.fail())
+	//	{
+	//		OutputDebugString(L"OBJ_Load() File Open ERROR\n");
+	//		return false;
+	//	}
+
+	//	DirectX::XMFLOAT3 vec3d;
+	//	DirectX::XMFLOAT2 vec2d;
+
+	//	//File Read Start
+	//	while (getline(ifs, str))
+	//	{
+	//		//key mtlib / v / vn etc...
+	//		memset(key, 0, sizeof(char) * 255);
+	//		sscanf_s(str.data(), "%s ", key, sizeof(key));
+
+	//		if (strcmp(key, "mtllib") == 0) {
+	//			char dummy[255] = { 0 };
+	//			sscanf_s(str.data(), "%s %s", dummy, sizeof(dummy),key, sizeof(key));
+	//			LoadMaterialFromFile(device, folderPath, key);
+	//		}
+	//		if (strcmp(key, "v") == 0) {
+	//			sscanf_s(str.data(), "v %f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
+	//			Vertex.push_back(vec3d);
+	//		}
+	//		if (strcmp(key, "vn") == 0) {
+	//			sscanf_s(str.data(), "vn %f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
+	//			Normal.push_back(vec3d);
+	//		}
+	//		if (strcmp(key, "vt") == 0) {
+	//			sscanf_s(str.data(), "vt %f %f", &vec2d.x, &vec2d.y);
+	//			vec2d.y *= -1;
+	//			uv.push_back(vec2d);
+	//		}
+	//		if (strcmp(key, "usemtl") == 0) {
+	//			sscanf_s(str.data(), "usemtl %s ", key, sizeof(key));
+	//			for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
+	//				if (strcmp(key, MaterialTbl[i].MaterialName.c_str()) == 0)
+	//				{
+	//					matID = i;
+	//				}
+	//			}
+	//		}
+	//		//face id0=vertex 1=UV 2=normal
+	//		if (strcmp(key, "f") == 0) {
+	//			Face[0].x = -1; Face[0].y = -1; Face[0].z = -1; Face[0].w = -1;//VertexID
+	//			Face[1].x = -1; Face[1].y = -1; Face[1].z = -1; Face[1].w = -1;//UVID
+	//			Face[2].x = -1; Face[2].y = -1; Face[2].z = -1; Face[2].w = -1;//NormalID
+
+	//			const s32 LineBufferLength = 1024;
+	//			char buffer[LineBufferLength];
+
+	//			if (getline(ifs, str))
+	//			{
+	//				std::vector<std::string> spaceSplit;
+	//				Split(' ', &str[0], spaceSplit);
+	//				std::vector<std::string> spaceSplitTmp(spaceSplit.size() - 1);
+	//				for (u32 i = 0; i < spaceSplit.size() - 1; i++)
+	//				{
+	//					spaceSplitTmp[i] = spaceSplit[i + 1];
+	//				}
+	//				spaceSplit = spaceSplitTmp;
+	//				s32 vtx_uv_nrmID[3] =
+	//				{
+	//					-1, -1, -1,
+	//				};
+
+	//				if (spaceSplit.size() == 3)//Triangle
+	//				{
+	//					for (s32 i = 0; i < 3; i++)
+	//					{
+	//						SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+	//						//vertexID uvID normalID
+	//						for (s32 i = 0; i < 3; i++)
+	//						{
+	//							s32 currID = vtx_uv_nrmID[i];
+
+	//							if (currID == -1)
+	//							{
+	//								continue;
+	//							}
+
+	//							switch (i)
+	//							{
+	//							case 0:
+	//								MaterialTbl[matID].TriangleVertexIDTbl.push_back(currID);
+	//								break;
+	//							case 1:
+	//								MaterialTbl[matID].TriangleUVIDTbl.push_back(currID);
+	//								break;
+	//							case 2:
+	//								MaterialTbl[matID].TriangleNormalIDTbl.push_back(currID);
+	//								break;
+	//							}
+	//						}
+	//					}
+	//				}
+	//				else if (spaceSplit.size() == 4)//Rectangle
+	//				{
+	//					OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+	//					//return true;
+	//					//for (s32 i = 0; i < 4; i++)
+	//					//{
+	//					//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+	//					//	//vertexID uvID normalID
+	//					//	for (s32 i = 0; i < 3; i++)
+	//					//	{
+	//					//		s32 currID = vtx_uv_nrmID[i];
+
+	//					//		if (currID == -1)
+	//					//		{
+	//					//			continue;
+	//					//		}
+
+	//					//		switch (i)
+	//					//		{
+	//					//		case 0:
+	//					//			MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
+	//					//			break;
+	//					//		case 1:
+	//					//			MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
+	//					//			break;
+	//					//		case 2:
+	//					//			MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
+	//					//			break;
+	//					//		}
+	//					//	}
+	//					//}
+	//				}
+	//				else
+	//				{
+	//					OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+	//					//return true;
+	//				}
+	//			}
+
+	//		}
+	//	}
+	//	//File Read End
+
+	//	for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+	//		MaterialTbl[j].TriangleVertexTbl.reserve(MaterialTbl[j].TriangleVertexIDTbl.size());
+	//		MaterialTbl[j].QuadrangleVertexTbl.reserve(MaterialTbl[j].QuadrangleVertexIDTbl.size());
+
+	//		for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
+	//			utility::VertexPNT Tri;
+	//			Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
+	//			Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
+	//			if (uv.size() > 0 && (MaterialTbl[j].TriangleUVIDTbl.size() > 0))
+	//			{
+	//				Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
+	//			}
+	//			else
+	//			{
+	//				Tri.UV = XMFLOAT2(0xff, 0xff);
+	//			}
+	//			MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
+	//		}
+	//		for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
+	//			utility::VertexPNT Quad;
+	//			Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
+	//			Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
+	//			if (uv.size() > 0)
+	//			{
+	//				Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+	//			}
+	//			else
+	//			{
+	//				Quad.UV = XMFLOAT2(0xff, 0xff);
+	//			}
+	//			MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
+	//		}
+	//	}
+
+	//	//No Indexing
+	//	for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+
+	//		if (MaterialTbl[j].TriangleVertexIDTbl.size() > 0)
+	//		{
+	//			MaterialTbl[j].TriangleVertexIDTbl.clear();
+	//			MaterialTbl[j].TriangleVertexIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
+	//			MaterialTbl[j].TriangleNormalIDTbl.clear();
+	//			MaterialTbl[j].TriangleNormalIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
+	//			MaterialTbl[j].TriangleUVIDTbl.clear();
+	//			MaterialTbl[j].TriangleUVIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
+	//		}
+
+	//		if (MaterialTbl[j].QuadrangleVertexIDTbl.size() > 0)
+	//		{
+	//			MaterialTbl[j].QuadrangleVertexIDTbl.clear();
+	//			MaterialTbl[j].QuadrangleVertexIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+	//			MaterialTbl[j].QuadrangleNormalIDTbl.clear();
+	//			MaterialTbl[j].QuadrangleNormalIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+	//			MaterialTbl[j].QuadrangleUVIDTbl.clear();
+	//			MaterialTbl[j].QuadrangleUVIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
+	//		}
+
+	//		u32 count = 0;
+	//		for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {
+	//			MaterialTbl[j].TriangleVertexIDTbl.push_back(count);
+	//			MaterialTbl[j].TriangleNormalIDTbl.push_back(count);
+	//			MaterialTbl[j].TriangleUVIDTbl.push_back(count);
+	//			count++;
+	//		}
+	//		count = 0;
+	//		for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexTbl.size(); i++) {
+	//			MaterialTbl[j].QuadrangleVertexIDTbl.push_back(count);
+	//			MaterialTbl[j].QuadrangleNormalIDTbl.push_back(count);
+	//			MaterialTbl[j].QuadrangleUVIDTbl.push_back(count);
+	//			count++;
+	//		}
+	//	}
+
+	//	Vertex.clear();
+	//	Normal.clear();
+	//	uv.clear();
+	//	return true;
+	//}
 
 	vector<MATERIAL> OBJ_MODEL::getMaterialList() const
 	{

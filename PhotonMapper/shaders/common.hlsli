@@ -30,13 +30,13 @@
 
 struct Payload
 {
-    uint compressedThroughput;
+    uint throughputU32;
     int recursive;
     uint flags;
     float T;//for SSS
     uint hittedCount;//for SSS
     float3 SSSnormal;//for SSS
-    uint compressedPrimaryBSDF;//for ReSTIR GI
+    uint primaryBSDFU32;//for ReSTIR GI
     float primaryPDF;//for ReSTIR GI
     uint bsdfRandomSeed;//for ReSTIR GI
     uint randomSeed;
@@ -47,7 +47,7 @@ struct Payload
 
 struct PhotonPayload
 {
-    uint compressedThroughput;
+    uint throughputU32;
     int recursive;
     float lambdaNM;
     float2 randomUV;
@@ -234,7 +234,7 @@ float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum() || length(U32toF32x3(payload.compressedThroughput)) < 1e-2)
+    if (payload.recursive >= getMaxBounceNum() || length(decompressU32asRGB(payload.throughputU32)) < 1e-2)
     {
         return true;
     }
@@ -272,7 +272,7 @@ inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
-        payload.compressedThroughput = 0u;
+        payload.throughputU32 = 0u;
         return true;
     }
     payload.recursive++;

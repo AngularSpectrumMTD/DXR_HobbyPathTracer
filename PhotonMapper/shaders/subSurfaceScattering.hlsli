@@ -196,7 +196,7 @@ void computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
         const float3 weight = 1.xxx;//(exp(-length(toHitPosition) / 1000 / d.x)).xxx;
 
         //Since the normal sampled R is very large compared to d, the exp term is almost zero.... ex) R 1 vs d 0.0000001
-        payload.compressedThroughput = F32x3toU32(U32toF32x3(payload.compressedThroughput) * weight);
+        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
 
         //debug
         if(payload.recursive == 1)

@@ -12,7 +12,7 @@ struct DIReservoir
     uint lightID;//light ID of most important light
     uint randomSeed;//replay(must be setted before the invocation of sampleLightWithID())
     float targetPDF; //weight of light
-    uint targetPDF_3f; //weight of light(float 3)
+    uint targetPDF_3f_U32; //weight of light(float 3)
     float W_sum; //sum of all weight
     float M; //number of ligts processed for this reservoir
 
@@ -21,7 +21,7 @@ struct DIReservoir
         lightID = 0;
         randomSeed = 0;
         targetPDF = 0;
-        targetPDF_3f = 0;
+        targetPDF_3f_U32 = 0;
         W_sum = 0;
         M = 0;
     }
@@ -36,7 +36,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
     {
         reservoir.lightID = inLightID;
         reservoir.targetPDF = p_hat;
-        reservoir.targetPDF_3f = p_hat_3f;
+        reservoir.targetPDF_3f_U32 = p_hat_3f;
         reservoir.randomSeed = randomSeed;
         return true;
     }
@@ -45,7 +45,7 @@ bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint r
 
 bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.M, rnd01);
+    return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeDIReservoir(in DIReservoir reservoir)
@@ -56,7 +56,7 @@ float3 shadeDIReservoir(in DIReservoir reservoir)
     }
 
     const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-    return U32toF32x3(reservoir.targetPDF_3f) * invPDF;
+    return decompressU32asRGB(reservoir.targetPDF_3f_U32) * invPDF;
 }
 
 bool isValidReservoir(in DIReservoir reservoir)
@@ -66,12 +66,12 @@ bool isValidReservoir(in DIReservoir reservoir)
 
 void recognizeAsShadowedReservoir(inout DIReservoir reservoir)
 {
-    reservoir.targetPDF_3f = 0;
+    reservoir.targetPDF_3f_U32 = 0;
 }
 
 struct GISample
 {
-    uint Lo_2nd;
+    uint Lo_2nd_U32;
     float3 pos_2nd;
     float3 nml_2nd;
 };
@@ -80,7 +80,7 @@ struct GIReservoir
 {
     uint randomSeed;//replay(must be setted before the invocation of computeBSDF_PDF())
     float targetPDF; //weight of light
-    uint targetPDF_3f; //weight of light(float 3)
+    uint targetPDF_3f_U32; //weight of light(float 3)
     float W_sum; //sum of all weight
     float M; //number of ligts processed for this reservoir
 
@@ -91,7 +91,7 @@ struct GIReservoir
     {
         randomSeed = 0;
         targetPDF = 0;
-        targetPDF_3f = 0;
+        targetPDF_3f_U32 = 0;
         W_sum = 0;
         M = 0;
 
@@ -108,7 +108,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
     if ((rnd01 < (w / reservoir.W_sum)) || reservoir.M == 0)
     {
         reservoir.targetPDF = p_hat;
-        reservoir.targetPDF_3f = p_hat_3f;
+        reservoir.targetPDF_3f_U32 = p_hat_3f;
         reservoir.randomSeed = randomSeed;
         reservoir.giSample = giSample;
         reservoir.compressedMaterial = compressedMaterial;
@@ -119,7 +119,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
 
 bool combineGIReservoirs(inout GIReservoir reservoir, in GIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f, reservoirCombineElem.giSample, reservoirCombineElem.compressedMaterial  , reservoirCombineElem.M, rnd01);
+    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.giSample, reservoirCombineElem.compressedMaterial  , reservoirCombineElem.M, rnd01);
 }
 
 float3 shadeGIReservoir(in GIReservoir reservoir)
@@ -130,7 +130,7 @@ float3 shadeGIReservoir(in GIReservoir reservoir)
     }
 
     const float invPDF = max(0, reservoir.W_sum / (reservoir.M * reservoir.targetPDF));
-    return U32toF32x3(reservoir.targetPDF_3f) * invPDF;
+    return decompressU32asRGB(reservoir.targetPDF_3f_U32) * invPDF;
 }
 
 bool isValidReservoir(in GIReservoir reservoir)
@@ -140,7 +140,7 @@ bool isValidReservoir(in GIReservoir reservoir)
 
 void recognizeAsShadowedReservoir(inout GIReservoir reservoir)
 {
-    reservoir.targetPDF_3f = 0;
+    reservoir.targetPDF_3f_U32 = 0;
 }
 
 #endif//__RESERVOIR_HLSLI__

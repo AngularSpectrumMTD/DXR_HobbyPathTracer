@@ -127,7 +127,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    const float3 element = U32toF32x3(payload.compressedThroughput) * photon;
+    const float3 element = decompressU32asRGB(payload.throughputU32) * photon;
     addCaustics(element);
 
     updateRay(currentMaterial, surfaceNormal, nextRay, payload);
@@ -155,7 +155,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.compressedThroughput, payload.randomSeed, payload.lambdaNM);
+    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {

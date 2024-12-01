@@ -428,7 +428,7 @@ float3 directionalLightingOnMissShader(Payload payload)
     const float cosMax = cos(DIRECTIONAL_LIGHT_SPREAD_HALF_ANGLE_RADIAN);
     if (payload.recursive > 0 && isDirectionalLightFinded && dot(dominantDir, -WorldRayDirection()) > cosMax)
     {
-        val = U32toF32x3(payload.compressedThroughput) * emis;
+        val = decompressU32asRGB(payload.throughputU32) * emis;
     }
 
     return val;

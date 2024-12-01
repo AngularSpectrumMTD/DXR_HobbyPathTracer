@@ -27,7 +27,7 @@ void miss(inout Payload payload) {
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hitLe, hitPosition, hitNormal))
     {
         setDI(hitLe);
-        payload.compressedThroughput = 0u;
+        payload.throughputU32 = 0u;
         const bool isAnaliticalLightHitted = (length(hitLe) > 0);
         const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
         const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
@@ -43,7 +43,7 @@ void miss(inout Payload payload) {
 
     if (isHitLightingRequired)
     {
-        float3 element = U32toF32x3(payload.compressedThroughput) * directionalLightingOnMissShader(payload);
+        float3 element = decompressU32asRGB(payload.throughputU32) * directionalLightingOnMissShader(payload);
 
         if(isDirectRay(payload) || isCompletelyMissRay(payload))
         {
@@ -61,7 +61,7 @@ void miss(inout Payload payload) {
     if(isUseIBL())
     {
         float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
-        float3 element = U32toF32x3(payload.compressedThroughput) * cubemap.rgb;
+        float3 element = decompressU32asRGB(payload.throughputU32) * cubemap.rgb;
         if(isDirectRay(payload) || isCompletelyMissRay(payload))
         {
             addDI(element);
@@ -72,13 +72,13 @@ void miss(inout Payload payload) {
         }
     }
     
-    payload.compressedThroughput = 0u;
+    payload.throughputU32 = 0u;
 }
 
 [shader("miss")]
 void photonMiss(inout PhotonPayload payload)
 {
-    payload.compressedThroughput = 0u;
+    payload.throughputU32 = 0u;
 }
 
 [shader("miss")]
