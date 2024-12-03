@@ -1,4 +1,4 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
 #include "AppInvoker.h"
 
@@ -9,7 +9,7 @@
 #include <wincodec.h>
 #include "utility/Utility.h"
 
-void DxrPhotonMapper::CreateRootSignatureGlobal()
+void DXRPathTracer::CreateRootSignatureGlobal()
 {
     //OrdinalRaytracing
     {
@@ -276,7 +276,7 @@ void DxrPhotonMapper::CreateRootSignatureGlobal()
     }
 }
 
-void DxrPhotonMapper::CreateRootSignatureLocal()
+void DXRPathTracer::CreateRootSignatureLocal()
 {
     {
         const u32 regSpace = 1;

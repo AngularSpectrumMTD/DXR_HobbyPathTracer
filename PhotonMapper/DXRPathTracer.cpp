@@ -1,4 +1,4 @@
-﻿#include "DxrPhotonMapper.h"
+﻿#include "DXRPathTracer.h"
 
 #include "AppInvoker.h"
 
@@ -27,13 +27,13 @@ using namespace DirectX;
 
 //This Program supports TRIANGULAR POLYGON only
 //If u wanna see beautiful caustics, polygon normal must be smooth!!!
-DxrPhotonMapper::DxrPhotonMapper(u32 width, u32 height) : AppBase(width, height, L"HobbyTracer"),
+DXRPathTracer::DXRPathTracer(u32 width, u32 height) : AppBase(width, height, L"HobbyTracer"),
 mMeshStage(), mMeshSphere(), mMeshBox(), mDispatchRayDesc(), mSceneParam(),
 mNormalSphereMaterialTbl()
 {
 }
 
-void DxrPhotonMapper::UpdateWindowText()
+void DXRPathTracer::UpdateWindowText()
 {
     std::wstringstream windowText;
     windowText.str(L"");
@@ -57,7 +57,7 @@ void DxrPhotonMapper::UpdateWindowText()
     SetWindowText(AppInvoker::GetHWND(), finalWindowText.c_str());
 }
 
-void DxrPhotonMapper::Setup()
+void DXRPathTracer::Setup()
 {
     mSceneType = SceneType_Sponza;
 
@@ -688,7 +688,7 @@ void DxrPhotonMapper::Setup()
     InitializeLightGenerateParams();
 }
 
-void DxrPhotonMapper::Initialize()
+void DXRPathTracer::Initialize()
 {
     if (!InitializeRenderDevice(AppInvoker::GetHWND()))
     {
@@ -717,7 +717,7 @@ void DxrPhotonMapper::Initialize()
     }
 }
 
-void DxrPhotonMapper::Draw()
+void DXRPathTracer::Draw()
 {
     QueryPerformanceFrequency(&mCpuFreq);
 
@@ -1222,7 +1222,7 @@ void DxrPhotonMapper::Draw()
     QueryPerformanceCounter(&mEndTime);
 }
 
-void DxrPhotonMapper::InitializeCamera()
+void DXRPathTracer::InitializeCamera()
 {
     mCamera.SetLookAt(mInitEyePos, mInitTargetPos);
 
@@ -1232,12 +1232,12 @@ void DxrPhotonMapper::InitializeCamera()
     );
 }
 
-void DxrPhotonMapper::Terminate()
+void DXRPathTracer::Terminate()
 {
     TerminateRenderDevice();
 }
 
-void DxrPhotonMapper::Update()
+void DXRPathTracer::Update()
 {
     if (mIsTemporalAccumulationForceDisable)
     {
@@ -1305,7 +1305,7 @@ void DxrPhotonMapper::Update()
     mIsHistoryResetRequested = false;
 }
 
-void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
+void DXRPathTracer::OnKeyDown(UINT8 wparam)
 {
     const f32 clampRange = (mStageType == StageType_Plane) ? 1.5f * PLANE_SIZE : 0.9f * PLANE_SIZE;
 
@@ -1518,26 +1518,26 @@ void DxrPhotonMapper::OnKeyDown(UINT8 wparam)
     }
 }
 
-void DxrPhotonMapper::OnMouseDown(MouseButton button, s32 x, s32 y)
+void DXRPathTracer::OnMouseDown(MouseButton button, s32 x, s32 y)
 {
     f32 fdx = f32(x) / GetWidth();
     f32 fdy = f32(y) / GetHeight();
     mCamera.OnMouseButtonDown(s32(button), fdx, fdy);
 }
 
-void DxrPhotonMapper::OnMouseUp(MouseButton button, s32 x, s32 y)
+void DXRPathTracer::OnMouseUp(MouseButton button, s32 x, s32 y)
 {
     mCamera.OnMouseButtonUp();
 }
 
-void DxrPhotonMapper::OnMouseMove(s32 dx, s32 dy)
+void DXRPathTracer::OnMouseMove(s32 dx, s32 dy)
 {
     f32 fdx = f32(dx) / GetWidth();
     f32 fdy = f32(dy) / GetHeight();
     mCamera.OnMouseMove(-fdx, fdy);
 }
 
-void DxrPhotonMapper::OnMouseWheel(s32 rotate)
+void DXRPathTracer::OnMouseWheel(s32 rotate)
 {
     //Note : 120 is wheel dir base
     if (rotate == 120)
@@ -1551,18 +1551,18 @@ void DxrPhotonMapper::OnMouseWheel(s32 rotate)
     mCamera.OnMouseWheel(rotate / 8000.f);
 }
 
-f32 DxrPhotonMapper::Clamp(f32 min, f32 max, f32 src)
+f32 DXRPathTracer::Clamp(f32 min, f32 max, f32 src)
 {
     return std::fmax(min, std::fmin(src, max));
 }
 
-void DxrPhotonMapper::UpdateSceneParams()
+void DXRPathTracer::UpdateSceneParams()
 {
     auto sceneConstantBuffer = mSceneCB.Get();
     mDevice->ImmediateBufferUpdateHostVisible(sceneConstantBuffer, &mSceneParam, sizeof(mSceneParam));
 }
 
-void DxrPhotonMapper::UpdateMaterialParams()
+void DXRPathTracer::UpdateMaterialParams()
 {
     auto materialConstantBuffer0 = mOBJ0MaterialCB.Get();
     mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer0, &mMaterialParam0, sizeof(mMaterialParam0));
@@ -1571,7 +1571,7 @@ void DxrPhotonMapper::UpdateMaterialParams()
     mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer1, &mMaterialParam1, sizeof(mMaterialParam1));
 }
 
-void DxrPhotonMapper::InitializeLightGenerateParams()
+void DXRPathTracer::InitializeLightGenerateParams()
 {
     mLightGenerationParamTbl.resize(0);
     for (u32 i = 0; i < LightCount_Rect; i++)
@@ -1603,7 +1603,7 @@ void DxrPhotonMapper::InitializeLightGenerateParams()
     }
 }
 
-void DxrPhotonMapper::UpdateLightGenerateParams()
+void DXRPathTracer::UpdateLightGenerateParams()
 {
     XMFLOAT3 colorTbl[] = {
         XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
@@ -1768,7 +1768,7 @@ void DxrPhotonMapper::UpdateLightGenerateParams()
     //mCommandList->ResourceBarrier(_countof(dstTosrv), dstTosrv);
 }
 
-f32 DxrPhotonMapper::getFrameRate()
+f32 DXRPathTracer::getFrameRate()
 {
     return 1000.0f * (mEndTime.QuadPart - mStartTime.QuadPart) / mCpuFreq.QuadPart;
 }

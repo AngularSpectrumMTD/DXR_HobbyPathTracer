@@ -1,9 +1,9 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 #include <random>
 
 using namespace DirectX;
 
-void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
+void DXRPathTracer::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
 {
     D3D12_RAYTRACING_INSTANCE_DESC templateDesc{};
     templateDesc.InstanceMask = 0xFF;
@@ -113,7 +113,7 @@ void DxrPhotonMapper::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>&
     }*/
 }
 
-void DxrPhotonMapper::SetupMeshMaterialAndPos()
+void DXRPathTracer::SetupMeshMaterialAndPos()
 {
     std::vector<utility::VertexPNT> verticesPNT;
     std::vector<u32> indices;
@@ -410,7 +410,7 @@ void DxrPhotonMapper::SetupMeshMaterialAndPos()
     mDevice->ImmediateBufferUpdateHostVisible(mStageMaterialCB.Get(), &mStageMaterial, bufferSize);
 }
 
-void DxrPhotonMapper::CreateSceneBLAS()
+void DXRPathTracer::CreateSceneBLAS()
 {
     mMeshStage.CreateBLAS(mDevice, L"Plane-BLAS");
     mMeshSphere.CreateBLAS(mDevice, L"Sphere-BLAS");
@@ -421,7 +421,7 @@ void DxrPhotonMapper::CreateSceneBLAS()
     mOBJModel.CreateBLASs(mDevice);
 }
 
-void DxrPhotonMapper::CreateSceneTLAS()
+void DXRPathTracer::CreateSceneTLAS()
 {
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
     SetupMeshInfo(instanceDescs);
@@ -465,7 +465,7 @@ void DxrPhotonMapper::CreateSceneTLAS()
     mDevice->WaitForCompletePipe();
 }
 
-void DxrPhotonMapper::UpdateSceneTLAS()
+void DXRPathTracer::UpdateSceneTLAS()
 {
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
     SetupMeshInfo(instanceDescs);
@@ -494,7 +494,7 @@ void DxrPhotonMapper::UpdateSceneTLAS()
     mCommandList->ResourceBarrier(1, &barrier);
 }
 
-void DxrPhotonMapper::CreateAccelerationStructure()
+void DXRPathTracer::CreateAccelerationStructure()
 {
     SetupMeshMaterialAndPos();
     CreateSceneBLAS();

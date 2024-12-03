@@ -1,6 +1,6 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
-void DxrPhotonMapper::SpatiotemporalVarianceGuidedFiltering()
+void DXRPathTracer::SpatiotemporalVarianceGuidedFiltering()
 {
     //auto frameIndex = mDevice->GetCurrentFrameIndex();
     //const u32 src = mRenderFrame % 2;

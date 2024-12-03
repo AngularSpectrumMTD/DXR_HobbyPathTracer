@@ -1,8 +1,8 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 #include <fstream>
 #include <wincodec.h>
 
-void DxrPhotonMapper::GetAssetsPath(_Out_writes_(pathSize) WCHAR* path, u32 pathSize)
+void DXRPathTracer::GetAssetsPath(_Out_writes_(pathSize) WCHAR* path, u32 pathSize)
 {
     if (path == nullptr)
     {
@@ -23,12 +23,12 @@ void DxrPhotonMapper::GetAssetsPath(_Out_writes_(pathSize) WCHAR* path, u32 path
     }
 }
 
-std::wstring DxrPhotonMapper::GetAssetFullPath(LPCWSTR assetName)
+std::wstring DXRPathTracer::GetAssetFullPath(LPCWSTR assetName)
 {
     return mAssetPath + assetName;
 }
 
-void DxrPhotonMapper::CreateComputeShaderStateObject(const LPCWSTR& compiledComputeShaderName, ComPtr<ID3D12PipelineState>& computePipelineState, ComPtr<ID3D12RootSignature> rootSig)
+void DXRPathTracer::CreateComputeShaderStateObject(const LPCWSTR& compiledComputeShaderName, ComPtr<ID3D12PipelineState>& computePipelineState, ComPtr<ID3D12RootSignature> rootSig)
 {
     u32 fileSize = 0;
     UINT8* shaderCodePtr;
@@ -45,7 +45,7 @@ void DxrPhotonMapper::CreateComputeShaderStateObject(const LPCWSTR& compiledComp
     }
 }
 
-void DxrPhotonMapper::CreateComputeRootSignatureAndPSO()
+void DXRPathTracer::CreateComputeRootSignatureAndPSO()
 {
     {
         utility::RootSignatureCreater rsCreater;

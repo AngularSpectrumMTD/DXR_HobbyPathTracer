@@ -1,8 +1,8 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 #include <DirectXTex.h>
 using namespace DirectX;
 
-//utility::TextureResource DxrPhotonMapper::LoadTextureFromFile(const std::wstring& fileName)
+//utility::TextureResource DXRPathTracer::LoadTextureFromFile(const std::wstring& fileName)
 //{
 //    DirectX::TexMetadata metadata;
 //    DirectX::ScratchImage image;

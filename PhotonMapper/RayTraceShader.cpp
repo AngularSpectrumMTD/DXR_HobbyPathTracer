@@ -1,6 +1,6 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
-void DxrPhotonMapper::CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, ComPtr<ID3D12RootSignature>& globalRootSignature, const u32 maxPayloadSize, const u32 maxAttributeSize, const u32 maxRecursionDepth, const wchar_t* rayGenLibraryName, const wchar_t* rayGenShaderName, const wchar_t* missLibraryName, const wchar_t* missShaderName, const wchar_t* chLibraryName, const wchar_t* chShaderName, const wchar_t* chLibraryNameWithTex, const wchar_t* chShaderNameWithTex, const wchar_t* ahShaderName, const wchar_t* ahShaderNameWithTex)
+void DXRPathTracer::CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, ComPtr<ID3D12RootSignature>& globalRootSignature, const u32 maxPayloadSize, const u32 maxAttributeSize, const u32 maxRecursionDepth, const wchar_t* rayGenLibraryName, const wchar_t* rayGenShaderName, const wchar_t* missLibraryName, const wchar_t* missShaderName, const wchar_t* chLibraryName, const wchar_t* chShaderName, const wchar_t* chLibraryNameWithTex, const wchar_t* chShaderNameWithTex, const wchar_t* ahShaderName, const wchar_t* ahShaderNameWithTex)
 {
     std::unordered_map<std::wstring, D3D12_SHADER_BYTECODE> shaders;
     const auto shaderFiles = {
@@ -230,7 +230,7 @@ void DxrPhotonMapper::CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, 
     }
 }
 
-void DxrPhotonMapper::CreateStateObjects()
+void DXRPathTracer::CreateStateObjects()
 {
     CreateStateObject(mRTPSO, mGlobalRootSig, sizeof(Payload), sizeof(TriangleIntersectionAttributes), MAX_RECURSION_DEPTH, RayTracingDxlibs::RayGen, RayTracingEntryPoints::RayGen, RayTracingDxlibs::Miss, RayTracingEntryPoints::Miss, RayTracingDxlibs::DefaultMaterialClosestHit, RayTracingEntryPoints::ClosestHitMaterial, RayTracingDxlibs::DefaultMaterialWithTexClosestHit, RayTracingEntryPoints::ClosestHitMaterialWithTex, RayTracingEntryPoints::AnyHit, RayTracingEntryPoints::AnyHitWithTex);
     CreateStateObject(mRTPSOPhoton, mGlobalRootSigPhoton, sizeof(PhotonPayload), sizeof(TriangleIntersectionAttributes), MAX_RECURSION_DEPTH, RayTracingDxlibs::RayGen, RayTracingEntryPoints::RayGenPhoton, RayTracingDxlibs::Miss, RayTracingEntryPoints::MissPhoton, RayTracingDxlibs::DefaultMaterialClosestHit, RayTracingEntryPoints::ClosestHitMaterialPhoton, RayTracingDxlibs::DefaultMaterialWithTexClosestHit, RayTracingEntryPoints::ClosestHitMaterialWithTexPhoton);
@@ -238,7 +238,7 @@ void DxrPhotonMapper::CreateStateObjects()
     CreateStateObject(mRTPSOReservoirTemporalReuse, mGlobalRootSigReservoirTemporalReuse, sizeof(Payload), sizeof(TriangleIntersectionAttributes), MAX_RECURSION_DEPTH, RayTracingDxlibs::RayGen, RayTracingEntryPoints::RayGenTemporalReuse, RayTracingDxlibs::Miss, RayTracingEntryPoints::Miss, RayTracingDxlibs::DefaultMaterialClosestHit, RayTracingEntryPoints::ClosestHitMaterial, RayTracingDxlibs::DefaultMaterialWithTexClosestHit, RayTracingEntryPoints::ClosestHitMaterialWithTex, RayTracingEntryPoints::AnyHit, RayTracingEntryPoints::AnyHitWithTex);
 }
 
-void DxrPhotonMapper::CreateRaytracingRootSignatureAndPSO()
+void DXRPathTracer::CreateRaytracingRootSignatureAndPSO()
 {
     CreateRootSignatureGlobal();
     CreateRootSignatureLocal();

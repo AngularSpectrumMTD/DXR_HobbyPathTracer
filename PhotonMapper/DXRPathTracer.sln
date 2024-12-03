@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DxrPhotonMapper", "DxrPhotonMapper.vcxproj", "{2444C099-B598-47E0-9A27-552933D8D57B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXRPathTracer", "DXRPathTracer.vcxproj", "{2444C099-B598-47E0-9A27-552933D8D57B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

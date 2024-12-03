@@ -1,7 +1,7 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
 
-void DxrPhotonMapper::BitonicSortLDS()
+void DXRPathTracer::BitonicSortLDS()
 {
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
@@ -103,7 +103,7 @@ void DxrPhotonMapper::BitonicSortLDS()
     }
 }
 
-void DxrPhotonMapper::BitonicSortSimple()
+void DXRPathTracer::BitonicSortSimple()
 {
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
@@ -148,7 +148,7 @@ void DxrPhotonMapper::BitonicSortSimple()
     }
 }
 
-void DxrPhotonMapper::Grid3DSort()
+void DXRPathTracer::Grid3DSort()
 {
     auto frameIndex = mDevice->GetCurrentFrameIndex();
     const u32 photonNum = mPhotonMapSize1D * mPhotonMapSize1D;

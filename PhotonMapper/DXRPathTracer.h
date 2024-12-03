@@ -114,9 +114,9 @@ namespace ComputeShaders {
 template<class T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-class DxrPhotonMapper : public AppBase {
+class DXRPathTracer : public AppBase {
 public:
-    DxrPhotonMapper(u32 width, u32 height);
+    DXRPathTracer(u32 width, u32 height);
 
     void Initialize() override;
     void Terminate() override;

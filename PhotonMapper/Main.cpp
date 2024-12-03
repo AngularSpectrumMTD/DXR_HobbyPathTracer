@@ -1,4 +1,4 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
 #define APP_INVOKER_IMPLEMENTATION
 #include "AppInvoker.h"
@@ -9,6 +9,6 @@ int APIENTRY wWinMain(
     _In_ LPWSTR /*cmdline*/,
     _In_ int /*nCmdShow*/)
 {
-    DxrPhotonMapper photonMapper(1280, 720);
+    DXRPathTracer photonMapper(1280, 720);
     return AppInvoker::Execute(&photonMapper, hInstance);
 }

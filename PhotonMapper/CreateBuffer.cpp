@@ -1,8 +1,8 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
 using namespace DirectX;
 
-void DxrPhotonMapper::CreateLightGenerationBuffer()
+void DXRPathTracer::CreateLightGenerationBuffer()
 {
     const u32 lightBufferSizeInBites = mLightGenerationParamTbl.size() * sizeof(LightGenerateParam);
     mLightGenerationParamBuffer = mDevice->CreateBuffer(lightBufferSizeInBites, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_HEAP_TYPE_UPLOAD, nullptr, L"LightGenerateParams");
@@ -16,7 +16,7 @@ void DxrPhotonMapper::CreateLightGenerationBuffer()
     mLightGenerationParamSRV = mDevice->CreateShaderResourceView(mLightGenerationParamBuffer.Get(), &srvDesc);
 }
 
-void DxrPhotonMapper::CreateRegularBuffer()
+void DXRPathTracer::CreateRegularBuffer()
 {
     auto width = GetWidth();
     auto height = GetHeight();
@@ -704,7 +704,7 @@ void DxrPhotonMapper::CreateRegularBuffer()
     }
 }
 
-void DxrPhotonMapper::CreateConstantBuffer()
+void DXRPathTracer::CreateConstantBuffer()
 {
     //Photon Grid Sorting
     {

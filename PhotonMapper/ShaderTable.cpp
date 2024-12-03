@@ -1,6 +1,6 @@
-#include "DxrPhotonMapper.h"
+#include "DXRPathTracer.h"
 
-void DxrPhotonMapper::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPtr<ID3D12StateObject>& stateObject, D3D12_DISPATCH_RAYS_DESC& dispatchRaysDesc, const u32 maxRootSigSizeRayGen, const u32 maxRootSigSizeMiss, const u32 maxRootSigSizeHitGroup, const wchar_t* shaderTableName, const wchar_t* rayGenShaderName, const wchar_t* missShaderName)
+void DXRPathTracer::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPtr<ID3D12StateObject>& stateObject, D3D12_DISPATCH_RAYS_DESC& dispatchRaysDesc, const u32 maxRootSigSizeRayGen, const u32 maxRootSigSizeMiss, const u32 maxRootSigSizeHitGroup, const wchar_t* shaderTableName, const wchar_t* rayGenShaderName, const wchar_t* missShaderName)
 {
     const auto ShaderRecordAlignment = D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT;
     u32 raygenRecordSize = 0;
@@ -241,7 +241,7 @@ void DxrPhotonMapper::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, Com
     dispatchRaysDesc.Depth = 1;
 }
 
-void DxrPhotonMapper::CreateShaderTables()
+void DXRPathTracer::CreateShaderTables()
 {
     CreateShaderTable(mShaderTable, mRTPSO, mDispatchRayDesc, 0, 0, max(mRegisterMapGlobalLocalRootSigMaterial.size(), mRegisterMapGlobalLocalRootSigMaterialWithTex.size()), L"ShaderTable", RayTracingEntryPoints::RayGen, RayTracingEntryPoints::Miss);
     CreateShaderTable(mShaderTablePhoton, mRTPSOPhoton, mDispatchPhotonRayDesc, 0, 0, max(mRegisterMapGlobalLocalRootSigMaterial.size(), mRegisterMapGlobalLocalRootSigMaterialWithTex.size()), L"ShaderTablePhoton", RayTracingEntryPoints::RayGenPhoton, RayTracingEntryPoints::MissPhoton);

@@ -14,9 +14,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{2444c099-b598-47e0-9a27-552933d8d57b}</ProjectGuid>
-    <RootNamespace>DxrPhotonMapper</RootNamespace>
+    <RootNamespace>DXRPathTracer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>DxrPhotonMapper</ProjectName>
+    <ProjectName>DXRPathTracer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -110,7 +110,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
     <ClCompile Include="GPUSort.cpp" />
     <ClCompile Include="LoadTexture.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="DxrPhotonMapper.cpp" />
+    <ClCompile Include="DXRPathTracer.cpp" />
     <ClCompile Include="RayTraceShader.cpp" />
     <ClCompile Include="SetUpRootSignature.cpp" />
     <ClCompile Include="ShaderTable.cpp" />
@@ -123,7 +123,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
     <ClInclude Include="..\common\include\AppInvoker.h" />
     <ClInclude Include="..\common\include\utility\OBJ.h" />
     <ClInclude Include="..\common\include\utility\Utility.h" />
-    <ClInclude Include="DxrPhotonMapper.h" />
+    <ClInclude Include="DXRPathTracer.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -336,7 +336,7 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DxrPhotonMapper.rc" />
+    <ResourceCompile Include="DXRPathTracer.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="photonMapperICON.ico" />
