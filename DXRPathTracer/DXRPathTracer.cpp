@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_Kitchen;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -192,7 +192,7 @@ void DXRPathTracer::Setup()
                         mCausticsBoost = 0.014;
                         mLightRange = 0.29f;
 
-                        mGlassModelType = ModelType_Buddha;
+                        mGlassModelType = ModelType_Afrodyta;
                         //mLightRange = 2.00f;
                     }
                 }
