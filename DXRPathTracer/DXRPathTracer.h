@@ -408,6 +408,7 @@ private:
         SceneType_Room,
         SceneType_GITest,
         SceneType_Kitchen,
+        SceneType_PTTest,
     };
 
     enum Spectrum

@@ -4,7 +4,9 @@
 
 #define PREPARE_ELEMENTS 10000
 #define REINTERPRET_GLASS_MATERIAL_NAME "ReinterpretGlass"
+#define REINTERPRET_ROUGH_GLASS_MATERIAL_NAME "ReinterpretRoughGlass"
 #define REINTERPRET_MIRROR_MATERIAL_NAME "ReinterpretMirror"
+#define REINTERPRET_ROUGH_MIRROR_MATERIAL_NAME "ReinterpretRoughMirror"
 #define MIN_ROUGHNESS 0.05f
 
 namespace utility {
@@ -813,6 +815,15 @@ namespace utility {
 					mparams.transRatio = 1;
 					mparams.transColor = mparams.albedo;
 					mparams.roughness = MIN_ROUGHNESS;
+				}
+				if (std::strcmp(m.MaterialName.c_str(), REINTERPRET_ROUGH_MIRROR_MATERIAL_NAME) == 0)
+				{
+					mparams.metallic = 1;
+				}
+				if (std::strcmp(m.MaterialName.c_str(), REINTERPRET_ROUGH_GLASS_MATERIAL_NAME) == 0)
+				{
+					mparams.transRatio = 1;
+					mparams.transColor = mparams.albedo;
 				}
 
 				mparams.roughness = max(mparams.roughness, MIN_ROUGHNESS);

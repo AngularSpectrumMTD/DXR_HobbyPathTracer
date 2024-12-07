@@ -4,13 +4,17 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+![Test](https://github.com/user-attachments/assets/fbe670e4-d90d-454d-af97-be02212dee23)
+
 ![bistroMain](https://github.com/user-attachments/assets/a3348bc1-88c9-4e6d-8d60-e4bb42592d12)
 
 ![Kitchen](https://github.com/user-attachments/assets/58b065cb-47c7-4568-998e-59fa32aa5a6f)
 
-![GItest](https://github.com/user-attachments/assets/2cbd3969-6917-4e80-8609-5d7aaeb4404c)
-
 ![comparison](https://github.com/user-attachments/assets/627a5dc6-fb2a-4d77-b5aa-7259d93e1738)
+
+![ReSTIR1](https://github.com/user-attachments/assets/13c0cad4-10d5-42e9-9303-5f8731a6769e)
+
+![ReSTIR2](https://github.com/user-attachments/assets/de44cdec-27a2-4669-ae2c-f1d87b4aa4ff)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -21,7 +25,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy)
-1. Set "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

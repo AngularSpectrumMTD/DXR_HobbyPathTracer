@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_Kitchen;
+    mSceneType = SceneType_PTTest;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -360,6 +360,30 @@ void DXRPathTracer::Setup()
 
             mGlassModelType = ModelType_Afrodyta;
             mIntenceBoost *= 3;
+        }
+        break;
+        case SceneType_PTTest:
+        {
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
+            mInitEyePos = XMFLOAT3(334.00f, 81.915, 161.07f);
+            mInitTargetPos = XMFLOAT3(300.78, 79.42, 147.028f);
+
+            mOBJFileName = "PTTest.obj";
+            mOBJFolderName = "model/PTTest";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 0.79f;
+
+            mGlassModelType = ModelType_Afrodyta;
         }
         break;
     }
