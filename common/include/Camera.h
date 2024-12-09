@@ -22,6 +22,7 @@ public:
     );
     void SetPerspective(
         f32 fovY, f32 aspect, f32 znear, f32 zfar);
+    void SetSpeed(f32 speed);
 
     XMMATRIX GetViewMatrix() const { return mMtxView; }
     XMMATRIX GetProjectionMatrix() const { return mMtxProj; }
@@ -48,6 +49,7 @@ private:
     XMMATRIX mMtxProj;
 
     s32 mButtonType;
+    f32 mSpeed = 1.0f;
 };
 
 #endif

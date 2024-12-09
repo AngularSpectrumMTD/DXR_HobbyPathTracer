@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTest;
+    mSceneType = SceneType_BistroExterior;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -386,6 +386,31 @@ void DXRPathTracer::Setup()
             mGlassModelType = ModelType_Afrodyta;
         }
         break;
+        case SceneType_PTTestBrick:
+        {
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
+            mInitEyePos = XMFLOAT3(619, 378, 596);
+            mInitTargetPos = XMFLOAT3(596, 372, 569);
+
+            mOBJFileName = "PTTestBrick.obj";
+            mOBJFolderName = "model/PTTest";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 0.79f;
+
+            mGlassModelType = ModelType_Afrodyta;
+            mCameraSpeed = 3.0f;
+        }
+        break;
     }
 
 #ifdef GI_TEST
@@ -525,6 +550,10 @@ void DXRPathTracer::Setup()
         {
             mGlassObjYOfsset = 16;
             mGlassObjScale = XMFLOAT3(0.02f, 0.02f, 0.02f);
+        }
+        if (mSceneType == SceneType_PTTestBrick)
+        {
+            mGlassObjYOfsset = 14;
         }
     }
     break;
@@ -1254,6 +1283,7 @@ void DXRPathTracer::InitializeCamera()
     mCamera.SetPerspective(
         XM_PIDIV4, GetAspect(), 0.1f, 100.0f
     );
+    mCamera.SetSpeed(mCameraSpeed);
 }
 
 void DXRPathTracer::Terminate()

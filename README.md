@@ -4,15 +4,20 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-![Test](https://github.com/user-attachments/assets/cfc637b9-c2c6-4df7-b9f3-9654ac1fcd1d)
+Scene Name "PTTest"(Made by AngularSpectrumMTD)
+![Test](https://github.com/user-attachments/assets/5ae6ce91-c5c4-48cc-a4be-493337a29c80)
 
-![bistroMain](https://github.com/user-attachments/assets/a3348bc1-88c9-4e6d-8d60-e4bb42592d12)
+Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
+![Test2](https://github.com/user-attachments/assets/20178fe3-4274-41c9-95ca-3d8cdb3d6746)
 
-![Kitchen](https://github.com/user-attachments/assets/58b065cb-47c7-4568-998e-59fa32aa5a6f)
+Scene Name "BistroExtorior"(External Resource)
+![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
 
 ![comparison](https://github.com/user-attachments/assets/627a5dc6-fb2a-4d77-b5aa-7259d93e1738)
 
 ![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
+
+![ReSTIR2](https://github.com/user-attachments/assets/9e47427e-201b-42a2-866c-34f8edfa80fa)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -22,8 +27,8 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 **NOTE : This program can only handle triangular polygons**
 
 ---
-#### With Simple Scene (Easy)
-1. Set "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+#### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
+1. Set "SceneType_PTTest" or ""SceneType_PTTest"Brick" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

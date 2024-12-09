@@ -409,6 +409,7 @@ private:
         SceneType_GITest,
         SceneType_Kitchen,
         SceneType_PTTest,
+        SceneType_PTTestBrick,
     };
 
     enum Spectrum
@@ -837,6 +838,8 @@ private:
 
     f32 mMeanFreePath = 10e-3f;//mMeanFreePathRatio * mMeanFreePath must be 1[mm] - 10[mm]
     f32 mMeanFreePathRatio = 0.5;
+
+    f32 mCameraSpeed = 1.0f;
 };
 
 #endif

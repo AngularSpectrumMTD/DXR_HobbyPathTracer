@@ -186,7 +186,7 @@ namespace utility {
 				utility::VertexPNT Tri;
 				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
 				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
-				if (uv.size() > 0 && (MaterialTbl[j].TriangleUVIDTbl.size() > 0))
+				if (uv.size() > 0 && MaterialTbl[j].TriangleUVIDTbl.size() > 0 && (i < MaterialTbl[j].TriangleUVIDTbl.size()))
 				{
 					Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
 				}

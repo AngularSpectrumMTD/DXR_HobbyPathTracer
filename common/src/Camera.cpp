@@ -22,6 +22,11 @@ void Camera::SetPerspective(f32 fovY, f32 aspect, f32 znear, f32 zfar)
     mMtxProj = XMMatrixPerspectiveFovRH(fovY, aspect, znear, zfar);
 }
 
+void Camera::SetSpeed(f32 speed)
+{
+    mSpeed = speed;
+}
+
 void Camera::OnMouseButtonDown(s32 buttonType, f32, f32 )
 {
     mButtonType = buttonType;
@@ -56,31 +61,30 @@ bool Camera::OnKeyDown(UINT8  wparam)
 {
     bool flag = false;
     XMVECTOR tmp = mEye - mTarget;
-    const f32 ratio = 1.0f;
     switch (wparam)
     {
         //Foward
     case VK_UP:
-        mEye -= ratio * XMVector3Normalize(tmp);
-        mTarget -= ratio * XMVector3Normalize(tmp);
+        mEye -= mSpeed * XMVector3Normalize(tmp);
+        mTarget -= mSpeed * XMVector3Normalize(tmp);
         flag =  true;
         break;
         //Backward
     case VK_DOWN:
-        mEye += ratio * XMVector3Normalize(tmp);
-        mTarget += ratio * XMVector3Normalize(tmp);
+        mEye += mSpeed * XMVector3Normalize(tmp);
+        mTarget += mSpeed * XMVector3Normalize(tmp);
         flag = true;
         break;
         //Right
     case VK_RIGHT:
-        mEye -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
-        mTarget -= ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mEye -= mSpeed * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget -= mSpeed * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         flag = true;
         break;
         //Left
     case VK_LEFT:
-        mEye += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
-        mTarget += ratio * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mEye += mSpeed * XMVector3Normalize(XMVector3Cross(tmp, mUp));
+        mTarget += mSpeed * XMVector3Normalize(XMVector3Cross(tmp, mUp));
         flag = true;
         break;
     }
