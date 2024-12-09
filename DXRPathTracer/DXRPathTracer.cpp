@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_BistroExterior;
+    mSceneType = SceneType_PTTestBrick;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
