@@ -391,9 +391,13 @@ void DXRPathTracer::Setup()
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
-            mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
-            mInitEyePos = XMFLOAT3(619, 378, 596);
-            mInitTargetPos = XMFLOAT3(596, 372, 569);
+            mPhiDirectional = 104.0f; mThetaDirectional = 321.0f;
+            mInitEyePos = XMFLOAT3(-85, 64, -18);
+            mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            //mInitEyePos = XMFLOAT3(976, 823, 979);
+            //mInitTargetPos = XMFLOAT3(955, 806, 954);
 
             mOBJFileName = "PTTestBrick.obj";
             mOBJFolderName = "model/PTTest";
@@ -408,7 +412,7 @@ void DXRPathTracer::Setup()
             mLightRange = 0.79f;
 
             mGlassModelType = ModelType_Afrodyta;
-            mCameraSpeed = 3.0f;
+            mCameraSpeed = 10.0f;
         }
         break;
     }

@@ -8,7 +8,7 @@ Scene Name "PTTest"(Made by AngularSpectrumMTD)
 ![Test](https://github.com/user-attachments/assets/5ae6ce91-c5c4-48cc-a4be-493337a29c80)
 
 Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
-![Test2](https://github.com/user-attachments/assets/20178fe3-4274-41c9-95ca-3d8cdb3d6746)
+![Test2](https://github.com/user-attachments/assets/eb8ec566-0518-425d-b5ec-57e043450de6)
 
 Scene Name "BistroExtorior"(External Resource)
 ![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
@@ -17,7 +17,7 @@ Scene Name "BistroExtorior"(External Resource)
 
 ![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
 
-![ReSTIR2](https://github.com/user-attachments/assets/9e47427e-201b-42a2-866c-34f8edfa80fa)
+![ReSTIR2](https://github.com/user-attachments/assets/9cb28c8b-fd02-4608-8fd2-a287777bc673)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
