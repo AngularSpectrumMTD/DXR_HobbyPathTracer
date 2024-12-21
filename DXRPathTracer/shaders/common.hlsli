@@ -19,10 +19,6 @@
 //MIP 0 == 64 x 64
 #define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
 
-#define MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_L 8
-#define MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_M 4
-#define MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_S 2
-
 #define RAY_MIN_T 0.001f
 #define RAY_MAX_T 1000000.0f
 
@@ -204,6 +200,14 @@ CompressedMaterialParams getScreenSpaceMaterial()
     return gScreenSpaceMaterial[serialIndex];
 }
 
+void setDIReservoir(in DIReservoir reservoir)
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    gDIReservoirBuffer[serialIndex] = reservoir;
+}
+
 void setGIReservoir(in GIReservoir giReservoir)
 {
     uint3 launchIndex = DispatchRaysIndex();
@@ -318,14 +322,6 @@ void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, i
 
         payload.flags |= PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED;
     }
-}
-
-void storeDIReservoir(in DIReservoir reservoir, in Payload payload)
-{
-    uint3 launchIndex = DispatchRaysIndex();
-    uint3 dispatchDimensions = DispatchRaysDimensions();
-    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
-    gDIReservoirBuffer[serialIndex] = reservoir;
 }
 
 float depthLoad(uint2 index)

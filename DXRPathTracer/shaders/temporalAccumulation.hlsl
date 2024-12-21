@@ -89,7 +89,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         GIReservoir currGIReservoir = GIReservoirBufferSrc[serialCurrID];
 
         float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
-        currDI = shadeDIReservoir(currDIReservoir) + reservoirElementRemovedDI;
+        currDI = (isIndirectOnly() ? 0.xxx : shadeDIReservoir(currDIReservoir)) + reservoirElementRemovedDI;
 
         float3 reservoirElementRemovedGI = CurrentGIBuffer[currID].rgb;
         currGI = shadeGIReservoir(currGIReservoir) + reservoirElementRemovedGI;

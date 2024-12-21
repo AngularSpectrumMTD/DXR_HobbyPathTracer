@@ -840,6 +840,10 @@ private:
     f32 mMeanFreePathRatio = 0.5;
 
     f32 mCameraSpeed = 1.0f;
+
+    f32 mLightAreaScale = 1.0f;
+
+    bool mIsUseDirectionalLight = true;
 };
 
 #endif

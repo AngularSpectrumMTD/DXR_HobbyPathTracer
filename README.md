@@ -4,31 +4,32 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
+![Test2](https://github.com/user-attachments/assets/b6f73506-9174-45e5-85f0-60d3a81bd112)
+
 Scene Name "PTTest"(Made by AngularSpectrumMTD)
 ![Test](https://github.com/user-attachments/assets/5ae6ce91-c5c4-48cc-a4be-493337a29c80)
-
-Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
-![Test2](https://github.com/user-attachments/assets/a36a0b05-85e8-47aa-af26-1887bdb97cee)
 
 Scene Name "BistroExtorior"(External Resource)
 ![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
 
-![comparison](https://github.com/user-attachments/assets/627a5dc6-fb2a-4d77-b5aa-7259d93e1738)
+![ReSTIR2](https://github.com/user-attachments/assets/465e2f34-8aeb-4c13-afb0-7e476029f5d3)
 
 ![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
 
-![ReSTIR2](https://github.com/user-attachments/assets/abd399db-0711-4b1d-8350-5b3eea37a07a)
+![comparison](https://github.com/user-attachments/assets/627a5dc6-fb2a-4d77-b5aa-7259d93e1738)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
-![debugView](https://github.com/user-attachments/assets/434db9e3-f851-4316-a90e-8ffa2710aed3)
+![debugView](https://github.com/user-attachments/assets/125c907f-bc08-4971-828c-8b1b0e9a1598)  
+![debugView2](https://github.com/user-attachments/assets/7fd86339-24fe-4128-800b-9d160555b9b5)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_PTTest" or ""SceneType_PTTest"Brick" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_PTTestBrick" or ""SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza
@@ -82,3 +83,4 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F5 : enable / disable Metal Test
 - F6 : enable / disable SSS
 - F7 : enable / disable IBL
+- F8 : enable / disable Directional Light

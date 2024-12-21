@@ -447,15 +447,15 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, in uint maxCandidatesNum, inout uint randomSeed)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, inout uint randomSeed)
 {
-    const uint M = min(getLightNum(), maxCandidatesNum);
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
 
     reservoir.initialize();
 
-    for (int i = 0; i < M; i++)
+    [unroll]
+    for (int i = 0; i < 8; i++)
     {
         const uint lightID = getRandomLightID(randomSeed);
         const uint replayRandomSeed = randomSeed;
@@ -467,10 +467,17 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         float emitterCos = dot(lightNormal, -wi);
         float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
+
+        if((i > 0) && (G < 0.00001f))
+        {
+            continue;
+        }
+
         float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
         float3 p_hat_3F = FGL;
         p_hat = computeLuminance(FGL);
+
         float updateW = p_hat / pdf;
 
         updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, compressRGBasU32(p_hat_3F), 1u, rand(randomSeed));
@@ -485,21 +492,12 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
     if (isUseStreamingRIS())
     {
         LightSample lightSample;
-        uint maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_L;
-        if(payload.recursive > 4)
-        {
-            maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_M;
-        }
-        else if(payload.recursive > 2)
-        {
-            maxCandidatesNum = MAX_RESERVOIR_INITIAL_CANDIDATES_NUM_S;
-        }
 
         bool visibility = false;
 
         if(isSSSExecutable(material))
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, payload.randomSeed);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed);
             visibility = isVisible(scatterPosition, lightSample);
 
             if(!visibility)
@@ -521,7 +519,7 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, maxCandidatesNum, payload.randomSeed);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed);
             visibility = isVisible(scatterPosition, lightSample);
         }
 
@@ -598,7 +596,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             {
                 //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
                 DIGIelement = 0.xxx;
-                storeDIReservoir(reservoir, payload);
+                setDIReservoir(reservoir);
             }
         }
         isFinish = false;

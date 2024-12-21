@@ -388,16 +388,19 @@ void DXRPathTracer::Setup()
         break;
         case SceneType_PTTestBrick:
         {
+            mLightAreaScale = 6;
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
-            mPhiDirectional = 104.0f; mThetaDirectional = 321.0f;
-            mInitEyePos = XMFLOAT3(-85, 64, -18);
-            mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+            mPhiDirectional = 140.0f; mThetaDirectional = 256.0f;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
 
             //far
-            //mInitEyePos = XMFLOAT3(976, 823, 979);
-            //mInitTargetPos = XMFLOAT3(955, 806, 954);
+            mInitEyePos = XMFLOAT3(480, 1113, 542);
+            mInitTargetPos = XMFLOAT3(469.87, 1090.23, 516.81);
 
             mOBJFileName = "PTTestBrick.obj";
             mOBJFolderName = "model/PTTest";
@@ -409,7 +412,7 @@ void DXRPathTracer::Setup()
             mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
             mPhi = 46.0f; mTheta = 239.0f;
 
-            mLightRange = 0.79f;
+            mLightRange = 4.0f;
 
             mGlassModelType = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
@@ -1437,6 +1440,7 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
     case 'A':
         mIsIndirectOnly = !mIsIndirectOnly;
         mIsUseAccumulation = false;
+        mIsHistoryResetRequested = true;
         break;
     case 'O':
         mThetaDirectional += mInverseMove ? -1 : 1;
@@ -1573,6 +1577,10 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         mIsUseIBL = !mIsUseIBL;
         mIsUseAccumulation = false;
         break;
+    case VK_F8:
+        mIsUseDirectionalLight = !mIsUseDirectionalLight;
+        mIsUseAccumulation = false;
+        break;
     }
 }
 
@@ -1679,7 +1687,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
     const u32 prevSize = (u32)mLightGenerationParamTbl.size();
     mLightGenerationParamTbl.resize(0);
     u32 count = 0;
-    const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION_FOR_LIGHT_POSITION;
+    const f32 cellSize = 2 * 0.9 * PLANE_SIZE * mLightAreaScale / STAGE_DIVISION_FOR_LIGHT_POSITION;
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
         if (i == 0 && !mIsSpotLightPhotonMapper)
@@ -1702,8 +1710,8 @@ void DXRPathTracer::UpdateLightGenerateParams()
         else if (!mIsSpotLightPhotonMapper)
         {
             f32 y = mLightPosY;
-            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             LightGenerateParam param;
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
@@ -1744,8 +1752,8 @@ void DXRPathTracer::UpdateLightGenerateParams()
         else if (mIsSpotLightPhotonMapper)
         {
             f32 y = mLightPosY;
-            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             LightGenerateParam param;
             XMFLOAT3 tangent;
             XMFLOAT3 bitangent;
@@ -1784,8 +1792,8 @@ void DXRPathTracer::UpdateLightGenerateParams()
                 y = mLightPosY + 15;
             }
            
-            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
-            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE;
+            f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
+            f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             LightGenerateParam param;
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
             param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
@@ -1796,13 +1804,16 @@ void DXRPathTracer::UpdateLightGenerateParams()
         count++;
     }
     count = 0;
-    for (u32 i = 0; i < LightCount_Directional; i++)
+    if (mIsUseDirectionalLight)
     {
-        LightGenerateParam param;
-        XMFLOAT3 direction;
-        XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-        param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost));
-        mLightGenerationParamTbl.push_back(param);
+        for (u32 i = 0; i < LightCount_Directional; i++)
+        {
+            LightGenerateParam param;
+            XMFLOAT3 direction;
+            XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
+            param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost));
+            mLightGenerationParamTbl.push_back(param);
+        }
     }
 
     if (prevSize != mLightGenerationParamTbl.size())
