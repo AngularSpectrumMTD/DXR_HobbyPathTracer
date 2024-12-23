@@ -5,7 +5,7 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - Emission Guided Photon Mapping  
 
 Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
-![Test2](https://github.com/user-attachments/assets/245c8938-4f4d-4970-b1e2-e28a7a161a8a)
+![Test2](https://github.com/user-attachments/assets/75421a2c-3b39-4d33-bbf9-53f786de2eb2)
 
 Scene Name "PTTest"(Made by AngularSpectrumMTD)
 ![Test](https://github.com/user-attachments/assets/5ae6ce91-c5c4-48cc-a4be-493337a29c80)
@@ -13,7 +13,7 @@ Scene Name "PTTest"(Made by AngularSpectrumMTD)
 Scene Name "BistroExtorior"(External Resource)
 ![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
 
-![ReSTIR2](https://github.com/user-attachments/assets/465e2f34-8aeb-4c13-afb0-7e476029f5d3)
+![ReSTIR2](https://github.com/user-attachments/assets/729b4d65-5b2b-4a88-bfdb-a55e7505788c)
 
 ![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
 
