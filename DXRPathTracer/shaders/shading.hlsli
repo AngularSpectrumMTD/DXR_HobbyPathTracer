@@ -139,7 +139,7 @@ float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
     }
 }
 
-void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout Payload payload, in float wavelength = 0)
+void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout Payload payload, in float wavelength = 0)
 {
     float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
@@ -285,7 +285,7 @@ void updateRay(in MaterialParams material, in float3 N_global, inout RayDesc nex
     }
 }
 
-void updatePhoton(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughputU32, inout uint randomSeed, in float wavelength = 0)
+void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughputU32, inout uint randomSeed, in float wavelength = 0)
 {
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
@@ -627,6 +627,52 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
 
     isFinish = false;
     return isFinish;
+}
+
+bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in float3 geomNormal, inout Payload payload, in MaterialParams currentMaterial, inout RayDesc nextRay, in float3 caustics)
+{
+    float3 surfaceNormal = vertexNormal;
+    float3 scatterPosition = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
+    float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
+    float3 originalSurfaceNormal = surfaceNormal;
+    float3 originalScatterPosition = scatterPosition;
+
+    float3 hitLe = 0.xxx;
+    float3 hitNormal = 0.xxx;
+    float3 hitPosition = 0.xxx;
+
+    if(isSSSExecutable(currentMaterial))
+    {
+        computeSSSPosition(payload, scatterPosition, surfaceNormal, geomNormal);
+    }
+    float3 DIGIelement = 0.xxx;
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement);
+    if(isDirectRay(payload))
+    {
+        setDI(DIGIelement);
+    }
+    if(isIndirectRay(payload))
+    {
+        addGI(DIGIelement);
+    }
+    const bool isAnaliticalLightHitted = (length(hitLe) > 0);
+    const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
+    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
+    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
+    storeGBuffer(payload, writePosition, writeColor, writeNormal, currentMaterial.roughness, currentMaterial);
+
+    if (isTerminate)
+    {
+        return true;
+    }
+    
+    addCaustics(caustics);
+
+    nextRay.Origin = scatterPosition;
+    nextRay.Direction = 0.xxx;
+    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload);
+
+    return false;
 }
 
 #endif//__SHADING_HLSLI__

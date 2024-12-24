@@ -185,63 +185,22 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     uint instanceIndex = InstanceIndex();
 
     VertexPNT vtx;
+
     bool isIgnoreHitDummy = false;
     MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHitDummy);
-    float3 surfaceNormal = vtx.Normal;
-    float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
-    float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
-    float3 originalSurfaceNormal = surfaceNormal;
-    float3 originalScatterPosition = scatterPosition;
 
-    //non color test
-    //currentMaterial.albedo = 1.xxxx;
-
-    float3 hitLe = 0.xxx;
-    float3 hitNormal = 0.xxx;
-    float3 hitPosition = 0.xxx;
-
-    if(isSSSExecutable(currentMaterial))
+    float3 caustics = 0.xxx;
+    if(payload.recursive <= 2)
     {
-        computeSSSPosition(payload, scatterPosition, surfaceNormal, getGeometricNormal(attrib));
+        caustics = accumulatePhoton(mul(float4(vtx.Position, 1), ObjectToWorld4x3()), mul(vtx.Normal, (float3x3)ObjectToWorld4x3()));
     }
 
-    float3 DIGIelement = 0.xxx;
-    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal,  hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement);
-    if(isDirectRay(payload))
-    {
-        setDI(DIGIelement);
-    }
-    if(isIndirectRay(payload))
-    {
-        addGI(DIGIelement);
-    }
-    const bool isAnaliticalLightHitted = (length(hitLe) > 0);
-    const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
-    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
-    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
-    storeGBuffer(payload, writePosition, writeColor, writeNormal, primitiveIndex, instanceIndex, currentMaterial.roughness, currentMaterial);
-
-    if (isTerminate)
+    RayDesc nextRay;
+    bool isTerminate = shadeAndSampleRay(vtx.Normal, vtx.Position, getGeometricNormal(attrib), payload, currentMaterial, nextRay, caustics);
+    if(isTerminate)
     {
         return;
     }
-    
-    RayDesc nextRay;
-    nextRay.Origin = scatterPosition;
-
-    nextRay.Direction = 0.xxx;
-    float3 photon = 0.xxx;
-    const float select = 0.25f / (max(1, payload.recursive));
-    if((payload.recursive < 3) && (rand(payload.randomSeed) < select))
-    {
-        const float pdf = select;
-        photon = accumulatePhoton(originalScatterPosition, bestFitWorldNormal) / pdf;
-    }
-    
-    const float3 element = decompressU32asRGB(payload.throughputU32) * photon;
-    addCaustics(element);
-    updateRay(currentMaterial, surfaceNormal, nextRay, payload);
-
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
     TraceDefaultRay(flags, rayMask, nextRay, payload);
@@ -270,7 +229,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    updatePhoton(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
+    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {

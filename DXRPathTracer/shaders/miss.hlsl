@@ -34,7 +34,7 @@ void miss(inout Payload payload) {
         const float3 writePosition = isAnaliticalLightHitted ? hitPosition : 0.xxx;
         MaterialParams material = (MaterialParams)0;
         material.albedo = float4(writeColor, 0);
-        storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, 0, 0, material);
+        storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, material);
         return;
     }
 
@@ -56,7 +56,7 @@ void miss(inout Payload payload) {
     }
 
     MaterialParams material = (MaterialParams)0;
-    storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, -1, -1, material);
+    storeGBuffer(payload, 0.xxx, 0.xxx, 0.xxx, -1, material);
 
     if(isUseIBL())
     {

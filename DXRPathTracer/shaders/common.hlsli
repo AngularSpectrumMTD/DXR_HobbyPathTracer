@@ -296,7 +296,7 @@ float compute01Depth(float3 wPos)
     return zeroOneDepth;
 }
 
-void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, in float3 normal, in uint primitiveIndex, in uint instanceIndex, in float roughness, in MaterialParams material)
+void storeGBuffer(inout Payload payload, in float3 position, in float3 albedo, in float3 normal, in float roughness, in MaterialParams material)
 {
     if (!(payload.flags & PAYLOAD_BIT_MASK_IS_DENOISE_HINT_STORED) && (payload.recursive <= 1))
     {
