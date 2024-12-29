@@ -390,21 +390,21 @@ void DXRPathTracer::Setup()
         {
             mLightAreaScale = 6;
             const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
+            const bool isRoomTestDebug = false;     
             const bool isAfrodytaTest = true;
-            mPhiDirectional = 140.0f; mThetaDirectional = 256.0f;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
 
             //near
             //mInitEyePos = XMFLOAT3(-85, 64, -18);
             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
 
             //far
-            mInitEyePos = XMFLOAT3(480, 1113, 542);
-            mInitTargetPos = XMFLOAT3(469.87, 1090.23, 516.81);
+            mInitEyePos = XMFLOAT3(166, 121, -375);
+            mInitTargetPos = XMFLOAT3(132, 108,-328);
 
             mOBJFileName = "PTTestBrick.obj";
             mOBJFolderName = "model/PTTest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(35, 35, 35), XMMatrixTranslation(-150, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
