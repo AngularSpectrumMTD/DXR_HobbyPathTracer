@@ -47,6 +47,8 @@
 #define PHOTON_EMISSION_GUIDE_MAP_SIZE_1D 64
 #define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
 
+//#define USE_SSS
+
 namespace HitGroups {
     static const wchar_t* ReflectReflactMaterialSphere = L"hgReflectReflactSpheres";
     static const wchar_t* ReflectReflactMaterialBox = L"hgReflectReflactBoxes";
@@ -410,6 +412,7 @@ private:
         SceneType_Kitchen,
         SceneType_PTTest,
         SceneType_PTTestBrick,
+        SceneType_MaterialTest,
     };
 
     enum Spectrum

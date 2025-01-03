@@ -511,6 +511,11 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
                 float receiverCos = dot(surfaceNormal, wi);
                 float emitterCos = dot(lightNormal, -wi);
                 float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, reservoirRandomSeed);
+                //Only albedo on the incident side is considered
+                if(isSSSExecutable(material))
+                {
+                    bsdfPDF.xyz = 1.xxx;
+                }
                 float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
                 float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 

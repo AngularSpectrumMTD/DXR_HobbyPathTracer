@@ -112,9 +112,6 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float3 prevWorldPos = PrevPositionBuffer[prevID].xyz;
         float2 prevLuminanceMoment = LuminanceMomentBufferSrc[prevID];
 
-        float luminance = computeLuminance(currDIGI);
-        float2 currLuminanceMoment = float2(luminance, luminance * luminance);
-
         uint accCount = PrevAccumulationCountBuffer[prevID];
         const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevWorldPos);
         if (isTemporalReuseEnable)
@@ -125,9 +122,9 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         {
             accCount = 1;
         }
-        AccumulationCountBuffer[currID] = accCount;
-
+        
         accCount = min(accCount, MAX_ACCUMULATION_RANGE);
+        AccumulationCountBuffer[currID] = accCount;
         const float tmpAccmuRatio = 1.f / accCount;
 
         float3 accumulatedDI = lerp(prevDI, currDI, tmpAccmuRatio);
@@ -135,6 +132,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float3 accumulatedDIGI = accumulatedDI + accumulatedGI;
         float3 accumulatedCaustics = lerp(prevCaustics, currCaustics, tmpAccmuRatio);
 
+        float luminance = computeLuminance(currDIGI);
+        float2 currLuminanceMoment = float2(luminance, luminance * luminance);
         currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
         currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
 

@@ -4,6 +4,8 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+![MaterialTest](https://github.com/user-attachments/assets/babeed02-4524-423d-bb6a-f16853277998)
+
 Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
 ![Test2](https://github.com/user-attachments/assets/4f95efbc-1128-410d-a04a-a006c93cf6d1)
 
@@ -29,7 +31,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_PTTestBrick" or ""SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

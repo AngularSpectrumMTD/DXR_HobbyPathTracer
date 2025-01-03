@@ -270,7 +270,7 @@ void DXRPathTracer::SetupMeshMaterialAndPos()
     defaultSSSMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     defaultSSSMaterial.metallic = 0.0;//blend diffuse specular at specTrans == 0
     defaultSSSMaterial.roughness = 1.0f;
-    defaultSSSMaterial.specular = 1.0;//spec power
+    defaultSSSMaterial.specular = 0.0;//spec power
     defaultSSSMaterial.transRatio = 0;//0:diffuse  1:trans
     defaultSSSMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
     defaultSSSMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -372,7 +372,9 @@ void DXRPathTracer::SetupMeshMaterialAndPos()
 #endif
 
         //sss test
-        //material = defaultSSSMaterial;
+#ifdef USE_SSS
+        material = defaultSSSMaterial;
+#endif
 
         albedoIndex++;
         transIndex++;

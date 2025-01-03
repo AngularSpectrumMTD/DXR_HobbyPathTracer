@@ -627,6 +627,16 @@ namespace utility {
 					fscanf_s(fp, "%f", &vec4d.x);
 					mtl.Shininess = vec4d.x;
 				}
+				if (strcmp(key, "Ni") == 0)
+				{
+					fscanf_s(fp, "%f", &vec4d.x);
+					mtl.Ni = vec4d.x;
+				}
+				if (strcmp(key, "d") == 0)
+				{
+					fscanf_s(fp, "%f", &vec4d.x);
+					mtl.opacity = vec4d.x;
+				}
 				if (strcmp(key, "map_Kd") == 0)
 				{
 					//fscanf_s(fp, "%s ", key, sizeof(key));
@@ -667,6 +677,8 @@ namespace utility {
 			mtl.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 			mtl.Reflection4Color.emission = DirectX::XMFLOAT4(0.0, 0.0, 0.0, 0.0);
 			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
+			mtl.Ni = 1.45;
+			mtl.opacity = 1.0f;
 			mtl.setDummyDiffuseTexture(device);
 			mtl.setDummyAlphaMask(device);
 			MaterialTbl.push_back(mtl);
@@ -800,10 +812,15 @@ namespace utility {
 				mparams.specular = (m.Reflection4Color.specular.x + m.Reflection4Color.specular.y + m.Reflection4Color.specular.z + m.Reflection4Color.specular.w) / 4.0f;
 				mparams.metallic = mparams.specular;
 				mparams.roughness = 1 - mparams.metallic;
-				mparams.transRatio = 0;
+				mparams.transRatio = ((m.Ni != 1.45) && (m.opacity != 1.0f)) ? 1.0f : 0.0f;
 				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
-				mparams.transColor = XMVectorSet(0, 0, 0, 0);
+				mparams.transColor = mparams.albedo;
 				mparams.isSSSExecutable = 0;
+
+				if (mparams.transRatio == 1)
+				{
+					mparams.roughness = 0;
+				}
 
 				if (std::strcmp(m.MaterialName.c_str(), REINTERPRET_MIRROR_MATERIAL_NAME) == 0)
 				{

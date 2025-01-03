@@ -417,6 +417,46 @@ void DXRPathTracer::Setup()
             mGlassModelType = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
         }
+        break;   
+        case SceneType_MaterialTest:
+        {
+            mLightAreaScale = 6;
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            mInitEyePos = XMFLOAT3(-101, 135, -161);
+            mInitTargetPos = XMFLOAT3(-68, 111, -118);
+
+            mOBJFileName = "MaterialTest.obj";
+            mOBJFolderName = "model/MaterialTest";
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = 1.98f; mLightPosY = 88.0f; mLightPosZ = 38.38f;
+            mPhi = 19.0f; mTheta = 239.0f;
+
+            mLightRange = 4.5f;
+
+            mCausticsBoost = 0.01;
+
+            mGlassModelType = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mIsUseDirectionalLight = false;
+
+            mGatherRadius = 0.5f;
+
+            mIsApplyCaustics = true;
+        }
         break;
     }
 

@@ -44,6 +44,8 @@ namespace utility {
 		string MaterialName;
 		Reflection4 Reflection4Color;
 		f32 Shininess;
+		f32 Ni;
+		f32 opacity;
 		string DiffuseTextureName;
 		string AlphaMaskName;
 		utility::TextureResource DiffuseTexture;
