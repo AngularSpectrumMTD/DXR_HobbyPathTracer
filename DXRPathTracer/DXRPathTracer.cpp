@@ -63,7 +63,7 @@ void DXRPathTracer::Setup()
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
-    mIntenceBoost = 300;
+    mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
     mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
@@ -359,7 +359,7 @@ void DXRPathTracer::Setup()
             mLightRange = 0.79f;
 
             mGlassModelType = ModelType_Afrodyta;
-            mIntenceBoost *= 3;
+            mIntensityBoost *= 3;
         }
         break;
         case SceneType_PTTest:
@@ -1462,7 +1462,7 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;
     case 'K':
-        mIntenceBoost = Clamp(1, 10000, mIntenceBoost + (mInverseMove ? -10 : 10));
+        mIntensityBoost = Clamp(1, 10000, mIntensityBoost + (mInverseMove ? -10 : 10));
         mIsUseAccumulation = false;
         break;
     case 'B':
@@ -1713,15 +1713,15 @@ void DXRPathTracer::InitializeLightGenerateParams()
 void DXRPathTracer::UpdateLightGenerateParams()
 {
     XMFLOAT3 colorTbl[] = {
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 0.0f),
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
-        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.0f),
-        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
-        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 1.0f),
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.8f, mIntenceBoost * 0.0f),
-        XMFLOAT3(mIntenceBoost * 0.0f, mIntenceBoost * 1.0f, mIntenceBoost * 0.8f),
-        XMFLOAT3(mIntenceBoost * 1.0f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
-        XMFLOAT3(mIntenceBoost * 0.8f, mIntenceBoost * 0.0f, mIntenceBoost * 1.0f),
+        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.0f, mIntensityBoost * 0.0f),
+        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.0f),
+        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.0f),
+        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
+        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 1.0f),
+        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.8f, mIntensityBoost * 0.0f),
+        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.8f),
+        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
+        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
     };
 
     const f32 scale = mLightRange;
@@ -1745,7 +1745,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
+            param.setParamAsRectLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         else if (!mIsSpotLightPhotonMapper)
@@ -1765,7 +1765,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
+            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
@@ -1787,7 +1787,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
+            param.setParamAsSpotLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         else if (mIsSpotLightPhotonMapper)
@@ -1807,7 +1807,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), tangent, bitangent);
+            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
@@ -1837,9 +1837,9 @@ void DXRPathTracer::UpdateLightGenerateParams()
             f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             LightGenerateParam param;
             //param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
-            param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntenceBoost, mIntenceBoost, mIntenceBoost), 10, 150);
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), 10, 150);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
@@ -1852,7 +1852,7 @@ void DXRPathTracer::UpdateLightGenerateParams()
             LightGenerateParam param;
             XMFLOAT3 direction;
             XMStoreFloat3(&direction, XMVectorSet(sin(mThetaDirectional * ONE_RADIAN) * cos(mPhiDirectional * ONE_RADIAN), sin(mThetaDirectional * ONE_RADIAN) * sin(mPhiDirectional * ONE_RADIAN), cos(mThetaDirectional * ONE_RADIAN), 0.0f));
-            param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost, DIRECTIONAL_LIGHT_POWER * mIntenceBoost));
+            param.setParamAsDirectionalLight(direction, XMFLOAT3(DIRECTIONAL_LIGHT_POWER * mIntensityBoost, DIRECTIONAL_LIGHT_POWER * mIntensityBoost, DIRECTIONAL_LIGHT_POWER * mIntensityBoost));
             mLightGenerationParamTbl.push_back(param);
         }
     }

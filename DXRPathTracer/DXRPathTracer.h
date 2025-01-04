@@ -756,7 +756,7 @@ private:
     f32 mMetalObjYOfsset;
     XMFLOAT3 mMetalObjScale;
     f32 mLightRange;
-    f32 mIntenceBoost;
+    f32 mIntensityBoost;
     f32 mGatherRadius;
     u32 mGatherBlockRange;
     f32 mStandardPhotonNum;
