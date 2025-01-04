@@ -431,22 +431,23 @@ void DXRPathTracer::Setup()
             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
 
             //far
-            mInitEyePos = XMFLOAT3(-101, 135, -161);
-            mInitTargetPos = XMFLOAT3(-68, 111, -118);
+            mInitEyePos = XMFLOAT3(75.9, 142, -48);
+            mInitTargetPos = XMFLOAT3(33.5, 115, -17.4);
 
             mOBJFileName = "MaterialTest.obj";
             mOBJFolderName = "model/MaterialTest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 70, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
 
-            mLightPosX = 1.98f; mLightPosY = 88.0f; mLightPosZ = 38.38f;
-            mPhi = 19.0f; mTheta = 239.0f;
+            mLightPosX = 10.36f; mLightPosY = 118.0f; mLightPosZ = 11.49f;
+            mPhi = -83.0f; mTheta = 121.0f;
 
-            mLightRange = 4.5f;
+            mLightRange = 1.2f;
 
-            mCausticsBoost = 0.01;
+            mCausticsBoost = 0.05;
+            mGatherBlockRange = 2;
 
             mGlassModelType = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;

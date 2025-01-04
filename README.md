@@ -4,7 +4,7 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-![MaterialTest](https://github.com/user-attachments/assets/babeed02-4524-423d-bb6a-f16853277998)
+![MaterialTest](https://github.com/user-attachments/assets/a73a1123-bd6c-4be8-b44e-ddbd4ad0619b)
 
 Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
 ![Test2](https://github.com/user-attachments/assets/4f95efbc-1128-410d-a04a-a006c93cf6d1)
@@ -15,11 +15,11 @@ Scene Name "PTTest"(Made by AngularSpectrumMTD)
 Scene Name "BistroExtorior"(External Resource)
 ![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
 
+Results of the verification of the ReSTIR DI/GI
+
 ![ReSTIR2](https://github.com/user-attachments/assets/792307a7-4468-4db6-85d1-7d7e68039765)
 
 ![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
-
-![comparison](https://github.com/user-attachments/assets/627a5dc6-fb2a-4d77-b5aa-7259d93e1738)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
