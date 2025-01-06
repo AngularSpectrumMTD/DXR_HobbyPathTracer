@@ -13,10 +13,10 @@ namespace utility {
 	OBJ_MODEL::OBJ_MODEL() {
 	}
 	OBJ_MODEL::OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
-		OBJ_Load(device, folderPath, FileName, modelNamePtr);
+		loadObjFile(device, folderPath, FileName, modelNamePtr);
 	}
 
-	bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
+	bool OBJ_MODEL::loadObjFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
 		vector <DirectX::XMFLOAT2> uv;
@@ -36,18 +36,18 @@ namespace utility {
 		err = fopen_s(&fp, fileName, "rt");
 		if (err == 0)
 		{
-			OutputDebugString(L"OBJ_Load() File Open Succeeded\n");
+			OutputDebugString(L"loadObjFile() File Open Succeeded\n");
 		}
 		else if (err > 0)
 		{
 			wchar_t debugStr[256];
-			swprintf_s(debugStr, L"OBJ_Load() File Open ERROR : code %d\n", err);
+			swprintf_s(debugStr, L"loadObjFile() File Open ERROR : code %d\n", err);
 			OutputDebugString(debugStr);
 			return false;
 		}
 		else
 		{
-			OutputDebugString(L"OBJ_Load() File Open ERROR\n");
+			OutputDebugString(L"loadObjFile() File Open ERROR\n");
 			return false;
 		}
 
@@ -192,6 +192,11 @@ namespace utility {
 				}
 				else
 				{
+					if (MaterialTbl[j].hasDiffuseTex || MaterialTbl[j].hasAlphaMask)
+					{
+						MaterialTbl[j].hasDiffuseTex = false;
+						MaterialTbl[j].hasAlphaMask = false;
+					}
 					Tri.UV = XMFLOAT2(0xff, 0xff);
 				}
 				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
@@ -206,6 +211,11 @@ namespace utility {
 				}
 				else
 				{
+					if (MaterialTbl[j].hasDiffuseTex || MaterialTbl[j].hasAlphaMask)
+					{
+						MaterialTbl[j].hasDiffuseTex = false;
+						MaterialTbl[j].hasAlphaMask = false;
+					}
 					Quad.UV = XMFLOAT2(0xff, 0xff);
 				}
 				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
@@ -257,7 +267,7 @@ namespace utility {
 		return true;
 	}
 
-	//bool OBJ_MODEL::OBJ_Load(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
+	//bool OBJ_MODEL::loadObjFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
 	//	vec4i Face[3];
 	//	vector <DirectX::XMFLOAT3> Vertex;
 	//	vector <DirectX::XMFLOAT3> Normal;
@@ -278,7 +288,7 @@ namespace utility {
 
 	//	if (ifs.fail())
 	//	{
-	//		OutputDebugString(L"OBJ_Load() File Open ERROR\n");
+	//		OutputDebugString(L"loadObjFile() File Open ERROR\n");
 	//		return false;
 	//	}
 
@@ -679,6 +689,8 @@ namespace utility {
 			mtl.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
 			mtl.Ni = 1.45;
 			mtl.opacity = 1.0f;
+			mtl.hasDiffuseTex = false;
+			mtl.hasAlphaMask = false;
 			mtl.setDummyDiffuseTexture(device);
 			mtl.setDummyAlphaMask(device);
 			MaterialTbl.push_back(mtl);
@@ -689,6 +701,7 @@ namespace utility {
 		{
 			if (strcmp(mat.DiffuseTextureName.c_str(), "") == 0)
 			{
+				mtl.hasDiffuseTex = false;
 				mat.setDummyDiffuseTexture(device);
 			}
 			else
@@ -705,16 +718,19 @@ namespace utility {
 				wchar_t nameTex[512];
 				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mat.DiffuseTextureName).c_str());
 				//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+				mtl.hasDiffuseTex = true;
 				mat.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
 
 				if (mat.DiffuseTexture.res == nullptr)
 				{
+					mtl.hasDiffuseTex = false;
 					mat.setDummyDiffuseTexture(device);
 				}
 			}
 
 			if (strcmp(mat.AlphaMaskName.c_str(), "") == 0)
 			{
+				mtl.hasAlphaMask = false;
 				mat.setDummyAlphaMask(device);
 			}
 			else
@@ -731,10 +747,12 @@ namespace utility {
 				wchar_t nameTex[512];
 				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mat.AlphaMaskName).c_str());
 				//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
+				mtl.hasAlphaMask = true;
 				mat.AlphaMask = utility::LoadTextureFromFile(device, nameTex, true);
 
 				if (mat.AlphaMask.res == nullptr)
 				{
+					mtl.hasAlphaMask = false;
 					mat.setDummyAlphaMask(device);
 				}
 			}
@@ -866,7 +884,7 @@ namespace utility {
 		MaterialTbl = validMaterialTbl;
 	}
 
-	void OBJ_MODEL::CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr)
+	void OBJ_MODEL::CreateMaterialwiseBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr)
 	{
 		auto command = device->CreateCommandList();
 		dx12::AccelerationStructureBuffers ASBuffer;
@@ -910,14 +928,14 @@ namespace utility {
 		device->WaitForCompletePipe();
 	}
 
-	void OBJ_MODEL::CreateBLASs(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	void OBJ_MODEL::CreateBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device)
 	{
 		for (auto& m : MaterialTbl)
 		{
 			wchar_t nameBLAS[60];
 			swprintf(nameBLAS, 60, L"BLAS : %ls", StringToWString(m.MaterialName).c_str());
 
-			CreateBLAS(device, m, nameBLAS);
+			CreateMaterialwiseBLAS(device, m, nameBLAS);
 		}
 	}
 

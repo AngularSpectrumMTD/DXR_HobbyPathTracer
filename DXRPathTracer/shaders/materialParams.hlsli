@@ -11,6 +11,8 @@ struct MaterialParams
     float4 transColor;
     float4 emission;
     uint isSSSExecutable;
+	bool hasDiffuseTex;
+	bool hasAlphaMask;
 };
 
 bool isSSSExecutable(in MaterialParams material)
