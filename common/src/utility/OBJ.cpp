@@ -55,6 +55,41 @@ namespace utility {
 		DirectX::XMFLOAT3 vec3d;
 		DirectX::XMFLOAT2 vec2d;
 
+		u32 vertexCounter = 0;
+		u32 normalCounter = 0;
+		u32 uvCounter = 0;
+
+		while (!feof(fp))
+		{
+			//key mtlib / v / vn etc...
+			memset(key, 0, sizeof(char) * 255);
+			fscanf_s(fp, "%s ", key, sizeof(key));
+
+			if (strcmp(key, "v") == 0) {
+				vertexCounter++;
+			}
+			if (strcmp(key, "vn") == 0) {
+				normalCounter++;
+			}
+			if (strcmp(key, "vt") == 0) {
+				uvCounter++;
+			}
+		}
+		Vertex.resize(vertexCounter);
+		Normal.resize(normalCounter);
+		uv.resize(uvCounter);
+
+		vertexCounter = 0;
+		normalCounter = 0;
+		uvCounter = 0;
+
+		//finish 1st time File Reading
+		fclose(fp);
+
+		//start 2nd time File Reading
+		fopen_s(&fp, fileName, "rt");
+		fseek(fp, SEEK_SET, 0);
+
 		//File Read Start
 		while (!feof(fp))
 		{
@@ -68,16 +103,19 @@ namespace utility {
 			}
 			if (strcmp(key, "v") == 0) {
 				fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Vertex.push_back(vec3d);
+				Vertex[vertexCounter] = vec3d;
+				vertexCounter++;
 			}
 			if (strcmp(key, "vn") == 0) {
 				fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Normal.push_back(vec3d);
+				Normal[normalCounter] = vec3d;
+				normalCounter++;
 			}
 			if (strcmp(key, "vt") == 0) {
 				fscanf_s(fp, "%f %f", &vec2d.x, &vec2d.y);
 				vec2d.y *= -1;
-				uv.push_back(vec2d);
+				uv[uvCounter] = vec2d;
+				uvCounter++;
 			}
 			if (strcmp(key, "usemtl") == 0) {
 				fscanf_s(fp, "%s ", key, sizeof(key));
@@ -105,20 +143,21 @@ namespace utility {
 
 					if (spaceSplit.size() == 3)//Triangle
 					{
+						//block x 3
 						for (s32 i = 0; i < 3; i++)
 						{
 							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
 							//vertexID uvID normalID
-							for (s32 i = 0; i < 3; i++)
+							for (s32 j = 0; j < 3; j++)
 							{
-								s32 currID = vtx_uv_nrmID[i];
+								s32 currID = vtx_uv_nrmID[j];
 
 								if (currID == -1)
 								{
 									continue;
 								}
 
-								switch (i)
+								switch (j)
 								{
 									case 0:
 										{
@@ -192,6 +231,7 @@ namespace utility {
 
 			}
 		}
+		//finish 2nd time File Reading
 		fclose(fp);
 		//File Read End
 
