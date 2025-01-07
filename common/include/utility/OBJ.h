@@ -25,8 +25,40 @@ namespace utility {
 		DirectX::XMVECTOR transColor;
 		DirectX::XMVECTOR emission;
 		u32 isSSSExecutable = 0;
-		bool hasDiffuseTex = false;
-		bool hasAlphaMask = false;
+		u32 hasDiffuseTex : 1;
+		u32 hasAlphaMask : 1;
+		u32 materialBitsReserved : 30;
+
+		//ctor
+		MaterialParam()
+		{
+			hasDiffuseTex = 0;
+			hasAlphaMask = 0;
+		}
+
+		void asDefault()
+		{
+			albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			metallic = 0;//blend diffuse specular at specTrans == 0
+			roughness = 0;
+			specular = 0;//spec power
+			transRatio = 1;//0:diffuse  1:trans
+			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+			isSSSExecutable = 0u;
+		}
+
+		void asDefaultSSS()
+		{
+			albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			metallic = 0.0;//blend diffuse specular at specTrans == 0
+			roughness = 1.0f;
+			specular = 0.0;//spec power
+			transRatio = 0;//0:diffuse  1:trans
+			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+			isSSSExecutable = 1u;
+		}
 	};
 
 	struct UV {
@@ -41,7 +73,7 @@ namespace utility {
 		s32 w;
 	};
 
-	struct MATERIAL {
+	struct OBJMaterial {
 		//cpu
 		string MaterialName;
 		Reflection4 Reflection4Color;
@@ -81,17 +113,17 @@ namespace utility {
 		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 	};
 
-	class OBJ_MODEL {
+	class OBJMaterialLinkedMesh {
 	protected:
 		bool LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName);
-		vector <MATERIAL> MaterialTbl;
-		bool CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName);
+		vector <OBJMaterial> MaterialTbl;
+		bool CreateMeshBuffer(std::unique_ptr<dx12::RenderDeviceDX12>& device, OBJMaterial& mat, const wchar_t* vbName, const wchar_t* ibName, const wchar_t* shaderName);
 
-		void CreateMaterialwiseBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, MATERIAL& mat, const wchar_t* blaslNamePtr);
+		void CreateMaterialwiseBLAS(std::unique_ptr<dx12::RenderDeviceDX12>& device, OBJMaterial& mat, const wchar_t* blaslNamePtr);
 	public:
-		vector<MATERIAL> getMaterialList() const;
-		OBJ_MODEL();
-		OBJ_MODEL(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
+		vector<OBJMaterial> getMaterialList() const;
+		OBJMaterialLinkedMesh();
+		OBJMaterialLinkedMesh(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
 		bool loadObjFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr);
 		u32 getTriangleVertexTblCount();
 		u32 getQuadrangleVertexTblCount();

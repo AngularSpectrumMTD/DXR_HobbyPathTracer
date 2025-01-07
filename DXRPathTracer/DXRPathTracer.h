@@ -47,6 +47,11 @@
 #define PHOTON_EMISSION_GUIDE_MAP_SIZE_1D 64
 #define PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL 7
 
+#define SPHERE_RADIUS 5
+#define BOX_X_LENGTH 3
+#define BOX_Y_LENGTH 3
+#define BOX_Z_LENGTH 3
+
 //#define USE_SSS
 
 namespace HitGroups {
@@ -465,7 +470,7 @@ private:
     f32 getFrameRate();
     //utility::TextureResource LoadTextureFromFile(const std::wstring& fileName);
     
-    void SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs);
+    void UpdateMeshInstances(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs);
 
     void Grid3DSort();
     void BitonicSortLDS();
@@ -491,7 +496,7 @@ private:
     std::string mOBJFileName;
     std::string mOBJFolderName;
 
-    utility::OBJ_MODEL mOBJModel;
+    utility::OBJMaterialLinkedMesh mOBJMaterialLinkedMesh;
 
     //ObjectAttributes of TLAS
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;
@@ -500,7 +505,7 @@ private:
     std::array<XMMATRIX, NormalOBJ1s> mOBJ1sNormalTbl;
     std::array<XMMATRIX, NormalLight> mLightTbl;
 
-    XMMATRIX mOBJModelTRS;
+    XMMATRIX mOBJMaterialLinkedMeshTRS;
 
     //Materials
     std::array<utility::MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;

@@ -11,9 +11,18 @@ struct MaterialParams
     float4 transColor;
     float4 emission;
     uint isSSSExecutable;
-	bool hasDiffuseTex;
-	bool hasAlphaMask;
+    uint materialBits;
 };
+
+bool hasDiffuseTex(in MaterialParams material)
+{
+    return (material.materialBits >> 0) & 1;
+}
+
+bool hasAlphaMask(in MaterialParams material)
+{
+    return (material.materialBits >> 1) & 1;
+}
 
 bool isSSSExecutable(in MaterialParams material)
 {

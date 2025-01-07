@@ -13,7 +13,7 @@ StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
 Texture2D<float> alphaMask: register(t3, space1);
 
-VertexPNT getVertex(TriangleIntersectionAttributes attrib, inout bool isNoTexture)
+VertexPNT getVertex(TriangleIntersectionAttributes attrib)
 {
     VertexPNT v = (VertexPNT) 0;
     uint start = PrimitiveIndex() * 3; // Triangle List.
@@ -21,17 +21,12 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib, inout bool isNoTextur
     float3 positionTbl[3], normalTbl[3];
     float2 texcoordTbl[3];
     
-    isNoTexture = false;
     for (int i = 0; i < 3; ++i)
     {
         uint index = indexBuffer[start + i];
         positionTbl[i] = vertexBuffer[index].Position;
         normalTbl[i] = vertexBuffer[index].Normal;
         texcoordTbl[i] = vertexBuffer[index].UV;
-        if (texcoordTbl[i].x == 0xff && texcoordTbl[i].y == 0xff)
-        {
-            isNoTexture = true;
-        }
     }
     v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
     v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
@@ -57,25 +52,28 @@ float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
     return normalize(cross(positionTbl[1] - positionTbl[0], positionTbl[2] - positionTbl[0]));
 }
 
-void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoTexture, in float2 UV)
+void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in float2 UV)
 {
     diffuseTexColor = 0.xxxx;
     float alpMask = 1;
-    float2 diffTexSize = 0.xx;
-    diffuseTex.GetDimensions(diffTexSize.x, diffTexSize.y);
-    float2 alphaMaskSize = 0.xx;
-    alphaMask.GetDimensions(alphaMaskSize.x, alphaMaskSize.y);
-    const bool isAlphaMaskInvalid = (alphaMaskSize.x == 1 && alphaMaskSize.y == 1);
-    bool isTexInvalid = (diffTexSize.x == 1 && diffTexSize.y == 1);
 
-    if (!isNoTexture && !isTexInvalid)
+    MaterialParams currentMaterial = constantBuffer;
+
+    if (hasDiffuseTex(currentMaterial) || hasAlphaMask(currentMaterial))
     {
-        diffuseTexColor = diffuseTex.SampleLevel(gSampler, UV, 0.0);
-        alpMask = alphaMask.SampleLevel(gSampler, UV, 0.0);
-        if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
+        if(hasDiffuseTex(currentMaterial))
         {
-            diffuseTexColor.rgb = diffuseTexColor.rrr;
+            diffuseTexColor = diffuseTex.SampleLevel(gSampler, UV, 0.0);
+            if (diffuseTexColor.r > 0 && diffuseTexColor.g == 0 && diffuseTexColor.b == 0)//1 channel
+            {
+                diffuseTexColor.rgb = diffuseTexColor.rrr;
+            }
         }
+
+         if(hasAlphaMask(currentMaterial))
+         {
+            alpMask = alphaMask.SampleLevel(gSampler, UV, 0.0);
+         }
     }
     else
     {
@@ -85,7 +83,7 @@ void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in bool isNoT
         return;
     }
     
-    isIgnoreHit = (diffuseTexColor.a < 1) || (!isAlphaMaskInvalid && alpMask < 1);
+    isIgnoreHit = (diffuseTexColor.a < 1) || (hasAlphaMask(currentMaterial) && alpMask < 1);
 }
 
 void editMaterial(inout MaterialParams mat)
@@ -111,12 +109,11 @@ void editMaterial(inout MaterialParams mat)
 
 MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout VertexPNT vtx, inout bool isIgnoreHit)
 {
-    bool isNoTexture = false;
-    vtx = getVertex(attrib, isNoTexture);
+    vtx = getVertex(attrib);
     
     float4 diffuseTexColor = 1.xxxx;
 
-    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
+    getTexColor(diffuseTexColor, isIgnoreHit, vtx.UV);
 
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
@@ -129,7 +126,7 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout V
     }
 
     //recognize as glass
-    if (length(currentMaterial.albedo) == 0 && !isNoTexture)
+    if (length(currentMaterial.albedo) == 0 && !hasDiffuseTex(currentMaterial))
     {
         editMaterial(currentMaterial);
     }
@@ -139,11 +136,10 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout V
 
 [shader("anyhit")]
 void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib) {
-    bool isNoTexture = false;
     float4 diffuseTexColor = 0.xxxx;
     bool isIgnoreHit = false;
-    VertexPNT vtx = getVertex(attrib, isNoTexture);
-    getTexColor(diffuseTexColor, isIgnoreHit, isNoTexture, vtx.UV);
+    VertexPNT vtx = getVertex(attrib);
+    getTexColor(diffuseTexColor, isIgnoreHit, vtx.UV);
 
     if(isIgnoreHit)
     {
@@ -171,8 +167,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if(isSSSRay(payload))
     {
-        bool isNoTexture = false;
-        payload.SSSnormal = getVertex(attrib, isNoTexture).Normal;
+        payload.SSSnormal = getVertex(attrib).Normal;
         payload.T = RayTCurrent();
         return;
     }

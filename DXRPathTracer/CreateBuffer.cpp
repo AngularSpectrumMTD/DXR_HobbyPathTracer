@@ -20,6 +20,91 @@ void DXRPathTracer::CreateRegularBuffer()
 {
     auto width = GetWidth();
     auto height = GetHeight();
+
+    //Mesh
+    {
+        //Plane
+        {
+            std::vector<utility::VertexPNT> verticesPNT;
+            std::vector<u32> indices;
+
+            if (mStageType == StageType_Box)
+            {
+                utility::CreateOpenedCube(verticesPNT, indices, PLANE_SIZE * 0.99f);
+            }
+            else
+            {
+                utility::CreatePlane(verticesPNT, indices, PLANE_SIZE * 0.99f);
+                for (auto& v : verticesPNT)
+                {
+                    v.Position.y = -PLANE_SIZE * 0.99f;
+                }
+            }
+
+            mMeshStage.CreateMeshBuffer(mDevice, verticesPNT, indices, L"PlaneVB", L"PlaneIB", L"");
+        }
+
+        //Sphere
+        {
+            std::vector<utility::VertexPN> verticesPN;
+            std::vector<u32> indices;
+
+            utility::CreateSphere(verticesPN, indices, SPHERE_RADIUS, 100, 100);
+            mMeshSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereVB", L"SphereIB", L"");
+        }
+
+        //GlassObj
+        {
+            std::vector<utility::VertexPN> verticesPN;
+            std::vector<u32> indices;
+
+            std::string strValue;
+            strValue.assign(mOBJ0FileName.begin(), mOBJ0FileName.end());
+            const char* charValue = strValue.c_str();
+            if (!utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale))
+            {
+                OutputDebugString(L"OBJ Load was Failed\n");
+                throw std::runtime_error("OBJ Load was Failed");
+            }
+            mMeshOBJ0.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
+        }
+
+        //MetalObj
+        {
+            std::vector<utility::VertexPN> verticesPN;
+            std::vector<u32> indices;
+
+            std::string strValue;
+            strValue.assign(mOBJ1FileName.begin(), mOBJ1FileName.end());
+            const char* charValue = strValue.c_str();
+            if (!utility::CreateMesh(charValue, verticesPN, indices, mMetalObjScale))
+            {
+                OutputDebugString(L"OBJ Load was Failed\n");
+                throw std::runtime_error("OBJ Load was Failed");
+            }
+            mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
+        }
+
+        //Box
+        {
+            std::vector<utility::VertexPN> verticesPN;
+            std::vector<u32> indices;
+
+            utility::CreateCube(verticesPN, indices, BOX_X_LENGTH, BOX_Y_LENGTH, BOX_Z_LENGTH);
+            mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
+        }
+
+        //OBJ File
+        {
+            if (!mOBJMaterialLinkedMesh.loadObjFile(mDevice, mOBJFolderName.c_str(), mOBJFileName.c_str(), L""))
+            {
+                OutputDebugString(L"OBJ Load was Failed\n");
+                throw std::runtime_error("OBJ Load was Failed");
+            }
+            mOBJMaterialLinkedMesh.CreateMeshBuffers(mDevice, L"");
+        }
+    }
+
     //RayTraced Result
     {
         mFinalRenderResult = mDevice->CreateTexture2D(
@@ -706,6 +791,23 @@ void DXRPathTracer::CreateRegularBuffer()
 
 void DXRPathTracer::CreateConstantBuffer()
 {
+    {
+        auto bufferSize = sizeof(utility::MaterialParam) * mNormalSphereMaterialTbl.size();
+        mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+
+        bufferSize = sizeof(utility::MaterialParam) * mNormalBoxMaterialTbl.size();
+        mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+
+        bufferSize = sizeof(utility::MaterialParam) * mOBJ1MaterialTbl.size();
+        mOBJ1MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+
+        bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
+        mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+
+        bufferSize = sizeof(utility::MaterialParam);
+        mStageMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+    }
+
     //Photon Grid Sorting
     {
         const u32 NUM_ELEMENTS = mPhotonMapSize1D * mPhotonMapSize1D;;//[2] is for Reflection at Refraction

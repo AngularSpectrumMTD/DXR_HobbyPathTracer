@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_Sponza;
+    mSceneType = SceneType_PTTestBrick;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -106,6 +106,11 @@ void DXRPathTracer::Setup()
     mGroundTex = utility::LoadTextureFromFile(mDevice, mStageTextureFileName);
     mCubeMapTex = utility::LoadTextureFromFile(mDevice, mCubeMapTextureFileName);
 
+    if (mGroundTex.res != nullptr)
+    {
+        mStageMaterial.hasDiffuseTex = 1;
+    }
+
     mStageType = StageType_Plane;
     mMetalModelType = ModelType::ModelType_SimpleCube;
 
@@ -115,7 +120,7 @@ void DXRPathTracer::Setup()
         {
             mOBJFileName = "diamond.obj";
             mOBJFolderName = "model";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(30, 30, 30), XMMatrixTranslation(0, -55, 0));
             mStageOffsetX = 0;
             mStageOffsetY = -55.0f;
             mStageOffsetZ = 0;
@@ -141,7 +146,7 @@ void DXRPathTracer::Setup()
             {
                 mOBJFileName = "fireplace_room.obj";
                 mOBJFolderName = "model/fireplace";
-                mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));
+                mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(-20, 0, 10));
                 mStageOffsetX = -20.0f;
                 mStageOffsetY = 0.0f;
                 mStageOffsetZ = 10.0f;
@@ -150,7 +155,7 @@ void DXRPathTracer::Setup()
             {
                 mOBJFileName = "sponza.obj";
                 mOBJFolderName = "model/sponza";
-                mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
+                mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(0, 0, 0));
                 mStageOffsetX = 0.0f;
                 mStageOffsetY = 0.0f;
                 mStageOffsetZ = 0.0f;
@@ -206,7 +211,7 @@ void DXRPathTracer::Setup()
             mPhiDirectional = 414; mThetaDirectional = 282;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
@@ -242,7 +247,7 @@ void DXRPathTracer::Setup()
             mPhiDirectional = 150; mThetaDirectional = 250;
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
@@ -276,7 +281,7 @@ void DXRPathTracer::Setup()
             mPhiDirectional = 104; mThetaDirectional = 255;//1
             mOBJFileName = "san-miguel-low-poly.obj";
             mOBJFolderName = "model/San_Miguel";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(20, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(20, 0, 0));
             mStageOffsetX = 20;
             mStageOffsetY = 0;
             mStageOffsetZ = 0;
@@ -300,7 +305,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "roomTestExp.obj";
             mOBJFolderName = "model/roomTestExp";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(3.5, 3.5, 3.5), XMMatrixTranslation(0, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -324,7 +329,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "GITest.obj";
             mOBJFolderName = "model/GITest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -348,7 +353,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "Kitchen.obj";
             mOBJFolderName = "model/Kitchen";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -373,7 +378,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "PTTest.obj";
             mOBJFolderName = "model/PTTest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -404,7 +409,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "PTTestBrick.obj";
             mOBJFolderName = "model/PTTest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(35, 35, 35), XMMatrixTranslation(-150, 0, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(35, 35, 35), XMMatrixTranslation(-150, 0, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -436,7 +441,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "MaterialTest.obj";
             mOBJFolderName = "model/MaterialTest";
-            mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 70, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 70, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
@@ -467,7 +472,7 @@ void DXRPathTracer::Setup()
     mPhiDirectional = 111; mThetaDirectional = 250;
     mOBJFileName = "interior.obj";
     mOBJFolderName = "model/bistro/Interior";
-    mOBJModelTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
+    mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
     mStageOffsetX = 20;
     mStageOffsetY = 0;
     mStageOffsetZ = 0;

@@ -3,54 +3,44 @@
 
 using namespace DirectX;
 
-void DXRPathTracer::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
+void DXRPathTracer::UpdateMeshInstances(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& instanceDescs)
 {
     D3D12_RAYTRACING_INSTANCE_DESC templateDesc{};
     templateDesc.InstanceMask = 0xFF;
     templateDesc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 
-    enum InstanceType
-    {
-        Reflect = 0,
-        Refract = 1,
-        Default = 2
-    };
-
-    auto entryOffset = 0;
+    auto hitGroupID = 0;
     //NOTE: InstanceContributionToHitGroupIndex is HitGroup ID(decided in CreateShaderTable())
     {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), XMMatrixIdentity());
-        desc.InstanceID = InstanceType::Default;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), XMMatrixIdentity());
+        desc.InstanceID =0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshStage.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& instances : mSpheresNormalTbl) {
-        entryOffset++;
+        hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = InstanceType::Default;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
+        desc.InstanceID = 0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshSphere.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
     for (const auto& instances : mBoxesNormalTbl) {
-        entryOffset++;
+        hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = InstanceType::Default;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
+        desc.InstanceID = 0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshBox.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
@@ -58,13 +48,12 @@ void DXRPathTracer::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& i
 
     for (const auto& instances : mOBJ0sNormalTbl)
     {
-        entryOffset++;
+        hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = InstanceType::Refract;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
+        desc.InstanceID = 0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshOBJ0.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
@@ -72,132 +61,33 @@ void DXRPathTracer::SetupMeshInfo(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& i
 
     for (const auto& instances : mOBJ1sNormalTbl)
     {
-        entryOffset++;
+        hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = InstanceType::Reflect;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
+        desc.InstanceID = 0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = mMeshOBJ1.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& instances : mOBJModel.getMaterialList())
+    for (const auto& instances : mOBJMaterialLinkedMesh.getMaterialList())
     {
-        entryOffset++;
+        hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), mOBJModelTRS);
-        desc.InstanceID = InstanceType::Default;
+        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), mOBJMaterialLinkedMeshTRS);
+        desc.InstanceID = 0;//unused
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
+        desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = instances.blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
     }
-
-   /* for (const auto& instances : mLightTbl)
-    {
-        entryOffset++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(
-            reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = InstanceType::Refract;
-        desc.InstanceMask = 0x08;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshLightSphere.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
-    }*/
 }
 
 void DXRPathTracer::CreateSceneInfo()
 {
-    const f32 sphereRadius = 5;
-    const f32 boxYLength = 5;
-    const f32 boxXLength = 3;
-    const f32 boxZLength = 3;
-
-    //Plane
-    {
-        std::vector<utility::VertexPNT> verticesPNT;
-        std::vector<u32> indices;
-
-        if (mStageType == StageType_Box)
-        {
-            utility::CreateOpenedCube(verticesPNT, indices, PLANE_SIZE * 0.99f);
-        }
-        else
-        {
-            utility::CreatePlane(verticesPNT, indices, PLANE_SIZE * 0.99f);
-            for (auto& v : verticesPNT)
-            {
-                v.Position.y = -PLANE_SIZE * 0.99f;
-            }
-        }
-
-        mMeshStage.CreateMeshBuffer(mDevice, verticesPNT, indices, L"PlaneVB", L"PlaneIB", L"");
-    }
-
-    //Sphere
-    {
-        std::vector<utility::VertexPN> verticesPN;
-        std::vector<u32> indices;
-
-        utility::CreateSphere(verticesPN, indices, sphereRadius, 100, 100);
-        mMeshSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereVB", L"SphereIB", L"");
-    }
-
-    //GlassObj
-    {
-        std::vector<utility::VertexPN> verticesPN;
-        std::vector<u32> indices;
-
-        std::string strValue;
-        strValue.assign(mOBJ0FileName.begin(), mOBJ0FileName.end());
-        const char* charValue = strValue.c_str();
-        if (!utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale))
-        {
-            OutputDebugString(L"OBJ Load was Failed\n");
-            throw std::runtime_error("OBJ Load was Failed");
-        }
-        mMeshOBJ0.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
-    }
-
-    //MetalObj
-    {
-        std::vector<utility::VertexPN> verticesPN;
-        std::vector<u32> indices;
-
-        std::string strValue;
-        strValue.assign(mOBJ1FileName.begin(), mOBJ1FileName.end());
-        const char* charValue = strValue.c_str();
-        if (!utility::CreateMesh(charValue, verticesPN, indices, mMetalObjScale))
-        {
-            OutputDebugString(L"OBJ Load was Failed\n");
-            throw std::runtime_error("OBJ Load was Failed");
-        }
-        mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
-    }
-
-    //Box
-    {
-        std::vector<utility::VertexPN> verticesPN;
-        std::vector<u32> indices;
-
-        utility::CreateCube(verticesPN, indices, boxXLength, boxYLength, boxZLength);
-        mMeshBox.CreateMeshBuffer(mDevice, verticesPN, indices, L"BoxVB", L"BoxIB", L"");
-
-        if (!mOBJModel.loadObjFile(mDevice, mOBJFolderName.c_str(), mOBJFileName.c_str(), L""))
-        {
-            OutputDebugString(L"OBJ Load was Failed\n");
-            throw std::runtime_error("OBJ Load was Failed");
-        }
-        mOBJModel.CreateMeshBuffers(mDevice, L"");
-    }
-
     s32 count = 0;
     std::mt19937 mt;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE / STAGE_DIVISION;
@@ -251,7 +141,7 @@ void DXRPathTracer::CreateSceneInfo()
         std::uniform_real_distribution<> rndScale(1, 3);
         for (auto& trs : mSpheresNormalTbl) {
             f32 scale = (f32)rndScale(mt);
-            const f32 scaledSize = sphereRadius * scale;
+            const f32 scaledSize = SPHERE_RADIUS * scale;
             f32 y = -PLANE_SIZE * 0.99f + scaledSize;
             f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
             f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
@@ -260,9 +150,9 @@ void DXRPathTracer::CreateSceneInfo()
         }
         for (auto& trs : mBoxesNormalTbl) {
             f32 scale = (f32)rndScale(mt);
-            const f32 scaledSizeY = boxYLength * scale;
-            const f32 scaledSizeX = boxXLength * scale;
-            const f32 scaledSizeZ = boxZLength * scale;
+            const f32 scaledSizeX = BOX_X_LENGTH * scale;
+            const f32 scaledSizeY = BOX_Y_LENGTH * scale;
+            const f32 scaledSizeZ = BOX_Z_LENGTH * scale;
             f32 y = -PLANE_SIZE * 0.98f + scaledSizeY;
             f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
             f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
@@ -286,24 +176,10 @@ void DXRPathTracer::CreateSceneInfo()
         };
 
         utility::MaterialParam defaultMaterial{};
-        defaultMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-        defaultMaterial.metallic = 0;//blend diffuse specular at specTrans == 0
-        defaultMaterial.roughness = 0;
-        defaultMaterial.specular = 0;//spec power
-        defaultMaterial.transRatio = 1;//0:diffuse  1:trans
-        defaultMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-        defaultMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-        defaultMaterial.isSSSExecutable = 0u;
+        defaultMaterial.asDefault();
 
         utility::MaterialParam defaultSSSMaterial{};
-        defaultSSSMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-        defaultSSSMaterial.metallic = 0.0;//blend diffuse specular at specTrans == 0
-        defaultSSSMaterial.roughness = 1.0f;
-        defaultSSSMaterial.specular = 0.0;//spec power
-        defaultSSSMaterial.transRatio = 0;//0:diffuse  1:trans
-        defaultSSSMaterial.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-        defaultSSSMaterial.emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-        defaultSSSMaterial.isSSSExecutable = 1u;
+        defaultSSSMaterial.asDefaultSSS();
 
         std::uniform_int_distribution rndID(0, 4);
         std::uniform_real_distribution rndF(0.f, 1.f);
@@ -424,23 +300,18 @@ void DXRPathTracer::CreateSceneInfo()
     //upload the data of material
     {
         auto bufferSize = sizeof(utility::MaterialParam) * mNormalSphereMaterialTbl.size();
-        mNormalSphereMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
         mDevice->ImmediateBufferUpdateHostVisible(mNormalSphereMaterialCB.Get(), mNormalSphereMaterialTbl.data(), bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam) * mNormalBoxMaterialTbl.size();
-        mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
         mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam) * mOBJ1MaterialTbl.size();
-        mOBJ1MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
         mDevice->ImmediateBufferUpdateHostVisible(mOBJ1MaterialCB.Get(), mOBJ1MaterialTbl.data(), bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
-        mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
         mDevice->ImmediateBufferUpdateHostVisible(mOBJ0MaterialCB.Get(), mOBJ0MaterialTbl.data(), bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam);
-        mStageMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
         mDevice->ImmediateBufferUpdateHostVisible(mStageMaterialCB.Get(), &mStageMaterial, bufferSize);
     }
 }
@@ -453,13 +324,13 @@ void DXRPathTracer::CreateSceneBLAS()
     mMeshOBJ1.CreateBLAS(mDevice, L"Metal-BLAS");
     //mMeshLightSphere.CreateBLAS(mDevice, L"LightSphere-BLAS");
     mMeshBox.CreateBLAS(mDevice, L"Box-BLAS");
-    mOBJModel.CreateBLAS(mDevice);
+    mOBJMaterialLinkedMesh.CreateBLAS(mDevice);
 }
 
 void DXRPathTracer::CreateSceneTLAS()
 {
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
-    SetupMeshInfo(instanceDescs);
+    UpdateMeshInstances(instanceDescs);
 
     size_t sizeOfInstanceDescs = instanceDescs.size() * sizeof(D3D12_RAYTRACING_INSTANCE_DESC);
 
@@ -503,7 +374,7 @@ void DXRPathTracer::CreateSceneTLAS()
 void DXRPathTracer::UpdateSceneTLAS()
 {
     std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
-    SetupMeshInfo(instanceDescs);
+    UpdateMeshInstances(instanceDescs);
 
     size_t sizeOfInstanceDescs = instanceDescs.size() * sizeof(D3D12_RAYTRACING_INSTANCE_DESC);
     mDevice->ImmediateBufferUpdateHostVisible(mInstanceDescsBuffer.Get(), instanceDescs.data(), sizeOfInstanceDescs);

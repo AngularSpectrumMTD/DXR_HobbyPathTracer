@@ -31,12 +31,6 @@
     <Filter Include="ソース ファイル\Common">
       <UniqueIdentifier>{a764a4e5-ce6e-4784-a9cc-9aa134d85d4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\PhotonMapper">
-      <UniqueIdentifier>{bb904edd-f2e4-4659-8f42-37c7c180f84f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\PhotonMapper">
-      <UniqueIdentifier>{7a2aacda-20b2-44d7-9287-ba1346c6de0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\shaders\SVGF">
       <UniqueIdentifier>{91dabe60-637b-45ac-82a3-91d4492419be}</UniqueIdentifier>
     </Filter>
@@ -58,6 +52,12 @@
     <Filter Include="ソース ファイル\shaders\Raygen">
       <UniqueIdentifier>{8891e5ed-c72a-4909-a130-8e338a9fbf34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\PathTracer">
+      <UniqueIdentifier>{bb904edd-f2e4-4659-8f42-37c7c180f84f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\PathTracer">
+      <UniqueIdentifier>{7a2aacda-20b2-44d7-9287-ba1346c6de0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -67,34 +67,31 @@
       <Filter>ソース ファイル\Core</Filter>
     </ClCompile>
     <ClCompile Include="AccelerationStructure.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="ComputeShader.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="CreateBuffer.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="Denoise.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
-    </ClCompile>
-    <ClCompile Include="DxrPhotonMapper.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="GPUSort.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="LoadTexture.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="RayTraceShader.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="SetUpRootSignature.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="ShaderTable.cpp">
-      <Filter>ソース ファイル\PhotonMapper</Filter>
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
     <ClCompile Include="..\common\src\Camera.cpp">
       <Filter>ソース ファイル\Core</Filter>
@@ -104,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="..\common\src\utility\OBJ.cpp">
       <Filter>ソース ファイル\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRPathTracer.cpp">
+      <Filter>ソース ファイル\PathTracer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +122,6 @@
     <ClInclude Include="..\common\include\RenderDeviceDX12.h">
       <Filter>ヘッダー ファイル\Core</Filter>
     </ClInclude>
-    <ClInclude Include="DxrPhotonMapper.h">
-      <Filter>ヘッダー ファイル\PhotonMapper</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\include\Camera.h">
       <Filter>ヘッダー ファイル\Core</Filter>
     </ClInclude>
@@ -133,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="..\common\include\utility\OBJ.h">
       <Filter>ヘッダー ファイル\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRPathTracer.h">
+      <Filter>ヘッダー ファイル\PathTracer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -228,7 +228,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DxrPhotonMapper.rc">
+    <ResourceCompile Include="DXRPathTracer.rc">
       <Filter>リソース ファイル</Filter>
     </ResourceCompile>
   </ItemGroup>
