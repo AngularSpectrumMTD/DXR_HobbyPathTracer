@@ -7,6 +7,11 @@
 
 #define USE_FGETS_FILE_READING
 
+bool isSameWord(const char* v0, const char* v1)
+{
+	return strcmp(v0, v1) == 0;
+}
+
 namespace utility {
 	OBJMaterialLinkedMesh::OBJMaterialLinkedMesh() {
 	}
@@ -19,10 +24,6 @@ namespace utility {
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
 		vector <DirectX::XMFLOAT2> uv;
-
-		Vertex.reserve(PREPARE_ELEMENTS);
-		Normal.reserve(PREPARE_ELEMENTS);
-		uv.reserve(PREPARE_ELEMENTS);
 
 		s32 matID = 0;
 		char key[255] = { 0 };
@@ -65,13 +66,13 @@ namespace utility {
 			memset(key, 0, sizeof(char) * 255);
 			fscanf_s(fp, "%s ", key, sizeof(key));
 
-			if (strcmp(key, "v") == 0) {
+			if (isSameWord(key, "v")) {
 				vertexCounter++;
 			}
-			if (strcmp(key, "vn") == 0) {
+			if (isSameWord(key, "vn")) {
 				normalCounter++;
 			}
-			if (strcmp(key, "vt") == 0) {
+			if (isSameWord(key, "vt")) {
 				uvCounter++;
 			}
 		}
