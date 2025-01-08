@@ -5,8 +5,6 @@
 #define PREPARE_ELEMENTS 10000
 #define MIN_ROUGHNESS 0.05f
 
-#define USE_FGETS_FILE_READING
-
 bool isSameWord(const char* v0, const char* v1)
 {
 	return strcmp(v0, v1) == 0;
@@ -19,7 +17,6 @@ namespace utility {
 		loadObjFile(device, folderPath, FileName, modelNamePtr);
 	}
 
-#ifdef USE_FGETS_FILE_READING
 	bool OBJMaterialLinkedMesh::loadObjFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
 		vector <DirectX::XMFLOAT3> Vertex;
 		vector <DirectX::XMFLOAT3> Normal;
@@ -31,27 +28,7 @@ namespace utility {
 		char fileName[60];
 		sprintf_s(fileName, "%s/%s", folderPath, FileName);
 
-		FILE* fp = NULL;
 		errno_t err;
-		err = fopen_s(&fp, fileName, "rt");
-		if (err == 0)
-		{
-			OutputDebugString(L"loadObjFile() File Open Succeeded\n");
-		}
-		else if (err > 0)
-		{
-			wchar_t debugStr[256];
-			swprintf_s(debugStr, L"loadObjFile() File Open ERROR : code %d\n", err);
-			OutputDebugString(debugStr);
-			return false;
-		}
-		else
-		{
-			OutputDebugString(L"loadObjFile() File Open ERROR\n");
-			return false;
-		}
-
-		fseek(fp, SEEK_SET, 0);
 
 		DirectX::XMFLOAT3 vec3d;
 		DirectX::XMFLOAT2 vec2d;
@@ -60,503 +37,274 @@ namespace utility {
 		u32 normalCounter = 0;
 		u32 uvCounter = 0;
 
-		while (!feof(fp))
+		//1st time File Reading
 		{
-			//key mtlib / v / vn etc...
-			memset(key, 0, sizeof(char) * 255);
-			fscanf_s(fp, "%s ", key, sizeof(key));
+			ifstream ifs(fileName);
+			if (ifs.fail())
+			{
+				OutputDebugString(L"loadObjFile() File Open ERROR\n");
+				return false;
+			}
 
-			if (isSameWord(key, "v")) {
-				vertexCounter++;
-			}
-			if (isSameWord(key, "vn")) {
-				normalCounter++;
-			}
-			if (isSameWord(key, "vt")) {
-				uvCounter++;
-			}
-		}
-		Vertex.resize(vertexCounter);
-		Normal.resize(normalCounter);
-		uv.resize(uvCounter);
+			string bufferStr;
 
-		vertexCounter = 0;
-		normalCounter = 0;
-		uvCounter = 0;
+			//File Read Start
+			while (getline(ifs, bufferStr))
+			{
+				//key mtlib / v / vn etc...
+				memset(key, 0, sizeof(char) * 255);
+				sscanf_s(bufferStr.data(), "%s ", key, sizeof(key));
 
-		//finish 1st time File Reading
-		fclose(fp);
-
-		//start 2nd time File Reading
-		fopen_s(&fp, fileName, "rt");
-		fseek(fp, SEEK_SET, 0);
-
-		//File Read Start
-		while (!feof(fp))
-		{
-			//key mtlib / v / vn etc...
-			memset(key, 0, sizeof(char) * 255);
-			fscanf_s(fp, "%s ", key, sizeof(key));
-
-			if (strcmp(key, "mtllib") == 0) {
-				fscanf_s(fp, "%s ", key, sizeof(key));
-				LoadMaterialFromFile(device, folderPath, key);
-			}
-			if (strcmp(key, "v") == 0) {
-				fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Vertex[vertexCounter] = vec3d;
-				vertexCounter++;
-			}
-			if (strcmp(key, "vn") == 0) {
-				fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Normal[normalCounter] = vec3d;
-				normalCounter++;
-			}
-			if (strcmp(key, "vt") == 0) {
-				fscanf_s(fp, "%f %f", &vec2d.x, &vec2d.y);
-				vec2d.y *= -1;
-				uv[uvCounter] = vec2d;
-				uvCounter++;
-			}
-			if (strcmp(key, "usemtl") == 0) {
-				fscanf_s(fp, "%s ", key, sizeof(key));
-				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
-					if (strcmp(key, MaterialTbl[i].MaterialName.c_str()) == 0)
-					{
-						matID = i;
-					}
+				if (isSameWord(key, "v")) {
+					vertexCounter++;
+				}
+				if (isSameWord(key, "vn")) {
+					normalCounter++;
+				}
+				if (isSameWord(key, "vt")) {
+					uvCounter++;
 				}
 			}
-			//face id0=vertex 1=UV 2=normal
-			if (strcmp(key, "f") == 0) {
-				const s32 LineBufferLength = 1024;
-				char buffer[LineBufferLength];
 
-				if (fgets(buffer, LineBufferLength, fp) != nullptr)
-				{
-					char* parsePoint = strchr(buffer, ' ');
-					std::vector<std::string> spaceSplit;
-					Split(' ', &buffer[0], spaceSplit);
-					s32 vtx_uv_nrmID[3] =
-					{
-						-1, -1, -1,
-					};
+			Vertex.resize(vertexCounter);
+			Normal.resize(normalCounter);
+			uv.resize(uvCounter);
 
-					if (spaceSplit.size() == 3)//Triangle
-					{
-						//block x 3
-						for (s32 i = 0; i < 3; i++)
+			vertexCounter = 0;
+			normalCounter = 0;
+			uvCounter = 0;
+
+			ifs.close();
+		}
+
+		//2nd time File Reading
+		{
+			FILE* fp = NULL;
+			fopen_s(&fp, fileName, "rt");
+			fseek(fp, SEEK_SET, 0);
+
+			//File Read Start
+			while (!feof(fp))
+			{
+				//key mtlib / v / vn etc...
+				memset(key, 0, sizeof(char) * 255);
+				fscanf_s(fp, "%s ", key, sizeof(key));
+
+				if (strcmp(key, "mtllib") == 0) {
+					fscanf_s(fp, "%s ", key, sizeof(key));
+					LoadMaterialFromFile(device, folderPath, key);
+				}
+				if (strcmp(key, "v") == 0) {
+					fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
+					Vertex[vertexCounter] = vec3d;
+					vertexCounter++;
+				}
+				if (strcmp(key, "vn") == 0) {
+					fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
+					Normal[normalCounter] = vec3d;
+					normalCounter++;
+				}
+				if (strcmp(key, "vt") == 0) {
+					fscanf_s(fp, "%f %f", &vec2d.x, &vec2d.y);
+					vec2d.y *= -1;
+					uv[uvCounter] = vec2d;
+					uvCounter++;
+				}
+				if (strcmp(key, "usemtl") == 0) {
+					fscanf_s(fp, "%s ", key, sizeof(key));
+					for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
+						if (isSameWord(key, MaterialTbl[i].MaterialName.c_str()))
 						{
-							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
-							//vertexID uvID normalID
-							for (s32 j = 0; j < 3; j++)
-							{
-								s32 currID = vtx_uv_nrmID[j];
-
-								if (currID == -1)
-								{
-									continue;
-								}
-
-								switch (j)
-								{
-									case 0:
-										{
-											if (MaterialTbl[matID].TriangleVertexIDTbl.size() == 0)
-											{
-												MaterialTbl[matID].TriangleVertexIDTbl.reserve(PREPARE_ELEMENTS);
-											}
-											MaterialTbl[matID].TriangleVertexIDTbl.push_back(currID);
-										}
-										break;
-									case 1:
-										{
-											if (MaterialTbl[matID].TriangleUVIDTbl.size() == 0)
-											{
-												MaterialTbl[matID].TriangleUVIDTbl.reserve(PREPARE_ELEMENTS);
-											}
-											MaterialTbl[matID].TriangleUVIDTbl.push_back(currID);
-										}
-										break;
-									case 2:
-										{
-											if (MaterialTbl[matID].TriangleNormalIDTbl.size() == 0)
-											{
-												MaterialTbl[matID].TriangleNormalIDTbl.reserve(PREPARE_ELEMENTS);
-											}
-											MaterialTbl[matID].TriangleNormalIDTbl.push_back(currID);
-										}
-										break;
-								}
-							}
+							matID = i;
 						}
 					}
-					else if (spaceSplit.size() == 4)//Rectangle
-					{
-						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						//return true;
-						//for (s32 i = 0; i < 4; i++)
-						//{
-						//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
-						//	//vertexID uvID normalID
-						//	for (s32 i = 0; i < 3; i++)
-						//	{
-						//		s32 currID = vtx_uv_nrmID[i];
-
-						//		if (currID == -1)
-						//		{
-						//			continue;
-						//		}
-
-						//		switch (i)
-						//		{
-						//		case 0:
-						//			MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
-						//			break;
-						//		case 1:
-						//			MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
-						//			break;
-						//		case 2:
-						//			MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
-						//			break;
-						//		}
-						//	}
-						//}
-					}
-					else
-					{
-						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						//return true;
-					}
 				}
+				//face id0=vertex 1=UV 2=normal
+				if (strcmp(key, "f") == 0) {
+					const s32 LineBufferLength = 1024;
+					char buffer[LineBufferLength];
 
-			}
-		}
-		//finish 2nd time File Reading
-		fclose(fp);
-		//File Read End
-
-		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
-			MaterialTbl[j].TriangleVertexTbl.reserve(MaterialTbl[j].TriangleVertexIDTbl.size());
-			MaterialTbl[j].QuadrangleVertexTbl.reserve(MaterialTbl[j].QuadrangleVertexIDTbl.size());
-
-			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
-				utility::VertexPNT Tri;
-				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
-				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
-				if (uv.size() > 0 && MaterialTbl[j].TriangleUVIDTbl.size() > 0 && (i < MaterialTbl[j].TriangleUVIDTbl.size()))
-				{
-					Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
-				}
-				else
-				{
-					MaterialTbl[j].hasDiffuseTex = false;
-					MaterialTbl[j].hasAlphaMask = false;
-					Tri.UV = XMFLOAT2(0xff, 0xff);
-				}
-				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
-			}
-			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
-				utility::VertexPNT Quad;
-				Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
-				Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
-				if (uv.size() > 0)
-				{
-					Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
-				}
-				else
-				{
-					MaterialTbl[j].hasDiffuseTex = false;
-					MaterialTbl[j].hasAlphaMask = false;
-					Quad.UV = XMFLOAT2(0xff, 0xff);
-				}
-				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
-			}
-		}
-
-		//No Indexing
-		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
-
-			if (MaterialTbl[j].TriangleVertexIDTbl.size() > 0)
-			{
-				MaterialTbl[j].TriangleVertexIDTbl.clear();
-				MaterialTbl[j].TriangleVertexIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size()); 
-				MaterialTbl[j].TriangleNormalIDTbl.clear();
-				MaterialTbl[j].TriangleNormalIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size());
-				MaterialTbl[j].TriangleUVIDTbl.clear();
-				MaterialTbl[j].TriangleUVIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size());
-			}
-
-			if (MaterialTbl[j].QuadrangleVertexIDTbl.size() > 0)
-			{
-				MaterialTbl[j].QuadrangleVertexIDTbl.clear();
-				MaterialTbl[j].QuadrangleVertexIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
-				MaterialTbl[j].QuadrangleNormalIDTbl.clear();
-				MaterialTbl[j].QuadrangleNormalIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
-				MaterialTbl[j].QuadrangleUVIDTbl.clear();
-				MaterialTbl[j].QuadrangleUVIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
-			}
-
-			u32 count = 0;
-			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {
-				MaterialTbl[j].TriangleVertexIDTbl[count] = count;
-				MaterialTbl[j].TriangleNormalIDTbl[count] = count;
-				MaterialTbl[j].TriangleUVIDTbl[count] = count;
-				count++;
-			}
-			count = 0;
-			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexTbl.size(); i++) {
-				MaterialTbl[j].QuadrangleVertexIDTbl[count] = count;
-				MaterialTbl[j].QuadrangleNormalIDTbl[count] = count;
-				MaterialTbl[j].QuadrangleUVIDTbl[count] = count;
-				count++;
-			}
-		}
-
-		Vertex.clear();
-		Normal.clear();
-		uv.clear();
-		return true;
-	}
-#else
-	bool OBJMaterialLinkedMesh::loadObjFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName, const wchar_t* modelNamePtr) {
-		vec4i Face[3];
-		vector <DirectX::XMFLOAT3> Vertex;
-		vector <DirectX::XMFLOAT3> Normal;
-		vector <DirectX::XMFLOAT2> uv;
-
-		Vertex.reserve(PREPARE_ELEMENTS);
-		Normal.reserve(PREPARE_ELEMENTS);
-		uv.reserve(PREPARE_ELEMENTS);
-
-		s32 matID = 0;
-		char key[255] = { 0 };
-
-		char fileName[60];
-		sprintf_s(fileName, "%s/%s", folderPath, FileName);
-
-		ifstream ifs(fileName);
-		string str;
-
-		if (ifs.fail())
-		{
-			OutputDebugString(L"loadObjFile() File Open ERROR\n");
-			return false;
-		}
-
-		DirectX::XMFLOAT3 vec3d;
-		DirectX::XMFLOAT2 vec2d;
-
-		//File Read Start
-		while (getline(ifs, str))
-		{
-			//key mtlib / v / vn etc...
-			memset(key, 0, sizeof(char) * 255);
-			sscanf_s(str.data(), "%s ", key, sizeof(key));
-
-			if (strcmp(key, "mtllib") == 0) {
-				char dummy[255] = { 0 };
-				sscanf_s(str.data(), "%s %s", dummy, sizeof(dummy),key, sizeof(key));
-				LoadMaterialFromFile(device, folderPath, key);
-			}
-			if (strcmp(key, "v") == 0) {
-				sscanf_s(str.data(), "v %f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Vertex.push_back(vec3d);
-			}
-			if (strcmp(key, "vn") == 0) {
-				sscanf_s(str.data(), "vn %f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
-				Normal.push_back(vec3d);
-			}
-			if (strcmp(key, "vt") == 0) {
-				sscanf_s(str.data(), "vt %f %f", &vec2d.x, &vec2d.y);
-				vec2d.y *= -1;
-				uv.push_back(vec2d);
-			}
-			if (strcmp(key, "usemtl") == 0) {
-				sscanf_s(str.data(), "usemtl %s ", key, sizeof(key));
-				for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
-					if (strcmp(key, MaterialTbl[i].MaterialName.c_str()) == 0)
+					if (fgets(buffer, LineBufferLength, fp) != nullptr)
 					{
-						matID = i;
-					}
-				}
-			}
-			//face id0=vertex 1=UV 2=normal
-			if (strcmp(key, "f") == 0) {
-				Face[0].x = -1; Face[0].y = -1; Face[0].z = -1; Face[0].w = -1;//VertexID
-				Face[1].x = -1; Face[1].y = -1; Face[1].z = -1; Face[1].w = -1;//UVID
-				Face[2].x = -1; Face[2].y = -1; Face[2].z = -1; Face[2].w = -1;//NormalID
-
-				const s32 LineBufferLength = 1024;
-				char buffer[LineBufferLength];
-
-				if (getline(ifs, str))
-				{
-					std::vector<std::string> spaceSplit;
-					Split(' ', &str[0], spaceSplit);
-					std::vector<std::string> spaceSplitTmp(spaceSplit.size() - 1);
-					for (u32 i = 0; i < spaceSplit.size() - 1; i++)
-					{
-						spaceSplitTmp[i] = spaceSplit[i + 1];
-					}
-					spaceSplit = spaceSplitTmp;
-					s32 vtx_uv_nrmID[3] =
-					{
-						-1, -1, -1,
-					};
-
-					if (spaceSplit.size() == 3)//Triangle
-					{
-						for (s32 i = 0; i < 3; i++)
+						char* parsePoint = strchr(buffer, ' ');
+						std::vector<std::string> spaceSplit;
+						Split(' ', &buffer[0], spaceSplit);
+						s32 vtx_uv_nrmID[3] =
 						{
-							SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
-							//vertexID uvID normalID
+							-1, -1, -1,
+						};
+
+						if (spaceSplit.size() == 3)//Triangle
+						{
+							//block x 3
 							for (s32 i = 0; i < 3; i++)
 							{
-								s32 currID = vtx_uv_nrmID[i];
-
-								if (currID == -1)
+								SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+								//vertexID uvID normalID
+								for (s32 j = 0; j < 3; j++)
 								{
-									continue;
-								}
+									s32 currID = vtx_uv_nrmID[j];
 
-								switch (i)
-								{
-								case 0:
-									MaterialTbl[matID].TriangleVertexIDTbl.push_back(currID);
+									if (currID == -1)
+									{
+										continue;
+									}
+
+									switch (j)
+									{
+									case 0:
+									{
+										MaterialTbl[matID].TriangleVertexIDTbl.push_back(currID);
+									}
 									break;
-								case 1:
-									MaterialTbl[matID].TriangleUVIDTbl.push_back(currID);
+									case 1:
+									{
+										MaterialTbl[matID].TriangleUVIDTbl.push_back(currID);
+									}
 									break;
-								case 2:
-									MaterialTbl[matID].TriangleNormalIDTbl.push_back(currID);
+									case 2:
+									{
+										MaterialTbl[matID].TriangleNormalIDTbl.push_back(currID);
+									}
 									break;
+									}
 								}
 							}
 						}
+						else if (spaceSplit.size() == 4)//Rectangle
+						{
+							OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+							//return true;
+							//for (s32 i = 0; i < 4; i++)
+							//{
+							//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
+							//	//vertexID uvID normalID
+							//	for (s32 i = 0; i < 3; i++)
+							//	{
+							//		s32 currID = vtx_uv_nrmID[i];
+
+							//		if (currID == -1)
+							//		{
+							//			continue;
+							//		}
+
+							//		switch (i)
+							//		{
+							//		case 0:
+							//			MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
+							//			break;
+							//		case 1:
+							//			MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
+							//			break;
+							//		case 2:
+							//			MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
+							//			break;
+							//		}
+							//	}
+							//}
+						}
+						else
+						{
+							OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
+							//return true;
+						}
 					}
-					else if (spaceSplit.size() == 4)//Rectangle
+
+				}
+			}
+			//finish 2nd time File Reading
+			fclose(fp);
+			//File Read End
+		}
+
+		//Construct Vertices, Normals, uv
+		{
+			for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
+				MaterialTbl[j].TriangleVertexTbl.resize(MaterialTbl[j].TriangleVertexIDTbl.size());
+				MaterialTbl[j].QuadrangleVertexTbl.resize(MaterialTbl[j].QuadrangleVertexIDTbl.size());
+
+				//Triangles
+				for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
+					utility::VertexPNT Tri;
+					Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
+					Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
+					if (uv.size() > 0 && MaterialTbl[j].TriangleUVIDTbl.size() > 0 && (i < MaterialTbl[j].TriangleUVIDTbl.size()))
 					{
-						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						//return true;
-						//for (s32 i = 0; i < 4; i++)
-						//{
-						//	SlashParser(vtx_uv_nrmID, (char*)spaceSplit.at(i).c_str());
-						//	//vertexID uvID normalID
-						//	for (s32 i = 0; i < 3; i++)
-						//	{
-						//		s32 currID = vtx_uv_nrmID[i];
-
-						//		if (currID == -1)
-						//		{
-						//			continue;
-						//		}
-
-						//		switch (i)
-						//		{
-						//		case 0:
-						//			MaterialTbl[matID].QuadrangleVertexIDTbl.push_back(currID);
-						//			break;
-						//		case 1:
-						//			MaterialTbl[matID].QuadrangleUVIDTbl.push_back(currID);
-						//			break;
-						//		case 2:
-						//			MaterialTbl[matID].QuadrangleNormalIDTbl.push_back(currID);
-						//			break;
-						//		}
-						//	}
-						//}
+						Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
 					}
 					else
 					{
-						OutputDebugString(L"Invalid Vertex. This Program Handles Triangular Vertex Only.\n");
-						//return true;
+						MaterialTbl[j].hasDiffuseTex = false;
+						MaterialTbl[j].hasAlphaMask = false;
+						Tri.UV = XMFLOAT2(0xff, 0xff);
 					}
+					MaterialTbl[j].TriangleVertexTbl[i] = Tri;
 				}
 
+				//Quadrangles
+				for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
+					utility::VertexPNT Quad;
+					Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
+					Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
+					if (uv.size() > 0)
+					{
+						Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+					}
+					else
+					{
+						MaterialTbl[j].hasDiffuseTex = false;
+						MaterialTbl[j].hasAlphaMask = false;
+						Quad.UV = XMFLOAT2(0xff, 0xff);
+					}
+					MaterialTbl[j].QuadrangleVertexTbl[i] = Quad;
+				}
 			}
 		}
-		//File Read End
+	
+		//Construct ID (No Indexing)
+		{
+			for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
 
-		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
-			MaterialTbl[j].TriangleVertexTbl.reserve(MaterialTbl[j].TriangleVertexIDTbl.size());
-			MaterialTbl[j].QuadrangleVertexTbl.reserve(MaterialTbl[j].QuadrangleVertexIDTbl.size());
-
-			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexIDTbl.size(); i++) {
-				utility::VertexPNT Tri;
-				Tri.Position = Vertex[MaterialTbl[j].TriangleVertexIDTbl[i]];
-				Tri.Normal = Normal[MaterialTbl[j].TriangleNormalIDTbl[i]];
-				if (uv.size() > 0 && (MaterialTbl[j].TriangleUVIDTbl.size() > 0))
+				if (MaterialTbl[j].TriangleVertexIDTbl.size() > 0)
 				{
-					Tri.UV = uv[MaterialTbl[j].TriangleUVIDTbl[i]];
+					MaterialTbl[j].TriangleVertexIDTbl.clear();
+					MaterialTbl[j].TriangleVertexIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size());
+					MaterialTbl[j].TriangleNormalIDTbl.clear();
+					MaterialTbl[j].TriangleNormalIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size());
+					MaterialTbl[j].TriangleUVIDTbl.clear();
+					MaterialTbl[j].TriangleUVIDTbl.resize(MaterialTbl[j].TriangleVertexTbl.size());
 				}
-				else
+
+				if (MaterialTbl[j].QuadrangleVertexIDTbl.size() > 0)
 				{
-					Tri.UV = XMFLOAT2(0xff, 0xff);
+					MaterialTbl[j].QuadrangleVertexIDTbl.clear();
+					MaterialTbl[j].QuadrangleVertexIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
+					MaterialTbl[j].QuadrangleNormalIDTbl.clear();
+					MaterialTbl[j].QuadrangleNormalIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
+					MaterialTbl[j].QuadrangleUVIDTbl.clear();
+					MaterialTbl[j].QuadrangleUVIDTbl.resize(MaterialTbl[j].QuadrangleVertexTbl.size());
 				}
-				MaterialTbl[j].TriangleVertexTbl.push_back(Tri);
-			}
-			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexIDTbl.size(); i++) {
-				utility::VertexPNT Quad;
-				Quad.Position = Vertex[MaterialTbl[j].QuadrangleVertexIDTbl[i]];
-				Quad.Normal = Normal[MaterialTbl[j].QuadrangleNormalIDTbl[i]];
-				if (uv.size() > 0)
-				{
-					Quad.UV = uv[MaterialTbl[j].QuadrangleUVIDTbl[i]];
+
+				for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {
+					MaterialTbl[j].TriangleVertexIDTbl[i] = i;
+					MaterialTbl[j].TriangleNormalIDTbl[i] = i;
+					MaterialTbl[j].TriangleUVIDTbl[i] = i;
 				}
-				else
-				{
-					Quad.UV = XMFLOAT2(0xff, 0xff);
+
+				for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexTbl.size(); i++) {
+					MaterialTbl[j].QuadrangleVertexIDTbl[i] = i;
+					MaterialTbl[j].QuadrangleNormalIDTbl[i] = i;
+					MaterialTbl[j].QuadrangleUVIDTbl[i] = i;
 				}
-				MaterialTbl[j].QuadrangleVertexTbl.push_back(Quad);
-			}
-		}
-
-		//No Indexing
-		for (s32 j = 0; j < (signed)MaterialTbl.size(); j++) {
-
-			if (MaterialTbl[j].TriangleVertexIDTbl.size() > 0)
-			{
-				MaterialTbl[j].TriangleVertexIDTbl.clear();
-				MaterialTbl[j].TriangleVertexIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
-				MaterialTbl[j].TriangleNormalIDTbl.clear();
-				MaterialTbl[j].TriangleNormalIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
-				MaterialTbl[j].TriangleUVIDTbl.clear();
-				MaterialTbl[j].TriangleUVIDTbl.reserve(MaterialTbl[j].TriangleVertexTbl.size());
-			}
-
-			if (MaterialTbl[j].QuadrangleVertexIDTbl.size() > 0)
-			{
-				MaterialTbl[j].QuadrangleVertexIDTbl.clear();
-				MaterialTbl[j].QuadrangleVertexIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
-				MaterialTbl[j].QuadrangleNormalIDTbl.clear();
-				MaterialTbl[j].QuadrangleNormalIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
-				MaterialTbl[j].QuadrangleUVIDTbl.clear();
-				MaterialTbl[j].QuadrangleUVIDTbl.reserve(MaterialTbl[j].QuadrangleVertexTbl.size());
-			}
-
-			u32 count = 0;
-			for (s32 i = 0; i < (signed)MaterialTbl[j].TriangleVertexTbl.size(); i++) {
-				MaterialTbl[j].TriangleVertexIDTbl.push_back(count);
-				MaterialTbl[j].TriangleNormalIDTbl.push_back(count);
-				MaterialTbl[j].TriangleUVIDTbl.push_back(count);
-				count++;
-			}
-			count = 0;
-			for (s32 i = 0; i < (signed)MaterialTbl[j].QuadrangleVertexTbl.size(); i++) {
-				MaterialTbl[j].QuadrangleVertexIDTbl.push_back(count);
-				MaterialTbl[j].QuadrangleNormalIDTbl.push_back(count);
-				MaterialTbl[j].QuadrangleUVIDTbl.push_back(count);
-				count++;
 			}
 		}
 
 		Vertex.clear();
 		Normal.clear();
 		uv.clear();
+
 		return true;
 	}
-#endif
 
 	vector<OBJMaterial> OBJMaterialLinkedMesh::getMaterialList() const
 	{
@@ -653,7 +401,7 @@ namespace utility {
 				{
 					//key newmtl / Ka / Kd etc...
 					fscanf_s(fp, "%s ", key, sizeof(key));
-					if (strcmp(key, "newmtl") == 0)
+					if (isSameWord(key, "newmtl"))
 					{
 						if (isMaterialIncluded)
 						{
@@ -667,42 +415,42 @@ namespace utility {
 						mtl.DiffuseTextureName = "";
 						mtl.AlphaMaskName = "";
 					}
-					if (strcmp(key, "Ka") == 0)
+					if (isSameWord(key, "Ka"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
 						mtl.Reflection4Color.ambient = vec4d;
 					}
-					if (strcmp(key, "Kd") == 0)
+					if (isSameWord(key, "Kd"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
 						mtl.Reflection4Color.diffuse = vec4d;
 					}
-					if (strcmp(key, "Ks") == 0)
+					if (isSameWord(key, "Ks"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
 						mtl.Reflection4Color.specular = vec4d;
 					}
-					if (strcmp(key, "Ke") == 0)
+					if (isSameWord(key, "Ke"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
 						mtl.Reflection4Color.emission = vec4d;
 					}
-					if (strcmp(key, "Ns") == 0)
+					if (isSameWord(key, "Ns"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
 						mtl.Shininess = vec4d.x;
 					}
-					if (strcmp(key, "Ni") == 0)
+					if (isSameWord(key, "Ni"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
 						mtl.Ni = vec4d.x;
 					}
-					if (strcmp(key, "d") == 0)
+					if (isSameWord(key, "d"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
 						mtl.opacity = vec4d.x;
 					}
-					if (strcmp(key, "map_Kd") == 0)
+					if (isSameWord(key, "map_Kd"))
 					{
 						//fscanf_s(fp, "%s ", key, sizeof(key));
 						fgets(key, 512, fp);
@@ -714,7 +462,7 @@ namespace utility {
 						}
 						mtl.DiffuseTextureName = key;
 					}
-					if (strcmp(key, "map_d") == 0)
+					if (isSameWord(key, "map_d"))
 					{
 						//fscanf_s(fp, "%s ", key, sizeof(key));
 						fgets(key, 512, fp);
@@ -731,6 +479,9 @@ namespace utility {
 				fclose(fp);
 			}
 
+			mtl.TriangleVertexIDTbl.reserve(PREPARE_ELEMENTS);
+			mtl.TriangleNormalIDTbl.reserve(PREPARE_ELEMENTS);
+			mtl.TriangleUVIDTbl.reserve(PREPARE_ELEMENTS);
 			if (isMaterialIncluded)
 			{
 				MaterialTbl.push_back(mtl);
@@ -755,7 +506,7 @@ namespace utility {
 		int count = 0;
 		for (auto & mat : MaterialTbl)
 		{
-			if (strcmp(mat.DiffuseTextureName.c_str(), "") == 0)
+			if (isSameWord(mat.DiffuseTextureName.c_str(), ""))
 			{
 				mat.hasDiffuseTex = false;
 				mat.setDummyDiffuseTexture(device);
@@ -784,7 +535,7 @@ namespace utility {
 				}
 			}
 
-			if (strcmp(mat.AlphaMaskName.c_str(), "") == 0)
+			if (isSameWord(mat.AlphaMaskName.c_str(), ""))
 			{
 				mat.hasAlphaMask = false;
 				mat.setDummyAlphaMask(device);
