@@ -50,7 +50,7 @@ namespace utility {
 
 		void asDefaultSSS()
 		{
-			albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			albedo = XMVectorSet(1.0f, 0.6f, 0.2f, 1.0f);
 			metallic = 0.0;//blend diffuse specular at specTrans == 0
 			roughness = 1.0f;
 			specular = 0.0;//spec power

@@ -52,6 +52,8 @@
 #define BOX_Y_LENGTH 3
 #define BOX_Z_LENGTH 3
 
+#define OBJ_COUNT 2
+
 //#define USE_SSS
 
 namespace HitGroups {
@@ -60,8 +62,7 @@ namespace HitGroups {
     static const wchar_t* DefaultMaterialSphere = L"hgMaterialSpheres";
     static const wchar_t* DefaultMaterialBox = L"hgMaterlalBoxes";
     static const wchar_t* Floor = L"hgFloor";
-    static const wchar_t* Obj0 = L"hgObj0";
-    static const wchar_t* Obj1 = L"hgObj1";
+    static const wchar_t* Obj[OBJ_COUNT] = { L"hgObj0", L"hgObj1" };
     static const wchar_t* Light = L"hgLight";
 }
 
@@ -236,12 +237,8 @@ private:
         NormalBoxes = 6
     };
 
-    enum OBJ0TypeCount {
-        NormalOBJ0s = 1
-    };
-
-    enum OBJ1TypeCount {
-        NormalOBJ1s = 1
+    enum OBJTypeCount {
+        NormalObjs = OBJ_COUNT
     };
 
     enum StageType {
@@ -485,11 +482,9 @@ private:
     utility::PolygonMesh mMeshStage;
     utility::PolygonMesh mMeshSphere;
     utility::PolygonMesh mMeshBox;
-    utility::PolygonMesh mMeshOBJ0;
-    utility::PolygonMesh mMeshOBJ1;
+    std::array < utility::PolygonMesh, NormalObjs> mMeshOBJTbl;
     //utility::PolygonMesh mMeshLightSphere;
-    std::wstring mOBJ0FileName;
-    std::wstring mOBJ1FileName;
+    std::array <std::wstring, NormalObjs> mOBJFileNameTbl;
     std::wstring mStageTextureFileName;
     std::wstring mCubeMapTextureFileName;
 
@@ -501,8 +496,7 @@ private:
     //ObjectAttributes of TLAS
     std::array<XMMATRIX, NormalSpheres> mSpheresNormalTbl;
     std::array<XMMATRIX, NormalBoxes> mBoxesNormalTbl;
-    std::array<XMMATRIX, NormalOBJ0s> mOBJ0sNormalTbl;
-    std::array<XMMATRIX, NormalOBJ1s> mOBJ1sNormalTbl;
+    std::array<XMMATRIX, NormalObjs> mOBJNormalTbl;
     std::array<XMMATRIX, NormalLight> mLightTbl;
 
     XMMATRIX mOBJMaterialLinkedMeshTRS;
@@ -510,8 +504,7 @@ private:
     //Materials
     std::array<utility::MaterialParam, NormalSpheres> mNormalSphereMaterialTbl;
     std::array<utility::MaterialParam, NormalBoxes> mNormalBoxMaterialTbl;
-    std::array<utility::MaterialParam, NormalOBJ0s> mOBJ0MaterialTbl;
-    std::array<utility::MaterialParam, NormalOBJ1s> mOBJ1MaterialTbl;
+    std::array<utility::MaterialParam, NormalObjs> mOBJMaterialTbl;
     utility::MaterialParam mStageMaterial;
     ComPtr<ID3D12Resource> mNormalSphereMaterialCB;
     ComPtr<ID3D12Resource> mNormalBoxMaterialCB;
@@ -519,9 +512,15 @@ private:
     ComPtr<ID3D12Resource> mRefractSphereMaterialCB;
     ComPtr<ID3D12Resource> mReflectBoxMaterialCB;
     ComPtr<ID3D12Resource> mRefractBoxMaterialCB;
-    ComPtr<ID3D12Resource> mOBJ0MaterialCB;
-    ComPtr<ID3D12Resource> mOBJ1MaterialCB;
+    ComPtr<ID3D12Resource> mOBJMaterialCB;
     ComPtr<ID3D12Resource> mStageMaterialCB;
+
+    //Scale, Offset
+    std::array<f32, NormalObjs> mObjYOffsetTbl;
+    std::array<XMFLOAT3, NormalObjs> mObjScaleTbl;
+
+    //Material
+    std::array<utility::MaterialParam, NormalObjs> mMaterialParamTbl;
 
     //Lights
     std::vector<LightGenerateParam> mLightGenerationParamTbl;
@@ -756,10 +755,6 @@ private:
 
     std::wstring mAssetPath;
 
-    f32 mGlassObjYOfsset;
-    XMFLOAT3 mGlassObjScale;
-    f32 mMetalObjYOfsset;
-    XMFLOAT3 mMetalObjScale;
     f32 mLightRange;
     f32 mIntensityBoost;
     f32 mGatherRadius;
@@ -781,10 +776,9 @@ private:
 
     f32 mCausticsBoost;
 
-    f32 mGlassRotateRange;
+    f32 mModelMovingRange;
 
-    ModelType mGlassModelType;
-    ModelType mMetalModelType;
+    std::array<ModelType, NormalObjs> mModelTypeTbl;
 
     bool mVisualizeLightRange;
 
@@ -809,10 +803,7 @@ private:
     StageType mStageType;
     SceneType mSceneType;
 
-    utility::MaterialParam mMaterialParam0;
-    utility::MaterialParam mMaterialParam1;
-
-    bool mIsTargetGlass;
+    u32 mTargetModelIndex;
 
     bool mIsUseAccumulation;
     bool mIsUseNEE;
@@ -852,6 +843,8 @@ private:
     f32 mLightAreaScale = 1.0f;
 
     bool mIsUseDirectionalLight = true;
+
+    u32 mMoveFrame = 0;
 };
 
 #endif

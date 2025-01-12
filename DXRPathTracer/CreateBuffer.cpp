@@ -53,36 +53,24 @@ void DXRPathTracer::CreateRegularBuffer()
             mMeshSphere.CreateMeshBuffer(mDevice, verticesPN, indices, L"SphereVB", L"SphereIB", L"");
         }
 
-        //GlassObj
+        //Obj
         {
             std::vector<utility::VertexPN> verticesPN;
             std::vector<u32> indices;
 
             std::string strValue;
-            strValue.assign(mOBJ0FileName.begin(), mOBJ0FileName.end());
-            const char* charValue = strValue.c_str();
-            if (!utility::CreateMesh(charValue, verticesPN, indices, mGlassObjScale))
-            {
-                OutputDebugString(L"OBJ Load was Failed\n");
-                throw std::runtime_error("OBJ Load was Failed");
-            }
-            mMeshOBJ0.CreateMeshBuffer(mDevice, verticesPN, indices, L"GlassVB", L"GlassIB", L"");
-        }
 
-        //MetalObj
-        {
-            std::vector<utility::VertexPN> verticesPN;
-            std::vector<u32> indices;
-
-            std::string strValue;
-            strValue.assign(mOBJ1FileName.begin(), mOBJ1FileName.end());
-            const char* charValue = strValue.c_str();
-            if (!utility::CreateMesh(charValue, verticesPN, indices, mMetalObjScale))
+            for (u32 i = 0; i < NormalObjs; i++)
             {
-                OutputDebugString(L"OBJ Load was Failed\n");
-                throw std::runtime_error("OBJ Load was Failed");
+                strValue.assign(mOBJFileNameTbl[i].begin(), mOBJFileNameTbl[i].end());
+                const char* charValue = strValue.c_str();
+                if (!utility::CreateMesh(charValue, verticesPN, indices, mObjScaleTbl[i]))
+                {
+                    OutputDebugString(L"OBJ Load was Failed\n");
+                    throw std::runtime_error("OBJ Load was Failed");
+                }
+                mMeshOBJTbl[i].CreateMeshBuffer(mDevice, verticesPN, indices, L"", L"", L"");
             }
-            mMeshOBJ1.CreateMeshBuffer(mDevice, verticesPN, indices, L"MetalVB", L"MetalIB", L"");
         }
 
         //Box
@@ -798,11 +786,8 @@ void DXRPathTracer::CreateConstantBuffer()
         bufferSize = sizeof(utility::MaterialParam) * mNormalBoxMaterialTbl.size();
         mNormalBoxMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
 
-        bufferSize = sizeof(utility::MaterialParam) * mOBJ1MaterialTbl.size();
-        mOBJ1MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
-
-        bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
-        mOBJ0MaterialCB = mDevice->CreateConstantBuffer(bufferSize);
+        bufferSize = sizeof(utility::MaterialParam) * mOBJMaterialTbl.size();
+        mOBJMaterialCB = mDevice->CreateConstantBuffer(bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam);
         mStageMaterialCB = mDevice->CreateConstantBuffer(bufferSize);

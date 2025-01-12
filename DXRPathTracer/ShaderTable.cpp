@@ -24,8 +24,7 @@ void DXRPathTracer::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPt
         1 //floor
         + NormalSpheres
         + NormalBoxes
-        + NormalOBJ0s
-        + NormalOBJ1s
+        + NormalObjs
         + mOBJMaterialLinkedMesh.getMaterialList().size();
     //+ 1;//light
     u32 hitGroupSize = hitgroupCount * hitgroupRecordSize;
@@ -138,11 +137,11 @@ void DXRPathTracer::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPt
         }
 
         {
-            auto cbAddress = mOBJ0MaterialCB->GetGPUVirtualAddress();
+            auto cbAddress = mOBJMaterialCB->GetGPUVirtualAddress();
             auto cbStride = sizeof(utility::MaterialParam);
-
-            for (auto& instances : mOBJ0MaterialTbl) {
-                auto shaderIDPtr = RTProperties->GetShaderIdentifier(HitGroups::Obj0);
+            u32 count = 0;
+            for (auto& instances : mOBJMaterialTbl) {
+                auto shaderIDPtr = RTProperties->GetShaderIdentifier(HitGroups::Obj[count]);
                 if (shaderIDPtr == nullptr) {
                     throw std::logic_error("Not found ShaderIdentifier");
                 }
@@ -150,32 +149,12 @@ void DXRPathTracer::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPt
                 memcpy(registerAddressOffset, shaderIDPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
                 registerAddressOffset += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
                 memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
-                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ0.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ0.descriptorVB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJTbl[count].descriptorIB.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJTbl[count].descriptorVB.hGpu.ptr, sizeof(UINT64));
 
                 cbAddress += cbStride;
                 recordAddressOffset += hitgroupRecordSize;
-            }
-        }
-
-        {
-            auto cbAddress = mOBJ1MaterialCB->GetGPUVirtualAddress();
-            auto cbStride = sizeof(utility::MaterialParam);
-
-            for (auto& instances : mOBJ1MaterialTbl) {
-                auto shaderIDPtr = RTProperties->GetShaderIdentifier(HitGroups::Obj1);
-                if (shaderIDPtr == nullptr) {
-                    throw std::logic_error("Not found ShaderIdentifier");
-                }
-                auto registerAddressOffset = recordAddressOffset;
-                memcpy(registerAddressOffset, shaderIDPtr, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-                registerAddressOffset += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["constantBuffer"], &cbAddress, sizeof(UINT64));
-                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["indexBuffer"], &mMeshOBJ1.descriptorIB.hGpu.ptr, sizeof(UINT64));
-                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterial["vertexBuffer"], &mMeshOBJ1.descriptorVB.hGpu.ptr, sizeof(UINT64));
-
-                cbAddress += cbStride;
-                recordAddressOffset += hitgroupRecordSize;
+                count++;
             }
         }
 

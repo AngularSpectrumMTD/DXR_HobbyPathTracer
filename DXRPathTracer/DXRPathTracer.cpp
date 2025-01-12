@@ -75,7 +75,7 @@ void DXRPathTracer::Setup()
     mPhiDirectional = 70; mThetaDirectional = 280;
     mSpectrumMode = Spectrum_D65;
     mLightLambdaNum = 12;
-    mGlassRotateRange = 8;
+    mModelMovingRange = 8;
     mCausticsBoost = 0.005f;
     mIsMoveModel = false;
     mIsApplyCaustics = false;
@@ -85,7 +85,7 @@ void DXRPathTracer::Setup()
     mInverseMove = false;
     mIsUseTexture = true;
     mIsUseDebugView = false;
-    mIsTargetGlass = true;
+    mTargetModelIndex = 0;
     mIsUseAccumulation = false;
     mIsIndirectOnly = false;
     mIsUseNEE = true;
@@ -112,7 +112,7 @@ void DXRPathTracer::Setup()
     }
 
     mStageType = StageType_Plane;
-    mMetalModelType = ModelType::ModelType_SimpleCube;
+    mModelTypeTbl[1] = ModelType::ModelType_SimpleCube;
 
     switch (mSceneType)
     {
@@ -130,7 +130,7 @@ void DXRPathTracer::Setup()
             mInitEyePos = XMFLOAT3(188.0f, -163.0f, -101.0f);
             mInitTargetPos = XMFLOAT3(0.0f, -132.0f, 0.0f);
             mLightRange = 10.0f;
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = true;
         }
         break;
@@ -166,8 +166,8 @@ void DXRPathTracer::Setup()
                 mLightPosX = 1.99f; mLightPosY = 2.8f; mLightPosZ = 4.9f;
                 mPhi = 306.0f; mTheta = 187.0f;
                 mLightRange = 3.18f;
-                mGlassModelType = ModelType_CurvedMesh;
-                //mGlassModelType = ModelType_DebugMesh;
+                mModelTypeTbl[0] = ModelType_CurvedMesh;
+                //mModelTypeTbl[0] = ModelType_DebugMesh;
             }
             else
             {
@@ -176,28 +176,28 @@ void DXRPathTracer::Setup()
                 mLightRange = 0.79f;
                 if (isDebugMeshTest)
                 {
-                    mGlassModelType = ModelType_DebugMesh;
+                    mModelTypeTbl[0] = ModelType_DebugMesh;
                 }
                 else
                 {
                     mLightPosX = 0.1f; mLightPosY = 6.59f; mLightPosZ = 3.4f;
                     mPhi = 447.0f; mTheta = 206.0f;
-                    mGlassModelType = ModelType_Diamond;
+                    mModelTypeTbl[0] = ModelType_Diamond;
                     mInitEyePos = XMFLOAT3(-20.0f, 19.0f, 2.4f);
                     if (isAfrodytaTest)
                     {
                         mLightPosX = -3.1f; mLightPosY = 12.19f; mLightPosZ = 1.79f;
                         mPhi = 334.0f; mTheta = 111.0f;
-                        //mGlassModelType = ModelType_Afrodyta;
-                        mGlassModelType = ModelType_Dragon;
-                        //mGlassModelType = ModelType_SimpleCube;
+                        //mModelTypeTbl[0] = ModelType_Afrodyta;
+                        mModelTypeTbl[0] = ModelType_Dragon;
+                        //mModelTypeTbl[0] = ModelType_SimpleCube;
                         mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
                         mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
                         mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
                         mCausticsBoost = 0.014;
                         mLightRange = 0.29f;
 
-                        mGlassModelType = ModelType_Afrodyta;
+                        mModelTypeTbl[0] = ModelType_Afrodyta;
                         //mLightRange = 2.00f;
                     }
                 }
@@ -230,14 +230,14 @@ void DXRPathTracer::Setup()
                 mInitEyePos = XMFLOAT3(-20, 9.97, -5.73);
                 mInitTargetPos = XMFLOAT3(14.4, 7.5, -4.0);
 #endif
-                mGlassModelType = ModelType_Dragon;
+                mModelTypeTbl[0] = ModelType_Dragon;
             }
             else
             {
                 mPhi = 412; mTheta = 262;
                 mLightPosX = 4.2f; mLightPosY = 8.8f; mLightPosZ = 0.2f;
                 mLightRange = 0.8f;
-                mGlassModelType = ModelType_Afrodyta;
+                mModelTypeTbl[0] = ModelType_Afrodyta;
             }
             mIsSpotLightPhotonMapper = true;
         }
@@ -268,7 +268,7 @@ void DXRPathTracer::Setup()
                 mLightRange = 3.68f;
             }
             
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
             mCausticsBoost = 0.0002f;
             mGatherRadius = 0.011f;
@@ -290,7 +290,7 @@ void DXRPathTracer::Setup()
             mInitEyePos = XMFLOAT3(30, 12, 9);
             mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
             mLightRange = 3.68f;
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mIsSpotLightPhotonMapper = false;
         }
         break;
@@ -315,7 +315,7 @@ void DXRPathTracer::Setup()
 
             mLightRange = 0.79f;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
         }
         break;
         case SceneType_GITest:
@@ -339,7 +339,7 @@ void DXRPathTracer::Setup()
 
             mLightRange = 0.79f;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
         }
         break; 
         case SceneType_Kitchen:
@@ -363,7 +363,7 @@ void DXRPathTracer::Setup()
 
             mLightRange = 0.79f;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mIntensityBoost *= 3;
         }
         break;
@@ -388,7 +388,7 @@ void DXRPathTracer::Setup()
 
             mLightRange = 0.79f;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
         }
         break;
         case SceneType_PTTestBrick:
@@ -419,7 +419,7 @@ void DXRPathTracer::Setup()
 
             mLightRange = 4.0f;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
         }
         break;   
@@ -454,7 +454,7 @@ void DXRPathTracer::Setup()
             mCausticsBoost = 0.05;
             mGatherBlockRange = 2;
 
-            mGlassModelType = ModelType_Afrodyta;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
 
             mIsUseDirectionalLight = false;
@@ -482,7 +482,7 @@ void DXRPathTracer::Setup()
     mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
     mLightRange = 2.98f;
 
-    mGlassModelType = ModelType_Afrodyta;
+    mModelTypeTbl[0] = ModelType_Afrodyta;
     mIsSpotLightPhotonMapper = false;
     mCausticsBoost = 0.0002f;
     mGatherRadius = 0.011f;
@@ -490,287 +490,288 @@ void DXRPathTracer::Setup()
     mIsTemporalAccumulationForceDisable = true;
 #endif
 
-    switch (mGlassModelType)
+    switch (mModelTypeTbl[0])
     {
     case  ModelType::ModelType_Crab:
     {
-        mOBJ0FileName = L"model/crab.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(12, 12, 12);
+        mOBJFileNameTbl[0] = L"model/crab.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
-        mOBJ0FileName = L"model/twistCube.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJFileNameTbl[0] = L"model/twistCube.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(5, 5, 5);
     }
     break;
     case ModelType::ModelType_SimpleCube:
     {
-        mOBJ0FileName = L"model/simpleCube.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJFileNameTbl[0] = L"model/simpleCube.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(5, 5, 5);
     }
     break;
     case ModelType::ModelType_Buddha:
     {
-        mOBJ0FileName = L"model/buddha/deciBuddha.obj";//test
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(15, 15, 15);//test
-        //mGlassObjScale = XMFLOAT3(0.1, 0.1, 0.1);//test
+        mOBJFileNameTbl[0] = L"model/buddha/deciBuddha.obj";//test
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(15, 15, 15);//test
+        //mObjScaleTbl[0] = XMFLOAT3(0.1, 0.1, 0.1);//test
     }
     break;
     case ModelType::ModelType_Teapot:
     {
-        mOBJ0FileName = L"model/teapot.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(2, 2, 2);
+        mOBJFileNameTbl[0] = L"model/teapot.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(2, 2, 2);
     }
     break;
     case  ModelType::ModelType_LikeWater:
     {
-        mOBJ0FileName = L"model/likeWater.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(4, 4, 4);
+        mOBJFileNameTbl[0] = L"model/likeWater.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(4, 4, 4);
     }
     break;
     case  ModelType::ModelType_Ocean:
     {
         mStageType = StageType_Box;
-        mGlassRotateRange *= 2;
-        mOBJ0FileName = L"model/ocean.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mModelMovingRange *= 2;
+        mOBJFileNameTbl[0] = L"model/ocean.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case  ModelType::ModelType_Ocean2:
     {
         mStageType = StageType_Box;
-        mGlassRotateRange *= 2;
-        mOBJ0FileName = L"model/ocean2.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mModelMovingRange *= 2;
+        mOBJFileNameTbl[0] = L"model/ocean2.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case  ModelType::ModelType_CurvedMesh:
     {
-        mOBJ0FileName = L"model/curvedMesh.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(4, 4, 4);
+        mOBJFileNameTbl[0] = L"model/curvedMesh.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(4, 4, 4);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
-        mOBJ0FileName = L"model/diamond.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(2, 2, 2);
+        mOBJFileNameTbl[0] = L"model/diamond.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(2, 2, 2);
     }
     break;
     case ModelType::ModelType_Skull:
     {
-        mOBJ0FileName = L"model/skull.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(30, 30, 30);
+        mOBJFileNameTbl[0] = L"model/skull.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(30, 30, 30);
     }
     break;
     case  ModelType::ModelType_HorseStatue:
     {
-        mOBJ0FileName = L"model/horse_statue_Tri.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(350, 350, 350);
+        mOBJFileNameTbl[0] = L"model/horse_statue_Tri.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(350, 350, 350);
     }
     break;
     case  ModelType::ModelType_Dragon:
     {
-        mOBJ0FileName = L"model/dragon.obj";
-        mGlassObjYOfsset = 11;
+        mOBJFileNameTbl[0] = L"model/dragon.obj";
+        mObjYOffsetTbl[0] = 11;
         if (mSceneType == SceneType_BistroExterior)
         {
 #ifndef CUBE_TEST
-            mGlassObjYOfsset = 4;
+            mObjYOffsetTbl[0] = 4;
 #endif
         }
-        mGlassObjScale = XMFLOAT3(12, 12, 12);
+        mObjScaleTbl[0] = XMFLOAT3(12, 12, 12);
     }
     break;
     case  ModelType::ModelType_Afrodyta:
     {
-        mOBJ0FileName = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
-        mGlassObjYOfsset = 8;
-        mGlassObjScale = XMFLOAT3(0.1f, 0.1f, 0.1f);
+        mOBJFileNameTbl[0] = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
+        mObjYOffsetTbl[0] = 8;
+        mObjScaleTbl[0] = XMFLOAT3(0.1f, 0.1f, 0.1f);
         if (mSceneType == SceneType_Room)
         {
-            mGlassObjYOfsset = 16;
-            mGlassObjScale = XMFLOAT3(0.02f, 0.02f, 0.02f);
+            mObjYOffsetTbl[0] = 16;
+            mObjScaleTbl[0] = XMFLOAT3(0.02f, 0.02f, 0.02f);
         }
         if (mSceneType == SceneType_PTTestBrick)
         {
-            mGlassObjYOfsset = 14;
+            mObjYOffsetTbl[0] = 14;
         }
     }
     break;
     case  ModelType::ModelType_Rock:
     {
-        mOBJ0FileName = L"model/rock.obj";
-        mGlassObjYOfsset = 8;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJFileNameTbl[0] = L"model/rock.obj";
+        mObjYOffsetTbl[0] = 8;
+        mObjScaleTbl[0] = XMFLOAT3(5, 5, 5);
     }
     break;
     case  ModelType::ModelType_DebugMesh:
     {
-        mOBJ0FileName = L"model/debugMesh.obj";
-        mGlassObjYOfsset = 8;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJFileNameTbl[0] = L"model/debugMesh.obj";
+        mObjYOffsetTbl[0] = 8;
+        mObjScaleTbl[0] = XMFLOAT3(5, 5, 5);
     }
     break;
     default:
     {
-        mOBJ0FileName = L"model/crab.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(12, 12, 12);
+        mOBJFileNameTbl[0] = L"model/crab.obj";
+        mObjYOffsetTbl[0] = 5;
+        mObjScaleTbl[0] = XMFLOAT3(12, 12, 12);
     }
     break;
     }
 
-    switch (mMetalModelType)
+    switch (mModelTypeTbl[1])
     {
     case  ModelType::ModelType_Crab:
     {
-        mOBJ1FileName = L"model/crab.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(12, 12, 12);
+        mOBJFileNameTbl[1] = L"model/crab.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
     }
     break;
     case ModelType::ModelType_TwistCube:
     {
-        mOBJ1FileName = L"model/twistCube.obj";
-        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15.0f :  50.0f;
-        mMetalObjScale = XMFLOAT3(3, 3, 3);
+        mOBJFileNameTbl[1] = L"model/twistCube.obj";
+        mObjYOffsetTbl[1] = (mSceneType == SceneType_BistroExterior) ? 15.0f :  50.0f;
+        mObjScaleTbl[1] = XMFLOAT3(3, 3, 3);
 
         if (mSceneType == SceneType_Simple)
         {
-            mMetalObjYOfsset = 90;
-            mMetalObjScale = XMFLOAT3(12, 12, 12);
+            mObjYOffsetTbl[1] = 90;
+            mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
         else if (mSceneType == SceneType_Sponza)
         {
-            mMetalObjYOfsset = 90;
-            mMetalObjScale = XMFLOAT3(12, 12, 12);
+            mObjYOffsetTbl[1] = 90;
+            mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
 #ifdef CUBE_TEST
-        mMetalObjYOfsset = 10;//test
-        mMetalObjScale = XMFLOAT3(6, 6, 6);//test
+        mObjYOffsetTbl[1] = 10;//test
+        mObjScaleTbl[1] = XMFLOAT3(6, 6, 6);//test
 #endif
     }
     break;
     case ModelType::ModelType_SimpleCube:
     {
-        mOBJ1FileName = L"model/simpleCube.obj";
-        mMetalObjYOfsset = (mSceneType == SceneType_BistroExterior) ? 15.0f : 50.0f;
-        mMetalObjScale = XMFLOAT3(3, 3, 3);
+        mOBJFileNameTbl[1] = L"model/simpleCube.obj";
+        mObjYOffsetTbl[1] = (mSceneType == SceneType_BistroExterior) ? 15.0f : 50.0f;
+        mObjScaleTbl[1] = XMFLOAT3(3, 3, 3);
 
         if (mSceneType == SceneType_Simple)
         {
-            mMetalObjYOfsset = 90;
-            mMetalObjScale = XMFLOAT3(12, 12, 12);
+            mObjYOffsetTbl[1] = 90;
+            mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
         else if (mSceneType == SceneType_Sponza)
         {
-            mMetalObjYOfsset = 90;
-            mMetalObjScale = XMFLOAT3(12, 12, 12);
+            mObjYOffsetTbl[1] = 90;
+            mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
         else if (mSceneType == SceneType_BistroInterior)
         {
-            mMetalObjYOfsset = 90;
-            mMetalObjScale = XMFLOAT3(12, 12, 12);
+            mObjYOffsetTbl[1] = 90;
+            mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
         else
         {
 #ifdef CUBE_TEST
-            mMetalObjYOfsset = 10;//test
-            mMetalObjScale = XMFLOAT3(6, 6, 6);//test
+            mObjYOffsetTbl[1] = 10;//test
+            mObjScaleTbl[1] = XMFLOAT3(6, 6, 6);//test
 #endif
         }
     }
     break;
     case ModelType::ModelType_Teapot:
     {
-        mOBJ1FileName = L"model/teapot.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(2, 2, 2);
+        mOBJFileNameTbl[1] = L"model/teapot.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(2, 2, 2);
     }
     break;
     case  ModelType::ModelType_LikeWater:
     {
-        mOBJ1FileName = L"model/likeWater.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(2, 4, 4);
+        mOBJFileNameTbl[1] = L"model/likeWater.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(2, 4, 4);
     }
     break;
     case  ModelType::ModelType_Ocean:
     {
         mStageType = StageType_Box;
-        mOBJ1FileName = L"model/ocean.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mOBJFileNameTbl[1] = L"model/ocean.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case  ModelType::ModelType_Ocean2:
     {
         mStageType = StageType_Box;
-        mOBJ1FileName = L"model/ocean2.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mOBJFileNameTbl[1] = L"model/ocean2.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
     }
     break;
     case  ModelType::ModelType_CurvedMesh:
     {
-        mOBJ0FileName = L"model/curvedMesh.obj";
-        mGlassObjYOfsset = 5;
-        mGlassObjScale = XMFLOAT3(4, 4, 4);
+        mOBJFileNameTbl[1] = L"model/curvedMesh.obj";
+        mObjYOffsetTbl[1] = 5;
+        mObjScaleTbl[1] = XMFLOAT3(4, 4, 4);
     }
     break;
     case ModelType::ModelType_Diamond:
     {
-        mOBJ1FileName = L"model/diamond.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(2, 2, 2);
+        mOBJFileNameTbl[1] = L"model/diamond.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(2, 2, 2);
     }
     break;
     case ModelType::ModelType_Skull:
     {
-        mOBJ1FileName = L"model/skull.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(30, 30, 30);
+        mOBJFileNameTbl[1] = L"model/skull.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(30, 30, 30);
     }
     break;
     case  ModelType::ModelType_DebugMesh:
     {
-        mOBJ0FileName = L"model/debugMesh.obj";
-        mGlassObjYOfsset = 8;
-        mGlassObjScale = XMFLOAT3(5, 5, 5);
+        mOBJFileNameTbl[1] = L"model/debugMesh.obj";
+        mObjYOffsetTbl[1] = 8;
+        mObjScaleTbl[1] = XMFLOAT3(5, 5, 5);
     }
     break;
     default:
     {
-        mOBJ1FileName = L"model/crab.obj";
-        mMetalObjYOfsset = 15;
-        mMetalObjScale = XMFLOAT3(12, 12, 12);
+        mOBJFileNameTbl[1] = L"model/crab.obj";
+        mObjYOffsetTbl[1] = 15;
+        mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
     }
     break;
     }
 
     if (mSceneType == SceneType_Simple)
     {
-        mMetalObjYOfsset -= 150;
-        mGlassObjYOfsset -= 180;
-        mGlassObjScale.x *= 3;
-        mGlassObjScale.y *= 3;
-        mGlassObjScale.z *= 3;
-        mMetalObjScale.x *= 3;
-        mMetalObjScale.y *= 3;
-        mMetalObjScale.z *= 3;
+        mObjYOffsetTbl[0] -= 180;
+        mObjScaleTbl[0].x *= 3;
+        mObjScaleTbl[0].y *= 3;
+        mObjScaleTbl[0].z *= 3;
+
+        mObjYOffsetTbl[1] -= 150;
+        mObjScaleTbl[1].x *= 3;
+        mObjScaleTbl[1].y *= 3;
+        mObjScaleTbl[1].z *= 3;
     }
 
     WCHAR assetsPath[512];
@@ -1358,10 +1359,17 @@ void DXRPathTracer::Update()
 
     if (mIsMoveModel)
     {
-        mIsUseAccumulation = false;
-        for (auto& pos : mOBJ0sNormalTbl)
+        u32 count = 0;
+        for (auto& pos : mOBJNormalTbl)
         {
-            pos = XMMatrixTranslation(0, mGlassObjYOfsset + mGlassRotateRange * sin(0.4f * mSeedFrame * ONE_RADIAN), 0);
+            pos = XMMatrixTranslation(0, mObjYOffsetTbl[count] + mModelMovingRange * sin(0.4f * mMoveFrame * ONE_RADIAN), 0);
+            count++;
+        }
+
+        mMoveFrame++;
+        if (mMoveFrame >= (UINT_MAX >> 1))
+        {
+            mMoveFrame = 0;
         }
     }
 
@@ -1515,43 +1523,19 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         break;
         //material start
     case 'R':
-        if (mIsTargetGlass)
-        {
-            mMaterialParam0.roughness = Clamp(0.02f, 1, mMaterialParam0.roughness + (mInverseMove ? -0.01f : 0.01f));
-            mIsUseAccumulation = false;
-        }
-        else
-        {
-            mMaterialParam1.roughness = Clamp(0.02f, 1, mMaterialParam1.roughness + (mInverseMove ? -0.01f : 0.01f));
-            mIsUseAccumulation = false;
-        }
+        mMaterialParamTbl[mTargetModelIndex].roughness = Clamp(0.02f, 1, mMaterialParamTbl[0].roughness + (mInverseMove ? -0.01f : 0.01f));
+        mIsUseAccumulation = false;
         break;
     case 'S':
-        if (mIsTargetGlass)
-        {
-            mMaterialParam0.transRatio = Clamp(0, 1, mMaterialParam0.transRatio + (mInverseMove ? -0.1f : 0.1f));
-            mIsUseAccumulation = false;
-        }
-        else
-        {
-            mMaterialParam1.transRatio = Clamp(0, 1, mMaterialParam1.transRatio + (mInverseMove ? -0.1f : 0.1f));
-            mIsUseAccumulation = false;
-        }
+        mMaterialParamTbl[mTargetModelIndex].transRatio = Clamp(0, 1, mMaterialParamTbl[0].transRatio + (mInverseMove ? -0.1f : 0.1f));
+        mIsUseAccumulation = false;
         break;
     case 'M':
-        if (mIsTargetGlass)
-        {
-            mMaterialParam0.metallic = Clamp(0, 1, mMaterialParam0.metallic + (mInverseMove ? -0.1f : 0.1f));
-            mIsUseAccumulation = false;
-        }
-        else
-        {
-            mMaterialParam1.metallic = Clamp(0, 1, mMaterialParam1.metallic + (mInverseMove ? -0.1f : 0.1f));
-            mIsUseAccumulation = false;
-        }
+        mMaterialParamTbl[mTargetModelIndex].metallic = Clamp(0, 1, mMaterialParamTbl[0].metallic + (mInverseMove ? -0.1f : 0.1f));
+        mIsUseAccumulation = false;
         break;
     case VK_SPACE:
-        mIsTargetGlass = !mIsTargetGlass;
+        mTargetModelIndex = (mTargetModelIndex == 0) ? 1 : 0;
         break;
     case VK_CONTROL:
         mIsUseStreamingRIS = !mIsUseStreamingRIS;
@@ -1594,30 +1578,15 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         mIsUseAccumulation = false;
         break;*/
     case VK_F6:
-        if (mIsTargetGlass)
+        if (mMaterialParamTbl[mTargetModelIndex].isSSSExecutable > 0)
         {
-            if (mMaterialParam0.isSSSExecutable > 0)
-            {
-                mMaterialParam0.isSSSExecutable = 0;
-            }
-            else
-            {
-                mMaterialParam0.isSSSExecutable = 1;
-            }
-            mIsUseAccumulation = false;
+            mMaterialParamTbl[mTargetModelIndex].isSSSExecutable = 0;
         }
         else
         {
-            if (mMaterialParam1.isSSSExecutable > 0)
-            {
-                mMaterialParam1.isSSSExecutable = 0;
-            }
-            else
-            {
-                mMaterialParam1.isSSSExecutable = 1;
-            }
-            mIsUseAccumulation = false;
+            mMaterialParamTbl[mTargetModelIndex].isSSSExecutable = 1;
         }
+        mIsUseAccumulation = false;
         break;
     case VK_F7:
         mIsUseIBL = !mIsUseIBL;
@@ -1676,11 +1645,8 @@ void DXRPathTracer::UpdateSceneParams()
 
 void DXRPathTracer::UpdateMaterialParams()
 {
-    auto materialConstantBuffer0 = mOBJ0MaterialCB.Get();
-    mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer0, &mMaterialParam0, sizeof(mMaterialParam0));
-
-    auto materialConstantBuffer1 = mOBJ1MaterialCB.Get();
-    mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer1, &mMaterialParam1, sizeof(mMaterialParam1));
+    auto materialConstantBuffer = mOBJMaterialCB.Get();
+    mDevice->ImmediateBufferUpdateHostVisible(materialConstantBuffer, &mMaterialParamTbl, mMaterialParamTbl.size() * sizeof(utility::MaterialParam));
 }
 
 void DXRPathTracer::InitializeLightGenerateParams()

@@ -46,7 +46,8 @@ void DXRPathTracer::UpdateMeshInstances(std::vector<D3D12_RAYTRACING_INSTANCE_DE
         instanceDescs.push_back(desc);
     }
 
-    for (const auto& instances : mOBJ0sNormalTbl)
+    u32 i = 0;
+    for (const auto& instances : mOBJNormalTbl)
     {
         hitGroupID++;
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
@@ -55,21 +56,9 @@ void DXRPathTracer::UpdateMeshInstances(std::vector<D3D12_RAYTRACING_INSTANCE_DE
         desc.InstanceMask = 0xFF;
         desc.InstanceContributionToHitGroupIndex = hitGroupID;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshOBJ0.blas->GetGPUVirtualAddress();
+        desc.AccelerationStructure = mMeshOBJTbl[i].blas->GetGPUVirtualAddress();
         instanceDescs.push_back(desc);
-    }
-
-    for (const auto& instances : mOBJ1sNormalTbl)
-    {
-        hitGroupID++;
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        XMStoreFloat3x4(reinterpret_cast<XMFLOAT3X4*>(&desc.Transform), instances);
-        desc.InstanceID = 0;//unused
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = hitGroupID;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = mMeshOBJ1.blas->GetGPUVirtualAddress();
-        instanceDescs.push_back(desc);
+        i++;
     }
 
     for (const auto& instances : mOBJMaterialLinkedMesh.getMaterialList())
@@ -94,14 +83,15 @@ void DXRPathTracer::CreateSceneInfo()
 
     //Scaling and Translation
     {
-        for (auto& trs : mOBJ0sNormalTbl)
+        u32 i = 0;
+        for (auto& trs : mOBJNormalTbl)
         {
-            f32 y = mGlassObjYOfsset;
+            f32 y = mObjYOffsetTbl[i];
 
             f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION);
             f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION);
 
-            if (count == 0 && NormalOBJ0s == 1)
+            if ((count == 0) || (count == 1))
             {
                 trs = XMMatrixTranslation(0, y, 0);
             }
@@ -110,26 +100,9 @@ void DXRPathTracer::CreateSceneInfo()
                 trs = XMMatrixTranslation(x, y, z);
             }
             count++;
+            i++;
         }
         count = 0;
-        for (auto& trs : mOBJ1sNormalTbl)
-        {
-            f32 y = mMetalObjYOfsset;
-
-            f32 x = cellSize * 0.5 + cellSize * (count / STAGE_DIVISION) - PLANE_SIZE;
-            f32 z = cellSize * 0.5 + cellSize * (count % STAGE_DIVISION) - PLANE_SIZE;
-
-            if (count == 0 && NormalOBJ1s == 1)
-            {
-                //trs = XMMatrixTranslation(-PLANE_SIZE * 0.02f, y, -PLANE_SIZE * 0.02f);
-                trs = XMMatrixTranslation(0, y, 0);
-            }
-            else
-            {
-                trs = XMMatrixTranslation(x, y, z);
-            }
-            count++;
-        }
 
         for (auto& trs : mLightTbl)
         {
@@ -205,40 +178,20 @@ void DXRPathTracer::CreateSceneInfo()
             albedoIndex++;
             transIndex++;
         }
-        for (auto& material : mOBJ1MaterialTbl) {
+
+        u32 i = 0;
+        for (auto& material : mOBJMaterialTbl) {
             material = defaultMaterial;
-            //material.albedo = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[albedoIndex % _countof(colorTbl)];
-            material.albedo = (NormalOBJ1s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[albedoIndex % _countof(colorTbl)];//test
-
-            //material.transColor = (NormalOBJ1s == 1) ? colorTbl[0] : colorTbl[transIndex % _countof(colorTbl)];
-            material.transColor = (NormalOBJ1s == 1) ? XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) : colorTbl[transIndex % _countof(colorTbl)];//test
-
-            material.metallic = 0;// rndF(mt);
-            material.roughness = 0.3;// rndF(mt);
-
-#ifdef GI_TEST
-            material.transRatio = 0;// rndF(mt);
-#else
-            material.transRatio = (mSceneType == SceneType_Sponza) ? 0 : 1;// rndF(mt);
-#endif
-
-            albedoIndex++;
-            transIndex++;
-
-            mMaterialParam1 = material;
-        }
-        for (auto& material : mOBJ0MaterialTbl) {
-            material = defaultMaterial;
-            material.albedo = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[albedoIndex % _countof(colorTbl)];
+            material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
             //material.metallic = rndF(mt);
             material.metallic = 0.3;
             //material.roughness = 0.1;// rndF(mt);
             //material.roughness = 0.0;// rndF(mt);
             material.roughness = 0.2;// rndF(mt);
-            material.transColor = (NormalOBJ0s == 1) ? colorTbl[2] : colorTbl[transIndex % _countof(colorTbl)];
+            material.transColor = colorTbl[transIndex % _countof(colorTbl)];
             //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 0.8f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
 
-            if (mGlassModelType == ModelType_Dragon)
+            if (mModelTypeTbl[0] == ModelType_Dragon)
             {
                 if (mSceneType == SceneType_Sponza)
                 {
@@ -249,14 +202,14 @@ void DXRPathTracer::CreateSceneInfo()
                 else
                 {
                     material.roughness = 0.3;
-                    material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-                    material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
+                    material.transColor = colorTbl[transIndex % _countof(colorTbl)];
+                    material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
                 }
             }
-            else if (mGlassModelType == ModelType_CurvedMesh)
+            else if (mModelTypeTbl[0] == ModelType_CurvedMesh)
             {
-                material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-                material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.1f, 1.0f, 0.4f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];
+                material.transColor =colorTbl[transIndex % _countof(colorTbl)];
+                material.albedo =  colorTbl[albedoIndex % _countof(colorTbl)];
             }
             else if (mSceneType == SceneType_Sponza)
             {
@@ -284,7 +237,7 @@ void DXRPathTracer::CreateSceneInfo()
             albedoIndex++;
             transIndex++;
             //material.emission = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
-            mMaterialParam0 = material;
+            mMaterialParamTbl[i] = material;
         }
 
         mStageMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
@@ -305,11 +258,8 @@ void DXRPathTracer::CreateSceneInfo()
         bufferSize = sizeof(utility::MaterialParam) * mNormalBoxMaterialTbl.size();
         mDevice->ImmediateBufferUpdateHostVisible(mNormalBoxMaterialCB.Get(), mNormalBoxMaterialTbl.data(), bufferSize);
 
-        bufferSize = sizeof(utility::MaterialParam) * mOBJ1MaterialTbl.size();
-        mDevice->ImmediateBufferUpdateHostVisible(mOBJ1MaterialCB.Get(), mOBJ1MaterialTbl.data(), bufferSize);
-
-        bufferSize = sizeof(utility::MaterialParam) * mOBJ0MaterialTbl.size();
-        mDevice->ImmediateBufferUpdateHostVisible(mOBJ0MaterialCB.Get(), mOBJ0MaterialTbl.data(), bufferSize);
+        bufferSize = sizeof(utility::MaterialParam) * mOBJMaterialTbl.size();
+        mDevice->ImmediateBufferUpdateHostVisible(mOBJMaterialCB.Get(), mOBJMaterialTbl.data(), bufferSize);
 
         bufferSize = sizeof(utility::MaterialParam);
         mDevice->ImmediateBufferUpdateHostVisible(mStageMaterialCB.Get(), &mStageMaterial, bufferSize);
@@ -320,8 +270,8 @@ void DXRPathTracer::CreateSceneBLAS()
 {
     mMeshStage.CreateBLAS(mDevice, L"Plane-BLAS");
     mMeshSphere.CreateBLAS(mDevice, L"Sphere-BLAS");
-    mMeshOBJ0.CreateBLAS(mDevice, L"Glass-BLAS");
-    mMeshOBJ1.CreateBLAS(mDevice, L"Metal-BLAS");
+    mMeshOBJTbl[0].CreateBLAS(mDevice, L"Glass-BLAS");
+    mMeshOBJTbl[1].CreateBLAS(mDevice, L"Metal-BLAS");
     //mMeshLightSphere.CreateBLAS(mDevice, L"LightSphere-BLAS");
     mMeshBox.CreateBLAS(mDevice, L"Box-BLAS");
     mOBJMaterialLinkedMesh.CreateBLAS(mDevice);

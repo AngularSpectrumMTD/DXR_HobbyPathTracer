@@ -71,25 +71,17 @@ void DXRPathTracer::CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, Co
         //Hit Group
         {
             {
-                auto subObj = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-                subObj->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-                subObj->SetClosestHitShaderImport(chShaderName);
-                if (ahShaderName != nullptr)
+                for (u32 i = 0; i < NormalObjs; i++)
                 {
-                    subObj->SetAnyHitShaderImport(ahShaderName);
+                    auto subObj = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+                    subObj->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+                    subObj->SetClosestHitShaderImport(chShaderName);
+                    if (ahShaderName != nullptr)
+                    {
+                        subObj->SetAnyHitShaderImport(ahShaderName);
+                    }
+                    subObj->SetHitGroupExport(HitGroups::Obj[i]);
                 }
-                subObj->SetHitGroupExport(HitGroups::Obj0);
-            }
-
-            {
-                auto subObj = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-                subObj->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-                subObj->SetClosestHitShaderImport(chShaderName);
-                if (ahShaderName != nullptr)
-                {
-                    subObj->SetAnyHitShaderImport(ahShaderName);
-                }
-                subObj->SetHitGroupExport(HitGroups::Obj1);
             }
 
             {
@@ -198,14 +190,12 @@ void DXRPathTracer::CreateStateObject(ComPtr<ID3D12StateObject>& stateObject, Co
                         subObj->SetSubobjectToAssociate(*localRootSig);
                     }
                     {
-                        auto subObj = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-                        subObj->AddExport(HitGroups::Obj0);
-                        subObj->SetSubobjectToAssociate(*localRootSig);
-                    }
-                    {
-                        auto subObj = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-                        subObj->AddExport(HitGroups::Obj1);
-                        subObj->SetSubobjectToAssociate(*localRootSig);
+                        for (u32 i = 0; i < NormalObjs; i++)
+                        {
+                            auto subObj = subobjects.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+                            subObj->AddExport(HitGroups::Obj[i]);
+                            subObj->SetSubobjectToAssociate(*localRootSig);
+                        }
                     }
                 }
 

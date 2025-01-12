@@ -106,6 +106,40 @@ float4 specularBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
     }
 }
 
+float4 ForceLambertianBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
+{
+    if (dot(N, wi) <= 0)
+    {
+        return float4(0, 0, 0, 1);
+    }
+
+    const float3 H = normalize(wi + wo);
+
+    const float dotNL = abs(dot(N, wi));
+
+    float3 F0 = 0.08.xxx;
+    F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+    
+    const float3 F = FresnelSchlick(max(dot(wo, H), 0), F0);
+
+    const float3 kS = F;
+    const float3 kD = (1 - kS) * (1 - material.metallic);
+    
+    const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+    const float diffPDF = CosineSamplingPDF(dotNL);
+    const float3 sumBSDF = (diffBRDF * kD) * dotNL;
+    const float sumPDF = diffPDF;
+
+    if (sumPDF > 0)
+    {
+        return float4(sumBSDF, sumPDF);
+    }
+    else
+    {
+        return float4(0, 0, 0, 1);
+    }
+}
+
 float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
 {
     const float specRatio = FresnelReflectance(-wo, N, etaOUT);
@@ -395,6 +429,34 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
     }
 }
 
+float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
+{
+    float4 BSDF_PDF = 0.xxxx;
+
+    const float eps = 0.001;
+
+    const float roulette = rand(randomSeed);
+    const float blending = rand(randomSeed);
+    const float probability = 1 - material.transRatio;
+
+    float3 wo_local = worldToTangent(N_global, wo_global);
+    float3 L_local = worldToTangent(N_global, wi_global);
+
+   if (wo_local.z < 0)
+    {
+        N_global *= -1;
+    }
+
+    wo_local = worldToTangent(N_global, wo_global);
+    
+    const float3 V_local = normalize(wo_local);
+    
+    //compute bsdf    V : wo   L : wi(sample)
+    BSDF_PDF = ForceLambertianBSDF_PDF(material, Z_AXIS, V_local, L_local);
+
+    return BSDF_PDF;
+}
+
 float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
@@ -447,7 +509,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, inout uint randomSeed)
+void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, inout uint randomSeed, in bool isSSSSample)
 {
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
@@ -465,7 +527,18 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         float3 wi = lightSample.directionToLight;
         float receiverCos = dot(surfaceNormal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
+
+        float4 bsdfPDF = 0.xxxx;
+        if(isSSSSample)
+        {
+            MaterialParams sssMaterial = material;
+            sssMaterial.albedo = 1.xxxx;
+            bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
+        }
+        else
+        {
+            bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
+        }
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
 
         if((i > 0) && (G < 0.00001f))
@@ -486,7 +559,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample, replaySeed);
 }
 
-float3 performNEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS)
+float3 performNEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS, in bool isSSSSample)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseStreamingRIS())
@@ -495,9 +568,9 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
 
         bool visibility = false;
 
-        if(isSSSExecutable(material))
+        if(isSSSSample)
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed, true);
             visibility = isVisible(scatterPosition, lightSample);
 
             if(!visibility)
@@ -510,12 +583,10 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
                 float3 wi = lightSample.directionToLight;
                 float receiverCos = dot(surfaceNormal, wi);
                 float emitterCos = dot(lightNormal, -wi);
-                float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, reservoirRandomSeed);
                 //Only albedo on the incident side is considered
-                if(isSSSExecutable(material))
-                {
-                    bsdfPDF.xyz = 1.xxx;
-                }
+                MaterialParams sssMaterial = material;
+                sssMaterial.albedo = 1.xxxx;
+                float4 bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surfaceNormal, -WorldRayDirection(), wi, reservoirRandomSeed);
                 float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
                 float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -524,7 +595,7 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed);
+            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed, false);
             visibility = isVisible(scatterPosition, lightSample);
         }
 
@@ -557,7 +628,7 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
     return estimatedColor;
 }
 
-bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement)
+bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement, in bool isSSSSample)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
@@ -596,7 +667,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
         if (isNEELightingRequired)
         {
             DIReservoir reservoir;
-            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS) * decompressU32asRGB(payload.throughputU32);
+            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS, isSSSSample) * decompressU32asRGB(payload.throughputU32);
             if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(material))
             {
                 //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
@@ -646,12 +717,19 @@ bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in floa
     float3 hitNormal = 0.xxx;
     float3 hitPosition = 0.xxx;
 
+    bool isSSSSample = false;
     if(isSSSExecutable(currentMaterial))
     {
-        computeSSSPosition(payload, scatterPosition, surfaceNormal, geomNormal);
+        isSSSSample = computeSSSPosition(payload, scatterPosition, surfaceNormal, geomNormal);
     }
+
+    if(isSSSSample)
+    {
+        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * currentMaterial.albedo.xyz);
+    }
+
     float3 DIGIelement = 0.xxx;
-    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement);
+    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
     if(isDirectRay(payload))
     {
         setDI(DIGIelement);

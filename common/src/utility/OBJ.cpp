@@ -90,27 +90,27 @@ namespace utility {
 				memset(key, 0, sizeof(char) * 255);
 				fscanf_s(fp, "%s ", key, sizeof(key));
 
-				if (strcmp(key, "mtllib") == 0) {
+				if (isSameWord(key, "mtllib")) {
 					fscanf_s(fp, "%s ", key, sizeof(key));
 					LoadMaterialFromFile(device, folderPath, key);
 				}
-				if (strcmp(key, "v") == 0) {
+				if (isSameWord(key, "v")) {
 					fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
 					Vertex[vertexCounter] = vec3d;
 					vertexCounter++;
 				}
-				if (strcmp(key, "vn") == 0) {
+				if (isSameWord(key, "vn")) {
 					fscanf_s(fp, "%f %f %f", &vec3d.x, &vec3d.y, &vec3d.z);
 					Normal[normalCounter] = vec3d;
 					normalCounter++;
 				}
-				if (strcmp(key, "vt") == 0) {
+				if (isSameWord(key, "vt")) {
 					fscanf_s(fp, "%f %f", &vec2d.x, &vec2d.y);
 					vec2d.y *= -1;
 					uv[uvCounter] = vec2d;
 					uvCounter++;
 				}
-				if (strcmp(key, "usemtl") == 0) {
+				if (isSameWord(key, "usemtl")) {
 					fscanf_s(fp, "%s ", key, sizeof(key));
 					for (s32 i = 0; i < (signed)MaterialTbl.size(); i++) {
 						if (isSameWord(key, MaterialTbl[i].MaterialName.c_str()))
@@ -120,7 +120,7 @@ namespace utility {
 					}
 				}
 				//face id0=vertex 1=UV 2=normal
-				if (strcmp(key, "f") == 0) {
+				if (isSameWord(key, "f")) {
 					const s32 LineBufferLength = 1024;
 					char buffer[LineBufferLength];
 

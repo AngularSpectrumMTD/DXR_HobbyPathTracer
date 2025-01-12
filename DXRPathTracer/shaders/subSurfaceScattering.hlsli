@@ -151,15 +151,15 @@ float BSSRDF_PDF(float3 toHitPosition, float3 normal, float3 hitNormal, float3 d
 //3. Sample inner direction
 //---------SSS
 //4. Sample BSDF at incident point (and perform NEE)
-void computeSSSPosition(inout Payload payload, inout float3 scatterPosition, inout float3 surfaceNormal, in float3 geometryNormal)
+bool computeSSSPosition(inout Payload payload, inout float3 scatterPosition, inout float3 surfaceNormal, in float3 geometryNormal)
 {
     float3 normal = normalize(WorldRayDirection());
     //meanFreePath must be 1[mm] - 10[mm]
     //float3 d = float3(meanFreePath(), meanFreePath(), meanFreePath());
     //float d_length(meanFreePath(), 1.4);
     float dlen = d_length(meanFreePath(), BSSRDF_TEST_IOR);
-    //float3 d = float3(dlen, dlen, dlen);
-    float3 d = float3(0.01, 0.01, 0.01);//test
+    float3 d = float3(dlen, dlen, dlen);
+    //float3 d = float3(0.01, 0.01, 0.01);//test
     float rMax = sample_r_BSSRDF(1.0f, max(d.x, max(d.y, d.z)));
     
     BSSRDFSample bssrdfSample;
@@ -192,11 +192,9 @@ void computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
         const float pdf = BSSRDF_PDF(toHitPosition, normal, surfaceNormal, d, sssPayload.hittedCount);
 
         float3 W = computeBSSRDF(length(toHitPosition), d, BSSRDF_TEST_IOR);
-        float P = pdf;
-        const float3 weight = 1.xxx;//(exp(-length(toHitPosition) / 1000 / d.x)).xxx;
 
         //Since the normal sampled R is very large compared to d, the exp term is almost zero.... ex) R 1 vs d 0.0000001
-        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
+        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * W / pdf);
 
         //debug
         if(payload.recursive == 1)
@@ -206,7 +204,9 @@ void computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
 
         scatterPosition = sssRay.Origin;
         surfaceNormal = sssPayload.SSSnormal;
+        return true;
     }
+    return false;
 }
 
 #endif//__SUBSURFACE_SCATTERING_HLSLI__
