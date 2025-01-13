@@ -834,8 +834,8 @@ void DXRPathTracer::Draw()
     mCommandList->Reset(allocator.Get(), nullptr);
     auto frameIndex = mDevice->GetCurrentFrameIndex();
 
-    const u32 prev = mRenderFrame % 2;
-    const u32 curr = (mRenderFrame + 1) % 2;
+    const u32 prev = mSeedFrame % 2;
+    const u32 curr = (mSeedFrame + 1) % 2;
 
     ID3D12DescriptorHeap* descriptorHeaps[] = {
         mDevice->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).Get(),
@@ -1352,6 +1352,11 @@ void DXRPathTracer::Update()
         mIsUseAccumulation = false;
     }
 
+    if (!mIsUseAccumulation)
+    {
+        mRenderFrame = 0;
+    }
+
     for (auto& pos : mLightTbl)
     {
         pos = XMMatrixTranslation(mLightPosX, mLightPosY, mLightPosZ);
@@ -1403,7 +1408,11 @@ void DXRPathTracer::Update()
     mSceneParam.sssParam = XMVectorSet(mMeanFreePathRatio * mMeanFreePath, 0, 0, 0);
     mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
 
-    mRenderFrame++;
+    if (!mIsTemporalAccumulationForceDisable)
+    {
+        mRenderFrame++;
+    }
+    
     mSeedFrame++;
 
     if (mRenderFrame >= (UINT_MAX >> 1))
