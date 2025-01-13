@@ -66,16 +66,20 @@ namespace utility {
 				}
 			}
 
+			ifs.close();
+		}
+
+		//intermediate buffer construction
+		{
 			Vertex.resize(vertexCounter);
 			Normal.resize(normalCounter);
 			uv.resize(uvCounter);
-
-			vertexCounter = 0;
-			normalCounter = 0;
-			uvCounter = 0;
-
-			ifs.close();
 		}
+
+		//reset index
+		vertexCounter = 0;
+		normalCounter = 0;
+		uvCounter = 0;
 
 		//2nd time File Reading
 		{
