@@ -48,7 +48,7 @@ bool combineDIReservoirs(inout DIReservoir reservoir, in DIReservoir reservoirCo
     return updateDIReservoir(reservoir, reservoirCombineElem.lightID, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.M, rnd01);
 }
 
-float3 shadeDIReservoir(in DIReservoir reservoir)
+float3 resolveDIReservoir(in DIReservoir reservoir)
 {
     if(reservoir.M == 0)
     {
@@ -122,7 +122,7 @@ bool combineGIReservoirs(inout GIReservoir reservoir, in GIReservoir reservoirCo
     return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.giSample, reservoirCombineElem.compressedMaterial  , reservoirCombineElem.M, rnd01);
 }
 
-float3 shadeGIReservoir(in GIReservoir reservoir)
+float3 resolveGIReservoir(in GIReservoir reservoir)
 {
     if(reservoir.M == 0)
     {

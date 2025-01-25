@@ -251,7 +251,8 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
 
             if(isDirectRay(payload))
             {
-                //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
+                //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
+                //So, we DON'T update the value of the throughput at this time
                 payload.primaryBSDFU32 = compressRGBasU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
                 payload.bsdfRandomSeed = currentSeed;
@@ -306,7 +307,8 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
 
             if(isDirectRay(payload))
             {
-                //The influence of the initial BSDF on indirect element is evaluated at the end of RayGen
+                //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
+                //So, we DON'T update the value of the throughput at this time
                 payload.primaryBSDFU32 = compressRGBasU32(BSDF_PDF.xyz * cosine);
                 payload.primaryPDF = BSDF_PDF.w;
                 payload.bsdfRandomSeed = currentSeed;
@@ -557,6 +559,7 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
     }
     uint replaySeed = reservoir.randomSeed;
     sampleLightWithID(scatterPosition, reservoir.lightID, lightSample, replaySeed);
+    reservoir.M = 1;
 }
 
 float3 performNEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS, in bool isSSSSample)
@@ -601,7 +604,7 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
 
         if (visibility)
         {
-            estimatedColor = shadeDIReservoir(reservoir);
+            estimatedColor = resolveDIReservoir(reservoir);
         }
         else
         {
@@ -628,7 +631,7 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
     return estimatedColor;
 }
 
-bool applyLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement, in bool isSSSSample)
+bool performLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement, in bool isSSSSample)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
@@ -647,18 +650,20 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
 
     if (isUseNEE(material))
     {
-        //ray hitted the light source
+        //ray hit the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
         {
             DIGIelement = decompressU32asRGB(payload.throughputU32) * Le;
+            payload.terminate();
             isFinish = true;
             return isFinish;
         }
 
-        //ray hitted the emissive material
+        //ray hit the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
             DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
+            payload.terminate();
             isFinish = false;
             return isFinish;
         }
@@ -680,7 +685,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
     }
     else
     {
-        //ray hitted the light source
+        //ray hit the light source
         if (isIntersect)
         {
             const bool isLighting = isIndirectOnly() ? isIndirectRay(payload) : true;
@@ -692,7 +697,7 @@ bool applyLighting(inout Payload payload, in MaterialParams material, in float3 
             return isFinish;
         }
 
-        //ray hitted the emissive material
+        //ray hit the emissive material
         if (material.emission.x + material.emission.y + material.emission.z > 0)
         {
             DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
@@ -729,7 +734,7 @@ bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in floa
     }
 
     float3 DIGIelement = 0.xxx;
-    const bool isTerminate = applyLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
+    const bool isTerminate = performLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
     if(isDirectRay(payload))
     {
         setDI(DIGIelement);
@@ -740,14 +745,9 @@ bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in floa
     }
     const bool isAnaliticalLightHitted = (length(hitLe) > 0);
     const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
-    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
-    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal wthe we execute SSS
+    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal when we execute SSS
+    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal when we execute SSS
     storeGBuffer(payload, writePosition, writeColor, writeNormal, currentMaterial.roughness, currentMaterial);
-
-    if (isTerminate)
-    {
-        return true;
-    }
     
     addCaustics(caustics);
 
@@ -755,7 +755,13 @@ bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in floa
     nextRay.Direction = 0.xxx;
     sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload);
 
-    return false;
+    //debug
+    // if(isDirectRay(payload))
+    // {
+    //     payload.throughputU32 = compressRGBasU32(float3(1, 0, 0));
+    // }
+
+    return isTerminate;
 }
 
 #endif//__SHADING_HLSLI__

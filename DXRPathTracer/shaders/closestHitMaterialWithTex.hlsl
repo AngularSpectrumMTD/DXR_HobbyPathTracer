@@ -174,6 +174,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
 
     if (isReachedRecursiveLimitPayload(payload))
     {
+        payload.terminate();
         return;
     }
     uint primitiveIndex = PrimitiveIndex();
@@ -194,8 +195,15 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     bool isTerminate = shadeAndSampleRay(vtx.Normal, vtx.Position, getGeometricNormal(attrib), payload, currentMaterial, nextRay, caustics);
     if(isTerminate)
     {
+        payload.terminate();
         return;
     }
+
+    //debug
+    // if(isDirectRay(payload))
+    // {
+    //     payload.throughputU32 = compressRGBasU32(float3(0, 1, 0));
+    // }
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
     TraceDefaultRay(flags, rayMask, nextRay, payload);

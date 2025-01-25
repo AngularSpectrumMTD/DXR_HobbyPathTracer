@@ -27,7 +27,7 @@ void miss(inout Payload payload) {
     if (!isIndirectOnly() && isCompletelyMissRay(payload) && intersectAllLightWithCurrentRay(hitLe, hitPosition, hitNormal))
     {
         setDI(hitLe);
-        payload.throughputU32 = 0u;
+        payload.terminate();
         const bool isAnaliticalLightHitted = (length(hitLe) > 0);
         const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
         const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
@@ -62,23 +62,24 @@ void miss(inout Payload payload) {
     {
         float4 cubemap = gEquiRecEnvMap.SampleLevel(gSampler, EquirecFetchUV(WorldRayDirection()), 0.0);
         float3 element = decompressU32asRGB(payload.throughputU32) * cubemap.rgb;
-        if(isDirectRay(payload) || isCompletelyMissRay(payload))
+        if(isCompletelyMissRay(payload))
         {
             addDI(element);
         }
-        if(isIndirectRay(payload))
+        //NOTE : This IBL element is not computed by NEE, so we have to recognize this element as GI
+        if(isDirectRay(payload) || isIndirectRay(payload))
         {
             addGI(element);
         }
     }
     
-    payload.throughputU32 = 0u;
+    payload.terminate();
 }
 
 [shader("miss")]
 void photonMiss(inout PhotonPayload payload)
 {
-    payload.throughputU32 = 0u;
+    payload.terminate();
 }
 
 [shader("miss")]

@@ -72,6 +72,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
 
     if (isReachedRecursiveLimitPayload(payload))
     {
+        payload.terminate();
         return;
     }
     uint primitiveIndex = PrimitiveIndex();
@@ -91,6 +92,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     bool isTerminate = shadeAndSampleRay(vtx.Normal, vtx.Position, getGeometricNormal(attrib), payload, currentMaterial, nextRay, caustics);
     if(isTerminate)
     {
+        payload.terminate();
         return;
     }
     RAY_FLAG flags = RAY_FLAG_NONE;

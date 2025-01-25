@@ -154,7 +154,7 @@ float meanFreePath()
     return gSceneParam.sssParam.x;
 }
 
-bool isTemporalReprojectionEnable(
+bool isTemporalReprojectionSuccessed(
     in float currDepth, in float prevDepth, 
     in float3 currNormal, in float3 prevNormal,
     in float3 currPos, in float3 prevPos)

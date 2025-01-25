@@ -3,7 +3,7 @@
 #include <fstream>
 
 #define PREPARE_ELEMENTS 10000
-#define MIN_ROUGHNESS 0.05f
+#define MIN_ROUGHNESS 0.01f
 
 bool isSameWord(const char* v0, const char* v1)
 {
@@ -387,15 +387,15 @@ namespace utility {
 			vec4d.y = 0.0f;
 			vec4d.z = 0.0f;
 			vec4d.w = 0.0f;
-			OBJMaterial mtl;
+			OBJMaterial tempMaterial;
 
-			mtl.Reflection4Color.emission = vec4d;
-			mtl.Reflection4Color.ambient = vec4d;
-			mtl.Reflection4Color.diffuse = vec4d;
-			mtl.Reflection4Color.specular = vec4d;
+			tempMaterial.Reflection4Color.emission = vec4d;
+			tempMaterial.Reflection4Color.ambient = vec4d;
+			tempMaterial.Reflection4Color.diffuse = vec4d;
+			tempMaterial.Reflection4Color.specular = vec4d;
 
-			mtl.Shininess = 0.0f;
-			mtl.TexID = 0;
+			tempMaterial.Shininess = 0.0f;
+			tempMaterial.TexID = 0;
 
 			if (isFileValid)
 			{
@@ -409,50 +409,50 @@ namespace utility {
 					{
 						if (isMaterialIncluded)
 						{
-							MaterialTbl.push_back(mtl);
-							mtl.TexID = 0;
+							MaterialTbl.push_back(tempMaterial);
+							tempMaterial.TexID = 0;
 						}
 						isMaterialIncluded = true;
 						fscanf_s(fp, "%s ", key, sizeof(key));
-						mtl.MaterialName = key;
+						tempMaterial.MaterialName = key;
 						isTextureIncluded = false;
-						mtl.DiffuseTextureName = "";
-						mtl.AlphaMaskName = "";
+						tempMaterial.DiffuseTextureName = "";
+						tempMaterial.AlphaMaskName = "";
 					}
 					if (isSameWord(key, "Ka"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-						mtl.Reflection4Color.ambient = vec4d;
+						tempMaterial.Reflection4Color.ambient = vec4d;
 					}
 					if (isSameWord(key, "Kd"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-						mtl.Reflection4Color.diffuse = vec4d;
+						tempMaterial.Reflection4Color.diffuse = vec4d;
 					}
 					if (isSameWord(key, "Ks"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-						mtl.Reflection4Color.specular = vec4d;
+						tempMaterial.Reflection4Color.specular = vec4d;
 					}
 					if (isSameWord(key, "Ke"))
 					{
 						fscanf_s(fp, "%f %f %f", &vec4d.x, &vec4d.y, &vec4d.z);
-						mtl.Reflection4Color.emission = vec4d;
+						tempMaterial.Reflection4Color.emission = vec4d;
 					}
 					if (isSameWord(key, "Ns"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
-						mtl.Shininess = vec4d.x;
+						tempMaterial.Shininess = vec4d.x;
 					}
 					if (isSameWord(key, "Ni"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
-						mtl.Ni = vec4d.x;
+						tempMaterial.Ni = vec4d.x;
 					}
 					if (isSameWord(key, "d"))
 					{
 						fscanf_s(fp, "%f", &vec4d.x);
-						mtl.opacity = vec4d.x;
+						tempMaterial.opacity = vec4d.x;
 					}
 					if (isSameWord(key, "map_Kd"))
 					{
@@ -464,7 +464,7 @@ namespace utility {
 						{
 							*p = '\0';
 						}
-						mtl.DiffuseTextureName = key;
+						tempMaterial.DiffuseTextureName = key;
 					}
 					if (isSameWord(key, "map_d"))
 					{
@@ -476,95 +476,96 @@ namespace utility {
 						{
 							*p = '\0';
 						}
-						mtl.AlphaMaskName = key;
+						tempMaterial.AlphaMaskName = key;
 					}
 				}
 
 				fclose(fp);
 			}
 
-			mtl.TriangleVertexIDTbl.reserve(PREPARE_ELEMENTS);
-			mtl.TriangleNormalIDTbl.reserve(PREPARE_ELEMENTS);
-			mtl.TriangleUVIDTbl.reserve(PREPARE_ELEMENTS);
+			tempMaterial.TriangleVertexIDTbl.reserve(PREPARE_ELEMENTS);
+			tempMaterial.TriangleNormalIDTbl.reserve(PREPARE_ELEMENTS);
+			tempMaterial.TriangleUVIDTbl.reserve(PREPARE_ELEMENTS);
 			if (isMaterialIncluded)
 			{
-				MaterialTbl.push_back(mtl);
+				MaterialTbl.emplace_back(tempMaterial);
 			}
 			else
 			{
-				mtl.MaterialName = "dummyMTL";
-				mtl.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-				mtl.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-				mtl.Reflection4Color.emission = DirectX::XMFLOAT4(0.0, 0.0, 0.0, 0.0);
-				mtl.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
-				mtl.Ni = 1.45;
-				mtl.opacity = 1.0f;
-				mtl.hasDiffuseTex = false;
-				mtl.hasAlphaMask = false;
-				mtl.setDummyDiffuseTexture(device);
-				mtl.setDummyAlphaMask(device);
-				MaterialTbl.push_back(mtl);
+				tempMaterial.MaterialName = "dummyMTL";
+				tempMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+				tempMaterial.Reflection4Color.ambient = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+				tempMaterial.Reflection4Color.emission = DirectX::XMFLOAT4(0.0, 0.0, 0.0, 0.0);
+				tempMaterial.Reflection4Color.specular = DirectX::XMFLOAT4(0.5, 0.5, 0.5, 0.5);
+				tempMaterial.Shininess = 0;
+				tempMaterial.Ni = 1.45;
+				tempMaterial.opacity = 1.0f;
+				tempMaterial.hasDiffuseTex = false;
+				tempMaterial.hasAlphaMask = false;
+				tempMaterial.setDummyDiffuseTexture(device);
+				tempMaterial.setDummyAlphaMask(device);
+				MaterialTbl.emplace_back(tempMaterial);
 			}
 		}
 
 		int count = 0;
-		for (auto & mat : MaterialTbl)
+		for (auto & cpuMaterial : MaterialTbl)
 		{
-			if (isSameWord(mat.DiffuseTextureName.c_str(), ""))
+			if (isSameWord(cpuMaterial.DiffuseTextureName.c_str(), ""))
 			{
-				mat.hasDiffuseTex = false;
-				mat.setDummyDiffuseTexture(device);
+				cpuMaterial.hasDiffuseTex = false;
+				cpuMaterial.setDummyDiffuseTexture(device);
 			}
 			else
 			{
 				if (
-					mat.Reflection4Color.diffuse.x == 0 &&
-					mat.Reflection4Color.diffuse.y == 0 &&
-					mat.Reflection4Color.diffuse.z == 0 &&
-					mat.Reflection4Color.diffuse.w == 0
+					cpuMaterial.Reflection4Color.diffuse.x == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.y == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.z == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.w == 0
 					)
 				{
-					mat.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+					cpuMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 				}
 				wchar_t nameTex[512];
-				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mat.DiffuseTextureName).c_str());
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.DiffuseTextureName).c_str());
 
-				mat.hasDiffuseTex = true;
-				mat.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
+				cpuMaterial.hasDiffuseTex = true;
+				cpuMaterial.DiffuseTexture = utility::LoadTextureFromFile(device, nameTex, true);
 
-				if (mat.DiffuseTexture.res == nullptr)
+				if (cpuMaterial.DiffuseTexture.res == nullptr)
 				{
-					mat.hasDiffuseTex = false;
-					mat.setDummyDiffuseTexture(device);
+					cpuMaterial.hasDiffuseTex = false;
+					cpuMaterial.setDummyDiffuseTexture(device);
 				}
 			}
 
-			if (isSameWord(mat.AlphaMaskName.c_str(), ""))
+			if (isSameWord(cpuMaterial.AlphaMaskName.c_str(), ""))
 			{
-				mat.hasAlphaMask = false;
-				mat.setDummyAlphaMask(device);
+				cpuMaterial.hasAlphaMask = false;
+				cpuMaterial.setDummyAlphaMask(device);
 			}
 			else
 			{
 				if (
-					mat.Reflection4Color.diffuse.x == 0 &&
-					mat.Reflection4Color.diffuse.y == 0 &&
-					mat.Reflection4Color.diffuse.z == 0 &&
-					mat.Reflection4Color.diffuse.w == 0
+					cpuMaterial.Reflection4Color.diffuse.x == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.y == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.z == 0 &&
+					cpuMaterial.Reflection4Color.diffuse.w == 0
 					)
 				{
-					mat.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+					cpuMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 				}
 				wchar_t nameTex[512];
-				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(mat.AlphaMaskName).c_str());
-				//mtl.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(mtl.TextureName));
-				mat.hasAlphaMask = true;
-				mat.AlphaMask = utility::LoadTextureFromFile(device, nameTex, true);
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.AlphaMaskName).c_str());
+				//cpuMaterial.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(cpuMaterial.TextureName));
+				cpuMaterial.hasAlphaMask = true;
+				cpuMaterial.AlphaMask = utility::LoadTextureFromFile(device, nameTex, true);
 
-				if (mat.AlphaMask.res == nullptr)
+				if (cpuMaterial.AlphaMask.res == nullptr)
 				{
-					mat.hasAlphaMask = false;
-					mat.setDummyAlphaMask(device);
+					cpuMaterial.hasAlphaMask = false;
+					cpuMaterial.setDummyAlphaMask(device);
 				}
 			}
 
@@ -624,51 +625,53 @@ namespace utility {
 		u32 count = 0;
 
 		vector<u32> validMaterialIDTbl;
-		for (auto& m : MaterialTbl)
+		for (auto& cpuMaterial : MaterialTbl)
 		{
 			wchar_t nameVB[60];
-			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
+			swprintf(nameVB, 60, L"VB : %ls %ls", modelNamePtr, StringToWString(cpuMaterial.MaterialName).c_str());
 
 			wchar_t nameIB[60];
-			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(m.MaterialName).c_str());
+			swprintf(nameIB, 60, L"IB : %ls %ls", modelNamePtr, StringToWString(cpuMaterial.MaterialName).c_str());
 			
-			const bool isValidMat = CreateMeshBuffer(device, m, nameVB, nameIB, L"");
+			const bool isValidMat = CreateMeshBuffer(device, cpuMaterial, nameVB, nameIB, L"");
 
 			if (isValidMat)
 			{
 				MaterialParam mparams;
-				mparams.albedo = XMVectorSet(m.Reflection4Color.diffuse.x, m.Reflection4Color.diffuse.y, m.Reflection4Color.diffuse.z, m.Reflection4Color.diffuse.w);
-				mparams.specular = (m.Reflection4Color.specular.x + m.Reflection4Color.specular.y + m.Reflection4Color.specular.z + m.Reflection4Color.specular.w) / 4.0f;
+				mparams.albedo = XMVectorSet(cpuMaterial.Reflection4Color.diffuse.x, cpuMaterial.Reflection4Color.diffuse.y, cpuMaterial.Reflection4Color.diffuse.z, cpuMaterial.Reflection4Color.diffuse.w);
+				mparams.specular = (cpuMaterial.Reflection4Color.specular.x + cpuMaterial.Reflection4Color.specular.y + cpuMaterial.Reflection4Color.specular.z + cpuMaterial.Reflection4Color.specular.w) / 4.0f;
 				mparams.metallic = mparams.specular;
-				mparams.roughness = 1 - mparams.metallic;
-				mparams.transRatio = ((m.Ni != 1.45) && (m.opacity != 1.0f)) ? 1.0f : 0.0f;
-				mparams.emission = XMVectorSet(m.Reflection4Color.emission.x, m.Reflection4Color.emission.y, m.Reflection4Color.emission.z, m.Reflection4Color.emission.w);
+				//https://blender.stackexchange.com/questions/149755/changing-the-specular-exponent-of-principled-bsdf-with-texture-when-exporting-to
+				//based on Principled BSDF
+				mparams.roughness = min(1, max(0, 1 - sqrt(cpuMaterial.Shininess) / 30));
+				mparams.transRatio = ((cpuMaterial.Ni != 1.45) && (cpuMaterial.opacity != 1.0f)) ? 1.0f : 0.0f;
+				mparams.emission = XMVectorSet(cpuMaterial.Reflection4Color.emission.x, cpuMaterial.Reflection4Color.emission.y, cpuMaterial.Reflection4Color.emission.z, cpuMaterial.Reflection4Color.emission.w);
 				mparams.transColor = mparams.albedo;
 				mparams.isSSSExecutable = 0;
-				mparams.hasDiffuseTex = m.hasDiffuseTex ? 1 : 0;
-				mparams.hasAlphaMask = m.hasAlphaMask ? 1 : 0;
+				mparams.hasDiffuseTex = cpuMaterial.hasDiffuseTex ? 1 : 0;
+				mparams.hasAlphaMask = cpuMaterial.hasAlphaMask ? 1 : 0;
 
 				if (mparams.transRatio == 1)
 				{
 					mparams.roughness = 0;
 				}
 
-				if (std::strcmp(m.MaterialName.c_str(), "ReinterpretMirror") == 0)
+				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretMirror") == 0)
 				{
 					mparams.metallic = 1;
 					mparams.roughness = MIN_ROUGHNESS;
 				}
-				if (std::strcmp(m.MaterialName.c_str(), "ReinterpretGlass") == 0)
+				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretGlass") == 0)
 				{
 					mparams.transRatio = 1;
 					mparams.transColor = mparams.albedo;
 					mparams.roughness = MIN_ROUGHNESS;
 				}
-				if (std::strcmp(m.MaterialName.c_str(), "ReinterpretRoughMirror") == 0)
+				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretRoughMirror") == 0)
 				{
 					mparams.metallic = 1;
 				}
-				if (std::strcmp(m.MaterialName.c_str(), "ReinterpretRoughGlass") == 0)
+				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretRoughGlass") == 0)
 				{
 					mparams.transRatio = 1;
 					mparams.transColor = mparams.albedo;
@@ -676,8 +679,8 @@ namespace utility {
 
 				mparams.roughness = max(mparams.roughness, MIN_ROUGHNESS);
 
-				m.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
-				device->ImmediateBufferUpdateHostVisible(m.materialCB.Get(), &mparams, sizeof(MaterialParam));
+				cpuMaterial.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
+				device->ImmediateBufferUpdateHostVisible(cpuMaterial.materialCB.Get(), &mparams, sizeof(MaterialParam));
 
 				validMaterialIDTbl.push_back(count);
 			}

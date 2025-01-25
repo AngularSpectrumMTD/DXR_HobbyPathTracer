@@ -414,6 +414,7 @@ private:
         SceneType_Kitchen,
         SceneType_PTTest,
         SceneType_PTTestBrick,
+        SceneType_PTTestRobot,
         SceneType_MaterialTest,
     };
 
@@ -805,7 +806,7 @@ private:
 
     u32 mTargetModelIndex;
 
-    bool mIsUseAccumulation;
+    bool mIsUseTemporalAccumulation;
     bool mIsUseNEE;
     //bool mIsUseDirectionalLight;
 

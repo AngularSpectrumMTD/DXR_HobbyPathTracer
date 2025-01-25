@@ -17,7 +17,7 @@
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
 #define MAX_ACCUMULATION_RANGE 1000
-#define DIRECTIONAL_LIGHT_POWER 10
+#define DIRECTIONAL_LIGHT_POWER 2
 
 #define NEE_AVAILABLE
 
@@ -40,7 +40,7 @@ void DXRPathTracer::UpdateWindowText()
 
     windowText 
         << L" <I> : Inv " << (mInverseMove ? L"ON" : L"OFF")
-        << L" <A> : Acc " << (mIsUseAccumulation ? L"ON" : L"OFF")
+        << L" <A> : Acc " << (mIsUseTemporalAccumulation ? L"ON" : L"OFF")
         << L" <E> : NEE " << (mIsUseNEE ? L"ON" : L"OFF")
         << L" <CTRL> : RIS " << (mIsUseStreamingRIS ? L"ON" : L"OFF")
         << L" <F1> : Temporal " << (mIsUseReservoirTemporalReuse ? L"ON" : L"OFF")
@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestBrick;
+    mSceneType = SceneType_PTTestRobot;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -86,7 +86,7 @@ void DXRPathTracer::Setup()
     mIsUseTexture = true;
     mIsUseDebugView = false;
     mTargetModelIndex = 0;
-    mIsUseAccumulation = false;
+    mIsUseTemporalAccumulation = false;
     mIsIndirectOnly = false;
     mIsUseNEE = true;
     mIsUseManySphereLightLighting = false;
@@ -191,7 +191,7 @@ void DXRPathTracer::Setup()
                         //mModelTypeTbl[0] = ModelType_Afrodyta;
                         mModelTypeTbl[0] = ModelType_Dragon;
                         //mModelTypeTbl[0] = ModelType_SimpleCube;
-                        mPhiDirectional = 100.0f; mThetaDirectional = 291.0f;
+                        mPhiDirectional = 100.0f; mThetaDirectional = 261.0f;
                         mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
                         mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
                         mCausticsBoost = 0.014;
@@ -422,7 +422,39 @@ void DXRPathTracer::Setup()
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
         }
-        break;   
+        break;
+        case SceneType_PTTestRobot:
+        {
+            mLightAreaScale = 6;
+            const bool isDebugMeshTest = false;
+            const bool isRoomTestDebug = false;
+            const bool isAfrodytaTest = true;
+            mPhiDirectional = 122.0f; mThetaDirectional = 315;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            mInitEyePos = XMFLOAT3(371, 141, -129);
+            mInitTargetPos = XMFLOAT3(314, 139, -114);
+
+            mOBJFileName = "PTTestRobot.obj";
+            mOBJFolderName = "model/PTTest";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(100, 100, 100), XMMatrixTranslation(-150, 70, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 4.0f;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+        }
+        break;
         case SceneType_MaterialTest:
         {
             mLightAreaScale = 6;
@@ -1349,10 +1381,10 @@ void DXRPathTracer::Update()
 {
     if (mIsTemporalAccumulationForceDisable)
     {
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
     }
 
-    if (!mIsUseAccumulation)
+    if (!mIsUseTemporalAccumulation)
     {
         mRenderFrame = 0;
     }
@@ -1388,7 +1420,7 @@ void DXRPathTracer::Update()
     mSceneParam.mtxProjInv = XMMatrixInverse(nullptr, mSceneParam.mtxProj);
     mSceneParam.gatherParams = XMVectorSet(mGatherRadius, 2.f, 0, (f32)mGatherBlockRange);
     mSceneParam.spotLightParams = XMVectorSet(mLightRange, (f32)mSeedFrame, (f32)mLightLambdaNum, mCausticsBoost);//light range,  seed, lambda num, CausticsBoost
-    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseAccumulation ? 1.0f : 0.0f, 0.0f, 0.0f);
+    mSceneParam.gatherParams2 = XMVectorSet(mStandardPhotonNum, mIsUseTemporalAccumulation ? 1.0f : 0.0f, 0.0f, 0.0f);
     mSceneParam.flags.x = 1;//0:DirectionalLight 1:SpotLight (Now Meaningless)
     mSceneParam.flags.y = mIsUseTexture;
     mSceneParam.flags.z = mIsDebug ? 1 : 0;//1: Add HeatMap of Photon
@@ -1425,7 +1457,7 @@ void DXRPathTracer::Update()
     }
 
     UpdateWindowText();
-    mIsUseAccumulation = true;
+    mIsUseTemporalAccumulation = true;
     mIsHistoryResetRequested = false;
 }
 
@@ -1442,137 +1474,137 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         break;
     case 'F':
         mIsUseManySphereLightLighting = !mIsUseManySphereLightLighting;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         mIsHistoryResetRequested = true;
         break;
     case 'E':
 #ifdef NEE_AVAILABLE
         mIsUseNEE = !mIsUseNEE;
 #endif
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'J':
         mIsMoveModel = !mIsMoveModel;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'G':
         mGatherRadius = Clamp(0.001f, max(0.05f, (2.f * PLANE_SIZE) / GRID_DIMENSION), mGatherRadius + (mInverseMove ? -0.01f : 0.01f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'X':
         mLightPosX = Clamp(-clampRange, clampRange, mLightPosX + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'Y':
         mLightPosY = Clamp(-clampRange, clampRange, mLightPosY + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'Z':
         mLightPosZ = Clamp(-clampRange, clampRange, mLightPosZ + (mInverseMove ? -PLANE_SIZE * 0.002f : PLANE_SIZE * 0.002f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'L':
         mLightRange = Clamp(0.1f, 10.0f, mLightRange + (mInverseMove ? -0.1f : 0.1f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'T':
         mTheta += mInverseMove ? -1 : 1;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'P':
         mPhi += mInverseMove ? -1 : 1;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'K':
         mIntensityBoost = Clamp(1, 10000, mIntensityBoost + (mInverseMove ? -10 : 10));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'B':
         mGatherBlockRange = (u32)Clamp(0, 3, (f32)mGatherBlockRange + (mInverseMove ? -1 : 1));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'C':
         mIsSpotLightPhotonMapper = !mIsSpotLightPhotonMapper;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'V':
         //mVisualizeLightRange = !mVisualizeLightRange;
         mIsUseDebugView = !mIsUseDebugView;
-        //mIsUseAccumulation = false;
+        //mIsUseTemporalAccumulation = false;
         break;
     case 'A':
         mIsIndirectOnly = !mIsIndirectOnly;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         mIsHistoryResetRequested = true;
         break;
     case 'O':
         mThetaDirectional += mInverseMove ? -1 : 1;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'W':
         mPhiDirectional += mInverseMove ? -1 : 1;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'N':
         mIsApplyCaustics = !mIsApplyCaustics;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'D':
         //mIsUseDenoise = !mIsUseDenoise;
         mRecursionDepth = (u32)Clamp(1.f, REAL_MAX_RECURSION_DEPTH * 1.0f, (f32)(mRecursionDepth + (mInverseMove ? -1 : 1)));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'Q':
         mCausticsBoost = Clamp(0.0001f, 20.0f, mCausticsBoost + (mInverseMove ? -0.0001f : 0.0001f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'U':
         mIsUseTexture = !mIsUseTexture;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
         //material start
     case 'R':
         mMaterialParamTbl[mTargetModelIndex].roughness = Clamp(0.02f, 1, mMaterialParamTbl[0].roughness + (mInverseMove ? -0.01f : 0.01f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'S':
         mMaterialParamTbl[mTargetModelIndex].transRatio = Clamp(0, 1, mMaterialParamTbl[0].transRatio + (mInverseMove ? -0.1f : 0.1f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case 'M':
         mMaterialParamTbl[mTargetModelIndex].metallic = Clamp(0, 1, mMaterialParamTbl[0].metallic + (mInverseMove ? -0.1f : 0.1f));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_SPACE:
         mTargetModelIndex = (mTargetModelIndex == 0) ? 1 : 0;
         break;
     case VK_CONTROL:
         mIsUseStreamingRIS = !mIsUseStreamingRIS;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_TAB:
         mIsTemporalAccumulationForceDisable = !mIsTemporalAccumulationForceDisable;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F1:
         mIsUseReservoirTemporalReuse = !mIsUseReservoirTemporalReuse;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F3:
         mIsUseReservoirSpatialReuse = !mIsUseReservoirSpatialReuse;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F4:
         mSpatialReuseTap = Clamp(1, MAX_SPATIAL_REUSE_TAP, mSpatialReuseTap + (mInverseMove ? -1 : 1));
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F5:
         mIsUseMetallicTest = !mIsUseMetallicTest;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     /*case VK_F6:
         mIsAlbedoOne = !mIsAlbedoOne;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F7:
         if (mInverseMove)
@@ -1584,7 +1616,7 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
             mMeanFreePathRatio += 1;
         }
         mMeanFreePathRatio = Clamp(1, 100, mMeanFreePathRatio);
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;*/
     case VK_F6:
         if (mMaterialParamTbl[mTargetModelIndex].isSSSExecutable > 0)
@@ -1595,15 +1627,15 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         {
             mMaterialParamTbl[mTargetModelIndex].isSSSExecutable = 1;
         }
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F7:
         mIsUseIBL = !mIsUseIBL;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     case VK_F8:
         mIsUseDirectionalLight = !mIsUseDirectionalLight;
-        mIsUseAccumulation = false;
+        mIsUseTemporalAccumulation = false;
         break;
     }
 }

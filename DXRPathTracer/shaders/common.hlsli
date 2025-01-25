@@ -36,6 +36,11 @@ struct Payload
     float primaryPDF;//for ReSTIR GI
     uint bsdfRandomSeed;//for ReSTIR GI
     uint randomSeed;
+
+    void terminate()
+    {
+        throughputU32 = 0u;
+    }
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
@@ -49,6 +54,11 @@ struct PhotonPayload
     float2 randomUV;
     uint flags;
     uint randomSeed;
+
+    void terminate()
+    {
+        throughputU32 = 0u;
+    }
 };
 
 struct TriangleIntersectionAttributes
@@ -238,7 +248,7 @@ float3 computeInterpolatedAttributeF3(float3 vertexAttributeTbl[3], float2 baryc
 inline bool isReachedRecursiveLimitPayload(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= getMaxBounceNum() || length(decompressU32asRGB(payload.throughputU32)) < 1e-2)
+    if (payload.recursive >= getMaxBounceNum())
     {
         return true;
     }
@@ -276,7 +286,7 @@ inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)
 {
     if (payload.recursive >= getMaxPhotonBounceNum())
     {
-        payload.throughputU32 = 0u;
+        payload.terminate();
         return true;
     }
     payload.recursive++;

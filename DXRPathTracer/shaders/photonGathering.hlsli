@@ -19,7 +19,7 @@ void storePhoton(inout PhotonPayload payload)
     if (ignore)
     {
         PhotonInfo photon;
-        photon.throughputU32 = 0u;
+        photon.terminate();
         photon.position = float3(0, 0, 0);
         //photon.inDir = WorldRayDirection();
         gPhotonMap[serialRaysIndex(DispatchRaysIndex(), DispatchRaysDimensions())] = photon;

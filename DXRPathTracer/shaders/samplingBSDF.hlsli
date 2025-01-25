@@ -53,7 +53,8 @@ float3 GGX_ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
     float randX = rand(randomSeed);
     float randY = rand(randomSeed);
 
-    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
+    const float eps = 0.001f;
+    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0 + eps) * randY));
     float sinT = sqrt(1 - cosT * cosT);
         
     float P = 2.0 * PI * randX;
@@ -138,15 +139,16 @@ float GGX_Distribution(float3 N, float3 H, float roughness)
     
     float denom = (dotNH_pow2 * (alpha_pow2 - 1.0) + 1.0);
     denom *= PI * denom;
-    
-    return alpha_pow2 / denom;
+    const float eps = 0.001f;
+    return alpha_pow2 / (denom + eps);
 }
 
 float GGX_Geometry_Schlick(float dotNX, float roughness)
 {
     float alpha = roughness * roughness;
     float k = alpha / 2;
-    return dotNX / (dotNX * (1 - k) + k);
+    const float eps = 0.001f;
+    return dotNX / (dotNX * (1 - k) + k + eps);
 }
 
 float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)

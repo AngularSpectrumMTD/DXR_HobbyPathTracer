@@ -15,6 +15,11 @@ struct PhotonInfo
     uint throughputU32;
     float3 position;
     //float3 inDir;
+
+    void terminate()
+    {
+        throughputU32 = 0u;
+    }
 };
 
 #define GRID_SORT_THREAD_NUM 1024
