@@ -41,6 +41,11 @@ struct Payload
     {
         throughputU32 = 0u;
     }
+
+    void updateThroughputByMulitiplicationF3(in float3 color)
+    {
+        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * color);
+    }
 };
 
 #define PHOTON_PAYLOAD_BIT_MASK_IS_PHOTON_STORED 1 << 0
@@ -58,6 +63,11 @@ struct PhotonPayload
     void terminate()
     {
         throughputU32 = 0u;
+    }
+
+    void updateThroughputByMulitiplicationF3(in float3 color)
+    {
+        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * color);
     }
 };
 
@@ -206,6 +216,14 @@ CompressedMaterialParams getScreenSpaceMaterial()
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+
+    return gScreenSpaceMaterial[serialIndex];
+}
+
+CompressedMaterialParams getScreenSpaceMaterial(in int2 id)
+{
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(uint3(id, 0), dispatchDimensions);
 
     return gScreenSpaceMaterial[serialIndex];
 }

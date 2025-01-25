@@ -32,6 +32,13 @@ namespace utility {
 		//ctor
 		MaterialParam()
 		{
+			albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			metallic = 0;
+			roughness = 0.001;
+			specular = 0;
+			transRatio = 1;
+			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			hasDiffuseTex = 0;
 			hasAlphaMask = 0;
 		}
@@ -39,10 +46,10 @@ namespace utility {
 		void asDefault()
 		{
 			albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-			metallic = 0;//blend diffuse specular at specTrans == 0
-			roughness = 0;
-			specular = 0;//spec power
-			transRatio = 1;//0:diffuse  1:trans
+			metallic = 0;
+			roughness = 0.001;
+			specular = 0;
+			transRatio = 1;
 			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			isSSSExecutable = 0u;
@@ -51,10 +58,10 @@ namespace utility {
 		void asDefaultSSS()
 		{
 			albedo = XMVectorSet(1.0f, 0.6f, 0.2f, 1.0f);
-			metallic = 0.0;//blend diffuse specular at specTrans == 0
+			metallic = 0.0;
 			roughness = 1.0f;
-			specular = 0.0;//spec power
-			transRatio = 0;//0:diffuse  1:trans
+			specular = 0.0;
+			transRatio = 0;
 			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			isSSSExecutable = 1u;

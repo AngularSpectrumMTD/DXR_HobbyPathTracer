@@ -25,6 +25,16 @@ struct DIReservoir
         W_sum = 0;
         M = 0;
     }
+
+    void applyMCapping()
+    {
+        if(M > MAX_REUSE_M_DI)
+        {
+            float r = max(0, ((float)MAX_REUSE_M_DI / M));
+            W_sum *= r;
+            M = MAX_REUSE_M_DI;
+        }
+    }
 };
 
 bool updateDIReservoir(inout DIReservoir reservoir, in uint inLightID, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in uint c, in float rnd01)
@@ -97,6 +107,16 @@ struct GIReservoir
 
         giSample = (GISample)0;
         compressedMaterial = (CompressedMaterialParams)0;
+    }
+
+    void applyMCapping()
+    {
+        if(M > MAX_REUSE_M_GI)
+        {
+            float r = max(0, ((float)MAX_REUSE_M_GI / M));
+            W_sum *= r;
+            M = MAX_REUSE_M_GI;
+        }
     }
 };
 

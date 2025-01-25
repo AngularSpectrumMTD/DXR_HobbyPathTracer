@@ -101,7 +101,7 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             float prevDepth = PrevNormalDepthBuffer[prevID].w;
             float3 prevNormal = PrevNormalDepthBuffer[prevID].xyz;
             float3 prevObjectWorldPos = PrevPositionBuffer[prevID].xyz;
-            const bool isTemporalReuseEnable = isTemporalReprojectionSuccessed(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
+            const bool isTemporalReuseEnable = isTemporalReprojectionEnable(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
             if(isTemporalReuseEnable)
             {
                 if(!isIndirectOnly())
@@ -114,6 +114,8 @@ void temporalReuse(uint3 dtid : SV_DispatchThreadID)
             }
         }
 
+        currDIReservoir.applyMCapping();
+        currGIReservoir.applyMCapping();
         DIReservoirBufferDst[serialCurrID] = currDIReservoir;
         GIReservoirBufferDst[serialCurrID] = currGIReservoir;
     }

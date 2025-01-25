@@ -118,7 +118,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = scatterPosition;
     nextRay.Direction = 0.xxx;
-    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
+    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {

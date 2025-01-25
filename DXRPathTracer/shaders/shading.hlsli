@@ -259,7 +259,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
             }
             else
             {
-                payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
+                payload.updateThroughputByMulitiplicationF3(weight);
             }
         }
         else
@@ -315,13 +315,13 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
             }
             else
             {
-                payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * weight);
+                payload.updateThroughputByMulitiplicationF3(weight);
             }
         }
     }
 }
 
-void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout uint throughputU32, inout uint randomSeed, in float wavelength = 0)
+void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc nextRay, inout PhotonPayload payload)
 {
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
@@ -330,8 +330,8 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
     const float3 wo_global = -WorldRayDirection();
     const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
-    const float roulette = rand(randomSeed);
-    const float blending = rand(randomSeed);
+    const float roulette = rand(payload.randomSeed);
+    const float blending = rand(payload.randomSeed);
     const float probability = 1 - material.transRatio;
 
     float3 wo_local = worldToTangent(N_global, wo_global);
@@ -354,7 +354,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
         if (roulette < diffRatio)//diffuse
         {
             float2 dummy = 0.xx;
-            L_local = HemisphereORCosineSampling(Z_AXIS, false, randomSeed, dummy);
+            L_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed, dummy);
         }
         else //specular
         {
@@ -364,8 +364,8 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
 
             const float a = material.roughness * material.roughness;
             float3 Vh_local = normalize(float3(a * V_local.x, a * V_local.y, V_local.z));
-            float phi = 2 * PI * rand(randomSeed);
-            float z = (1 - rand(randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
+            float phi = 2 * PI * rand(payload.randomSeed);
+            float z = (1 - rand(payload.randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
             float R = sqrt(saturate(1 - z * z));
             float2 sincosXY = 0.xx;
             sincos(phi, sincosXY.x, sincosXY.y);
@@ -383,7 +383,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
         float4 BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, L_local);
         const float cosine = max(0, abs(L_local.z));
         const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * weight);
+        payload.updateThroughputByMulitiplicationF3(weight);
     }
     else
     {
@@ -398,7 +398,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
 
         wo_local = worldToTangent(N_global, wo_global);
         
-        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
+        const float etaOUT = (payload.lambdaNM > 0) ? J_Bak4.computeRefIndex(payload.lambdaNM * 1e-3) : 1.7;
 
         float3 V_local = normalize(wo_local);
         const float3 H_local = Z_AXIS;//ImportanceSampling(Z_AXIS, material.roughness);
@@ -427,7 +427,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
         float4 BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
         const float cosine = max(0, abs(L_local.z));
         const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * weight);
+        payload.updateThroughputByMulitiplicationF3(weight);
     }
 }
 
@@ -730,7 +730,7 @@ bool shadeAndSampleRay(in float3 vertexNormal, in float3 vertexPosition, in floa
 
     if(isSSSSample)
     {
-        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * currentMaterial.albedo.xyz);
+        payload.updateThroughputByMulitiplicationF3(currentMaterial.albedo.xyz);
     }
 
     float3 DIGIelement = 0.xxx;

@@ -217,10 +217,19 @@ void DXRPathTracer::CreateSceneInfo()
                 material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
             }
 
-            //material.transRatio = 0.6;// rndF(mt);
-            //material.transRatio = 1;// rndF(mt);
-            material.transRatio = 1;// rndF(mt);
+            material.transRatio = 1;
+
+            if (i == 1)
+            {
+                material.transRatio = 0;
+            }
+
             if (mSceneType == SceneType_Simple)
+            {
+                material.transRatio = 0;
+            }
+
+            if (mSceneType == SceneType_BistroInterior)
             {
                 material.transRatio = 0;
             }
@@ -238,6 +247,8 @@ void DXRPathTracer::CreateSceneInfo()
             transIndex++;
             //material.emission = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
             mMaterialParamTbl[i] = material;
+
+            i++;
         }
 
         mStageMaterial.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);

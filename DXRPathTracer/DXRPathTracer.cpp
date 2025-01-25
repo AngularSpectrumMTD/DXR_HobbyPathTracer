@@ -21,7 +21,7 @@ using namespace DirectX;
 
 #define NEE_AVAILABLE
 
-#define USE_SPATIAL_RESERVOIR_FEEDBACK
+//#define USE_SPATIAL_RESERVOIR_FEEDBACK
 
 //#define CUBE_TEST
 
@@ -208,7 +208,7 @@ void DXRPathTracer::Setup()
         case SceneType_BistroExterior:
         {
             mCausticsBoost = 0.004f;
-            mPhiDirectional = 414; mThetaDirectional = 282;
+            mPhiDirectional = 414; mThetaDirectional = 302;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
@@ -244,7 +244,7 @@ void DXRPathTracer::Setup()
         break;
         case SceneType_BistroInterior:
         {
-            mPhiDirectional = 150; mThetaDirectional = 250;
+            mPhiDirectional = 150; mThetaDirectional = 225;
             mOBJFileName = "interior.obj";
             mOBJFolderName = "model/bistro/Interior";
             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
@@ -261,11 +261,11 @@ void DXRPathTracer::Setup()
             }
             else
             {
-                mLightPosX = 53; mLightPosY = 11.3f; mLightPosZ = -5.1f;
-                mPhi = 376; mTheta = 107;
-                mInitEyePos = XMFLOAT3(30, 12, 9);
-                mInitTargetPos = XMFLOAT3(66, 10, -11.41f);
-                mLightRange = 3.68f;
+                mLightPosX = 41; mLightPosY = 11.3f; mLightPosZ = -24.1f;
+                mPhi = 371; mTheta = -84;
+                mInitEyePos = XMFLOAT3(28, 12, 0.2);
+                mInitTargetPos = XMFLOAT3(69, 9.36, -5.2f);
+                mLightRange = 1.2f;
             }
             
             mModelTypeTbl[0] = ModelType_Afrodyta;
@@ -429,7 +429,7 @@ void DXRPathTracer::Setup()
             const bool isDebugMeshTest = false;
             const bool isRoomTestDebug = false;
             const bool isAfrodytaTest = true;
-            mPhiDirectional = 122.0f; mThetaDirectional = 315;
+            mPhiDirectional = 110.0f; mThetaDirectional = 287;
 
             //near
             //mInitEyePos = XMFLOAT3(-85, 64, -18);
@@ -441,7 +441,7 @@ void DXRPathTracer::Setup()
 
             mOBJFileName = "PTTestRobot.obj";
             mOBJFolderName = "model/PTTest";
-            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(100, 100, 100), XMMatrixTranslation(-150, 70, 0));
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(100, 100, 100), XMMatrixTranslation(-150, 65, 0));
             mStageOffsetX = 0.0f;
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;

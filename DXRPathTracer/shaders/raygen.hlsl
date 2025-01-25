@@ -424,16 +424,18 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse() || (currDIReservoir.M < (MAX_REUSE_M_DI / 2)))
+    if(isUseReservoirSpatialReuse())
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
-            const float r = rand(randomSeed) * ((currDIReservoir.M > (MAX_REUSE_M_DI / 4)) ? 1 : getReservoirSpatialReuseNum());
-            const float v = rand(randomSeed);
-            const float phi = 2.0f * PI * v;
-            float2 sc = 0.xx;
-            sincos(phi, sc.x, sc.y);
-            int3 nearIndex = launchIndex + int3(r * sc, 0);
+            //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
+            const float baseRadius = 1;
+            float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
+            float2 pos;
+            pos.x = baseRadius / 1.96 * gauss.x;
+            pos.y = baseRadius / 1.96 * gauss.y;
+
+            int3 nearIndex = launchIndex + int3(pos, 0);
             
             if(!isWithinBounds(nearIndex.xy, dims))
             {
@@ -446,13 +448,14 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
             const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
+            MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
+            const bool isSpecularDiffusePath = (screenSpaceMaterialNear.transRatio == 0);
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
-            const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
 
-            const bool isSimilar = isNearPosition && isNearNormal;
-            if(!isSimilar || (length(nearNormal) < 0.01))
+            const bool isSimilar = isNearDepth && isNearNormal;
+            if(!isSimilar || (length(nearNormal) < 0.01) || !isSpecularDiffusePath)
             {
                 continue;
             }
@@ -461,12 +464,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
         }
     }
 
-    if(spatDIReservoir.M > MAX_REUSE_M_DI)
-    {
-        float r = max(0, ((float)MAX_REUSE_M_DI / spatDIReservoir.M));
-        spatDIReservoir.W_sum *= r;
-        spatDIReservoir.M = MAX_REUSE_M_DI;
-    }
+    spatDIReservoir.applyMCapping();
 }
 
 void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
@@ -480,16 +478,18 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand(randomSeed));
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse() || (currGIReservoir.M < (MAX_REUSE_M_GI / 2)))
+    if(isUseReservoirSpatialReuse())
     {
         for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
         {
-            const float r = rand(randomSeed) * ((currGIReservoir.M > (MAX_REUSE_M_GI / 4)) ? 1 : 2);
-            const float v = rand(randomSeed);
-            const float phi = 2.0f * PI * v;
-            float2 sc = 0.xx;
-            sincos(phi, sc.x, sc.y);
-            int3 nearIndex = launchIndex + int3(r * sc, 0);
+            //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
+            const float baseRadius = 2;
+            float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
+            float2 pos;
+            pos.x = baseRadius / 1.96 * gauss.x;
+            pos.y = baseRadius / 1.96 * gauss.y;
+
+            int3 nearIndex = launchIndex + int3(pos, 0);
             
             if(!isWithinBounds(nearIndex.xy, dims))
             {
@@ -502,13 +502,14 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
             const float nearDepth = gNormalDepthBuffer[nearIndex.xy].w;
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
+            MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
+            const bool isSpecularDiffusePath = (screenSpaceMaterialNear.transRatio == 0);
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
-            const bool isNearPosition = (sqrt(dot(centerPos - nearPos, centerPos - nearPos)) < 0.3f);//30cm
 
-            const bool isSimilar = isNearPosition && isNearNormal;
-            if(!isSimilar || (length(nearNormal) < 0.01))
+            const bool isSimilar = isNearDepth && isNearNormal;
+            if(!isSimilar || (length(nearNormal) < 0.01) || !isSpecularDiffusePath)
             {
                 continue;
             }
@@ -517,12 +518,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
         }
     }
 
-    if(spatGIReservoir.M > MAX_REUSE_M_GI)
-    {
-        float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
-        spatGIReservoir.W_sum *= r;
-        spatGIReservoir.M = MAX_REUSE_M_GI;
-    }
+    spatGIReservoir.applyMCapping();
 }
 
 [shader("raygeneration")]
@@ -596,17 +592,21 @@ void spatialReuse() {
         float cosine = abs(dot(wi, centerNormal));
         float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);
 
-        // float3 biasedPosition = centerPos + 0.1f * wi;
-        // if(!isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd))
-        // {
-        //     Lo = 0.xxx;
-        // }
-
         const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
 
         if(isReEvaluateValid && !isIBLSample)
         {
             spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(bsdfPDF.xyz * cosine * Lo);
+        }
+        else
+        {
+            spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
+            if(spatGIReservoir.M > MAX_REUSE_M_GI)
+            {
+                float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
+                spatGIReservoir.W_sum *= r;
+                spatGIReservoir.M = MAX_REUSE_M_GI;
+            }
         }
     }
 

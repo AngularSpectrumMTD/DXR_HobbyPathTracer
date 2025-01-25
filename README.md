@@ -4,34 +4,23 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-![MaterialTest](https://github.com/user-attachments/assets/a73a1123-bd6c-4be8-b44e-ddbd4ad0619b)
-
-Scene Name "PTTestBrick"(Made by AngularSpectrumMTD)
-![Test2](https://github.com/user-attachments/assets/4f95efbc-1128-410d-a04a-a006c93cf6d1)
-
-Scene Name "PTTest"(Made by AngularSpectrumMTD)
-![Test](https://github.com/user-attachments/assets/5ae6ce91-c5c4-48cc-a4be-493337a29c80)
-
-Scene Name "BistroExtorior"(External Resource)
-![Test3](https://github.com/user-attachments/assets/831c97c5-fa21-473d-a3d0-123a9cb1e2ae)
+![Image](https://github.com/user-attachments/assets/79fd1092-95eb-42b0-ae4f-768af3c7dca5)
 
 Results of the verification of the ReSTIR DI/GI
 
-![ReSTIR2](https://github.com/user-attachments/assets/792307a7-4468-4db6-85d1-7d7e68039765)
-
-![ReSTIR1](https://github.com/user-attachments/assets/3077561f-84b1-4779-b617-f21332fe0775)
+![Image](https://github.com/user-attachments/assets/5402d00f-8d9c-4c28-b6d5-23395057d051)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
-![debugView](https://github.com/user-attachments/assets/125c907f-bc08-4971-828c-8b1b0e9a1598)  
-![debugView2](https://github.com/user-attachments/assets/7fd86339-24fe-4128-800b-9d160555b9b5)
+
+![Image](https://github.com/user-attachments/assets/1e0f72aa-62e2-41f0-8dd1-6cef64b5d1de)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

@@ -194,7 +194,7 @@ bool computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
         float3 W = computeBSSRDF(length(toHitPosition), d, BSSRDF_TEST_IOR);
 
         //Since the normal sampled R is very large compared to d, the exp term is almost zero.... ex) R 1 vs d 0.0000001
-        payload.throughputU32 = compressRGBasU32(decompressU32asRGB(payload.throughputU32) * W / pdf);
+        payload.updateThroughputByMulitiplicationF3(W / pdf);
 
         //debug
         if(payload.recursive == 1)

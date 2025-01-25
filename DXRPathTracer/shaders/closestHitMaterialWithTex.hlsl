@@ -232,7 +232,7 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload.throughputU32, payload.randomSeed, payload.lambdaNM);
+    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload);
 
     if (isPhotonStoreRequired(currentMaterial, payload))
     {
