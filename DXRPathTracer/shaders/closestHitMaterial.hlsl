@@ -44,6 +44,15 @@ float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
 
 [shader("anyhit")]
 void anyHit(inout Payload payload, TriangleIntersectionAttributes attrib) {
+    // if(isShadowRay(payload))
+    // {
+    //     MaterialParams currentMaterial = constantBuffer;
+    //     if(isTransparentMaterial(currentMaterial))
+    //     {
+    //         IgnoreHit();
+    //     }
+    // }
+
     if(isSSSRay(payload))
     {
         payload.hittedCount++;

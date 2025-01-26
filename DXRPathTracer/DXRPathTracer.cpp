@@ -455,6 +455,38 @@ void DXRPathTracer::Setup()
             mCameraSpeed = 10.0f;
         }
         break;
+        //case SceneType_PTTestRoom:
+        //{
+        //    mLightAreaScale = 6;
+        //    const bool isDebugMeshTest = false;
+        //    const bool isRoomTestDebug = false;
+        //    const bool isAfrodytaTest = true;
+        //    mPhiDirectional = 220.0f; mThetaDirectional = 146;
+
+        //    //near
+        //    //mInitEyePos = XMFLOAT3(-85, 64, -18);
+        //    //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+        //    //far
+        //    mInitEyePos = XMFLOAT3(37, 106, 87);
+        //    mInitTargetPos = XMFLOAT3(-14, 96, 61);
+
+        //    mOBJFileName = "PTTestRoom.obj";
+        //    mOBJFolderName = "model/PTTest";
+        //    mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(100, 100, 100), XMMatrixTranslation(-150, 65, 0));
+        //    mStageOffsetX = 0.0f;
+        //    mStageOffsetY = 0.0f;
+        //    mStageOffsetZ = 0.0f;
+
+        //    mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+        //    mPhi = 46.0f; mTheta = 239.0f;
+
+        //    mLightRange = 4.0f;
+
+        //    mModelTypeTbl[0] = ModelType_Afrodyta;
+        //    mCameraSpeed = 10.0f;
+        //}
+        //break;
         case SceneType_MaterialTest:
         {
             mLightAreaScale = 6;

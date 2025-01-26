@@ -146,6 +146,15 @@ void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib)
         IgnoreHit();
     }
 
+    if(isShadowRay(payload))
+    {
+        MaterialParams currentMaterial = constantBuffer;
+        if(isTransparentMaterial(currentMaterial))
+        {
+            IgnoreHit();
+        }
+    }
+
     if(isSSSRay(payload))
     {
         payload.hittedCount++;

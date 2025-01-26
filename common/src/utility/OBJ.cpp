@@ -651,11 +651,6 @@ namespace utility {
 				mparams.hasDiffuseTex = cpuMaterial.hasDiffuseTex ? 1 : 0;
 				mparams.hasAlphaMask = cpuMaterial.hasAlphaMask ? 1 : 0;
 
-				if (mparams.transRatio == 1)
-				{
-					mparams.roughness = 0;
-				}
-
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretMirror") == 0)
 				{
 					mparams.metallic = 1;

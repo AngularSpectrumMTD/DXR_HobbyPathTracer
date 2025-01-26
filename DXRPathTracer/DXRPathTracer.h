@@ -415,6 +415,7 @@ private:
         SceneType_PTTest,
         SceneType_PTTestBrick,
         SceneType_PTTestRobot,
+        SceneType_PTTestRoom,
         SceneType_MaterialTest,
     };
 

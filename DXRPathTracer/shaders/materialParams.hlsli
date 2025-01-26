@@ -14,6 +14,11 @@ struct MaterialParams
     uint materialBits;
 };
 
+bool isTransparentMaterial(in MaterialParams material)
+{
+    return (material.transRatio > 0);
+}
+
 bool hasDiffuseTex(in MaterialParams material)
 {
     return (material.materialBits >> 0) & 1;
