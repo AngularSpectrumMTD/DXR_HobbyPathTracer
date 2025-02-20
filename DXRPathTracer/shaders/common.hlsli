@@ -136,6 +136,8 @@ RWStructuredBuffer<GIReservoir> gGIReservoirBufferSrc : register(u21);
 RWTexture2D<float4> gPrevNormalDepthBuffer : register(u22);
 RWTexture2D<float4> gPrevPositionBuffer : register(u23);
 
+RWTexture2D<uint> gRandomNumber : register(u24);
+
 struct ReSTIRParam
 {
     uint4 data;
@@ -192,9 +194,24 @@ void setCaustics(in float3 color)
 ////////////////////////////////////
 // Common Function
 ////////////////////////////////////
-uint getReservoirSpatialReuseNum()
+uint getDIReservoirSpatialReuseNum()
 {
     return gReSTIRParam.data.x;
+}
+
+uint getGIReservoirSpatialReuseNum()
+{
+    return gReSTIRParam.data.y;
+}
+
+uint getDIReservoirSpatialReuseBaseRadius()
+{
+    return gReSTIRParam.data.z;
+}
+
+uint getGIReservoirSpatialReuseBaseRadius()
+{
+    return gReSTIRParam.data.w;
 }
 
 inline int serialRaysIndex(int3 dispatchRaysIndex, int3 dispatchRaysDimensions)
@@ -415,6 +432,19 @@ void TraceDefaultRay(in bool flags, in uint rayMask, inout RayDesc ray, inout Pa
 void TraceDefaultPhoton(in bool flags, in uint rayMask, inout RayDesc ray, inout PhotonPayload payload)
 {
     TraceRay(gBVH, flags, rayMask, DEFAULT_RAY_ID, DEFAULT_GEOM_CONT_MUL, DEFAULT_MISS_ID, ray, payload);
+}
+
+void initializeRNG(uint2 index, out uint seed)
+{
+    uint3 launchIndex = DispatchRaysIndex();
+    uint3 dispatchDimensions = DispatchRaysDimensions();
+    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
+    seed = gRandomNumber[index] + serialIndex;
+}
+
+void finalizeRNG(uint2 index, in uint seed)
+{
+    gRandomNumber[index] = seed;
 }
 
 #endif//__COMMON_HLSLI__

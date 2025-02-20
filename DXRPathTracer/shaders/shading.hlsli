@@ -98,7 +98,7 @@ float4 specularBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
 
     if (sumPDF > 0)
     {
-        return float4(sumBSDF, sumPDF);
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
     }
     else
     {
@@ -132,7 +132,7 @@ float4 ForceLambertianBSDF_PDF(in MaterialParams material, in float3 N, in float
 
     if (sumPDF > 0)
     {
-        return float4(sumBSDF, sumPDF);
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
     }
     else
     {
@@ -165,7 +165,7 @@ float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
 
     if (sumPDF > 0)
     {
-        return float4(sumBSDF, sumPDF);
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
     }
     else
     {
@@ -278,7 +278,7 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
             const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
             float3 V_local = normalize(wo_local);
-            const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness, payload.randomSeed);
+            const float3 H_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, payload.randomSeed);
 
             float3 L_local = 0.xxx;
 
@@ -401,7 +401,8 @@ void sampleBSDF(in MaterialParams material, in float3 N_global, inout RayDesc ne
         const float etaOUT = (payload.lambdaNM > 0) ? J_Bak4.computeRefIndex(payload.lambdaNM * 1e-3) : 1.7;
 
         float3 V_local = normalize(wo_local);
-        const float3 H_local = Z_AXIS;//ImportanceSampling(Z_AXIS, material.roughness);
+        uint seedDummy = 0;
+        const float3 H_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, seedDummy);
 
         float3 L_local = 0.xxx;
 
@@ -435,8 +436,6 @@ float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 N_global,
 {
     float4 BSDF_PDF = 0.xxxx;
 
-    const float eps = 0.001;
-
     const float roulette = rand(randomSeed);
     const float blending = rand(randomSeed);
     const float probability = 1 - material.transRatio;
@@ -462,8 +461,6 @@ float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 N_global,
 float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
-
-    const float eps = 0.001;
 
     const float roulette = rand(randomSeed);
     const float blending = rand(randomSeed);
@@ -502,7 +499,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 N_global, in float3
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
         float3 V_local = normalize(wo_local);
-        const float3 H_local = ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
+        const float3 H_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
 
         //compute bsdf    V : wo   L : wi(sample)
         BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, V_local, L_local, H_local, ETA_AIR, etaOUT, true, isFromOutside);

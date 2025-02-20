@@ -91,6 +91,11 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     
     MaterialParams currentMaterial = constantBuffer;
 
+    if(!isUseEmissivePolygon())
+    {
+        currentMaterial.emission = 0.xxxx;
+    }
+
     float3 caustics = 0.xxx;
     if(payload.recursive <= 2)
     {

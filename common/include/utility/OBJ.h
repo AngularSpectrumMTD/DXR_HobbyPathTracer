@@ -6,6 +6,7 @@
 #include "Utility.h"
 
 using namespace std;
+#define AIR_NI 1.45f
 
 namespace utility {
 	struct Reflection4 {
@@ -36,7 +37,7 @@ namespace utility {
 			metallic = 0;
 			roughness = 0.001;
 			specular = 0;
-			transRatio = 1;
+			transRatio = 0.8;
 			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			hasDiffuseTex = 0;
@@ -49,7 +50,7 @@ namespace utility {
 			metallic = 0;
 			roughness = 0.001;
 			specular = 0;
-			transRatio = 1;
+			transRatio = 0.8;
 			transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			isSSSExecutable = 0u;
@@ -118,6 +119,11 @@ namespace utility {
 
 		void setDummyDiffuseTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+
+		bool isTransparent()
+		{
+			return (Ni != AIR_NI) && (opacity != 1.0f);
+		}
 	};
 
 	class OBJMaterialLinkedMesh {

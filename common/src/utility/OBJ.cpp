@@ -3,7 +3,7 @@
 #include <fstream>
 
 #define PREPARE_ELEMENTS 10000
-#define MIN_ROUGHNESS 0.01f
+#define MIN_ROUGHNESS 0.001f
 
 bool isSameWord(const char* v0, const char* v1)
 {
@@ -644,9 +644,9 @@ namespace utility {
 				//https://blender.stackexchange.com/questions/149755/changing-the-specular-exponent-of-principled-bsdf-with-texture-when-exporting-to
 				//based on Principled BSDF
 				mparams.roughness = min(1, max(0, 1 - sqrt(cpuMaterial.Shininess) / 30));
-				mparams.transRatio = ((cpuMaterial.Ni != 1.45) && (cpuMaterial.opacity != 1.0f)) ? 1.0f : 0.0f;
+				mparams.transRatio = cpuMaterial.isTransparent() ? (1 - cpuMaterial.opacity) : 0.0f;
 				mparams.emission = XMVectorSet(cpuMaterial.Reflection4Color.emission.x, cpuMaterial.Reflection4Color.emission.y, cpuMaterial.Reflection4Color.emission.z, cpuMaterial.Reflection4Color.emission.w);
-				mparams.transColor = mparams.albedo;
+				mparams.transColor = XMVectorSet(1, 1, 1, 1);
 				mparams.isSSSExecutable = 0;
 				mparams.hasDiffuseTex = cpuMaterial.hasDiffuseTex ? 1 : 0;
 				mparams.hasAlphaMask = cpuMaterial.hasAlphaMask ? 1 : 0;
@@ -659,7 +659,6 @@ namespace utility {
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretGlass") == 0)
 				{
 					mparams.transRatio = 1;
-					mparams.transColor = mparams.albedo;
 					mparams.roughness = MIN_ROUGHNESS;
 				}
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretRoughMirror") == 0)
@@ -669,7 +668,6 @@ namespace utility {
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretRoughGlass") == 0)
 				{
 					mparams.transRatio = 1;
-					mparams.transColor = mparams.albedo;
 				}
 
 				mparams.roughness = max(mparams.roughness, MIN_ROUGHNESS);

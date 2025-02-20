@@ -36,7 +36,7 @@ bool isSSSExecutable(in MaterialParams material)
 
 bool isNEEExecutable(in MaterialParams material)
 {
-    return (material.roughness > 0.1f) && (material.transRatio == 0);
+    return (material.roughness > 0.1f) && !isTransparentMaterial(material);
 }
 
 struct CompressedMaterialParams

@@ -93,6 +93,29 @@ void DXRPathTracer::CreateRegularBuffer()
         }
     }
 
+    //PRNG
+    {
+        mRandomNumberBuffer = mDevice->CreateTexture2D(
+            width, height, DXGI_FORMAT_R32_UINT,
+            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+            D3D12_RESOURCE_STATE_COPY_SOURCE,
+            D3D12_HEAP_TYPE_DEFAULT,
+            L"RandomNumber"
+        );
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        mRandomNumberBufferDescriptorSRV = mDevice->CreateShaderResourceView(mRandomNumberBuffer.Get(), &srvDesc);
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        mRandomNumberBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mRandomNumberBuffer.Get(), &uavDesc);
+    }
+
     //RayTraced Result
     {
         mFinalRenderResult = mDevice->CreateTexture2D(

@@ -7,7 +7,7 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 
 #define THREAD_NUM 16
 #define REINHARD_L 1000
-#define MAX_ACCUMULATION_RANGE 1000
+#define MAX_ACCUMULATION_RANGE 10000
 
 Texture2D<float4> HistoryDIBuffer : register(t0);
 Texture2D<float4> HistoryGIBuffer : register(t1);

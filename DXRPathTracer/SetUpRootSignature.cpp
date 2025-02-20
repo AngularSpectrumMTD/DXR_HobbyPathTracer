@@ -43,6 +43,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 24);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSig = rsCreater.Create(mDevice, false, L"RootSignatureGlobal");
         mRegisterMapGlobalRootSig.clear();
@@ -75,6 +76,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSig["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSig.size();
         mRegisterMapGlobalRootSig["gPrevPositionBuffer"] = mRegisterMapGlobalRootSig.size();
+        mRegisterMapGlobalRootSig["gRandomNumber"] = mRegisterMapGlobalRootSig.size();
     }
 
     //PhotonMapping
@@ -109,6 +111,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 24);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigPhoton = rsCreater.Create(mDevice, false, L"RootSignatureGlobalPhoton");
         mRegisterMapGlobalRootSigPhoton.clear();
@@ -141,6 +144,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigPhoton["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
         mRegisterMapGlobalRootSigPhoton["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigPhoton.size();
+        mRegisterMapGlobalRootSigPhoton["gRandomNumber"] = mRegisterMapGlobalRootSigPhoton.size();
     }
     {
         utility::RootSignatureCreater rsCreater;
@@ -173,6 +177,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 24);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 2);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigReservoirSpatialReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirSpatialReuse");
@@ -206,6 +211,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
+        mRegisterMapGlobalRootSigReservoirSpatialReuse["gRandomNumber"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
         mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"] = mRegisterMapGlobalRootSigReservoirSpatialReuse.size();
     }
     {
@@ -239,6 +245,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 21);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 22);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 23);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 24);
         rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 2);
         rsCreater.PushStaticSampler(0);
         mGlobalRootSigReservoirTemporalReuse = rsCreater.Create(mDevice, false, L"RootSignatureGlobalReservoirTemporalReuse");
@@ -272,6 +279,7 @@ void DXRPathTracer::CreateRootSignatureGlobal()
         mRegisterMapGlobalRootSigReservoirTemporalReuse["gGIReservoirBufferSrc"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
         mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevNormalDepthBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
         mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevPositionBuffer"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
+        mRegisterMapGlobalRootSigReservoirTemporalReuse["gRandomNumber"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
         mRegisterMapGlobalRootSigReservoirTemporalReuse["gReSTIRParam"] = mRegisterMapGlobalRootSigReservoirTemporalReuse.size();
     }
 }

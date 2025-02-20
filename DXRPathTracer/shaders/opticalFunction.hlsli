@@ -20,7 +20,7 @@ bool isPrimarySurfaceHasHighPossibilityCausticsGenerate(in PhotonPayload payload
 
 bool isPhotonStoreRequired(in MaterialParams params, inout PhotonPayload payload)
 {
-    return (rand(payload.randomSeed) < params.roughness) && (params.transRatio == 0);
+    return (rand(payload.randomSeed) < params.roughness) && !isTransparentMaterial(params);
 }
 
 // void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
@@ -53,6 +53,8 @@ uint getRandomLightID(inout uint randomSeed)
 {
     return min(max(0, (uint) (rand(randomSeed) * (getLightNum()) + 0.5)), getLightNum() - 1);
 }
+
+#define BSDF_EPS 0.0001f
 
 #include "reservoir.hlsli"
 #include "geometryIntersection.hlsli"

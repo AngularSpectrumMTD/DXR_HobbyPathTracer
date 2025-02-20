@@ -131,6 +131,11 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout V
         editMaterial(currentMaterial);
     }
 
+    if(!isUseEmissivePolygon())
+    {
+        currentMaterial.emission = 0.xxxx;
+    }
+
     return currentMaterial;
 }
 

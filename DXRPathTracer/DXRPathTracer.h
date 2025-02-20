@@ -563,6 +563,9 @@ private:
     ComPtr<ID3D12Resource> mPhotonGridId;
     dx12::Descriptor mPhotonGridIdDescriptorSRV;
     dx12::Descriptor mPhotonGridIdDescriptorUAV;
+    ComPtr <ID3D12Resource> mRandomNumberBuffer;
+    dx12::Descriptor mRandomNumberBufferDescriptorUAV;
+    dx12::Descriptor mRandomNumberBufferDescriptorSRV;
 
     std::vector < ComPtr<ID3D12Resource>> mNormalDepthBufferTbl;
     std::vector < dx12::Descriptor> mNormalDepthBufferDescriptorSRVTbl;
@@ -793,6 +796,7 @@ private:
     bool mIsIndirectOnly;
     bool mIsUseDebugView;
     bool mIsUseIBL;
+    bool mIsUseEmissivePolygon;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;

@@ -103,7 +103,9 @@ void rayGen() {
     }
 
     //random
-    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = 0;
+
+    initializeRNG(launchIndex.xy, randomSeed);
 
     const float energyBoost = 1.0f;
     
@@ -167,6 +169,8 @@ void rayGen() {
     setGIReservoir(giReservoir);
 
     setGI(0.xxx);
+    
+    finalizeRNG(launchIndex.xy, payload.randomSeed);
 }
 
 float getPhotonEmissionGuideMap(int2 pos, int mip)
@@ -271,7 +275,8 @@ void photonEmitting()
     uint3 dispatchDimensions = DispatchRaysDimensions();
     
     //random
-    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = 0;
+    initializeRNG(launchIndex.xy, randomSeed);
 
     PhotonInfo photon;
     photon.throughputU32 = 0u;
@@ -316,6 +321,8 @@ void photonEmitting()
     uint rayMask = ~(LIGHT_INSTANCE_MASK); //ignore your self!! lightsource model
 
     TraceDefaultPhoton(flags, rayMask, nextRay, payload);
+
+    finalizeRNG(launchIndex.xy, payload.randomSeed);
 }
 
 void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, inout uint randomState)
@@ -371,7 +378,8 @@ void temporalReuse()
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
     
     //random
-    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = 0;
+    initializeRNG(launchIndex.xy, randomSeed);
 
     uint2 currID = launchIndex.xy;
     uint2 randID = currID;
@@ -409,11 +417,13 @@ void temporalReuse()
         gDIReservoirBuffer[serialCurrID] = currDIReservoir;
         gGIReservoirBuffer[serialCurrID] = currGIReservoir;
     }
+
+    finalizeRNG(launchIndex.xy, randomSeed);
 }
 
 #define SPATIAL_REUSE_NUM 4
 
-void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
+void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in bool isTransparent)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -426,10 +436,10 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
     {
-        for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
+        for(int s = 0; s < getDIReservoirSpatialReuseNum(); s++)
         {
             //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
-            const float baseRadius = 1;
+            const float baseRadius = getDIReservoirSpatialReuseBaseRadius();
             float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
             float2 pos;
             pos.x = baseRadius / 1.96 * gauss.x;
@@ -449,13 +459,12 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
             MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
-            const bool isSpecularDiffusePath = (screenSpaceMaterialNear.transRatio == 0);
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
 
             const bool isSimilar = isNearDepth && isNearNormal;
-            if(!isSimilar || (length(nearNormal) < 0.01) || !isSpecularDiffusePath)
+            if(!isSimilar || (length(nearNormal) < 0.01) || (isTransparent != isTransparentMaterial(screenSpaceMaterialNear)))
             {
                 continue;
             }
@@ -467,7 +476,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     spatDIReservoir.applyMCapping();
 }
 
-void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed)
+void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in bool isTransparent)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -480,10 +489,10 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
     {
-        for(int s = 0; s < getReservoirSpatialReuseNum(); s++)
+        for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {
             //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
-            const float baseRadius = 2;
+            const float baseRadius = isTransparent ? max(1, getDIReservoirSpatialReuseBaseRadius() / 4.0f) : getDIReservoirSpatialReuseBaseRadius();
             float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
             float2 pos;
             pos.x = baseRadius / 1.96 * gauss.x;
@@ -496,6 +505,8 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
                 continue;
             }
 
+            const float2 nearUV = nearIndex.xy / dims;
+
             const uint serialNearID = serialRaysIndex(nearIndex, dispatchDimensions);
 
             GIReservoir nearGIReservoir = gGIReservoirBufferSrc[serialNearID];
@@ -503,13 +514,12 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
             const float3 nearNormal = gNormalDepthBuffer[nearIndex.xy].xyz;
             const float3 nearPos = gPositionBuffer[nearIndex.xy].xyz;
             MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
-            const bool isSpecularDiffusePath = (screenSpaceMaterialNear.transRatio == 0);
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
 
             const bool isSimilar = isNearDepth && isNearNormal;
-            if(!isSimilar || (length(nearNormal) < 0.01) || !isSpecularDiffusePath)
+            if(!isSimilar || (length(nearNormal) < 0.01) || (isTransparent != isTransparentMaterial(screenSpaceMaterialNear)))// || isTransparentMaterial(screenSpaceMaterialNear))
             {
                 continue;
             }
@@ -529,7 +539,8 @@ void spatialReuse() {
     int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
 
     //random
-    uint randomSeed = generateRandomSeed(launchIndex.xy, DispatchRaysDimensions().x);
+    uint randomSeed = 0;
+    initializeRNG(launchIndex.xy, randomSeed);
 
     MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
     const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
@@ -545,7 +556,7 @@ void spatialReuse() {
     DIReservoir spatDIReservoir;
     spatDIReservoir.initialize();
 
-    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed);
+    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, isTransparentMaterial(screenSpaceMaterial));
 
     //Reevaluation
     {
@@ -578,16 +589,16 @@ void spatialReuse() {
     GIReservoir spatGIReservoir;
     spatGIReservoir.initialize();
 
-    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed);
+    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, isTransparentMaterial(screenSpaceMaterial));
 
     //Reevaluation
     {
         const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
         float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
 
-        const bool isSpecularDiffusePath = (screenSpaceMaterial.transRatio == 0);
         const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
-        const bool isReEvaluateValid = isSpecularDiffusePath && (diffRatio > 0.5); 
+        //const bool isReEvaluateValid = !isTransparentMaterial(screenSpaceMaterial) && (diffRatio > 0.1); 
+        const bool isReEvaluateValid = true;//(diffRatio > 0.1); 
 
         float cosine = abs(dot(wi, centerNormal));
         float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);

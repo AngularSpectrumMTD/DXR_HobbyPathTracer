@@ -16,7 +16,7 @@
 
 using namespace DirectX;
 #define ONE_RADIAN XM_PI / 180.f
-#define MAX_ACCUMULATION_RANGE 1000
+#define MAX_ACCUMULATION_RANGE 10000
 #define DIRECTIONAL_LIGHT_POWER 2
 
 #define NEE_AVAILABLE
@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRobot;
+    mSceneType = SceneType_PTTestRoom;
 
     mIsUseIBL = true;
     mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
@@ -96,8 +96,9 @@ void DXRPathTracer::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = true;
+    mIsUseReservoirSpatialReuse = false;
     mIsTemporalAccumulationForceDisable = true;
+    mIsUseEmissivePolygon = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -296,9 +297,6 @@ void DXRPathTracer::Setup()
         break;
         case SceneType_Room:
         {
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 41.0f; mThetaDirectional = 245.0f;
             mInitEyePos = XMFLOAT3(-7.69f, 4.48, 18.3f);
             mInitTargetPos = XMFLOAT3(23.13, 7.58, -0.12f);
@@ -320,9 +318,6 @@ void DXRPathTracer::Setup()
         break;
         case SceneType_GITest:
         {
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 123.0f; mThetaDirectional = 326.0f;
             mInitEyePos = XMFLOAT3(-45.85f, 46.655, 123.07f);
             mInitTargetPos = XMFLOAT3(-25.78, 39.42, 94.028f);
@@ -344,9 +339,6 @@ void DXRPathTracer::Setup()
         break; 
         case SceneType_Kitchen:
         {
-            const bool isDebugMeshTest = false; 
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 8.0f; mThetaDirectional = 215.0f;
             mInitEyePos = XMFLOAT3(347, 46.51, -161.34f);
             mInitTargetPos = XMFLOAT3(319.1, 46.58, -142.253f);
@@ -369,9 +361,6 @@ void DXRPathTracer::Setup()
         break;
         case SceneType_PTTest:
         {
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
             mInitEyePos = XMFLOAT3(334.00f, 81.915, 161.07f);
             mInitTargetPos = XMFLOAT3(300.78, 79.42, 147.028f);
@@ -394,9 +383,6 @@ void DXRPathTracer::Setup()
         case SceneType_PTTestBrick:
         {
             mLightAreaScale = 6;
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;     
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 51.0f; mThetaDirectional = 234;
 
             //near
@@ -426,9 +412,6 @@ void DXRPathTracer::Setup()
         case SceneType_PTTestRobot:
         {
             mLightAreaScale = 6;
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 110.0f; mThetaDirectional = 287;
 
             //near
@@ -455,44 +438,38 @@ void DXRPathTracer::Setup()
             mCameraSpeed = 10.0f;
         }
         break;
-        //case SceneType_PTTestRoom:
-        //{
-        //    mLightAreaScale = 6;
-        //    const bool isDebugMeshTest = false;
-        //    const bool isRoomTestDebug = false;
-        //    const bool isAfrodytaTest = true;
-        //    mPhiDirectional = 220.0f; mThetaDirectional = 146;
+        case SceneType_PTTestRoom:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 294.0f; mThetaDirectional = 147;
 
-        //    //near
-        //    //mInitEyePos = XMFLOAT3(-85, 64, -18);
-        //    //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+                
+            //far
+            mInitEyePos = XMFLOAT3(27.0, 137, 64.5);
+            mInitTargetPos = XMFLOAT3(-18, 135, 22.5);
 
-        //    //far
-        //    mInitEyePos = XMFLOAT3(37, 106, 87);
-        //    mInitTargetPos = XMFLOAT3(-14, 96, 61);
+            mOBJFileName = "PTTestRoom.obj";
+            mOBJFolderName = "model/PTTest";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(-150, 65, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
 
-        //    mOBJFileName = "PTTestRoom.obj";
-        //    mOBJFolderName = "model/PTTest";
-        //    mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(100, 100, 100), XMMatrixTranslation(-150, 65, 0));
-        //    mStageOffsetX = 0.0f;
-        //    mStageOffsetY = 0.0f;
-        //    mStageOffsetZ = 0.0f;
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
 
-        //    mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
-        //    mPhi = 46.0f; mTheta = 239.0f;
+            mLightRange = 4.0f;
 
-        //    mLightRange = 4.0f;
-
-        //    mModelTypeTbl[0] = ModelType_Afrodyta;
-        //    mCameraSpeed = 10.0f;
-        //}
-        //break;
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+        }
+        break;
         case SceneType_MaterialTest:
         {
             mLightAreaScale = 6;
-            const bool isDebugMeshTest = false;
-            const bool isRoomTestDebug = false;
-            const bool isAfrodytaTest = true;
             mPhiDirectional = 51.0f; mThetaDirectional = 234;
 
             //near
@@ -933,6 +910,11 @@ void DXRPathTracer::Draw()
             CD3DX12_RESOURCE_BARRIER::Transition(mCausticsBufferPingPongTbl[prev].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE),
             CD3DX12_RESOURCE_BARRIER::Transition(mCausticsBufferPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
     };
+
+    CD3DX12_RESOURCE_BARRIER uavBRandom[] = {
+      CD3DX12_RESOURCE_BARRIER::UAV(mRandomNumberBuffer.Get()),
+    };
+
     // BackBuffer To RT
     auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_RENDER_TARGET);
     // Present
@@ -949,6 +931,8 @@ void DXRPathTracer::Draw()
 
     auto gridCB = mGridSortCB.Get();
     auto sceneCB = mSceneCB.Get();
+
+    mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     if (mIsApplyCaustics)
     {
@@ -983,6 +967,7 @@ void DXRPathTracer::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -1074,6 +1059,7 @@ void DXRPathTracer::Draw()
     };
 
     mCommandList->ResourceBarrier(u32(_countof(uavBarrierRandomCounter)), uavBarrierRandomCounter);
+    mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     //RayTracing
     mCommandList->SetComputeRootSignature(mGlobalRootSig.Get());
@@ -1106,12 +1092,14 @@ void DXRPathTracer::Draw()
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
     PIXEndEvent(mCommandList.Get());
 
     mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
+    mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     //if (mIsUseDenoise)
     //{
@@ -1181,6 +1169,7 @@ void DXRPathTracer::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirTemporalReuse["gReSTIRParam"], mReSTIRParamCBTbl[0]->GetGPUVirtualAddress());
         mCommandList->SetPipelineState1(mRTPSOReservoirTemporalReuse.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "ReservoirTemporalReuse");
@@ -1193,6 +1182,8 @@ void DXRPathTracer::Draw()
         };
         mCommandList->ResourceBarrier(u32(_countof(tempBarrier)), tempBarrier);
     }
+
+    mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     u32 finalSpatialID = 0;
     //Reservoir Spatial Reuse
@@ -1222,6 +1213,8 @@ void DXRPathTracer::Draw()
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
 
+        mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
+
         u32 spatialIDPing = curr;
         u32 spatialIDPong = prev;
 
@@ -1229,10 +1222,10 @@ void DXRPathTracer::Draw()
         {
             ReSTIRParam cb;
             XMUINT4 d;
-            d.x = max(1, 4 >> i);
-            d.y = 0;
-            d.z = 0;
-            d.w = 0;
+            d.x = max(1, 1 + 2 *  i);//DIReservoirSpatialReuseNum
+            d.y = max(1, 1 + 1 * i);//GIReservoirSpatialReuseNum
+            d.z = max(1, 1 + 1 * i);//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, 1 + 1 * i);//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();
@@ -1268,6 +1261,7 @@ void DXRPathTracer::Draw()
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
@@ -1279,11 +1273,13 @@ void DXRPathTracer::Draw()
             spatialIDPong = tmp;
 
             mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
+            mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
         }
 
         finalSpatialID = spatialIDPong;
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
+        mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
         //feedback
  #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
@@ -1350,6 +1346,8 @@ void DXRPathTracer::Draw()
         };
         mCommandList->ResourceBarrier(u32(_countof(tempBarrier)), tempBarrier);
     }
+
+    mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     if (mIsUseDebugView)
     {
@@ -1471,6 +1469,7 @@ void DXRPathTracer::Update()
     mSceneParam.additional1.w = mIsHistoryResetRequested ? 1 : 0;
     mSceneParam.sssParam = XMVectorSet(mMeanFreePathRatio * mMeanFreePath, 0, 0, 0);
     mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
+    mSceneParam.additional2.y = mIsUseEmissivePolygon ? 1 : 0;
 
     if (!mIsTemporalAccumulationForceDisable)
     {
@@ -1667,6 +1666,10 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         break;
     case VK_F8:
         mIsUseDirectionalLight = !mIsUseDirectionalLight;
+        mIsUseTemporalAccumulation = false;
+        break;
+    case VK_F9:
+        mIsUseEmissivePolygon = !mIsUseEmissivePolygon;
         mIsUseTemporalAccumulation = false;
         break;
     }

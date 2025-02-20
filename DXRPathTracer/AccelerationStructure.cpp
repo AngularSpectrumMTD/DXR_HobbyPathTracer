@@ -217,7 +217,7 @@ void DXRPathTracer::CreateSceneInfo()
                 material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
             }
 
-            material.transRatio = 1;
+            material.transRatio = 0.8;
 
             if (i == 1)
             {

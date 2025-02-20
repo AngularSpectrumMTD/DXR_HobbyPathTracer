@@ -53,8 +53,7 @@ float3 GGX_ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
     float randX = rand(randomSeed);
     float randY = rand(randomSeed);
 
-    const float eps = 0.001f;
-    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0 + eps) * randY));
+    float cosT = sqrt((1.0 - randY) / (1.0 + (alpha * alpha - 1.0) * randY));
     float sinT = sqrt(1 - cosT * cosT);
         
     float P = 2.0 * PI * randX;
@@ -63,21 +62,21 @@ float3 GGX_ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
     return tangentToWorld(N, tangentDir);
 }
 
-float3 ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
-{
-    float u = rand(randomSeed);
-    float v = rand(randomSeed);
-    float a = roughness * roughness;
-    float th = atan(a * sqrt(u) / sqrt(1 - u));
-    float ph = 2 * PI * v;
-    float st = sin(th);
-    float ct = cos(th);
-    float sp = sin(ph);
-    float cp = cos(ph);
-    float3 t, b;
-    ONB(N, t, b);
-    return normalize((st * cp) * t + (sp * cp) * b + ct * N);
-}
+// float3 ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
+// {
+//     float u = rand(randomSeed);
+//     float v = rand(randomSeed);
+//     float a = roughness * roughness;
+//     float th = atan(a * sqrt(u) / sqrt(1 - u));
+//     float ph = 2 * PI * v;
+//     float st = sin(th);
+//     float ct = cos(th);
+//     float sp = sin(ph);
+//     float cp = cos(ph);
+//     float3 t, b;
+//     ONB(N, t, b);
+//     return normalize((st * cp) * t + (sp * cp) * b + ct * N);
+// }
 
 //=========================================================================
 //PDF
@@ -139,16 +138,14 @@ float GGX_Distribution(float3 N, float3 H, float roughness)
     
     float denom = (dotNH_pow2 * (alpha_pow2 - 1.0) + 1.0);
     denom *= PI * denom;
-    const float eps = 0.001f;
-    return alpha_pow2 / (denom + eps);
+    return alpha_pow2 / (denom + BSDF_EPS);
 }
 
 float GGX_Geometry_Schlick(float dotNX, float roughness)
 {
     float alpha = roughness * roughness;
     float k = alpha / 2;
-    const float eps = 0.001f;
-    return dotNX / (dotNX * (1 - k) + k + eps);
+    return dotNX / (dotNX * (1 - k) + k + BSDF_EPS);
 }
 
 float GGX_Geometry_Smith(float3 N, float3 V, float3 L, float roughness)
@@ -167,9 +164,8 @@ float3 SpecularBRDF(float D, float G, float3 F, float3 V, float3 L, float3 N)
 {
     float dotNL = abs(dot(N, L));
     float dotNV = abs(dot(N, V));
-    float eps = 0.001;
 
-    return (D * G * F) / (4 * dotNV * dotNL + eps);
+    return (D * G * F) / (4 * dotNV * dotNL + BSDF_EPS);
 }
 
 float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, float3 H, float etaIN, float etaOUT)
@@ -178,11 +174,10 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
     float dotNV = abs(dot(N, V));
     float dotVH = abs(dot(V, H));
     float dotLH = abs(dot(L, H));
-    float eps = 0.001;
     
     float A = dotVH * dotLH / (dotNV * dotNL);
     float3 XYZ = etaOUT * etaOUT * (1 - F) * G * D;
-    float B = (etaIN * dotVH + etaOUT * dotLH) * (etaIN * dotVH + etaOUT * dotLH) + eps;
+    float B = (etaIN * dotVH + etaOUT * dotLH) * (etaIN * dotVH + etaOUT * dotLH) + BSDF_EPS;
     return A * XYZ / B;
 }
 

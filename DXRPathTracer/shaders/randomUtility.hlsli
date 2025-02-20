@@ -1,4 +1,4 @@
-uint generateHash(uint orig)
+uint generateHash(inout uint orig)
 {
     orig ^= 2747636419u;
     orig *= 2654435769u;
@@ -9,14 +9,13 @@ uint generateHash(uint orig)
     return orig;
 }
 
-float rand1D(uint seed)
+float rand1D(inout uint seed)
 {
     return float(generateHash(seed)) / 4294967295.0;
 }
 
 float rand(inout uint randomState)//0-1
 {
-    randomState += 1.0;
     return rand1D(randomState);
 }
 

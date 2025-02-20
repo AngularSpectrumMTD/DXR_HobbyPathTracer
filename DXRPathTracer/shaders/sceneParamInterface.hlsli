@@ -44,11 +44,6 @@ bool isUseStreamingRIS()
     return gSceneParam.additional.w == 1;
 }
 
-bool isUseIBL()
-{
-    return gSceneParam.additional2.x == 1;
-}
-
 bool isApplyCaustics()
 {
     return gSceneParam.photonParams.x == 1;
@@ -147,6 +142,16 @@ bool isUseMetallicTest()
 bool isHistoryResetRequested()
 {
     return gSceneParam.additional1.w == 1;
+}
+
+bool isUseIBL()
+{
+    return gSceneParam.additional2.x == 1;
+}
+
+bool isUseEmissivePolygon()
+{
+    return gSceneParam.additional2.y == 1;
 }
 
 float meanFreePath()
