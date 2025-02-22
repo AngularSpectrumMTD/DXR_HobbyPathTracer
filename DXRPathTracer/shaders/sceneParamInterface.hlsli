@@ -154,6 +154,11 @@ bool isUseEmissivePolygon()
     return gSceneParam.additional2.y == 1;
 }
 
+bool isUseMedianFiltering()
+{
+    return gSceneParam.additional2.z == 1;
+}
+
 float meanFreePath()
 {
     return gSceneParam.sssParam.x;

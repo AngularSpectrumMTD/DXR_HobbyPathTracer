@@ -301,4 +301,23 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
     }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        mRsFinalizePathtracedResult = rsCreater.Create(mDevice, false, L"rsFinalizePathtracedResult");
+        CreateComputeShaderStateObject(ComputeShaders::FinalizePathtracedResult, mFinalizePathtracedResultPSO, mRsFinalizePathtracedResult);
+        mRegisterMapFinalizePathtracedResult.clear();
+        mRegisterMapFinalizePathtracedResult["gSceneParam"] = mRegisterMapFinalizePathtracedResult.size();
+        mRegisterMapFinalizePathtracedResult["NormalDepthBuffer"] = mRegisterMapFinalizePathtracedResult.size();
+        mRegisterMapFinalizePathtracedResult["ScreenSpaceMaterial"] = mRegisterMapFinalizePathtracedResult.size();
+        mRegisterMapFinalizePathtracedResult["AccumulationCountBuffer"] = mRegisterMapFinalizePathtracedResult.size();
+        mRegisterMapFinalizePathtracedResult["NativePathtracedResult"] = mRegisterMapFinalizePathtracedResult.size();
+        mRegisterMapFinalizePathtracedResult["FinalizedPathtracedResult"] = mRegisterMapFinalizePathtracedResult.size();
+    }
 }

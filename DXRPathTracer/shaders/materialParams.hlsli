@@ -19,6 +19,11 @@ bool isTransparentMaterial(in MaterialParams material)
     return (material.transRatio > 0);
 }
 
+bool isSpecularMaterial(in MaterialParams material)
+{
+    return (material.metallic > 0.5) && (material.roughness < 0.5);
+}
+
 bool hasDiffuseTex(in MaterialParams material)
 {
     return (material.materialBits >> 0) & 1;

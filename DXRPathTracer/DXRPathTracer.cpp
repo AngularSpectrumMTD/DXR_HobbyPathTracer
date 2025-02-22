@@ -62,7 +62,7 @@ void DXRPathTracer::Setup()
     mSceneType = SceneType_PTTestRoom;
 
     mIsUseIBL = true;
-    mRecursionDepth = min(5, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
     mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
@@ -96,9 +96,10 @@ void DXRPathTracer::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = false;
+    mIsUseReservoirSpatialReuse = true;
     mIsTemporalAccumulationForceDisable = true;
     mIsUseEmissivePolygon = true;
+    mIsUseMedianFiltering = true;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -441,15 +442,15 @@ void DXRPathTracer::Setup()
         case SceneType_PTTestRoom:
         {
             mLightAreaScale = 6;
-            mPhiDirectional = 294.0f; mThetaDirectional = 147;
+            mPhiDirectional = 326.0f; mThetaDirectional = 128;
 
             //near
             //mInitEyePos = XMFLOAT3(-85, 64, -18);
             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
                 
             //far
-            mInitEyePos = XMFLOAT3(27.0, 137, 64.5);
-            mInitTargetPos = XMFLOAT3(-18, 135, 22.5);
+            mInitEyePos = XMFLOAT3(34.7, 137, 85.5);
+            mInitTargetPos = XMFLOAT3(-10, 135, 43.4);
 
             mOBJFileName = "PTTestRoom.obj";
             mOBJFolderName = "model/PTTest";
@@ -887,9 +888,6 @@ void DXRPathTracer::Draw()
     D3D12_RESOURCE_BARRIER barriersSRVToUAV[] = {
             CD3DX12_RESOURCE_BARRIER::Transition(mFinalRenderResult.Get(),D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
     };
-    CD3DX12_RESOURCE_BARRIER uavBarriers[] = {
-        CD3DX12_RESOURCE_BARRIER::UAV(mAccumulationBuffer.Get())
-    };
     // Copy To BackBuffer
     D3D12_RESOURCE_BARRIER barriers[] = {
             CD3DX12_RESOURCE_BARRIER::Transition(mFinalRenderResult.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
@@ -913,6 +911,14 @@ void DXRPathTracer::Draw()
 
     CD3DX12_RESOURCE_BARRIER uavBRandom[] = {
       CD3DX12_RESOURCE_BARRIER::UAV(mRandomNumberBuffer.Get()),
+    };
+
+    CD3DX12_RESOURCE_BARRIER uavBPTresult[] = {
+  CD3DX12_RESOURCE_BARRIER::UAV(mPathtracedRenderResult.Get()),
+    };
+
+    CD3DX12_RESOURCE_BARRIER uavBFinalizedPTresult[] = {
+CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
     };
 
     // BackBuffer To RT
@@ -1098,7 +1104,6 @@ void DXRPathTracer::Draw()
     mCommandList->DispatchRays(&mDispatchRayDesc);
     PIXEndEvent(mCommandList.Get());
 
-    mCommandList->ResourceBarrier(u32(_countof(uavBarriers)), uavBarriers);
     mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
     //if (mIsUseDenoise)
@@ -1222,10 +1227,10 @@ void DXRPathTracer::Draw()
         {
             ReSTIRParam cb;
             XMUINT4 d;
-            d.x = max(1, 1 + 2 *  i);//DIReservoirSpatialReuseNum
-            d.y = max(1, 1 + 1 * i);//GIReservoirSpatialReuseNum
-            d.z = max(1, 1 + 1 * i);//DIReservoirSpatialReuseBaseRadius
-            d.w = max(1, 1 + 1 * i);//GIReservoirSpatialReuseBaseRadius
+            d.x = 8;// max(1, 1 + 2 * i);//DIReservoirSpatialReuseNum
+            d.y = 8;// max(1, 1 + 1 * i);//GIReservoirSpatialReuseNum
+            d.z = max(1, 12 - (i + 1));//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, 12 - (i + 1));//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();
@@ -1321,7 +1326,7 @@ void DXRPathTracer::Draw()
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[curr].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIGIBuffer"], mFinalRenderResultDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIGIBuffer"], mPathtracedRenderDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[prev].hGpu);
@@ -1348,6 +1353,23 @@ void DXRPathTracer::Draw()
     }
 
     mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
+    mCommandList->ResourceBarrier(u32(_countof(uavBPTresult)), uavBPTresult);
+
+    //Finalize
+    {
+        mCommandList->SetComputeRootSignature(mRsFinalizePathtracedResult.Get());
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapFinalizePathtracedResult["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["NormalDepthBuffer"], mNormalDepthBufferDescriptorSRVTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["NativePathtracedResult"], mPathtracedRenderDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["FinalizedPathtracedResult"], mFinalRenderResultDescriptorUAV.hGpu);
+        mCommandList->SetPipelineState(mFinalizePathtracedResultPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "FinalizePathtracedResult");
+        mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
+    }
+    mCommandList->ResourceBarrier(u32(_countof(uavBFinalizedPTresult)), uavBFinalizedPTresult);
 
     if (mIsUseDebugView)
     {
@@ -1470,6 +1492,7 @@ void DXRPathTracer::Update()
     mSceneParam.sssParam = XMVectorSet(mMeanFreePathRatio * mMeanFreePath, 0, 0, 0);
     mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
     mSceneParam.additional2.y = mIsUseEmissivePolygon ? 1 : 0;
+    mSceneParam.additional2.z = mIsUseMedianFiltering ? 1 : 0;
 
     if (!mIsTemporalAccumulationForceDisable)
     {
@@ -1671,6 +1694,9 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
     case VK_F9:
         mIsUseEmissivePolygon = !mIsUseEmissivePolygon;
         mIsUseTemporalAccumulation = false;
+        break;
+    case VK_F11:
+        mIsUseMedianFiltering = !mIsUseMedianFiltering;
         break;
     }
 }

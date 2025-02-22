@@ -110,6 +110,7 @@ namespace ComputeShaders {
     const LPCWSTR DebugView = L"debugView.cso";
 
     const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
+    const LPCWSTR FinalizePathtracedResult = L"finalizePathtracedResult.cso";
     //const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 
     const LPCWSTR ClearPhotonEmissionGuideMap = L"clearPhotonEmissionGuideMap.cso";
@@ -546,8 +547,9 @@ private:
     ComPtr <ID3D12Resource> mFinalRenderResult;
     dx12::Descriptor mFinalRenderResultDescriptorUAV;
     dx12::Descriptor mFinalRenderResultDescriptorSRV;
-    ComPtr<ID3D12Resource> mAccumulationBuffer;
-    dx12::Descriptor mAccumulationBufferDescriptorUAV;
+    ComPtr <ID3D12Resource> mPathtracedRenderResult;
+    dx12::Descriptor mPathtracedRenderDescriptorUAV;
+    dx12::Descriptor mPathtracedRenderDescriptorSRV;
     ComPtr<ID3D12Resource> mPhotonMap;
     dx12::Descriptor mPhotonMapDescriptorSRV;
     dx12::Descriptor mPhotonMapDescriptorUAV;
@@ -729,6 +731,10 @@ private:
     std::unordered_map < std::string, u32> mRegisterMapTemporalAccumulation;
     ComPtr<ID3D12PipelineState> mTemporalAccumulationPSO;
 
+    ComPtr<ID3D12RootSignature> mRsFinalizePathtracedResult;
+    std::unordered_map < std::string, u32> mRegisterMapFinalizePathtracedResult;
+    ComPtr<ID3D12PipelineState> mFinalizePathtracedResultPSO;
+
     //Emission Guiding
     ComPtr<ID3D12RootSignature> mRsClearPhotonEmissionGuideMap;
     std::unordered_map < std::string, u32> mRegisterMapClearPhotonEmissionGuideMap;
@@ -797,6 +803,7 @@ private:
     bool mIsUseDebugView;
     bool mIsUseIBL;
     bool mIsUseEmissivePolygon;
+    bool mIsUseMedianFiltering;
 
     LARGE_INTEGER mCpuFreq;
     LARGE_INTEGER mStartTime;
@@ -833,7 +840,7 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 4;
+    u32 mSpatialReuseTap = 3;
 
     bool mIsUseMetallicTest = false;
 

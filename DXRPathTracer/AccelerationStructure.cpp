@@ -190,34 +190,16 @@ void DXRPathTracer::CreateSceneInfo()
             material.roughness = 0.2;// rndF(mt);
             material.transColor = colorTbl[transIndex % _countof(colorTbl)];
             //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 0.8f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-
-            if (mModelTypeTbl[0] == ModelType_Dragon)
-            {
-                if (mSceneType == SceneType_Sponza)
-                {
-                    /* material.roughness = 0.3;
-                     material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
-                     material.albedo = (NormalOBJ0s == 1) ? XMVectorSet(0.5f, 1.0f, 1.0f, 0.0f) : colorTbl[albedoIndex % _countof(colorTbl)];*/
-                }
-                else
-                {
-                    material.roughness = 0.3;
-                    material.transColor = colorTbl[transIndex % _countof(colorTbl)];
-                    material.albedo = colorTbl[albedoIndex % _countof(colorTbl)];
-                }
-            }
-            else if (mModelTypeTbl[0] == ModelType_CurvedMesh)
+            if (mModelTypeTbl[0] == ModelType_CurvedMesh)
             {
                 material.transColor =colorTbl[transIndex % _countof(colorTbl)];
                 material.albedo =  colorTbl[albedoIndex % _countof(colorTbl)];
             }
-            else if (mSceneType == SceneType_Sponza)
-            {
-                material.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-                material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-            }
 
-            material.transRatio = 0.8;
+            material.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+            material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+
+            material.transRatio = 0.0;
 
             if (i == 1)
             {

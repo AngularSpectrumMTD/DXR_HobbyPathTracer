@@ -6,23 +6,21 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 **NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
 
-![Image](https://github.com/user-attachments/assets/79fd1092-95eb-42b0-ae4f-768af3c7dca5)
+![Image](https://github.com/user-attachments/assets/426a88fc-20ca-46a6-838d-e1c40ec03ad7)
 
 Results of the verification of the ReSTIR DI/GI
 
-![Image](https://github.com/user-attachments/assets/5402d00f-8d9c-4c28-b6d5-23395057d051)
+![Image](https://github.com/user-attachments/assets/e6023a3c-e608-413b-9df1-51d2fd6f272a)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
-
-![Image](https://github.com/user-attachments/assets/1e0f72aa-62e2-41f0-8dd1-6cef64b5d1de)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

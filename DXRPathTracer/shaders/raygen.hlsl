@@ -423,7 +423,7 @@ void temporalReuse()
 
 #define SPATIAL_REUSE_NUM 4
 
-void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in bool isTransparent)
+void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -433,17 +433,29 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     DIReservoir currDIReservoir = gDIReservoirBufferSrc[serialIndex];
     combineDIReservoirs(spatDIReservoir, currDIReservoir, currDIReservoir.W_sum, rand(randomSeed));
 
+    const bool isTransparent = isTransparentMaterial(centerMaterialParams);
+    float baseSpatialReusingRadius = getDIReservoirSpatialReuseBaseRadius();
+
+    if(isTransparent)
+    {
+        baseSpatialReusingRadius /= 2;
+        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
+    }
+    else
+    {
+        baseSpatialReusingRadius *= (centerMaterialParams.roughness + 0.5) / 1.5;
+        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius);
+    }
+
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
     {
         for(int s = 0; s < getDIReservoirSpatialReuseNum(); s++)
         {
-            //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
-            const float baseRadius = getDIReservoirSpatialReuseBaseRadius();
             float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
             float2 pos;
-            pos.x = baseRadius / 1.96 * gauss.x;
-            pos.y = baseRadius / 1.96 * gauss.y;
+            pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
+            pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
 
             int3 nearIndex = launchIndex + int3(pos, 0);
             
@@ -476,7 +488,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     spatDIReservoir.applyMCapping();
 }
 
-void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in bool isTransparent)
+void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -486,17 +498,29 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     GIReservoir currGIReservoir = gGIReservoirBufferSrc[serialIndex];
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand(randomSeed));
 
+    const bool isTransparent = isTransparentMaterial(centerMaterialParams);
+    float baseSpatialReusingRadius = getDIReservoirSpatialReuseBaseRadius();
+
+    if(isTransparent)
+    {
+        baseSpatialReusingRadius /= 2;
+        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
+    }
+    else
+    {
+        baseSpatialReusingRadius *= (centerMaterialParams.roughness + 0.5) / 1.5;
+        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius);
+    }
+
     //combine reservoirs
     if(isUseReservoirSpatialReuse())
     {
         for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {
-            //if we don't use USE_SPATIAL_RESERVOIR_FEEDBACK, we can use large number for this param.
-            const float baseRadius = isTransparent ? max(1, getDIReservoirSpatialReuseBaseRadius() / 4.0f) : getDIReservoirSpatialReuseBaseRadius();
             float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
             float2 pos;
-            pos.x = baseRadius / 1.96 * gauss.x;
-            pos.y = baseRadius / 1.96 * gauss.y;
+            pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
+            pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
 
             int3 nearIndex = launchIndex + int3(pos, 0);
             
@@ -556,7 +580,7 @@ void spatialReuse() {
     DIReservoir spatDIReservoir;
     spatDIReservoir.initialize();
 
-    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, isTransparentMaterial(screenSpaceMaterial));
+    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
 
     //Reevaluation
     {
@@ -589,7 +613,7 @@ void spatialReuse() {
     GIReservoir spatGIReservoir;
     spatGIReservoir.initialize();
 
-    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, isTransparentMaterial(screenSpaceMaterial));
+    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
 
     //Reevaluation
     {
