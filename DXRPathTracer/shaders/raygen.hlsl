@@ -474,8 +474,9 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isNearMaterial = (abs(centerMaterialParams.roughness - screenSpaceMaterialNear.roughness) < 0.1) && (abs(centerMaterialParams.metallic - screenSpaceMaterialNear.metallic) < 0.1);
 
-            const bool isSimilar = isNearDepth && isNearNormal;
+            const bool isSimilar = isNearDepth && isNearNormal && isNearMaterial;
             if(!isSimilar || (length(nearNormal) < 0.01) || (isTransparent != isTransparentMaterial(screenSpaceMaterialNear)))
             {
                 continue;
@@ -541,8 +542,9 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
             const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isNearMaterial = (abs(centerMaterialParams.roughness - screenSpaceMaterialNear.roughness) < 0.1) && (abs(centerMaterialParams.metallic - screenSpaceMaterialNear.metallic) < 0.1);
 
-            const bool isSimilar = isNearDepth && isNearNormal;
+            const bool isSimilar = isNearDepth && isNearNormal && isNearMaterial;
             if(!isSimilar || (length(nearNormal) < 0.01) || (isTransparent != isTransparentMaterial(screenSpaceMaterialNear)))// || isTransparentMaterial(screenSpaceMaterialNear))
             {
                 continue;

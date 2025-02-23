@@ -4,13 +4,19 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-**NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
+**NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, , PTTestRoom.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
 
-![Image](https://github.com/user-attachments/assets/426a88fc-20ca-46a6-838d-e1c40ec03ad7)
+![Image](https://github.com/user-attachments/assets/30eb6c7f-9333-4104-b63c-5d168b193680)
+
+![Image](https://github.com/user-attachments/assets/cf6fc26f-342a-456b-8f81-67880aeb12be)
+
+![Image](https://github.com/user-attachments/assets/1f46ba90-dff9-4257-b28f-a66a8d6fd0e2)
+
+![Image](https://github.com/user-attachments/assets/19930dc1-bc84-45ee-8ba6-cff27d6588d5)
 
 Results of the verification of the ReSTIR DI/GI
 
-![Image](https://github.com/user-attachments/assets/e6023a3c-e608-413b-9df1-51d2fd6f272a)
+![Image](https://github.com/user-attachments/assets/9b201620-ce51-47b7-b4d5-5b0e2a156c6e)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
