@@ -196,7 +196,7 @@ void DXRPathTracer::Setup()
                         mPhiDirectional = 100.0f; mThetaDirectional = 261.0f;
                         mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
                         mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
-                        mCausticsBoost = 0.014;
+                        mCausticsBoost = 0.05;
                         mLightRange = 0.29f;
 
                         mModelTypeTbl[0] = ModelType_Afrodyta;

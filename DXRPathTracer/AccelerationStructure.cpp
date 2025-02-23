@@ -216,6 +216,11 @@ void DXRPathTracer::CreateSceneInfo()
                 material.transRatio = 0;
             }
 
+            if (material.transRatio > 0)
+            {
+                material.roughness = max(0.05, material.roughness * 0.1);
+            }
+
 #ifdef GI_TEST
             material.transRatio = 0;// rndF(mt);
 #endif

@@ -438,7 +438,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
 
     if(isTransparent)
     {
-        baseSpatialReusingRadius /= 2;
+        baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
         baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
     }
     else
@@ -504,7 +504,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
 
     if(isTransparent)
     {
-        baseSpatialReusingRadius /= 2;
+        baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
         baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
     }
     else
