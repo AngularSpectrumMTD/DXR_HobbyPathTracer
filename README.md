@@ -4,7 +4,7 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-**NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, , PTTestRoom.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
+**NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, PTTestRoom.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
 
 ![Image](https://github.com/user-attachments/assets/d082c2c7-0898-4a18-a622-1e687b7b2d33)
 
