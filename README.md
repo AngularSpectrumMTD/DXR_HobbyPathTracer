@@ -81,3 +81,5 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F6 : enable / disable SSS
 - F7 : enable / disable IBL
 - F8 : enable / disable Directional Light
+- F9 : enable / disable Emissive Polygons
+- F11 : enable / disable Median Filter
