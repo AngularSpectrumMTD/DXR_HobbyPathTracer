@@ -14,6 +14,8 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 ![Image](https://github.com/user-attachments/assets/5cefc8e8-d599-48a2-8397-e7bd2e73765e)
 
+![Image](https://github.com/user-attachments/assets/efc96033-8635-4da5-86a8-682684400fa3)
+
 Results of the verification of the ReSTIR DI/GI
 
 ![Image](https://github.com/user-attachments/assets/548478da-d473-455f-8cca-90647a7c489d)
