@@ -16,25 +16,30 @@ PTTestRoom.mtl/obj
 roomTestExp.mtl/obj 
 are made by owner of this repository(AngularSpectrumMTD)**
 
-![Image](https://github.com/user-attachments/assets/1441ae05-31d2-42c0-baee-9e77678237d8)
+![Image](https://github.com/user-attachments/assets/5a6ee6b5-7896-44d7-aef9-55491c47c571)
 
-![Image](https://github.com/user-attachments/assets/7b03603d-8893-401c-8d73-9f8fce60c930)
+![Image](https://github.com/user-attachments/assets/4776ccb1-032c-44b8-89ad-e369f2caf939)
 
-![Image](https://github.com/user-attachments/assets/758e3e65-4f1a-49bd-9efe-3be881d80698)
+![Image](https://github.com/user-attachments/assets/2718445f-fe24-4c53-be03-19ee9680daf9)
 
-![Image](https://github.com/user-attachments/assets/de8a84f6-ac51-4e41-b163-6ffa5c00728e)
+![Image](https://github.com/user-attachments/assets/4c139b81-9a05-4bb5-a8a7-e47ffff8cc39)
 
-![Image](https://github.com/user-attachments/assets/37914beb-863a-4990-add4-938f01510a7e)
+![Image](https://github.com/user-attachments/assets/ea70f742-d7b6-430e-8068-ff13134bc7b6)
 
-![Image](https://github.com/user-attachments/assets/00de085d-804f-4fc5-a531-c3a928daacf8)
+![Image](https://github.com/user-attachments/assets/2b12b3d5-b8fd-41d2-848c-10a16ccc27f7)
 
-![Image](https://github.com/user-attachments/assets/af7fb92e-c273-4f0c-b311-a14c15783022)
+![Image](https://github.com/user-attachments/assets/e4091777-5256-42af-9cd8-b2c333fbfaa8)
 
-![Image](https://github.com/user-attachments/assets/e903502b-3c03-4df0-85db-23f6701ada9d)
+![Image](https://github.com/user-attachments/assets/740bb41f-93d1-483c-a963-2350b914f00f)
 
 Results of the verification of the ReSTIR DI/GI
 
-![Image](https://github.com/user-attachments/assets/baaa5071-d8e1-4c85-a36f-fadffa6fbe27)
+![Image](https://github.com/user-attachments/assets/2d5e0bc1-5be7-42a3-b147-a20d4a34b3c9)
+
+![Image](https://github.com/user-attachments/assets/a0bd9ff5-a9ad-4f53-aaec-c6ff531e88b3)
+
+![Image](https://github.com/user-attachments/assets/fe70c510-6fa2-4ee9-8d71-b4e40278ca60)
+
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -44,7 +49,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza

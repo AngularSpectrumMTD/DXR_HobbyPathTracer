@@ -54,6 +54,9 @@
 
 #define OBJ_COUNT 2
 
+#define DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 4
+#define GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 6
+
 //#define USE_SSS
 
 namespace HitGroups {

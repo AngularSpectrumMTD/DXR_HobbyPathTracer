@@ -1271,8 +1271,8 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             XMUINT4 d;
             d.x = 8;// max(1, 1 + 2 * i);//DIReservoirSpatialReuseNum
             d.y = 8;// max(1, 1 + 1 * i);//GIReservoirSpatialReuseNum
-            d.z = max(1, 12 - (i + 1));//DIReservoirSpatialReuseBaseRadius
-            d.w = max(1, 12 - (i + 1));//GIReservoirSpatialReuseBaseRadius
+            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS - (i + 1));//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS - (i + 1));//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();
