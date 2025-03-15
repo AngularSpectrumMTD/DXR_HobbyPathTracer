@@ -34,12 +34,11 @@ are made by owner of this repository(AngularSpectrumMTD)**
 
 Results of the verification of the ReSTIR DI/GI
 
-![Image](https://github.com/user-attachments/assets/2d5e0bc1-5be7-42a3-b147-a20d4a34b3c9)
+![Image](https://github.com/user-attachments/assets/0cbe082e-a4e7-4822-8225-31fe062f791f)
 
-![Image](https://github.com/user-attachments/assets/a0bd9ff5-a9ad-4f53-aaec-c6ff531e88b3)
+![Image](https://github.com/user-attachments/assets/8ddb74ed-572a-47de-a641-34ee3c62ab81)
 
-![Image](https://github.com/user-attachments/assets/fe70c510-6fa2-4ee9-8d71-b4e40278ca60)
-
+![Image](https://github.com/user-attachments/assets/593e0571-f1e7-423e-8163-42507e56ee56)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
