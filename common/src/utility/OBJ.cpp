@@ -639,7 +639,8 @@ namespace utility {
 			{
 				MaterialParam mparams;
 				mparams.albedo = XMVectorSet(cpuMaterial.Reflection4Color.diffuse.x, cpuMaterial.Reflection4Color.diffuse.y, cpuMaterial.Reflection4Color.diffuse.z, cpuMaterial.Reflection4Color.diffuse.w);
-				mparams.specular = (cpuMaterial.Reflection4Color.specular.x + cpuMaterial.Reflection4Color.specular.y + cpuMaterial.Reflection4Color.specular.z + cpuMaterial.Reflection4Color.specular.w) / 4.0f;
+				//based on Principled BSDF(I think MultiscatterGGX's IOR Level on blender means "metallic")
+				mparams.specular = (cpuMaterial.Reflection4Color.specular.x + cpuMaterial.Reflection4Color.specular.y + cpuMaterial.Reflection4Color.specular.z) / 3.0f;
 				mparams.metallic = mparams.specular;
 				//https://blender.stackexchange.com/questions/149755/changing-the-specular-exponent-of-principled-bsdf-with-texture-when-exporting-to
 				//based on Principled BSDF

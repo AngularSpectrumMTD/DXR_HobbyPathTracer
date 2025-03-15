@@ -418,6 +418,7 @@ private:
         SceneType_PTTestRobot,
         SceneType_PTTestRoom,
         SceneType_MaterialTest,
+        SceneType_Corridor,
     };
 
     enum Spectrum

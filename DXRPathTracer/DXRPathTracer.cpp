@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom;
+    mSceneType = SceneType_Corridor;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -504,6 +504,48 @@ void DXRPathTracer::Setup()
             mGatherRadius = 0.5f;
 
             mIsApplyCaustics = true;
+        }
+        break;
+        case SceneType_Corridor:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            //mInitEyePos = XMFLOAT3(-6, 78, 165);
+            //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+            mInitEyePos = XMFLOAT3(9.9, 77, 161);
+            mInitTargetPos = XMFLOAT3(-13.2, 81, 103.7);
+
+            mOBJFileName = "Corridor.obj";
+            mOBJFolderName = "model/Corridor";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 70, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = 10.36f; mLightPosY = 118.0f; mLightPosZ = 11.49f;
+            mPhi = -83.0f; mTheta = 121.0f;
+
+            mLightRange = 1.2f;
+
+            mCausticsBoost = 0.05;
+            mGatherBlockRange = 2;  
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mIsUseDirectionalLight = false;
+
+            mGatherRadius = 0.5f;
+
+            mIsApplyCaustics = false;
+            mIsUseIBL = false;
         }
         break;
     }

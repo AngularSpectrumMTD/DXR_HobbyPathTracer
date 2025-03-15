@@ -4,21 +4,37 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
-**NOTE : MaterialTest.mtl/obj, Kitchen.mtl/obj, GITest.mtl/obj, PTTest.mtl/obj, PTTestBrick.mtl/obj, PTTestRobot.mtl/obj, PTTestRoom.mtl/obj, roomTestExp.mtl/obj are made by owner of this repository(AngularSpectrumMTD)**
+**NOTE : 
+MaterialTest.mtl/obj
+Corridor.mtl/obj
+Kitchen.mtl/obj
+GITest.mtl/obj
+PTTest.mtl/obj
+PTTestBrick.mtl/obj
+PTTestRobot.mtl/obj
+PTTestRoom.mtl/obj
+roomTestExp.mtl/obj 
+are made by owner of this repository(AngularSpectrumMTD)**
 
-![Image](https://github.com/user-attachments/assets/76224fd4-24fe-497b-9c71-e402d47f4c3f)
+![Image](https://github.com/user-attachments/assets/1441ae05-31d2-42c0-baee-9e77678237d8)
 
-![Image](https://github.com/user-attachments/assets/1dfca0ea-9ec3-4907-bbc8-9ac06ec7ef72)
+![Image](https://github.com/user-attachments/assets/7b03603d-8893-401c-8d73-9f8fce60c930)
 
-![Image](https://github.com/user-attachments/assets/1ab5dcf4-c1bd-4b1a-afde-633168f0cdaa)
+![Image](https://github.com/user-attachments/assets/758e3e65-4f1a-49bd-9efe-3be881d80698)
 
-![Image](https://github.com/user-attachments/assets/5cefc8e8-d599-48a2-8397-e7bd2e73765e)
+![Image](https://github.com/user-attachments/assets/de8a84f6-ac51-4e41-b163-6ffa5c00728e)
 
-![Image](https://github.com/user-attachments/assets/efc96033-8635-4da5-86a8-682684400fa3)
+![Image](https://github.com/user-attachments/assets/37914beb-863a-4990-add4-938f01510a7e)
+
+![Image](https://github.com/user-attachments/assets/00de085d-804f-4fc5-a531-c3a928daacf8)
+
+![Image](https://github.com/user-attachments/assets/af7fb92e-c273-4f0c-b311-a14c15783022)
+
+![Image](https://github.com/user-attachments/assets/e903502b-3c03-4df0-85db-23f6701ada9d)
 
 Results of the verification of the ReSTIR DI/GI
 
-![Image](https://github.com/user-attachments/assets/548478da-d473-455f-8cca-90647a7c489d)
+![Image](https://github.com/user-attachments/assets/baaa5071-d8e1-4c85-a36f-fadffa6fbe27)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
