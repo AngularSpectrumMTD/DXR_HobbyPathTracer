@@ -278,6 +278,7 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         mRsTemporalAccumulation = rsCreater.Create(mDevice, false, L"rsTemporalAccumulation");
         CreateComputeShaderStateObject(ComputeShaders::TemporalAccumulation, mTemporalAccumulationPSO, mRsTemporalAccumulation);
         mRegisterMapTemporalAccumulation.clear();
@@ -300,6 +301,7 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
+        mRegisterMapTemporalAccumulation["ScreenSpaceMaterial"] = mRegisterMapTemporalAccumulation.size();
     }
 
     {

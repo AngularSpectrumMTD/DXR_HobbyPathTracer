@@ -5,6 +5,7 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "compressionUtility.hlsli"
 #include "materialParams.hlsli"
 
+#define REINHARD_L 1000
 #define THREAD_NUM 16
 
 Texture2D<float4> NormalDepthBuffer : register(t0);
@@ -110,5 +111,8 @@ void finalizePathtracedResult(uint3 dtid : SV_DispatchThreadID)
         }
     }
 
+    const float3 modAlbedo = modulatedAlbedo(material);
+    finalCol.rgb = float3(finalCol.rgb * reinhard(computeLuminance(finalCol.rgb), REINHARD_L) / computeLuminance(finalCol.rgb));//luminance based tone mapping
+    finalCol.rgb *= modAlbedo;
     FinalizedPathtracedResult[currID] = finalCol;
 }

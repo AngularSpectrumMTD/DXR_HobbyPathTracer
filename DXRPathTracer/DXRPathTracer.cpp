@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_Corridor;
+    mSceneType = SceneType_MaterialTest;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -86,7 +86,7 @@ void DXRPathTracer::Setup()
     mIsUseTexture = true;
     mIsUseDebugView = false;
     mTargetModelIndex = 0;
-    mIsUseTemporalAccumulation = false;
+    mIsUseTemporalAccumulation = true;
     mIsIndirectOnly = false;
     mIsUseNEE = true;
     mIsUseManySphereLightLighting = false;
@@ -97,9 +97,10 @@ void DXRPathTracer::Setup()
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
     mIsUseReservoirSpatialReuse = true;
-    mIsTemporalAccumulationForceDisable = true;
+    mIsTemporalAccumulationForceDisable = false ;
     mIsUseEmissivePolygon = true;
-    mIsUseMedianFiltering = true;
+    mIsUseMedianFiltering = false;
+    mSpatialReuseTap = 4;//Most Important Param For Getting High Quality Spatial Resampling Result
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -193,9 +194,9 @@ void DXRPathTracer::Setup()
                         //mModelTypeTbl[0] = ModelType_Afrodyta;
                         mModelTypeTbl[0] = ModelType_Dragon;
                         //mModelTypeTbl[0] = ModelType_SimpleCube;
-                        mPhiDirectional = 100.0f; mThetaDirectional = 261.0f;
-                        mInitEyePos = XMFLOAT3(38.6f, 14.23, -1.55f);
-                        mInitTargetPos = XMFLOAT3(12.37f, 7.95, -7.3f);
+                        mPhiDirectional = 100.0f; mThetaDirectional = 247.0f;
+                        mInitEyePos = XMFLOAT3(63.2f, 34.2f, -19.1f);
+                        mInitTargetPos = XMFLOAT3(39.1f, 31.3f, -6.0f);
                         mCausticsBoost = 0.05;
                         mLightRange = 0.29f;
 
@@ -471,15 +472,15 @@ void DXRPathTracer::Setup()
         case SceneType_MaterialTest:
         {
             mLightAreaScale = 6;
-            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+            mPhiDirectional = 165.0f; mThetaDirectional = 272;
 
             //near
             //mInitEyePos = XMFLOAT3(-85, 64, -18);
             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
 
             //far
-            mInitEyePos = XMFLOAT3(75.9, 142, -48);
-            mInitTargetPos = XMFLOAT3(33.5, 115, -17.4);
+            mInitEyePos = XMFLOAT3(165.5, 101.0, 154.6);
+            mInitTargetPos = XMFLOAT3(139.5, 96.2, 111.4);
 
             mOBJFileName = "MaterialTest.obj";
             mOBJFolderName = "model/MaterialTest";
@@ -488,7 +489,7 @@ void DXRPathTracer::Setup()
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
 
-            mLightPosX = 10.36f; mLightPosY = 118.0f; mLightPosZ = 11.49f;
+            mLightPosX = 10.36f; mLightPosY = 218.0f; mLightPosZ = 11.49f;
             mPhi = -83.0f; mTheta = 121.0f;
 
             mLightRange = 1.2f;
@@ -499,7 +500,7 @@ void DXRPathTracer::Setup()
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
 
-            mIsUseDirectionalLight = false;
+            mIsUseDirectionalLight = true;
 
             mGatherRadius = 0.5f;
 
@@ -1016,6 +1017,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+        //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
         mCommandList->DispatchRays(&mDispatchPhotonRayDesc);
@@ -1141,6 +1143,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+    //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
     mCommandList->DispatchRays(&mDispatchRayDesc);
@@ -1217,6 +1220,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+        //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirTemporalReuse["gReSTIRParam"], mReSTIRParamCBTbl[0]->GetGPUVirtualAddress());
         mCommandList->SetPipelineState1(mRTPSOReservoirTemporalReuse.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "ReservoirTemporalReuse");
@@ -1269,10 +1273,10 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         {
             ReSTIRParam cb;
             XMUINT4 d;
-            d.x = 8;// max(1, 1 + 2 * i);//DIReservoirSpatialReuseNum
-            d.y = 8;// max(1, 1 + 1 * i);//GIReservoirSpatialReuseNum
-            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS - (i + 1));//DIReservoirSpatialReuseBaseRadius
-            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS - (i + 1));//GIReservoirSpatialReuseBaseRadius
+            d.x = max(1, 8 - 2 * i);//DIReservoirSpatialReuseNum
+            d.y = max(1, 6 - 1 * i);//GIReservoirSpatialReuseNum
+            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 2 * (i + 1));//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 4 * (i + 1));//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();
@@ -1309,6 +1313,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+            //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
             PIXBeginEvent(mCommandList.Get(), 0, "ReservoirSpatialReuse");
@@ -1373,6 +1378,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["GIReservoirBufferSrc"], mGISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetPipelineState(mTemporalAccumulationPSO.Get());

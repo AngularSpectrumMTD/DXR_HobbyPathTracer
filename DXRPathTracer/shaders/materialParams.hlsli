@@ -86,4 +86,23 @@ CompressedMaterialParams compressMaterialParams(in MaterialParams original)
     return compressed;
 }
 
+float3 modulatedAlbedo(in MaterialParams material)
+{
+    float3 modulatedColor = 1.xxx;
+    float3 matAlbedo = material.albedo.xyz;
+    if(matAlbedo.r > 0)
+    {
+        modulatedColor.r = matAlbedo.r;
+    }
+    if(matAlbedo.g > 0)
+    {
+        modulatedColor.g = matAlbedo.g;
+    }
+    if(matAlbedo.b > 0)
+    {
+        modulatedColor.b = matAlbedo.b;
+    }
+    return modulatedColor;
+}
+
 #endif//__MATERIAL_PARAMS_HLSLI__

@@ -54,8 +54,8 @@
 
 #define OBJ_COUNT 2
 
-#define DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 4
-#define GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 6
+#define DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 2
+#define GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS 2
 
 //#define USE_SSS
 
@@ -844,7 +844,7 @@ private:
     bool mIsUseReservoirTemporalReuse = false;
     bool mIsUseReservoirSpatialReuse = false;
 
-    u32 mSpatialReuseTap = 3;
+    u32 mSpatialReuseTap = 1;
 
     bool mIsUseMetallicTest = false;
 
