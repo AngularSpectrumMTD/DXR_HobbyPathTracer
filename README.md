@@ -18,8 +18,8 @@ PTTestRoom.mtl/obj
 roomTestExp.mtl/obj 
 are made by owner of this repository(AngularSpectrumMTD)**
 
-MaterialTest
-![Image](https://github.com/user-attachments/assets/7cb8b88b-671c-4ef3-87c0-a26a348ab934)
+MaterialTest  
+![Image](https://github.com/user-attachments/assets/3d9c1f4d-f2bf-4eb7-97ac-272b45117989)
 
 Corridor
 ![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
@@ -42,8 +42,8 @@ Robot
 Room
 ![Image](https://github.com/user-attachments/assets/4060169f-233c-406c-9e4f-ea0af8c8db94)
 
-Results of the verification of the ReSTIR DI/GI
-![Image](https://github.com/user-attachments/assets/46aa8584-5519-4426-a34d-efadcb089dd0)
+Results of the verification of the ReSTIR DI/GI  
+![Image](https://github.com/user-attachments/assets/80e60c10-c40b-4c72-91e2-9626432d12da)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
