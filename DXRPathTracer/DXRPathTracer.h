@@ -21,6 +21,8 @@
 
 //#define GI_TEST
 
+#define FORMAT_FINAL_RENDER_RESULT DXGI_FORMAT_R8G8B8A8_UNORM
+
 #define STAGE_DIVISION 4
 #define STAGE_DIVISION_FOR_LIGHT_POSITION 20
 
@@ -277,6 +279,7 @@ private:
         XMUINT4 additional1;
         XMUINT4 additional2;
         XMVECTOR sssParam;
+        XMVECTOR toneMappingParam;
     };
 
     struct PhotonInfo
@@ -413,9 +416,9 @@ private:
         SceneType_BistroExterior,
         SceneType_BistroInterior,
         SceneType_SanMiguel,
-        SceneType_Room,
-        SceneType_GITest,
-        SceneType_Kitchen,
+        //SceneType_Room,
+        //SceneType_GITest,
+        //SceneType_Kitchen,
         SceneType_PTTest,
         SceneType_PTTestBrick,
         SceneType_PTTestRobot,
@@ -862,6 +865,7 @@ private:
     bool mIsUseDirectionalLight = true;
 
     u32 mMoveFrame = 0;
+    f32 mExposure = 1.0f;
 };
 
 #endif

@@ -22,6 +22,7 @@ struct SceneCB
     uint4 additional1;
     uint4 additional2;
     float4 sssParam;
+    float4 toneMappingParam;
 };
 
 #endif//__SCENE_CB_DEFINITION_HLSLI__

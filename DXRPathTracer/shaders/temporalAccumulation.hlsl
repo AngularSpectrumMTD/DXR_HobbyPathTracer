@@ -6,7 +6,6 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "reservoir.hlsli"
 
 #define THREAD_NUM 16
-#define REINHARD_L 1000
 #define MAX_ACCUMULATION_RANGE 10000
 
 Texture2D<float4> HistoryDIBuffer : register(t0);
@@ -39,31 +38,6 @@ bool isWithinBounds(int2 id, int2 size)
 float computeLuminance(const float3 linearRGB)
 {
     return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
-}
-
-float reinhard(float x, float L)
-{
-    return (x / (1 + x)) * (1 + x / L / L);
-}
-
-float3 reinhard3f(float3 v, float L)
-{
-    return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
-}
-
-float ACESFilmicTonemapping(float x)
-{
-    const float a = 2.51;
-    const float b = 0.03;
-    const float c = 2.43;
-    const float d = 0.59;
-    const float e = 0.14;
-    return saturate(x * (a * x + b) / (x * (c * x + d) + c));
-}
-
-float3 ACESFilmicTonemapping3f(float3 v)
-{
-    return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
 }
 
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
@@ -147,9 +121,7 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
         currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
 
-        float3 toneMappedDIGI = float3(accumulatedDIGI * reinhard(computeLuminance(accumulatedDIGI), REINHARD_L) / computeLuminance(accumulatedDIGI));//luminance based tone mapping
-        //DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * accumulatedCaustics;//Tonemapped
-        DIGIBuffer[currID].rgb = accumulatedDIGI + getCausticsBoost() * accumulatedCaustics;//UnTonemapped
+        DIGIBuffer[currID].rgb = accumulatedDIGI + getCausticsBoost() * accumulatedCaustics;
         CurrentDIBuffer[currID].rgb = accumulatedDI;
         CurrentGIBuffer[currID].rgb = accumulatedGI;
         CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
@@ -159,9 +131,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     {
         AccumulationCountBuffer[currID] = 1;
         float3 currDIGI = currDI + currGI;
-        float3 toneMappedDIGI = float3(currDIGI * reinhard(computeLuminance(currDIGI), REINHARD_L) / computeLuminance(currDIGI));//luminance based tone mapping
-        //DIGIBuffer[currID].rgb = toneMappedDIGI + getCausticsBoost() * currCaustics;//Tonemapped
-        DIGIBuffer[currID].rgb = currDIGI + getCausticsBoost() * currCaustics;//UnTonemapped
+
+        DIGIBuffer[currID].rgb = currDIGI + getCausticsBoost() * currCaustics;
         CurrentDIBuffer[currID].rgb = currDI;
         CurrentGIBuffer[currID].rgb = currGI;
         CurrentCausticsBuffer[currID].rgb = currCaustics;

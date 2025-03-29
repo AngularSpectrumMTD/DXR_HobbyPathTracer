@@ -116,10 +116,10 @@ void DXRPathTracer::CreateRegularBuffer()
         mRandomNumberBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mRandomNumberBuffer.Get(), &uavDesc);
     }
 
-    //RayTraced Result
+    //Final Result
     {
         mFinalRenderResult = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
+            width, height, FORMAT_FINAL_RENDER_RESULT,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
             D3D12_RESOURCE_STATE_COPY_SOURCE,
             D3D12_HEAP_TYPE_DEFAULT,
@@ -141,7 +141,7 @@ void DXRPathTracer::CreateRegularBuffer()
     //RayTraced Result
     {
         mPathtracedRenderResult = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
+            width, height, DXGI_FORMAT_R32G32B32A32_FLOAT,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
             D3D12_RESOURCE_STATE_COPY_SOURCE,
             D3D12_HEAP_TYPE_DEFAULT,
@@ -163,7 +163,7 @@ void DXRPathTracer::CreateRegularBuffer()
     //Denoised Color
     {
         mDenoisedColorBuffer = mDevice->CreateTexture2D(
-            width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
+            width, height, DXGI_FORMAT_R32G32B32A32_FLOAT,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
             D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
             D3D12_HEAP_TYPE_DEFAULT,

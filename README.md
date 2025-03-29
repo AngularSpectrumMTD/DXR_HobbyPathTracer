@@ -4,6 +4,8 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI (Prototype)
 - Emission Guided Photon Mapping  
 
+https://github.com/user-attachments/assets/8d6d50cd-3ef6-43cc-89b2-e760781940da
+
 **NOTE : 
 MaterialTest.mtl/obj
 Corridor.mtl/obj
@@ -16,29 +18,32 @@ PTTestRoom.mtl/obj
 roomTestExp.mtl/obj 
 are made by owner of this repository(AngularSpectrumMTD)**
 
-![Image](https://github.com/user-attachments/assets/5a6ee6b5-7896-44d7-aef9-55491c47c571)
+MaterialTest
+![Image](https://github.com/user-attachments/assets/7cb8b88b-671c-4ef3-87c0-a26a348ab934)
 
-![Image](https://github.com/user-attachments/assets/4776ccb1-032c-44b8-89ad-e369f2caf939)
+Corridor
+![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
 
-![Image](https://github.com/user-attachments/assets/2718445f-fe24-4c53-be03-19ee9680daf9)
+Sponza
+![Image](https://github.com/user-attachments/assets/3fc94f4d-a5fa-46f4-8bff-707b4a965a2c)
 
-![Image](https://github.com/user-attachments/assets/4c139b81-9a05-4bb5-a8a7-e47ffff8cc39)
+BistroExterior
+![Image](https://github.com/user-attachments/assets/5937affe-b9de-4c75-904f-451a96efcaa3)
 
-![Image](https://github.com/user-attachments/assets/ea70f742-d7b6-430e-8068-ff13134bc7b6)
+BistroInterior
+![Image](https://github.com/user-attachments/assets/981619e1-03a7-47dd-8694-b29a7d22bb86)
 
-![Image](https://github.com/user-attachments/assets/2b12b3d5-b8fd-41d2-848c-10a16ccc27f7)
+Brick
+![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)
 
-![Image](https://github.com/user-attachments/assets/e4091777-5256-42af-9cd8-b2c333fbfaa8)
+Robot
+![Image](https://github.com/user-attachments/assets/7f7fd6ca-1521-4ab3-ad51-1e5a44171802)
 
-![Image](https://github.com/user-attachments/assets/740bb41f-93d1-483c-a963-2350b914f00f)
+Room
+![Image](https://github.com/user-attachments/assets/4060169f-233c-406c-9e4f-ea0af8c8db94)
 
 Results of the verification of the ReSTIR DI/GI
-
-![Image](https://github.com/user-attachments/assets/0cbe082e-a4e7-4822-8225-31fe062f791f)
-
-![Image](https://github.com/user-attachments/assets/8ddb74ed-572a-47de-a641-34ee3c62ab81)
-
-![Image](https://github.com/user-attachments/assets/593e0571-f1e7-423e-8163-42507e56ee56)
+![Image](https://github.com/user-attachments/assets/46aa8584-5519-4426-a34d-efadcb089dd0)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -48,7 +53,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" or "SceneType_GITest" or "SceneType_Kitchen" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
 2. Build and Execute  
 ---
 #### With Sponza
@@ -105,3 +110,4 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F8 : enable / disable Directional Light
 - F9 : enable / disable Emissive Polygons
 - F11 : enable / disable Median Filter
+- F12 : increase / decrease the value of Exposure

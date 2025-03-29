@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_MaterialTest;
+    mSceneType = SceneType_PTTestRobot;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -101,6 +101,7 @@ void DXRPathTracer::Setup()
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
     mSpatialReuseTap = 4;//Most Important Param For Getting High Quality Spatial Resampling Result
+    mExposure = 0;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -266,8 +267,8 @@ void DXRPathTracer::Setup()
             {
                 mLightPosX = 41; mLightPosY = 11.3f; mLightPosZ = -24.1f;
                 mPhi = 371; mTheta = -84;
-                mInitEyePos = XMFLOAT3(28, 12, 0.2);
-                mInitTargetPos = XMFLOAT3(69, 9.36, -5.2f);
+                mInitEyePos = XMFLOAT3(17, 12.5, -13.5);
+                mInitTargetPos = XMFLOAT3(57.6, 4.5, -9.8f);
                 mLightRange = 1.2f;
             }
             
@@ -275,6 +276,7 @@ void DXRPathTracer::Setup()
             mIsSpotLightPhotonMapper = false;
             mCausticsBoost = 0.0002f;
             mGatherRadius = 0.011f;
+            mIsUseDirectionalLight = false;
         }
         break;
         case SceneType_SanMiguel:
@@ -297,7 +299,7 @@ void DXRPathTracer::Setup()
             mIsSpotLightPhotonMapper = false;
         }
         break;
-        case SceneType_Room:
+      /*  case SceneType_Room:
         {
             mPhiDirectional = 41.0f; mThetaDirectional = 245.0f;
             mInitEyePos = XMFLOAT3(-7.69f, 4.48, 18.3f);
@@ -360,7 +362,7 @@ void DXRPathTracer::Setup()
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mIntensityBoost *= 3;
         }
-        break;
+        break;*/
         case SceneType_PTTest:
         {
             mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
@@ -684,11 +686,11 @@ void DXRPathTracer::Setup()
         mOBJFileNameTbl[0] = L"model/aphorodite/Tri_Deci_Rz_123_Afrodyta_z_Melos.obj";
         mObjYOffsetTbl[0] = 8;
         mObjScaleTbl[0] = XMFLOAT3(0.1f, 0.1f, 0.1f);
-        if (mSceneType == SceneType_Room)
+     /*   if (mSceneType == SceneType_Room)
         {
             mObjYOffsetTbl[0] = 16;
             mObjScaleTbl[0] = XMFLOAT3(0.02f, 0.02f, 0.02f);
-        }
+        }*/
         if (mSceneType == SceneType_PTTestBrick)
         {
             mObjYOffsetTbl[0] = 14;
@@ -1541,6 +1543,7 @@ void DXRPathTracer::Update()
     mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
     mSceneParam.additional2.y = mIsUseEmissivePolygon ? 1 : 0;
     mSceneParam.additional2.z = mIsUseMedianFiltering ? 1 : 0;
+    mSceneParam.toneMappingParam = XMVectorSet(mExposure, 0, 0, 0);
 
     if (!mIsTemporalAccumulationForceDisable)
     {
@@ -1745,6 +1748,9 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         break;
     case VK_F11:
         mIsUseMedianFiltering = !mIsUseMedianFiltering;
+        break;
+    case VK_F12:
+        mExposure = Clamp(-10, 10, mExposure + (mInverseMove ? -1 : 1));
         break;
     }
 }

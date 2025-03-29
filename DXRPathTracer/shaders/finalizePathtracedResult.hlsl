@@ -5,7 +5,6 @@ ConstantBuffer<SceneCB> gSceneParam : register(b0);
 #include "compressionUtility.hlsli"
 #include "materialParams.hlsli"
 
-#define REINHARD_L 1000
 #define THREAD_NUM 16
 
 Texture2D<float4> NormalDepthBuffer : register(t0);
@@ -26,29 +25,11 @@ float computeLuminance(const float3 linearRGB)
     return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
 }
 
-float reinhard(float x, float L)
+float3 reinhard(in float3 col)
 {
-    return (x / (1 + x)) * (1 + x / L / L);
-}
-
-float3 reinhard3f(float3 v, float L)
-{
-    return float3(reinhard(v.x, L), reinhard(v.y, L), reinhard(v.z, L));
-}
-
-float ACESFilmicTonemapping(float x)
-{
-    const float a = 2.51;
-    const float b = 0.03;
-    const float c = 2.43;
-    const float d = 0.59;
-    const float e = 0.14;
-    return saturate(x * (a * x + b) / (x * (c * x + d) + c));
-}
-
-float3 ACESFilmicTonemapping3f(float3 v)
-{
-    return float3(ACESFilmicTonemapping(v.x), ACESFilmicTonemapping(v.y), ACESFilmicTonemapping(v.z));
+    col.rgb *= exp2(exposure());
+    col.rgb /= 1.0 + col.rgb;
+    return col;
 }
 
 #define minMaxSwap(a, b)				temp = a; a = min(a, b); b = max(temp, b);
@@ -110,9 +91,8 @@ void finalizePathtracedResult(uint3 dtid : SV_DispatchThreadID)
             finalCol = origCol;
         }
     }
-
-    const float3 modAlbedo = modulatedAlbedo(material);
-    finalCol.rgb = float3(finalCol.rgb * reinhard(computeLuminance(finalCol.rgb), REINHARD_L) / computeLuminance(finalCol.rgb));//luminance based tone mapping
-    finalCol.rgb *= modAlbedo;
+    
+    finalCol.rgb *= modulatedAlbedo(material);
+    finalCol.rgb = reinhard(finalCol.rgb);
     FinalizedPathtracedResult[currID] = finalCol;
 }
