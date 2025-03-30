@@ -772,6 +772,11 @@ void DXRPathTracer::Setup()
             mObjYOffsetTbl[1] = 90;
             mObjScaleTbl[1] = XMFLOAT3(12, 12, 12);
         }
+        else if (mSceneType == SceneType_MaterialTest)
+        {
+            mObjYOffsetTbl[1] = -1;
+            mObjScaleTbl[1] = XMFLOAT3(6, 6, 6);
+        }
         else
         {
 #ifdef CUBE_TEST

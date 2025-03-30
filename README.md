@@ -1,25 +1,10 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
-- ReSTIR DI
-- ReSTIR GI (Prototype)
-- Emission Guided Photon Mapping  
 
 https://github.com/user-attachments/assets/8d6d50cd-3ef6-43cc-89b2-e760781940da
 
-**NOTE : 
-MaterialTest.mtl/obj
-Corridor.mtl/obj
-Kitchen.mtl/obj
-GITest.mtl/obj
-PTTest.mtl/obj
-PTTestBrick.mtl/obj
-PTTestRobot.mtl/obj
-PTTestRoom.mtl/obj
-roomTestExp.mtl/obj 
-are made by owner of this repository(AngularSpectrumMTD)**
-
 MaterialTest  
-![Image](https://github.com/user-attachments/assets/3d9c1f4d-f2bf-4eb7-97ac-272b45117989)
+![Image](https://github.com/user-attachments/assets/c0639c7c-a2b8-45f0-bd41-55d1d2165b56)
 
 Corridor
 ![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
@@ -42,8 +27,13 @@ Robot
 Room
 ![Image](https://github.com/user-attachments/assets/4060169f-233c-406c-9e4f-ea0af8c8db94)
 
+### Algorithm
+- ReSTIR DI
+- ReSTIR GI
+- Emission Guided Photon Mapping  
+
 Results of the verification of the ReSTIR DI/GI  
-![Image](https://github.com/user-attachments/assets/80e60c10-c40b-4c72-91e2-9626432d12da)
+![Image](https://github.com/user-attachments/assets/219bf28d-36bb-431c-9970-fda52eecacfb)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -53,7 +43,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  
+1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  (MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom.mtl/obj are made by owner of this repository(AngularSpectrumMTD))
 2. Build and Execute  
 ---
 #### With Sponza
