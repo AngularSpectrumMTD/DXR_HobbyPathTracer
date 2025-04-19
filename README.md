@@ -3,6 +3,16 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 https://github.com/user-attachments/assets/8d6d50cd-3ef6-43cc-89b2-e760781940da
 
+Room2
+
+![Image](https://github.com/user-attachments/assets/92bbf2ad-40a8-4cd4-8f30-af8d42f610a7)
+
+![Image](https://github.com/user-attachments/assets/aa79c9ba-1003-40de-9951-8d38720aae86)
+
+![Image](https://github.com/user-attachments/assets/076575b4-7d99-46df-91a8-966792481c4f)
+
+![Image](https://github.com/user-attachments/assets/4085ffd3-6629-4062-8f1d-b9554191779f)
+
 MaterialTest  
 ![Image](https://github.com/user-attachments/assets/c0639c7c-a2b8-45f0-bd41-55d1d2165b56)
 
@@ -33,7 +43,7 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR DI/GI  
-![Image](https://github.com/user-attachments/assets/219bf28d-36bb-431c-9970-fda52eecacfb)
+![Image](https://github.com/user-attachments/assets/5f7e0aa1-d5fc-43cb-86e7-4c3b6eec182a)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -43,7 +53,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  (MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom.mtl/obj are made by owner of this repository(AngularSpectrumMTD))
+1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  (MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom.mtl/obj are made by owner of this repository(AngularSpectrumMTD))
 2. Build and Execute  
 ---
 #### With Sponza

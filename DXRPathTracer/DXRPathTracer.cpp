@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_MaterialTest;
+    mSceneType = SceneType_PTTestRoom2;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -469,6 +469,41 @@ void DXRPathTracer::Setup()
 
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
+        }
+        break;
+        case SceneType_PTTestRoom2:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 206.f; mThetaDirectional = 51;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //stair side
+            mInitEyePos = XMFLOAT3(-133.7, 141.3, -125.4);
+            mInitTargetPos = XMFLOAT3(-176.6, 126.64, -104.2);
+
+            //chair side
+  /*          mInitEyePos = XMFLOAT3(120.4, 108.6, -54.9);
+            mInitTargetPos = XMFLOAT3(70.6, 105.9, -51.0);*/
+
+            mOBJFileName = "PTTestRoom2.obj";
+            mOBJFolderName = "model/PTTest";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(-150, 65, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 4.0f;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mSpatialReuseTap = 3;
         }
         break;
         case SceneType_MaterialTest:

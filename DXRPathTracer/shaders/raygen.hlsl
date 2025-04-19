@@ -448,7 +448,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     }
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse())
+    if(isUseReservoirSpatialReuse() && (currDIReservoir.M < 5))
     {
         for(int s = 0; s < getDIReservoirSpatialReuseNum(); s++)
         {
@@ -514,7 +514,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     }
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse())
+    if(isUseReservoirSpatialReuse() && (currGIReservoir.M < 5))
     {
         for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {
