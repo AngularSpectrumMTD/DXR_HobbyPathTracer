@@ -53,7 +53,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  (MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom.mtl/obj are made by owner of this repository(AngularSpectrumMTD))
+1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza
