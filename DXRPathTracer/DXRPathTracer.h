@@ -426,6 +426,7 @@ private:
         SceneType_PTTestRoom2,
         SceneType_MaterialTest,
         SceneType_Corridor,
+        SceneType_CausticsTest,
     };
 
     enum Spectrum

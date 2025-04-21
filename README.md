@@ -3,6 +3,9 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 https://github.com/user-attachments/assets/8d6d50cd-3ef6-43cc-89b2-e760781940da
 
+CausticsTest  
+![Image](https://github.com/user-attachments/assets/b3a35893-8dee-41a9-8527-0eb5a4ba8216)
+
 Room2
 
 ![Image](https://github.com/user-attachments/assets/92bbf2ad-40a8-4cd4-8f30-af8d42f610a7)
@@ -53,7 +56,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza

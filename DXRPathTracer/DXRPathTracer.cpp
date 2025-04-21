@@ -585,6 +585,52 @@ void DXRPathTracer::Setup()
             mIsApplyCaustics = false;
             mIsUseIBL = false;
         }
+        break; 
+        case SceneType_CausticsTest:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            //mInitEyePos = XMFLOAT3(-6, 78, 165);
+            //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+            mInitEyePos = XMFLOAT3(36.08, 206.8, -14.3);
+            mInitTargetPos = XMFLOAT3(-20.9, 196.8, 7.5);
+
+            mOBJFileName = "CausticsTest.obj";
+            mOBJFolderName = "model";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -0.01f; mLightPosY = 206.9f; mLightPosZ = 11.49f;
+            mPhi = -91.0f; mTheta = 134.0f;
+
+            mLightRange = 1.09f;
+
+            mIntensityBoost *= 0.1;
+            mCausticsBoost = 0.2;
+            mGatherBlockRange = 2;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mIsUseDirectionalLight = false;
+
+            mGatherRadius = 0.1f;
+
+            mIsApplyCaustics = true;
+            mIsUseIBL = true;
+
+            mIsUseReservoirTemporalReuse = false;
+            mIsUseReservoirSpatialReuse = false;
+        }
         break;
     }
 
@@ -659,20 +705,20 @@ void DXRPathTracer::Setup()
     break;
     case  ModelType::ModelType_Ocean:
     {
-        mStageType = StageType_Box;
         mModelMovingRange *= 2;
         mOBJFileNameTbl[0] = L"model/ocean.obj";
         mObjYOffsetTbl[0] = 5;
-        mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        //mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mObjScaleTbl[0] = XMFLOAT3(10, 10, 10);
     }
     break;
     case  ModelType::ModelType_Ocean2:
     {
-        mStageType = StageType_Box;
         mModelMovingRange *= 2;
         mOBJFileNameTbl[0] = L"model/ocean2.obj";
         mObjYOffsetTbl[0] = 5;
-        mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        //mObjScaleTbl[0] = XMFLOAT3(PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f, PLANE_SIZE * 0.99f);
+        mObjScaleTbl[0] = XMFLOAT3(10, 10, 10);
     }
     break;
     case  ModelType::ModelType_CurvedMesh:
