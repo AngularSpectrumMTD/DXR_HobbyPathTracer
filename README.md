@@ -42,7 +42,8 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR DI/GI  
-![Image](https://github.com/user-attachments/assets/5f7e0aa1-d5fc-43cb-86e7-4c3b6eec182a)
+
+![Image](https://github.com/user-attachments/assets/eebaf9a9-41a1-4df0-be19-ef935dc41003)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
