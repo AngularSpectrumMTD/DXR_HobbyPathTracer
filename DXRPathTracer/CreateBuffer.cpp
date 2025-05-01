@@ -519,6 +519,20 @@ void DXRPathTracer::CreateRegularBuffer()
                     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
                     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
                     mPhotonEmissionGuideMipMapDescriptorUAVTbl[i] = mDevice->CreateUnorderedAccessView(mPhotonEmissionGuideMipMapTbl[i].Get(), &uavDesc);
+
+                    if (i == 0)
+                    {
+                        mPhotonEmissionGuideMipMap0Prev = mDevice->CreateTexture2D(
+                            PHOTON_EMISSION_GUIDE_MAP_SIZE_1D >> i, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D >> i, DXGI_FORMAT_R16_FLOAT,
+                            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                            D3D12_HEAP_TYPE_DEFAULT,
+                            L"PhotonEmissionGuideMipMap[0]Prev"
+                        );
+
+                        mPhotonEmissionGuideMipMap0PrevDescriptorSRV = mDevice->CreateShaderResourceView(mPhotonEmissionGuideMipMap0Prev.Get(), &srvDesc);
+                        mPhotonEmissionGuideMipMap0PrevDescriptorUAV = mDevice->CreateUnorderedAccessView(mPhotonEmissionGuideMipMap0Prev.Get(), &uavDesc);
+                    }
                 }
             }
         }

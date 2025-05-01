@@ -126,6 +126,14 @@ void rayGen() {
         nextRay.TMin = 0;
         nextRay.TMax = 100000;
 
+        AABB photonAABB;
+        photonAABB.maxElem = gGridParam.photonExistRange.xxx;
+        photonAABB.minElem = -gGridParam.photonExistRange.xxx;
+        float t = 0;
+#ifdef PHOTON_AABB_DEBUG
+        const bool intersectedPhotonAABB = isIntersectedOriginOrientedAABBvsRay(nextRay.Origin, nextRay.Direction, photonAABB, t);
+#endif
+
         payload.throughputU32 = compressRGBasU32(energyBoost * float3(1, 1, 1));
         payload.recursive = 0;
         payload.flags = 0;//empty
@@ -139,6 +147,16 @@ void rayGen() {
         uint rayMask = 0xFF;
 
         TraceDefaultRay(flags, rayMask, nextRay, payload);
+
+#ifdef PHOTON_AABB_DEBUG
+        //photon AABB debug draw
+        {
+            if((payload.recursive == 0) && intersectedPhotonAABB)
+            {
+                addDI(float3(0, 1, 0));
+            }
+        }
+#endif
     }
 
     //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
@@ -448,7 +466,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     }
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse() && (currDIReservoir.M < 5))
+    if(isUseReservoirSpatialReuse())// && (currDIReservoir.M < 5))
     {
         for(int s = 0; s < getDIReservoirSpatialReuseNum(); s++)
         {
@@ -514,7 +532,7 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     }
 
     //combine reservoirs
-    if(isUseReservoirSpatialReuse() && (currGIReservoir.M < 5))
+    if(isUseReservoirSpatialReuse())// && (currGIReservoir.M < 5))
     {
         for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {

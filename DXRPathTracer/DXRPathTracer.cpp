@@ -66,8 +66,8 @@ void DXRPathTracer::Setup()
     mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
+    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
+    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
     //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
     mSceneParam.photonParams.w = PHOTON_RECURSION_DEPTH;
     mLightRange = 1.0f;
@@ -1052,6 +1052,10 @@ void DXRPathTracer::Draw()
 CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
     };
 
+    CD3DX12_RESOURCE_BARRIER uavBGuide0[] = {
+  CD3DX12_RESOURCE_BARRIER::UAV(mPhotonEmissionGuideMipMapTbl[0].Get()),
+    };
+
     // BackBuffer To RT
     auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_RENDER_TARGET);
     // Present
@@ -1130,11 +1134,23 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
         PIXEndEvent(mCommandList.Get());
 
+        mCommandList->ResourceBarrier(_countof(uavBGuide0), uavBGuide0);
+
         mCommandList->SetComputeRootSignature(mRsGeneratePhotonEmissionGuideMap.Get());
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonRandomCounterMap"], mPhotonRandomCounterMapDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGeneratePhotonEmissionGuideMap["gPhotonEmissionGuideMap"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
         mCommandList->SetPipelineState(mGeneratePhotonEmissionGuideMapPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "GeneratePhotonEmissionGuideMap");
+        mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
+        PIXEndEvent(mCommandList.Get());
+
+        mCommandList->ResourceBarrier(_countof(uavBGuide0), uavBGuide0);
+
+        mCommandList->SetComputeRootSignature(mRsAccumulatePhotonEmissionGuideMap.Get());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapAccumulatePhotonEmissionGuideMap["gPhotonEmissionGuideMapPrev"], mPhotonEmissionGuideMipMap0PrevDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapAccumulatePhotonEmissionGuideMap["gPhotonEmissionGuideMapCurr"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+        mCommandList->SetPipelineState(mAccumulatePhotonEmissionGuideMapPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "AccumulatePhotonEmissionGuideMap");
         mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
         PIXEndEvent(mCommandList.Get());
 
@@ -1188,6 +1204,16 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
                 break;
             }
         }
+
+        mCommandList->ResourceBarrier(_countof(uavBGuide0), uavBGuide0);
+
+        mCommandList->SetComputeRootSignature(mRsCopyPhotonEmissionGuideMap.Get());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapCopyPhotonEmissionGuideMap["gPhotonEmissionGuideMapSrc"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[0].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapCopyPhotonEmissionGuideMap["gPhotonEmissionGuideMapDst"], mPhotonEmissionGuideMipMap0PrevDescriptorUAV.hGpu);
+        mCommandList->SetPipelineState(mCopyPhotonEmissionGuideMapPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "CopyPhotonEmissionGuideMap");
+        mCommandList->Dispatch(PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, PHOTON_EMISSION_GUIDE_MAP_SIZE_1D / 16, 1);
+        PIXEndEvent(mCommandList.Get());
 
         Grid3DSort();
     }

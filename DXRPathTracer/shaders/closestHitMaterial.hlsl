@@ -102,8 +102,29 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
         caustics = accumulatePhoton(mul(float4(vtx.Position, 1), ObjectToWorld4x3()), mul(vtx.Normal, (float3x3)ObjectToWorld4x3()));
     }
 
+    const float3 dir = WorldRayDirection();
+    const float T = RayTCurrent();
+
     RayDesc nextRay;
     bool isTerminate = shadeAndSampleRay(vtx.Normal, vtx.Position, getGeometricNormal(attrib), payload, currentMaterial, nextRay, caustics);
+
+#ifdef PHOTON_AABB_DEBUG
+    //photon AABB debug draw
+    {
+        AABB photonAABB;
+        photonAABB.maxElem = gGridParam.photonExistRange.xxx;
+        photonAABB.minElem = -gGridParam.photonExistRange.xxx;
+        float t = 0;
+        const float3 hitPos = vtx.Position;
+        const bool intersectedPhotonAABB = isIntersectedOriginOrientedAABBvsRay(hitPos - T * dir , dir, photonAABB, t);
+
+        if(intersectedPhotonAABB && isDirectRay(payload) && (t > 0) && (t < T))
+        {
+            addDI(float3(0, 1, 0));
+        }
+    }
+#endif
+
     if(isTerminate)
     {
         payload.terminate();

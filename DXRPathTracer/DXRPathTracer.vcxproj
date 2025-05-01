@@ -148,6 +148,14 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
     </FxCompile>
+    <FxCompile Include="shaders\accumulatePhotonEmissionGuideMap.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">accumulatePhotonEmissionGuideMap</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">accumulatePhotonEmissionGuideMap</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
+    </FxCompile>
     <FxCompile Include="shaders\BitonicSort.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BitonicSort</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
@@ -215,6 +223,14 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">computeVariance</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shaders\copyPhotonEmissionGuideMap.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copyPhotonEmissionGuideMap</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copyPhotonEmissionGuideMap</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\debugView.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">debugView</EntryPointName>

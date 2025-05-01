@@ -22,6 +22,8 @@
 #define RAY_MIN_T 0.001f
 #define RAY_MAX_T 1000000.0f
 
+//#define PHOTON_AABB_DEBUG
+
 #include "materialParams.hlsli"
 
 struct Payload
@@ -85,6 +87,64 @@ struct LightGenerateParam
     float sphereRadius; //radius for sphere light
     uint type; //Sphere Light 0 / Rect Light 1 / Spot Light 2 / Directional Light 3
 };
+
+struct AABB
+{
+    float3 maxElem;
+    float3 minElem;
+};
+
+bool isIntersectedOriginOrientedAABBvsRay(in float3 rayOrigin, in float3 rayDir, in AABB aabb, out float t)
+{
+    const float FLT_MAX = 100000;
+    const float eps = 0.0001;
+    t = -FLT_MAX;
+    float t_max = FLT_MAX;
+    float finalT = FLT_MAX;
+
+    for (int i = 0; i < 3; ++i) 
+    {
+        if (abs(rayDir[i]) < eps) 
+        {
+            if (rayOrigin[i] < aabb.minElem[i] || rayOrigin[i] > aabb.maxElem[i] )
+            {
+                return false;
+            }
+        } 
+        else 
+        {
+            float t1 = (aabb.minElem[i] - rayOrigin[i]) / rayDir[i];
+            float t2 = (aabb.maxElem[i] - rayOrigin[i]) / rayDir[i];
+            if (t1 > t2) 
+            {
+                float tmp = t1; t1 = t2; t2 = tmp;
+            }
+
+            if (t1 > t)
+            { 
+                t = t1;
+            }
+
+            if (t2 < t_max) 
+            {
+                t_max = t2;
+            }
+
+            if(t > 0)
+            {
+                finalT = min(t, finalT);
+            }
+
+            if (t >= t_max)
+            {
+                return false;
+            }
+        }
+    }
+
+    t = finalT;
+    return true;
+}
 
 #define LIGHT_TYPE_SPHERE 0
 #define LIGHT_TYPE_RECT 1

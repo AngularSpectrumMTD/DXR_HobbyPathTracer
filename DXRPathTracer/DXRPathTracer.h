@@ -123,6 +123,8 @@ namespace ComputeShaders {
     const LPCWSTR GeneratePhotonEmissionGuideMipMap = L"generatePhotonEmissionGuideMipMap.cso";
     const LPCWSTR GeneratePhotonEmissionGuideMipMap2x2 = L"generatePhotonEmissionGuideMipMap2x2.cso";
     const LPCWSTR GeneratePhotonEmissionGuideMipMap4x4 = L"generatePhotonEmissionGuideMipMap4x4.cso";
+    const LPCWSTR AccumulatePhotonEmissionGuideMap = L"accumulatePhotonEmissionGuideMap.cso";
+    const LPCWSTR CopyPhotonEmissionGuideMap = L"copyPhotonEmissionGuideMap.cso";
 }
 
 template<class T>
@@ -652,6 +654,10 @@ private:
     dx12::Descriptor mPhotonEmissionGuideMipMapDescriptorSRVTbl[PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL];
     dx12::Descriptor mPhotonEmissionGuideMipMapDescriptorUAVTbl[PHOTON_EMISSION_GUIDE_MAP_MIP_LEVEL];
 
+    ComPtr<ID3D12Resource> mPhotonEmissionGuideMipMap0Prev;
+    dx12::Descriptor mPhotonEmissionGuideMipMap0PrevDescriptorSRV;
+    dx12::Descriptor mPhotonEmissionGuideMipMap0PrevDescriptorUAV;
+
     //ConstantBuffers
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB0Tbl;
     std::vector<ComPtr<ID3D12Resource>> mBitonicLDSCB1Tbl;
@@ -748,6 +754,14 @@ private:
     ComPtr<ID3D12RootSignature> mRsClearPhotonEmissionGuideMap;
     std::unordered_map < std::string, u32> mRegisterMapClearPhotonEmissionGuideMap;
     ComPtr<ID3D12PipelineState> mClearPhotonEmissionGuideMapPSO;
+
+    ComPtr<ID3D12RootSignature> mRsAccumulatePhotonEmissionGuideMap;
+    std::unordered_map < std::string, u32> mRegisterMapAccumulatePhotonEmissionGuideMap;
+    ComPtr<ID3D12PipelineState> mAccumulatePhotonEmissionGuideMapPSO;
+
+    ComPtr<ID3D12RootSignature> mRsCopyPhotonEmissionGuideMap;
+    std::unordered_map < std::string, u32> mRegisterMapCopyPhotonEmissionGuideMap;
+    ComPtr<ID3D12PipelineState> mCopyPhotonEmissionGuideMapPSO;
 
     ComPtr<ID3D12RootSignature> mRsGeneratePhotonEmissionGuideMap;
     std::unordered_map < std::string, u32> mRegisterMapGeneratePhotonEmissionGuideMap;

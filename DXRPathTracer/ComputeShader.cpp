@@ -190,6 +190,28 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         utility::RootSignatureCreater rsCreater;
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        mRsAccumulatePhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsAccumulatePhotonEmissionGuideMap");
+        CreateComputeShaderStateObject(ComputeShaders::AccumulatePhotonEmissionGuideMap, mAccumulatePhotonEmissionGuideMapPSO, mRsAccumulatePhotonEmissionGuideMap);
+        mRegisterMapAccumulatePhotonEmissionGuideMap.clear();
+        mRegisterMapAccumulatePhotonEmissionGuideMap["gPhotonEmissionGuideMapPrev"] = mRegisterMapAccumulatePhotonEmissionGuideMap.size();
+        mRegisterMapAccumulatePhotonEmissionGuideMap["gPhotonEmissionGuideMapCurr"] = mRegisterMapAccumulatePhotonEmissionGuideMap.size();
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        mRsCopyPhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsCopyPhotonEmissionGuideMap");
+        CreateComputeShaderStateObject(ComputeShaders::CopyPhotonEmissionGuideMap, mCopyPhotonEmissionGuideMapPSO, mRsCopyPhotonEmissionGuideMap);
+        mRegisterMapCopyPhotonEmissionGuideMap.clear();
+        mRegisterMapCopyPhotonEmissionGuideMap["gPhotonEmissionGuideMapSrc"] = mRegisterMapCopyPhotonEmissionGuideMap.size();
+        mRegisterMapCopyPhotonEmissionGuideMap["gPhotonEmissionGuideMapDst"] = mRegisterMapCopyPhotonEmissionGuideMap.size();
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         mRsGeneratePhotonEmissionGuideMap = rsCreater.Create(mDevice, false, L"rsGeneratePhotonEmissionGuideMap");
         CreateComputeShaderStateObject(ComputeShaders::GeneratePhotonEmissionGuideMap, mGeneratePhotonEmissionGuideMapPSO, mRsGeneratePhotonEmissionGuideMap);
         mRegisterMapGeneratePhotonEmissionGuideMap.clear();
