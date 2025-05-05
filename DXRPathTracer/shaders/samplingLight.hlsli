@@ -305,20 +305,20 @@ bool intersectLightWithCurrentRay(out float3 Le, inout uint randomSeed)
     else if (isRectLight(param))
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
+        float hitT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
         Le = param.emission * max(1, getLightNum() - 1);
-        return isFrontHit && (hittedT > 0 && hittedT < rayT);
+        return isFrontHit && (hitT > 0 && hitT < rayT);
     }
     else if (isSpotLight(param))
     {
         const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-        float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
+        float hitT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
         const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
         Le = param.emission * max(1, getLightNum() - 1);
-        return isFrontHit && (hittedT > 0 && hittedT < rayT);
+        return isFrontHit && (hitT > 0 && hitT < rayT);
     }
 
     return false;
@@ -343,17 +343,17 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
         if (isSphereLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectSphere(rayOrigin, rayDiretion, param.positionORDirection,
+            float hitT = intersectSphere(rayOrigin, rayDiretion, param.positionORDirection,
             shapeForwardDir, normalize(param.V), param.sphereRadius, param.sphereRadius, param.sphereRadius);
 
             Le = param.emission * max(1, getLightNum() - 1);
-            isIntersect = (hittedT >= 0 && hittedT < rayT);
+            isIntersect = (hitT >= 0 && hitT < rayT);
             if (isIntersect)
             {
-                if(currT > hittedT)
+                if(currT > hitT)
                 {
                     mostNearIndex = i;
-                    currT = hittedT;
+                    currT = hitT;
                     mostNearLe = Le;
                     hitNormal = normalize(rayOrigin + currT * rayDiretion - param.positionORDirection);
                 }
@@ -362,17 +362,17 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
         else if (isRectLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
+            float hitT = intersectRectangle(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
             const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
             Le = param.emission * max(1, getLightNum() - 1);
-            isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
+            isIntersect =  isFrontHit && (hitT > 0 && hitT < rayT);
             if (isIntersect)
             {
-                if(currT > hittedT)
+                if(currT > hitT)
                 {
                     mostNearIndex = i;
-                    currT = hittedT;
+                    currT = hitT;
                     mostNearLe = Le;
                     hitNormal = shapeForwardDir;
                 }
@@ -381,17 +381,17 @@ bool intersectAllLightWithCurrentRay(out float3 Le, out float3 hitPosition, out 
         else if (isSpotLight(param))
         {
             const float3 shapeForwardDir = normalize(cross(param.U, param.V));
-            float hittedT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
+            float hitT = intersectEllipse(rayOrigin, rayDiretion, param.positionORDirection, param.U, param.V);
             const bool isFrontHit = (length(shapeForwardDir) > 0) && (dot(shapeForwardDir, -rayDiretion) > 0);
 
             Le = param.emission * max(1, getLightNum() - 1);
-            isIntersect =  isFrontHit && (hittedT > 0 && hittedT < rayT);
+            isIntersect =  isFrontHit && (hitT > 0 && hitT < rayT);
             if (isIntersect)
             {
-                if(currT > hittedT)
+                if(currT > hitT)
                 {
                     mostNearIndex = i;
-                    currT = hittedT;
+                    currT = hitT;
                     mostNearLe = Le;
                     hitNormal = shapeForwardDir;
                 }

@@ -188,7 +188,7 @@ void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib)
 
     if(isSSSRay(payload))
     {
-        payload.hittedCount++;
+        payload.hitCount++;
         payload.SSSnormal = surface.normal;
         payload.T = RayTCurrent();
         IgnoreHit();

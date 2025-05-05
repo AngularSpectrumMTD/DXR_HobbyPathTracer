@@ -75,7 +75,7 @@ void anyHit(inout Payload payload, TriangleIntersectionAttributes attrib) {
 
     if(isSSSRay(payload))
     {
-        payload.hittedCount++;
+        payload.hitCount++;
         payload.SSSnormal = surface.normal;
         //payload.SSSnormal = getGeometricNormal(attrib);
         payload.T = RayTCurrent();

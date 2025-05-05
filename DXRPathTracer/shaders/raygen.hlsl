@@ -328,6 +328,7 @@ void photonEmitting()
 
     PhotonPayload payload;
     payload.throughputU32 = compressRGBasU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
+    //payload.throughputU32 = getBaseLightXYZ(LAMBDA_NM);
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;

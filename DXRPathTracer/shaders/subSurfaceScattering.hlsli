@@ -122,7 +122,7 @@ BSSRDFSample sampleBSSRDF(float3 position, float3 normal, float3 d, float rMax, 
     return bssrdfSample;
 }
 
-float BSSRDF_PDF(float3 toHitPosition, float3 normal, float3 hitNormal, float3 d, uint hittedCount)
+float BSSRDF_PDF(float3 toHitPosition, float3 normal, float3 hitNormal, float3 d, uint hitCount)
 {
     float pmf_axis[3] = { BSSRDF_PMF_AXIS };
     float3 axis[3];
@@ -134,7 +134,7 @@ float BSSRDF_PDF(float3 toHitPosition, float3 normal, float3 hitNormal, float3 d
     {
         float NdotV = abs(dot(hitNormal, axis[i]));
         float projectedR = length(toHitPosition - dot(toHitPosition , axis[i]) * axis[i]);
-        float scaling = NdotV * pmf_axis[i] * BSSRDF_CHANNEL_PMF / (1.0f * hittedCount);
+        float scaling = NdotV * pmf_axis[i] * BSSRDF_CHANNEL_PMF / (1.0f * hitCount);
         float3 bssrdfPDF = computeBSSRDF(projectedR, d, BSSRDF_TEST_IOR);
         pdf += bssrdfPDF.x * scaling;
         pdf += bssrdfPDF.y * scaling;
@@ -168,7 +168,7 @@ bool computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
     Payload sssPayload;
     sssPayload.flags = 0;
     sssPayload.flags |= PAYLOAD_BIT_MASK_IS_SSS_RAY;
-    sssPayload.hittedCount = 0;
+    sssPayload.hitCount = 0;
     sssPayload.T = -1;
     sssPayload.SSSnormal = float3(0, 0, 0);
 
@@ -184,12 +184,12 @@ bool computeSSSPosition(inout Payload payload, inout float3 scatterPosition, ino
 
     TraceDefaultRay(flags, rayMask, sssRay, sssPayload);
 
-    if (sssPayload.hittedCount > 0)
+    if (sssPayload.hitCount > 0)
     {
         sssRay.Origin += normalize(sssRay.Direction) * sssPayload.T;
         const float3 toHitPosition = sssRay.Origin - scatterPosition;
-        const float hittedCount = sssPayload.hittedCount;
-        const float pdf = BSSRDF_PDF(toHitPosition, normal, surfaceNormal, d, sssPayload.hittedCount);
+        const float hitCount = sssPayload.hitCount;
+        const float pdf = BSSRDF_PDF(toHitPosition, normal, surfaceNormal, d, sssPayload.hitCount);
 
         float3 W = computeBSSRDF(length(toHitPosition), d, BSSRDF_TEST_IOR);
 

@@ -28,10 +28,10 @@ void miss(inout Payload payload) {
     {
         setDI(hitLe);
         payload.terminate();
-        const bool isAnaliticalLightHitted = (length(hitLe) > 0);
-        const float3 writeColor = isAnaliticalLightHitted ? hitLe : 0.xxx;
-        const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : 0.xxx;
-        const float3 writePosition = isAnaliticalLightHitted ? hitPosition : 0.xxx;
+        const bool isAnaliticalLightHit = (length(hitLe) > 0);
+        const float3 writeColor = isAnaliticalLightHit ? hitLe : 0.xxx;
+        const float3 writeNormal = isAnaliticalLightHit ? hitNormal : 0.xxx;
+        const float3 writePosition = isAnaliticalLightHit ? hitPosition : 0.xxx;
         MaterialParams material = (MaterialParams)0;
         material.albedo = float4(writeColor, 0);
         storeGBuffer(payload, writePosition, writeColor, writeNormal, 0, material);

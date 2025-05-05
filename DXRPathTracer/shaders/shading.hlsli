@@ -746,10 +746,10 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     {
         addGI(DIGIelement);
     }
-    const bool isAnaliticalLightHitted = (length(hitLe) > 0);
-    const float3 writeColor = isAnaliticalLightHitted ? hitLe : currentMaterial.albedo.xyz;
-    const float3 writeNormal = isAnaliticalLightHitted ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal when we execute SSS
-    const float3 writePosition = isAnaliticalLightHitted ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal when we execute SSS
+    const bool isAnaliticalLightHit = (length(hitLe) > 0);
+    const float3 writeColor = isAnaliticalLightHit ? hitLe : currentMaterial.albedo.xyz;
+    const float3 writeNormal = isAnaliticalLightHit ? hitNormal : originalSurfaceNormal;//this param is used for denoise, so we have to get stable normal when we execute SSS
+    const float3 writePosition = isAnaliticalLightHit ? hitPosition : originalScatterPosition;//this param is used for denoise, so we have to get stable normal when we execute SSS
     storeGBuffer(payload, writePosition, writeColor, writeNormal, currentMaterial.roughness, currentMaterial);
     
     addCaustics(caustics);

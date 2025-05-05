@@ -32,7 +32,7 @@ struct Payload
     int recursive;
     uint flags;
     float T;//for SSS
-    uint hittedCount;//for SSS
+    uint hitCount;//for SSS
     float3 SSSnormal;//for SSS
     uint primaryBSDFU32;//for ReSTIR GI
     float primaryPDF;//for ReSTIR GI
@@ -372,9 +372,9 @@ inline void setVisibility(inout Payload payload, in bool visibility)
     }
 }
 
-inline bool isSSSRayHitted(in Payload payload)
+inline bool isSSSRayHit(in Payload payload)
 {
-    return payload.hittedCount > 0;
+    return payload.hitCount > 0;
 }
 
 inline bool isReachedRecursiveLimitPhotonPayload(inout PhotonPayload payload)

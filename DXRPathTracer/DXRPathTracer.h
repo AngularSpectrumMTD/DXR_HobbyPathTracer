@@ -185,7 +185,7 @@ private:
         s32 recursive;
         u32 flags;
         f32 T;//for SSS
-        u32 hittedCount;//for SSS
+        u32 hitCount;//for SSS
         float3 SSSnormal;//for SSS
         u32 primaryBSDFU32;//for ReSTIR GI
         f32 primaryPDF;//for ReSTIR GI
