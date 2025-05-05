@@ -2,7 +2,7 @@
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
 CausticsTest  
-![Image](https://github.com/user-attachments/assets/b3a35893-8dee-41a9-8527-0eb5a4ba8216)
+![Image](https://github.com/user-attachments/assets/909701d3-11e7-4f14-b8a0-7ac832535843)
 
 Room2
 

@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_BistroInterior;
+    mSceneType = SceneType_PTTestRoom2;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -599,8 +599,8 @@ void DXRPathTracer::Setup()
             //mInitEyePos = XMFLOAT3(-6, 78, 165);
             //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
 
-            mInitEyePos = XMFLOAT3(36.08, 206.8, -14.3);
-            mInitTargetPos = XMFLOAT3(-20.9, 196.8, 7.5);
+            mInitEyePos = XMFLOAT3(50.86, 217.31, -3.07);
+            mInitTargetPos = XMFLOAT3(-5.17, 201.7, 17.98);
 
             mOBJFileName = "CausticsTest.obj";
             mOBJFolderName = "model";
@@ -609,13 +609,13 @@ void DXRPathTracer::Setup()
             mStageOffsetY = 0.0f;
             mStageOffsetZ = 0.0f;
 
-            mLightPosX = -0.01f; mLightPosY = 206.9f; mLightPosZ = 11.49f;
-            mPhi = -91.0f; mTheta = 134.0f;
+            mLightPosX = -0.01f; mLightPosY = 202.5f; mLightPosZ = -5.31f;
+            mPhi = -85.0f; mTheta = 228.0f;
 
-            mLightRange = 1.09f;
+            mLightRange = 5.68f;
 
             mIntensityBoost *= 0.1;
-            mCausticsBoost = 0.2;
+            mCausticsBoost = 0.05;
             mGatherBlockRange = 2;
 
             mModelTypeTbl[0] = ModelType_Afrodyta;

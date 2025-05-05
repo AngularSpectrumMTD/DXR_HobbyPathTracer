@@ -315,8 +315,8 @@ void photonEmitting()
     const float2 origRandomUV = randomUV;
 
     const float LAMBDA_NM = LAMBDA_VIO_NM + LAMBDA_STEP * (randomSeed % LAMBDA_NUM);
-    const float flutter = 0.1f;
-    const float2 guidedUV = rand(randomSeed) < flutter ? origRandomUV : emissionGuiding(randomUV);
+    const float flutter = 0.2f;
+    const float2 guidedUV = (rand(randomSeed) < flutter) ? origRandomUV : emissionGuiding(randomUV);
 
     sampleLightEmitDirAndPositionWithUV(emitDir, emitOrigin, guidedUV, randomSeed);
 
