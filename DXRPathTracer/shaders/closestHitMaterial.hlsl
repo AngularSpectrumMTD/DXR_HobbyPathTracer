@@ -54,6 +54,7 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
 
     surface.isIgnoreHit = false;
     surface.material = material;
+    surface.geomNormal = getGeometricNormal(attrib);
 
     return surface;
 }
@@ -122,7 +123,7 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     const float T = RayTCurrent();
 
     RayDesc nextRay;
-    bool isTerminate = shadeAndSampleRay(surface.normal, surface.position, getGeometricNormal(attrib), payload, surface.material, nextRay, caustics);
+    bool isTerminate = shadeAndSampleRay(surface, payload, nextRay, caustics);
 
 #ifdef PHOTON_AABB_DEBUG
     //photon AABB debug draw
@@ -164,7 +165,7 @@ void materialStorePhotonClosestHit(inout PhotonPayload payload, TriangleIntersec
     RayDesc nextRay;
     nextRay.Origin = surface.position;
     nextRay.Direction = 0.xxx;
-    sampleBSDF(surface.material, surface.normal, nextRay, payload);
+    sampleBSDF(surface, nextRay, payload);
 
     if (isPhotonStoreRequired(surface.material, payload))
     {
