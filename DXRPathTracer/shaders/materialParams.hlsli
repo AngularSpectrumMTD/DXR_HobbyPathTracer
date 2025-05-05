@@ -14,6 +14,14 @@ struct MaterialParams
     uint materialBits;
 };
 
+struct Surface
+{
+    float3 position;
+    float3 normal;
+    MaterialParams material;
+    bool isIgnoreHit;
+};
+
 bool isTransparentMaterial(in MaterialParams material)
 {
     return (material.transRatio > 0);

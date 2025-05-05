@@ -120,13 +120,11 @@ void editMaterial(inout MaterialParams mat)
     }
 }
 
-MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout VertexPNT vtx, inout bool isIgnoreHit)
+MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, in float2 uv, inout bool isIgnoreHit)
 {
-    vtx = getVertex(attrib);
-    
     float4 diffuseTexColor = 1.xxxx;
 
-    getTexColor(diffuseTexColor, isIgnoreHit, vtx.UV);
+    getTexColor(diffuseTexColor, isIgnoreHit, uv);
 
     MaterialParams currentMaterial = constantBuffer;
     currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
@@ -152,22 +150,35 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, inout V
     return currentMaterial;
 }
 
+Surface constructSurface(TriangleIntersectionAttributes attrib)
+{
+    Surface surface = (Surface)0;
+
+    VertexPNT vertex = getVertex(attrib);
+    surface.position = vertex.Position;
+    surface.normal = vertex.Normal;
+
+    bool isIgnoreHit = false;
+    MaterialParams material = getCurrentMaterial(attrib, vertex.UV, isIgnoreHit);
+
+    surface.isIgnoreHit = isIgnoreHit;
+    surface.material = material;
+
+    return surface;
+}
+
 [shader("anyhit")]
 void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib) {
-    float4 diffuseTexColor = 0.xxxx;
-    bool isIgnoreHit = false;
-    VertexPNT vtx = getVertex(attrib);
-    getTexColor(diffuseTexColor, isIgnoreHit, vtx.UV);
+    Surface surface = constructSurface(attrib);
 
-    if(isIgnoreHit)
+    if(surface.isIgnoreHit)
     {
         IgnoreHit();
     }
 
     if(isShadowRay(payload))
     {
-        MaterialParams currentMaterial = constantBuffer;
-        if(isTransparentMaterial(currentMaterial))
+        if(isTransparentMaterial(surface.material))
         {
             IgnoreHit();
         }
@@ -176,8 +187,7 @@ void anyHitWithTex(inout Payload payload, TriangleIntersectionAttributes attrib)
     if(isSSSRay(payload))
     {
         payload.hittedCount++;
-        payload.SSSnormal = vtx.Normal;
-        //payload.SSSnormal = getGeometricNormal(attrib);
+        payload.SSSnormal = surface.normal;
         payload.T = RayTCurrent();
         IgnoreHit();
     }
@@ -204,25 +214,20 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         payload.terminate();
         return;
     }
-    uint primitiveIndex = PrimitiveIndex();
-    uint instanceIndex = InstanceIndex();
 
-    VertexPNT vtx;
-
-    bool isIgnoreHitDummy = false;
-    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHitDummy);
+    Surface surface = constructSurface(attrib);
 
     float3 caustics = 0.xxx;
     if(payload.recursive <= 2)
     {
-        caustics = accumulatePhoton(mul(float4(vtx.Position, 1), ObjectToWorld4x3()), mul(vtx.Normal, (float3x3)ObjectToWorld4x3()));
+        caustics = accumulatePhoton(mul(float4(surface.position, 1), ObjectToWorld4x3()), mul(surface.normal, (float3x3)ObjectToWorld4x3()));
     }
 
     const float3 dir = WorldRayDirection();
     const float T = RayTCurrent();
 
     RayDesc nextRay;
-    bool isTerminate = shadeAndSampleRay(vtx.Normal, vtx.Position, getGeometricNormal(attrib), payload, currentMaterial, nextRay, caustics);
+    bool isTerminate = shadeAndSampleRay(surface.normal, surface.position, getGeometricNormal(attrib), payload, surface.material, nextRay, caustics);
 
 #ifdef PHOTON_AABB_DEBUG
     //photon AABB debug draw
@@ -231,7 +236,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         photonAABB.maxElem = gGridParam.photonExistRange.xxx;
         photonAABB.minElem = -gGridParam.photonExistRange.xxx;
         float t = 0;
-        const float3 hitPos = vtx.Position;
+        const float3 hitPos = surface.position;
         const bool intersectedPhotonAABB = isIntersectedOriginOrientedAABBvsRay(hitPos - T * dir , dir, photonAABB, t);
 
         if(intersectedPhotonAABB && isDirectRay(payload) && (t > 0) && (t < T))
@@ -263,26 +268,19 @@ void materialWithTexStorePhotonClosestHit(inout PhotonPayload payload, TriangleI
     if (isReachedRecursiveLimitPhotonPayload(payload) || isPhotonStored(payload)) {
         return;
     }
-    uint primitiveIndex = PrimitiveIndex();
-    uint instanceIndex = InstanceIndex();
 
-    VertexPNT vtx;
-    bool isIgnoreHitDummy = false;
-    MaterialParams currentMaterial = getCurrentMaterial(attrib, vtx, isIgnoreHitDummy);
-    primarySurfaceHasHighPossibilityCausticsGenerate(currentMaterial, payload);
-    float3 surfaceNormal = vtx.Normal;
-
-    float3 scatterPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
+    Surface surface = constructSurface(attrib);
+    primarySurfaceHasHighPossibilityCausticsGenerate(surface.material, payload);
 
     RayDesc nextRay;
-    nextRay.Origin = scatterPosition;
+    nextRay.Origin = surface.position;
    
     nextRay.TMin = RAY_MIN_T;
     nextRay.TMax = RAY_MAX_T;
     nextRay.Direction = WorldRayDirection();
-    sampleBSDF(currentMaterial, surfaceNormal, nextRay, payload);
+    sampleBSDF(surface.material, surface.normal, nextRay, payload);
 
-    if (isPhotonStoreRequired(currentMaterial, payload))
+    if (isPhotonStoreRequired(surface.material, payload))
     {
         storePhoton(payload);
     }
