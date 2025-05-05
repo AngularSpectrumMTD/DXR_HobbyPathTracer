@@ -22,6 +22,7 @@
 #define RAY_MIN_T 0.001f
 #define RAY_MAX_T 1000000.0f
 
+//#define USE_SPECTRAL_RENDERED_CAUSTICS
 //#define PHOTON_AABB_DEBUG
 
 #include "materialParams.hlsli"

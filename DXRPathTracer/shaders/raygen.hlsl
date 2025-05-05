@@ -327,8 +327,11 @@ void photonEmitting()
     nextRay.TMax = 100000;
 
     PhotonPayload payload;
-    payload.throughputU32 = compressRGBasU32(1.xxx / pdf);//getBaseLightXYZ(LAMBDA_NM);
-    //payload.throughputU32 = getBaseLightXYZ(LAMBDA_NM);
+#ifdef USE_SPECTRAL_RENDERED_CAUSTICS
+    payload.throughputU32 = compressRGBasU32(getBaseLightXYZ(LAMBDA_NM) / pdf);
+#else
+    payload.throughputU32 = compressRGBasU32(1.xxx / pdf);
+#endif
     payload.recursive = 0;
     payload.flags = 0;//empty
     payload.lambdaNM = LAMBDA_NM;

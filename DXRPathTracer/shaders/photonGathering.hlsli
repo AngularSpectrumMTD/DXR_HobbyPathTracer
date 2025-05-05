@@ -55,7 +55,7 @@ float poly6Kernel2D(float distance, float maxd)
     alpha *= alpha;
     alpha *= alpha;
     alpha *= alpha;
-    float tmp = maxd * maxd - distance * distance;
+    float tmp = max(0, maxd * maxd - distance * distance);
     tmp = tmp * tmp * tmp;
     return alpha * tmp * 4 / PI;
 }
@@ -99,10 +99,7 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
                 {
                     PhotonInfo comparePhoton = gPhotonMap[G];
                     float distanceSqr = dot(gatherCenterPos - comparePhoton.position, gatherCenterPos - comparePhoton.position);
-                    if ((distanceSqr < getGatherRadius() * getGatherRadius()))
-                    {
-                        accumulateXYZ += decompressU32asRGB(comparePhoton.throughputU32) * poly6Kernel2D(sqrt(distanceSqr), getGatherRadius());
-                    }
+                    accumulateXYZ += decompressU32asRGB(comparePhoton.throughputU32) * poly6Kernel2D(sqrt(distanceSqr), getGatherRadius());
                 }
 
                 // if (isDebug)
@@ -118,7 +115,12 @@ float3 accumulatePhotonHGC(float3 gatherCenterPos, float3 worldNormal, bool isDe
 
 float3 accumulatePhoton(float3 gatherCenterPos, float3 worldNormal, bool isDebug = false)
 {
-    return accumulatePhotonHGC(gatherCenterPos, worldNormal, isDebug);
+    const float3 c = accumulatePhotonHGC(gatherCenterPos, worldNormal, isDebug);
+#ifdef USE_SPECTRAL_RENDERED_CAUSTICS
+    return max(0.xxx, mul(c, XYZtoRGB2));
+#else
+    return c;
+#endif
 }
 
 #endif//__PHOTONGATHERING_HLSLI__

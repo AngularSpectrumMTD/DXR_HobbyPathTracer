@@ -59,16 +59,18 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom2;
+    mSceneType = SceneType_CausticsTest;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
     mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_MIDDLE);
-    mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_LOW);
-    //mPhotonMapSize1D = utility::roundUpPow2(CausticsQuality_HIGH);
+
+    const CausticsQuality causticsQuality = CausticsQuality_MIDDLE;
+    const f32 causticsPDF = (causticsQuality * 1.0f) / CausticsQuality_LOW;
+    mPhotonMapSize1D = utility::roundUpPow2(causticsQuality);
+
     mSceneParam.photonParams.w = PHOTON_RECURSION_DEPTH;
     mLightRange = 1.0f;
     mStandardPhotonNum = 1;// (2 * mPhotonMapSize1D / GRID_DIMENSION)* (2 * mPhotonMapSize1D / GRID_DIMENSION);// mPhotonMapSize1D * 0.1f;
@@ -633,6 +635,8 @@ void DXRPathTracer::Setup()
         }
         break;
     }
+
+    mCausticsBoost /= causticsPDF;
 
 #ifdef GI_TEST
     mIsApplyCaustics = false;
