@@ -634,11 +634,11 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
     return estimatedColor;
 }
 
-bool performLighting(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement, in bool isSSSSample)
+bool performLighting(inout Payload payload, in Surface surface, out float3 hitLe,  out float3 hitPosition, out float3 hitNormal, in float3 originalSurfaceNormal, in float3 originalScatterPositionForSSS, out float3 DIGIelement, in bool isSSSSample)
 {
     bool isFinish = false;
     float3 Le = 0.xxx;
-    setNEEFlag(payload, isUseNEE(material));
+    setNEEFlag(payload, isUseNEE(surface.material));
 
     bool isIntersect = false;
     if (isDirectRay(payload))
@@ -651,7 +651,7 @@ bool performLighting(inout Payload payload, in MaterialParams material, in float
         isIntersect = intersectLightWithCurrentRay(Le, payload.randomSeed);
     }
 
-    if (isUseNEE(material))
+    if (isUseNEE(surface.material))
     {
         //ray hit the light source
         if (isIntersect && isDirectRay(payload) && !isIndirectOnly())
@@ -663,9 +663,9 @@ bool performLighting(inout Payload payload, in MaterialParams material, in float
         }
 
         //ray hit the emissive material
-        if (material.emission.x + material.emission.y + material.emission.z > 0)
+        if (surface.material.emission.x + surface.material.emission.y + surface.material.emission.z > 0)
         {
-            DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
+            DIGIelement = decompressU32asRGB(payload.throughputU32) * surface.material.emission.xyz;
             payload.terminate();
             isFinish = false;
             return isFinish;
@@ -675,8 +675,8 @@ bool performLighting(inout Payload payload, in MaterialParams material, in float
         if (isNEELightingRequired)
         {
             DIReservoir reservoir;
-            DIGIelement = performNEE(payload, material, scatterPosition, surfaceNormal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS, isSSSSample) * decompressU32asRGB(payload.throughputU32);
-            if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(material))
+            DIGIelement = performNEE(payload, surface.material, surface.position, surface.normal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS, isSSSSample) * decompressU32asRGB(payload.throughputU32);
+            if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(surface.material))
             {
                 //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
                 DIGIelement = 0.xxx;
@@ -701,9 +701,9 @@ bool performLighting(inout Payload payload, in MaterialParams material, in float
         }
 
         //ray hit the emissive material
-        if (material.emission.x + material.emission.y + material.emission.z > 0)
+        if (surface.material.emission.x + surface.material.emission.y + surface.material.emission.z > 0)
         {
-            DIGIelement = decompressU32asRGB(payload.throughputU32) * material.emission.xyz;
+            DIGIelement = decompressU32asRGB(payload.throughputU32) * surface.material.emission.xyz;
             isFinish = false;
             return isFinish;
         }
@@ -716,10 +716,8 @@ bool performLighting(inout Payload payload, in MaterialParams material, in float
 bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc nextRay, in float3 caustics)
 {
     float3 surfaceNormal = surface.normal;
-    float3 scatterPosition = mul(float4(surface.position, 1), ObjectToWorld4x3());
-    float3 bestFitWorldNormal = mul(surfaceNormal, (float3x3)ObjectToWorld4x3());
     float3 originalSurfaceNormal = surfaceNormal;
-    float3 originalScatterPosition = scatterPosition;
+    float3 originalScatterPosition = surface.position;
 
     float3 hitLe = 0.xxx;
     float3 hitNormal = 0.xxx;
@@ -730,7 +728,7 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     bool isSSSSample = false;
     if(isSSSExecutable(currentMaterial))
     {
-        isSSSSample = computeSSSPosition(payload, scatterPosition, surfaceNormal, surface.geomNormal);
+        isSSSSample = computeSSSPosition(payload, surface.position, surfaceNormal, surface.geomNormal);
     }
 
     if(isSSSSample)
@@ -739,7 +737,7 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     }
 
     float3 DIGIelement = 0.xxx;
-    const bool isTerminate = performLighting(payload, currentMaterial, scatterPosition, surfaceNormal, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
+    const bool isTerminate = performLighting(payload, surface, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
     if(isDirectRay(payload))
     {
         setDI(DIGIelement);
@@ -756,7 +754,7 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     
     addCaustics(caustics);
 
-    nextRay.Origin = scatterPosition;
+    nextRay.Origin = surface.position;
     nextRay.Direction = 0.xxx;
     sampleBSDF(surface, nextRay, payload);
 

@@ -156,6 +156,7 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
 
     VertexPNT vertex = getVertex(attrib);
     surface.position = vertex.Position;
+    surface.position = mul(float4(surface.position, 1), ObjectToWorld4x3());
     surface.normal = vertex.Normal;
 
     bool isIgnoreHit = false;
@@ -221,7 +222,7 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     float3 caustics = 0.xxx;
     if(payload.recursive <= 2)
     {
-        caustics = accumulatePhoton(mul(float4(surface.position, 1), ObjectToWorld4x3()), mul(surface.normal, (float3x3)ObjectToWorld4x3()));
+        caustics = accumulatePhoton(surface.position, mul(surface.normal, (float3x3)ObjectToWorld4x3()));
     }
 
     const float3 dir = WorldRayDirection();
