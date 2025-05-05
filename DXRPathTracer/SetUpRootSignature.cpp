@@ -308,6 +308,7 @@ void DXRPathTracer::CreateRootSignatureLocal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 2, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4, regSpace);
         mLocalRootSigMaterialWithTex = rsCreater.Create(mDevice, true, L"lrsMaterialWithTex");
         mRegisterMapGlobalLocalRootSigMaterialWithTex.clear();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
@@ -315,5 +316,6 @@ void DXRPathTracer::CreateRootSignatureLocal()
         mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
+        mRegisterMapGlobalLocalRootSigMaterialWithTex["bumpMap"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
     }
 }

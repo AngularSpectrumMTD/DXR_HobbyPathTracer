@@ -34,6 +34,11 @@ bool hasAlphaMask(in MaterialParams material)
     return (material.materialBits >> 1) & 1;
 }
 
+bool hasBumpMap(in MaterialParams material)
+{
+    return (material.materialBits >> 2) & 1;
+}
+
 bool isSSSExecutable(in MaterialParams material)
 {
     return material.isSSSExecutable && (material.transRatio < 0.1f) && (material.roughness > 0.2f);

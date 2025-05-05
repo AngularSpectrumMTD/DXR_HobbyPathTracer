@@ -1,8 +1,6 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
-https://github.com/user-attachments/assets/8d6d50cd-3ef6-43cc-89b2-e760781940da
-
 CausticsTest  
 ![Image](https://github.com/user-attachments/assets/b3a35893-8dee-41a9-8527-0eb5a4ba8216)
 
@@ -19,13 +17,15 @@ Corridor
 ![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
 
 Sponza
-![Image](https://github.com/user-attachments/assets/3fc94f4d-a5fa-46f4-8bff-707b4a965a2c)
+![Image](https://github.com/user-attachments/assets/4dbe2d04-06d2-4727-ba8e-ea654449032e)
+
+![Image](https://github.com/user-attachments/assets/1aad1681-b9fd-437c-bf54-5e76723c90c9)
 
 BistroExterior
-![Image](https://github.com/user-attachments/assets/5937affe-b9de-4c75-904f-451a96efcaa3)
+![Image](https://github.com/user-attachments/assets/7f4c3ebf-6bda-4052-a280-e22c6b99ced5)
 
 BistroInterior
-![Image](https://github.com/user-attachments/assets/981619e1-03a7-47dd-8694-b29a7d22bb86)
+![Image](https://github.com/user-attachments/assets/f194957d-8bd0-4b16-8532-ca5c6395d87b)
 
 Brick
 ![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)
@@ -43,7 +43,7 @@ Room
 
 Results of the verification of the ReSTIR DI/GI  
 
-![Image](https://github.com/user-attachments/assets/eebaf9a9-41a1-4df0-be19-ef935dc41003)
+![Image](https://github.com/user-attachments/assets/b20639f8-c1a1-49c3-b180-315bc0ac7f09)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     

@@ -26,9 +26,11 @@ namespace utility {
 		DirectX::XMVECTOR transColor;
 		DirectX::XMVECTOR emission;
 		u32 isSSSExecutable = 0;
+
 		u32 hasDiffuseTex : 1;
 		u32 hasAlphaMask : 1;
-		u32 materialBitsReserved : 30;
+		u32 hasBumpMap : 1;
+		u32 materialBitsReserved :29;
 
 		//ctor
 		MaterialParam()
@@ -42,6 +44,7 @@ namespace utility {
 			emission = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 			hasDiffuseTex = 0;
 			hasAlphaMask = 0;
+			hasBumpMap = 0;
 		}
 
 		void asDefault()
@@ -90,8 +93,10 @@ namespace utility {
 		f32 opacity;
 		string DiffuseTextureName;
 		string AlphaMaskName;
+		string BumpMapName;
 		utility::TextureResource DiffuseTexture;
 		utility::TextureResource AlphaMask;
+		utility::TextureResource BumpMap;
 		s32 TexID;
 		vector <utility::VertexPNT> TriangleVertexTbl;
 		vector <utility::VertexPNT> QuadrangleVertexTbl;
@@ -116,9 +121,11 @@ namespace utility {
 
 		bool hasDiffuseTex = false;
 		bool hasAlphaMask = false;
+		bool hasBumpMap = false;
 
 		void setDummyDiffuseTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyBumpMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 
 		bool isTransparent()
 		{

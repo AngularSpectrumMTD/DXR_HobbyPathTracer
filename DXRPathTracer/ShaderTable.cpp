@@ -180,6 +180,7 @@ void DXRPathTracer::CreateShaderTable(ComPtr<ID3D12Resource>& shaderTable, ComPt
                 memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["vertexBuffer"], &instances.descriptorTriangleVB.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["diffuseTex"], &instances.DiffuseTexture.srv.hGpu.ptr, sizeof(UINT64));
                 memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"], &instances.AlphaMask.srv.hGpu.ptr, sizeof(UINT64));
+                memcpy(registerAddressOffset + sizeof(UINT64) * mRegisterMapGlobalLocalRootSigMaterialWithTex["bumpMap"], &instances.BumpMap.srv.hGpu.ptr, sizeof(UINT64));
 
                 cbAddress += cbStride;
                 recordAddressOffset += hitgroupRecordSize;

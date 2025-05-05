@@ -12,6 +12,19 @@ StructuredBuffer<uint>   indexBuffer : register(t0,space1);
 StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
 Texture2D<float> alphaMask: register(t3, space1);
+Texture2D<float> bumpMap: register(t4, space1);
+
+float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
+{
+    uint start = PrimitiveIndex() * 3;
+    
+    float3 positionTbl[3];
+    for (int i = 0; i < 3; ++i) {
+        uint index = indexBuffer[start + i];
+        positionTbl[i] = vertexBuffer[index].Position;
+    }
+    return normalize(cross(positionTbl[1] - positionTbl[0], positionTbl[2] - positionTbl[0]));
+}
 
 VertexPNT getVertex(TriangleIntersectionAttributes attrib)
 {
@@ -29,28 +42,33 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib)
         texcoordTbl[i] = vertexBuffer[index].UV;
     }
     v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
-    v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
+
+    MaterialParams currentMaterial = constantBuffer;
+    
     v.UV = computeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
+
+    if(hasBumpMap(currentMaterial))
+    {
+        float3 geomNormal = getGeometricNormal(attrib);
+        float4 bumpValues = bumpMap.GatherRed(gSampler, v.UV, 0.0);
+        //GatherOp
+        //w z
+        //x y
+        float nz = bumpValues.x;
+        float nx = nz - bumpValues.y;
+        float ny = nz - bumpValues.w;
+        float3 localNormal = normalize(float3(nx, ny, nz));
+        v.Normal = tangentToWorld(geomNormal, localNormal);
+    }
+    else
+    {
+        v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
+    }
 
     v.Normal = normalize(v.Normal);
     return v;
 }
 
-float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
-{
-    VertexPNT v = (VertexPNT)0;
-    uint start = PrimitiveIndex() * 3;
-    
-    float3 positionTbl[3], normalTbl[3];
-    for (int i = 0; i < 3; ++i) {
-        uint index = indexBuffer[start + i];
-        positionTbl[i] = vertexBuffer[index].Position;
-        normalTbl[i] = vertexBuffer[index].Normal;
-    }
-    
-    v.Position = computeInterpolatedAttributeF3(positionTbl, attrib.barys);
-    return normalize(cross(positionTbl[1] - positionTbl[0], positionTbl[2] - positionTbl[0]));
-}
 
 void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in float2 UV)
 {
