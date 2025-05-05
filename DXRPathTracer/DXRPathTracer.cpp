@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom2;
+    mSceneType = SceneType_BistroInterior;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -212,7 +212,7 @@ void DXRPathTracer::Setup()
         case SceneType_BistroExterior:
         {
             mCausticsBoost = 0.004f;
-            mPhiDirectional = 414; mThetaDirectional = 302;
+            mPhiDirectional = 480; mThetaDirectional = 302;
             mOBJFileName = "exterior.obj";
             mOBJFolderName = "model/bistro/Exterior";
             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
@@ -231,8 +231,8 @@ void DXRPathTracer::Setup()
                 mInitEyePos = XMFLOAT3(-17, 23, -28);
                 mLightRange = 2.29f;
 #else
-                mInitEyePos = XMFLOAT3(-20, 9.97, -5.73);
-                mInitTargetPos = XMFLOAT3(14.4, 7.5, -4.0);
+                mInitEyePos = XMFLOAT3(-18, 6.46, 0.66);
+                mInitTargetPos = XMFLOAT3(16.4, 5.2, 0.02);
 #endif
                 mModelTypeTbl[0] = ModelType_Dragon;
             }

@@ -46,10 +46,9 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib)
     MaterialParams currentMaterial = constantBuffer;
     
     v.UV = computeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
-
+    v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
     if(hasBumpMap(currentMaterial))
     {
-        float3 geomNormal = getGeometricNormal(attrib);
         float4 bumpValues = bumpMap.GatherRed(gSampler, v.UV, 0.0);
         //GatherOp
         //w z
@@ -58,11 +57,7 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib)
         float nx = nz - bumpValues.y;
         float ny = nz - bumpValues.w;
         float3 localNormal = normalize(float3(nx, ny, nz));
-        v.Normal = tangentToWorld(geomNormal, localNormal);
-    }
-    else
-    {
-        v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
+        v.Normal = tangentToWorld(v.Normal, localNormal);
     }
 
     v.Normal = normalize(v.Normal);

@@ -17,15 +17,16 @@ Corridor
 ![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
 
 Sponza
-![Image](https://github.com/user-attachments/assets/4dbe2d04-06d2-4727-ba8e-ea654449032e)
-
-![Image](https://github.com/user-attachments/assets/1aad1681-b9fd-437c-bf54-5e76723c90c9)
+![Image](https://github.com/user-attachments/assets/ec2c5244-89da-46b2-80f4-4b1b6831e48b)
+![Image](https://github.com/user-attachments/assets/4a92bbbc-4fe8-4758-a0ed-7645a4f53758)
 
 BistroExterior
-![Image](https://github.com/user-attachments/assets/7f4c3ebf-6bda-4052-a280-e22c6b99ced5)
+![Image](https://github.com/user-attachments/assets/67305315-6771-4c90-90fd-35b34a599bb2)
+![Image](https://github.com/user-attachments/assets/cda019d7-532a-48dd-b8d5-7074ac934a89)
 
 BistroInterior
-![Image](https://github.com/user-attachments/assets/f194957d-8bd0-4b16-8532-ca5c6395d87b)
+![Image](https://github.com/user-attachments/assets/3570e10b-135a-43ed-940b-f42e4fa7d7dd)
+![Image](https://github.com/user-attachments/assets/d839ecc6-bc7c-4b63-9ea2-f1a09e011d84)
 
 Brick
 ![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)
@@ -42,8 +43,8 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR DI/GI  
+![Image](https://github.com/user-attachments/assets/38b3b351-aac5-44bf-a2bb-6f46c003b43d)
 
-![Image](https://github.com/user-attachments/assets/b20639f8-c1a1-49c3-b180-315bc0ac7f09)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
