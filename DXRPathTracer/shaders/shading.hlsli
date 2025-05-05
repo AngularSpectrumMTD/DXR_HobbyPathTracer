@@ -177,14 +177,14 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
 {
     float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
 
-    float3 globalNormal = surface.normal;
+    float3 n_global = surface.normal;
     MaterialParams currMaterial = surface.material;
 
     if(payload.recursive == 2)
     {
         GIReservoir giReservoir = getGIReservoir();
         giReservoir.giSample.pos_2nd = currentRayOrigin;
-        giReservoir.giSample.nml_2nd = globalNormal;
+        giReservoir.giSample.nml_2nd = n_global;
         giReservoir.compressedMaterial = compressMaterialParams(currMaterial);
 
         setGIReservoir(giReservoir);
@@ -202,16 +202,16 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
         const float blending = rand(payload.randomSeed);
         const float probability = 1 - currMaterial.transRatio;
 
-        float3 wo_local = worldToTangent(globalNormal, wo_global);
+        float3 wo_local = worldToTangent(n_global, wo_global);
 
         if (blending < probability)
         {
             if (wo_local.z < 0)
             {
-                globalNormal *= -1;
+                n_global *= -1;
             }
 
-            wo_local = worldToTangent(globalNormal, wo_global);
+            wo_local = worldToTangent(n_global, wo_global);
 
             //sample direction
             float3 wi_local = 0.xxx;
@@ -244,8 +244,8 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                 wi_local = reflect(-wo_local, Ne_local);
             }
 
-            nextRay.Origin = currentRayOrigin + globalNormal * eps;
-            nextRay.Direction = tangentToWorld(globalNormal, wi_local);
+            nextRay.Origin = currentRayOrigin + n_global * eps;
+            nextRay.Direction = tangentToWorld(n_global, wi_local);
             
             //compute bsdf    V : wo   L : wi(sample)
             float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
@@ -273,10 +273,10 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
             //change the normal direction to the incident direction side
             if (!isFromOutside)
             {
-                globalNormal *= -1;
+                n_global *= -1;
             }
 
-            wo_local = worldToTangent(globalNormal, wo_global);
+            wo_local = worldToTangent(n_global, wo_global);
             
             const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
@@ -299,8 +299,8 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                     wi_local = normalize(refractVec);
                     isRefractSampled = true;
                 }
-                nextRay.Origin = currentRayOrigin - globalNormal * eps;
-                nextRay.Direction = tangentToWorld(globalNormal, wi_local);
+                nextRay.Origin = currentRayOrigin - n_global * eps;
+                nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 
             //compute bsdf    V : wo   L : wi(sample)
@@ -326,7 +326,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
 
 void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload payload)
 {
-    float3 globalNormal = surface.normal;
+    float3 n_global = surface.normal;
     MaterialParams currMaterial = surface.material;
 
     nextRay.TMin = RAY_MIN_T;
@@ -340,16 +340,16 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
     const float blending = rand(payload.randomSeed);
     const float probability = 1 - currMaterial.transRatio;
 
-    float3 wo_local = worldToTangent(globalNormal, wo_global);
+    float3 wo_local = worldToTangent(n_global, wo_global);
 
     if (blending < probability)
     {
         if (wo_local.z < 0)
         {
-            globalNormal *= -1;
+            n_global *= -1;
         }
 
-        wo_local = worldToTangent(globalNormal, wo_global);
+        wo_local = worldToTangent(n_global, wo_global);
 
         //sample direction
         float3 wi_local = 0.xxx;
@@ -382,8 +382,8 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
             wi_local = reflect(-wo_local, Ne_local);
         }
 
-        nextRay.Origin = currentRayOrigin + globalNormal * eps;
-        nextRay.Direction = tangentToWorld(globalNormal, wi_local);
+        nextRay.Origin = currentRayOrigin + n_global * eps;
+        nextRay.Direction = tangentToWorld(n_global, wi_local);
         
         //compute bsdf    V : wo   L : wi(sample)
         float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
@@ -399,10 +399,10 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
         //change the normal direction to the incident direction side
         if (!isFromOutside)
         {
-            globalNormal *= -1;
+            n_global *= -1;
         }
 
-        wo_local = worldToTangent(globalNormal, wo_global);
+        wo_local = worldToTangent(n_global, wo_global);
         
         const float etaOUT = (payload.lambdaNM > 0) ? J_Bak4.computeRefIndex(payload.lambdaNM * 1e-3) : 1.7;
 
@@ -426,8 +426,8 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
                 wi_local = normalize(refractVec);
                 isRefractSampled = true;
             }
-            nextRay.Origin = currentRayOrigin - globalNormal * eps;
-            nextRay.Direction = tangentToWorld(globalNormal, wi_local);
+            nextRay.Origin = currentRayOrigin - n_global * eps;
+            nextRay.Direction = tangentToWorld(n_global, wi_local);
         }
 
         //compute bsdf    V : wo   L : wi(sample)
@@ -438,7 +438,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
     }
 }
 
-float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 globalNormal, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
+float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 n_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
 
@@ -446,15 +446,15 @@ float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 globalNor
     const float blending = rand(randomSeed);
     const float probability = 1 - material.transRatio;
 
-    float3 wo_local = worldToTangent(globalNormal, wo_global);
-    float3 wi_local = worldToTangent(globalNormal, wi_global);
+    float3 wo_local = worldToTangent(n_global, wo_global);
+    float3 wi_local = worldToTangent(n_global, wi_global);
 
    if (wo_local.z < 0)
     {
-        globalNormal *= -1;
+        n_global *= -1;
     }
 
-    wo_local = worldToTangent(globalNormal, wo_global);
+    wo_local = worldToTangent(n_global, wo_global);
     
     wo_local = normalize(wo_local);
     
@@ -464,7 +464,7 @@ float4 computeLambertianBSDF_PDF(in MaterialParams material, in float3 globalNor
     return BSDF_PDF;
 }
 
-float4 computeBSDF_PDF(in MaterialParams material, in float3 globalNormal, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
+float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
     float4 BSDF_PDF = 0.xxxx;
 
@@ -472,17 +472,17 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 globalNormal, in fl
     const float blending = rand(randomSeed);
     const float probability = 1 - material.transRatio;
 
-    float3 wo_local = worldToTangent(globalNormal, wo_global);
-    float3 wi_local = worldToTangent(globalNormal, wi_global);
+    float3 wo_local = worldToTangent(n_global, wo_global);
+    float3 wi_local = worldToTangent(n_global, wi_global);
 
     if (blending < probability)
     {
         if (wo_local.z < 0)
         {
-            globalNormal *= -1;
+            n_global *= -1;
         }
 
-        wo_local = worldToTangent(globalNormal, wo_global);
+        wo_local = worldToTangent(n_global, wo_global);
         
         const float3 V_local = normalize(wo_local);
         
@@ -497,10 +497,10 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 globalNormal, in fl
         //change the normal direction to the incident direction side
         if (!isFromOutside)
         {
-            globalNormal *= -1;
+            n_global *= -1;
         }
 
-        wo_local = worldToTangent(globalNormal, wo_global);
+        wo_local = worldToTangent(n_global, wo_global);
 
         const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
 
@@ -514,7 +514,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 globalNormal, in fl
     return BSDF_PDF;
 }
 
-void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout LightSample lightSample, out DIReservoir reservoir, inout uint randomSeed, in bool isSSSSample)
+void sampleLightStreamingRIS(in Surface surface, inout LightSample lightSample, out DIReservoir reservoir, inout uint randomSeed, in bool isSSSSample)
 {
     const float pdf = 1.0f / getLightNum();//ordinal pdf to get the one sample from all lights
     float p_hat = 0;
@@ -526,23 +526,23 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
     {
         const uint lightID = getRandomLightID(randomSeed);
         const uint replayRandomSeed = randomSeed;
-        sampleLightWithID(scatterPosition, lightID, lightSample, randomSeed);
+        sampleLightWithID(surface.position, lightID, lightSample, randomSeed);
 
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
-        float receiverCos = dot(surfaceNormal, wi);
+        float receiverCos = dot(surface.normal, wi);
         float emitterCos = dot(lightNormal, -wi);
 
         float4 bsdfPDF = 0.xxxx;
         if(isSSSSample)
         {
-            MaterialParams sssMaterial = material;
+            MaterialParams sssMaterial = surface.material;
             sssMaterial.albedo = 1.xxxx;
-            bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
+            bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surface.normal, -WorldRayDirection(), wi, randomSeed);
         }
         else
         {
-            bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, randomSeed);
+            bsdfPDF = computeBSDF_PDF(surface.material, surface.normal, -WorldRayDirection(), wi, randomSeed);
         }
         float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
 
@@ -561,11 +561,11 @@ void sampleLightStreamingRIS(in MaterialParams material, in float3 scatterPositi
         updateDIReservoir(reservoir, lightID, replayRandomSeed, updateW, p_hat, compressRGBasU32(p_hat_3F), 1u, rand(randomSeed));
     }
     uint replaySeed = reservoir.randomSeed;
-    sampleLightWithID(scatterPosition, reservoir.lightID, lightSample, replaySeed);
+    sampleLightWithID(surface.position, reservoir.lightID, lightSample, replaySeed);
     reservoir.M = 1;
 }
 
-float3 performNEE(inout Payload payload, in MaterialParams material, in float3 scatterPosition, in float3 surfaceNormal, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS, in bool isSSSSample)
+float3 performNEE(inout Payload payload, in Surface surface, inout DIReservoir reservoir, in float3 originalNormal, in float3 originalScatterPositionForSSS, in bool isSSSSample)
 {
     float3 estimatedColor = 0.xxx;
     if (isUseStreamingRIS())
@@ -576,8 +576,8 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
 
         if(isSSSSample)
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed, true);
-            visibility = isVisible(scatterPosition, lightSample);
+            sampleLightStreamingRIS(surface, lightSample, reservoir, payload.randomSeed, true);
+            visibility = isVisible(surface.position, lightSample);
 
             if(!visibility)
             {
@@ -587,12 +587,12 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
                 //recomputation
                 float3 lightNormal = lightSample.normal;
                 float3 wi = lightSample.directionToLight;
-                float receiverCos = dot(surfaceNormal, wi);
+                float receiverCos = dot(surface.normal, wi);
                 float emitterCos = dot(lightNormal, -wi);
                 //Only albedo on the incident side is considered
-                MaterialParams sssMaterial = material;
+                MaterialParams sssMaterial = surface.material;
                 sssMaterial.albedo = 1.xxxx;
-                float4 bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surfaceNormal, -WorldRayDirection(), wi, reservoirRandomSeed);
+                float4 bsdfPDF = computeLambertianBSDF_PDF(sssMaterial, surface.normal, -WorldRayDirection(), wi, reservoirRandomSeed);
                 float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
                 float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
 
@@ -601,8 +601,8 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
         }
         else
         {
-            sampleLightStreamingRIS(material, scatterPosition, surfaceNormal, lightSample, reservoir, payload.randomSeed, false);
-            visibility = isVisible(scatterPosition, lightSample);
+            sampleLightStreamingRIS(surface, lightSample, reservoir, payload.randomSeed, false);
+            visibility = isVisible(surface.position, lightSample);
         }
 
         if (visibility)
@@ -618,14 +618,14 @@ float3 performNEE(inout Payload payload, in MaterialParams material, in float3 s
     {
         //explicitly connect to light source
         LightSample lightSample;
-        sampleLight(scatterPosition, lightSample, payload.randomSeed);
+        sampleLight(surface.position, lightSample, payload.randomSeed);
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
-        float receiverCos = dot(surfaceNormal, wi);
+        float receiverCos = dot(surface.normal, wi);
         float emitterCos = dot(lightNormal, -wi);
-        if (isVisible(scatterPosition, lightSample) && (receiverCos > 0) && (emitterCos > 0))
+        if (isVisible(surface.position, lightSample) && (receiverCos > 0) && (emitterCos > 0))
         {
-            float4 bsdfPDF = computeBSDF_PDF(material, surfaceNormal, -WorldRayDirection(), wi, payload.randomSeed);
+            float4 bsdfPDF = computeBSDF_PDF(surface.material, surface.normal, -WorldRayDirection(), wi, payload.randomSeed);
             float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
             float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
             estimatedColor = FGL;
@@ -675,7 +675,7 @@ bool performLighting(inout Payload payload, in Surface surface, out float3 hitLe
         if (isNEELightingRequired)
         {
             DIReservoir reservoir;
-            DIGIelement = performNEE(payload, surface.material, surface.position, surface.normal, reservoir, originalSurfaceNormal, originalScatterPositionForSSS, isSSSSample) * decompressU32asRGB(payload.throughputU32);
+            DIGIelement = performNEE(payload, surface, reservoir, originalSurfaceNormal, originalScatterPositionForSSS, isSSSSample) * decompressU32asRGB(payload.throughputU32);
             if(isDirectRay(payload) && isUseStreamingRIS() && !isSSSExecutable(surface.material))
             {
                 //When we use the ordinal ReSTIR to SSS evaluated sample, that is return to non SSS sample.
