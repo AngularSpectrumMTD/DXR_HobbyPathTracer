@@ -115,9 +115,9 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     }
 
     float3 caustics = 0.xxx;
-    if(payload.recursive <= 2)
+    if(payload.recursive <= 3)
     {
-        caustics = accumulatePhoton(surface.position, mul(surface.normal, (float3x3)ObjectToWorld4x3()));
+        caustics = accumulatePhoton(surface.position, surface.normal);
     }
 
     const float3 dir = WorldRayDirection();

@@ -140,7 +140,7 @@ float4 ForceLambertianBSDF_PDF(in MaterialParams material, in float3 N, in float
     }
 }
 
-float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT, in bool isRefractSampled, in bool isFromOutside)
+float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT)
 {
     const float specRatio = FresnelReflectance(-wo, N, etaOUT);
 
@@ -285,26 +285,23 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
 
             float3 wi_local = 0.xxx;
 
-            bool isRefractSampled = true;
             {
                 float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
                 float3 refractVec = refract(-wo_local, halfVec_local, eta);
                 if (length(refractVec) < 0.001f)
                 {
                     wi_local = reflect(-wo_local, halfVec_local); //handle as total reflection
-                    isRefractSampled = false;
                 }
                 else
                 {
                     wi_local = normalize(refractVec);
-                    isRefractSampled = true;
                 }
                 nextRay.Origin = currentRayOrigin - n_global * eps;
                 nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 
             //compute bsdf    V : wo   L : wi(sample)
-            float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
+            float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
             const float cosine = max(0, abs(wi_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
 
@@ -324,117 +321,117 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
     }
 }
 
-void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload payload)
+void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload payload, in float wavelength = 0)
 {
+    float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
+
     float3 n_global = surface.normal;
     MaterialParams currMaterial = surface.material;
 
-    nextRay.TMin = RAY_MIN_T;
-    nextRay.TMax = RAY_MAX_T;
-    
-    const float eps = 0.001;
-    const float3 wo_global = -WorldRayDirection();
-    const float3 currentRayOrigin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();
-
-    const float roulette = rand(payload.randomSeed);
-    const float blending = rand(payload.randomSeed);
-    const float probability = 1 - currMaterial.transRatio;
-
-    float3 wo_local = worldToTangent(n_global, wo_global);
-
-    if (blending < probability)
+    const uint currentSeed = payload.randomSeed;
     {
-        if (wo_local.z < 0)
-        {
-            n_global *= -1;
-        }
-
-        wo_local = worldToTangent(n_global, wo_global);
-
-        //sample direction
-        float3 wi_local = 0.xxx;
+        nextRay.TMin = RAY_MIN_T;
+        nextRay.TMax = RAY_MAX_T;
         
-        const float diffRatio = 1.0 - currMaterial.metallic;
-        wo_local = normalize(wo_local);
-        
-        if (roulette < diffRatio)//diffuse
+        const float eps = 0.001;
+        const float3 wo_global = -WorldRayDirection();
+
+        const float roulette = rand(payload.randomSeed);
+        const float blending = rand(payload.randomSeed);
+        const float probability = 1 - currMaterial.transRatio;
+
+        float3 wo_local = worldToTangent(n_global, wo_global);
+
+        if (blending < probability)
         {
-            float2 dummy = 0.xx;
-            wi_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed, dummy);
-        }
-        else //specular
-        {
-            //const float3 H = GGX_ImportanceSampling(N, material.roughness);
-            //const float3 halfVec_local = ImportanceSampling(Z_AXIS, material.roughness);
-            //wi_local = normalize(2.0f * dot(wo_local, halfVec_local) * halfVec_local - wo_local);
-
-            const float a = currMaterial.roughness * currMaterial.roughness;
-            float3 Vh_local = normalize(float3(a * wo_local.x, a * wo_local.y, wo_local.z));
-            float phi = 2 * PI * rand(payload.randomSeed);
-            float z = (1 - rand(payload.randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
-            float R = sqrt(saturate(1 - z * z));
-            float2 sincosXY = 0.xx;
-            sincos(phi, sincosXY.x, sincosXY.y);
-            float x = R * sincosXY.y;
-            float y = R * sincosXY.x;
-            float3 Nh_local = float3(x, y, z) + Vh_local;
-            float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
-            wi_local = reflect(-wo_local, Ne_local);
-        }
-
-        nextRay.Origin = currentRayOrigin + n_global * eps;
-        nextRay.Direction = tangentToWorld(n_global, wi_local);
-        
-        //compute bsdf    V : wo   L : wi(sample)
-        float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
-        const float cosine = max(0, abs(wi_local.z));
-        const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        payload.updateThroughputByMulitiplicationF3(weight);
-    }
-    else
-    {
-        //sample direction
-        bool isFromOutside = wo_local.z > 0;
-
-        //change the normal direction to the incident direction side
-        if (!isFromOutside)
-        {
-            n_global *= -1;
-        }
-
-        wo_local = worldToTangent(n_global, wo_global);
-        
-        const float etaOUT = (payload.lambdaNM > 0) ? J_Bak4.computeRefIndex(payload.lambdaNM * 1e-3) : 1.7;
-
-        wo_local = normalize(wo_local);
-        uint seedDummy = 0;
-        const float3 halfVec_local = GGX_ImportanceSampling(Z_AXIS, currMaterial.roughness, seedDummy);
-
-        float3 wi_local = 0.xxx;
-
-        bool isRefractSampled = true;
-        {
-            float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
-            float3 refractVec = refract(-wo_local, halfVec_local, eta);
-            if (length(refractVec) < 0.001f)
+            if (wo_local.z < 0)
             {
-                wi_local = reflect(-wo_local, halfVec_local); //handle as total reflection
-                isRefractSampled = false;
+                n_global *= -1;
             }
-            else
+
+            wo_local = worldToTangent(n_global, wo_global);
+
+            //sample direction
+            float3 wi_local = 0.xxx;
+            
+            const float diffRatio = 1.0 - currMaterial.metallic;
+            wo_local = normalize(wo_local);
+            
+            if (roulette < diffRatio)//diffuse
             {
-                wi_local = normalize(refractVec);
-                isRefractSampled = true;
+                float2 dummy = 0.xx;
+                wi_local = HemisphereORCosineSampling(Z_AXIS, false, payload.randomSeed, dummy);
             }
-            nextRay.Origin = currentRayOrigin - n_global * eps;
+            else //specular
+            {
+                //const float3 H = GGX_ImportanceSampling(N, material.roughness);
+                //const float3 halfVec_local = ImportanceSampling(Z_AXIS, material.roughness);
+                //wi_local = normalize(2.0f * dot(wo_local, halfVec_local) * halfVec_local - wo_local);
+
+                const float a = currMaterial.roughness * currMaterial.roughness;
+                float3 Vh_local = normalize(float3(a * wo_local.x, a * wo_local.y, wo_local.z));
+                float phi = 2 * PI * rand(payload.randomSeed);
+                float z = (1 - rand(payload.randomSeed)) * (1 + Vh_local.z) - Vh_local.z;
+                float R = sqrt(saturate(1 - z * z));
+                float2 sincosXY = 0.xx;
+                sincos(phi, sincosXY.x, sincosXY.y);
+                float x = R * sincosXY.y;
+                float y = R * sincosXY.x;
+                float3 Nh_local = float3(x, y, z) + Vh_local;
+                float3 Ne_local = normalize(float3(a * Nh_local.x, a * Nh_local.y, max(0, Nh_local.z)));
+                wi_local = reflect(-wo_local, Ne_local);
+            }
+
+            nextRay.Origin = currentRayOrigin + n_global * eps;
             nextRay.Direction = tangentToWorld(n_global, wi_local);
+            
+            //compute bsdf    V : wo   L : wi(sample)
+            float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
+            const float cosine = max(0, abs(wi_local.z));
+            const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+            payload.updateThroughputByMulitiplicationF3(weight);
         }
+        else
+        {
+            //sample direction
+            bool isFromOutside = wo_local.z > 0;
 
-        //compute bsdf    V : wo   L : wi(sample)
-        float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT, isRefractSampled, isFromOutside);
-        const float cosine = max(0, abs(wi_local.z));
-        const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
-        payload.updateThroughputByMulitiplicationF3(weight);
+            //change the normal direction to the incident direction side
+            if (!isFromOutside)
+            {
+                n_global *= -1;
+            }
+
+            wo_local = worldToTangent(n_global, wo_global);
+            
+            const float etaOUT = (payload.lambdaNM > 0) ? J_Bak4.computeRefIndex(payload.lambdaNM * 1e-3) : 1.7;
+
+            wo_local = normalize(wo_local);
+            const float3 halfVec_local = GGX_ImportanceSampling(Z_AXIS, currMaterial.roughness, payload.randomSeed);
+
+            float3 wi_local = 0.xxx;
+
+            {
+                float eta = isFromOutside ? ETA_AIR / etaOUT : etaOUT / ETA_AIR;
+                float3 refractVec = refract(-wo_local, halfVec_local, eta);
+                if (length(refractVec) < 0.001f)
+                {
+                    wi_local = reflect(-wo_local, halfVec_local); //handle as total reflection
+                }
+                else
+                {
+                    wi_local = normalize(refractVec);
+                }
+                nextRay.Origin = currentRayOrigin - n_global * eps;
+                nextRay.Direction = tangentToWorld(n_global, wi_local);
+            }
+
+            //compute bsdf    V : wo   L : wi(sample)
+            float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+            const float cosine = max(0, abs(wi_local.z));
+            const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
+            payload.updateThroughputByMulitiplicationF3(weight);
+        }
     }
 }
 
@@ -508,7 +505,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3
         const float3 halfVec_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
 
         //compute bsdf    V : wo   L : wi(sample)
-        BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT, true, isFromOutside);
+        BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
     }
 
     return BSDF_PDF;

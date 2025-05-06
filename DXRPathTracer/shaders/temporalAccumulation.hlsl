@@ -121,7 +121,12 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         currLuminanceMoment.x = lerp(prevLuminanceMoment.x, currLuminanceMoment.x, tmpAccmuRatio);
         currLuminanceMoment.y = lerp(prevLuminanceMoment.y, currLuminanceMoment.y, tmpAccmuRatio);
 
-        DIGIBuffer[currID].rgb = accumulatedDIGI + getCausticsBoost() * accumulatedCaustics;
+        float3 renderCaustics = accumulatedCaustics;
+// #ifdef USE_SPECTRAL_RENDERED_CAUSTICS
+//         renderCaustics = max(0.xxx, mul(renderCaustics, XYZtoRGB2));
+// #endif
+
+        DIGIBuffer[currID].rgb = accumulatedDIGI + getCausticsBoost() * renderCaustics;
         CurrentDIBuffer[currID].rgb = accumulatedDI;
         CurrentGIBuffer[currID].rgb = accumulatedGI;
         CurrentCausticsBuffer[currID].rgb = accumulatedCaustics;
@@ -132,7 +137,12 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         AccumulationCountBuffer[currID] = 1;
         float3 currDIGI = currDI + currGI;
 
-        DIGIBuffer[currID].rgb = currDIGI + getCausticsBoost() * currCaustics;
+        float3 renderCaustics = currCaustics;
+// #ifdef USE_SPECTRAL_RENDERED_CAUSTICS
+//         renderCaustics = max(0.xxx, mul(renderCaustics, XYZtoRGB2));
+// #endif
+
+        DIGIBuffer[currID].rgb = currDIGI + getCausticsBoost() * renderCaustics;
         CurrentDIBuffer[currID].rgb = currDI;
         CurrentGIBuffer[currID].rgb = currGI;
         CurrentCausticsBuffer[currID].rgb = currCaustics;

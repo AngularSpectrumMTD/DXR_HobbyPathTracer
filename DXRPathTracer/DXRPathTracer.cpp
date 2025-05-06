@@ -203,7 +203,8 @@ void DXRPathTracer::Setup()
                         mCausticsBoost = 0.05;
                         mLightRange = 0.29f;
 
-                        mModelTypeTbl[0] = ModelType_Afrodyta;
+                        //mModelTypeTbl[0] = ModelType_Afrodyta;
+                        mModelTypeTbl[0] = ModelType_Ocean2;
                         //mLightRange = 2.00f;
                     }
                 }
@@ -1776,7 +1777,15 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         mIsUseTemporalAccumulation = false;
         break;
     case 'Q':
-        mCausticsBoost = Clamp(0.0001f, 20.0f, mCausticsBoost + (mInverseMove ? -0.0001f : 0.0001f));
+        if (mInverseMove)
+        {
+            mCausticsBoost /= 2.0f;
+        }
+        else
+        {
+            mCausticsBoost *= 2.0f;
+        }
+        mCausticsBoost = Clamp(0.0001f, 20.0f, mCausticsBoost);
         mIsUseTemporalAccumulation = false;
         break;
     case 'U':
