@@ -25,7 +25,62 @@
 #define USE_SPECTRAL_RENDERED_CAUSTICS
 //#define PHOTON_AABB_DEBUG
 
+#define ETA_AIR 1.0f
+#define MEAN_FREE_PATH 1e-5f
+
+#define Z_AXIS float3(0, 0, 1)
+#define BSDF_EPS 0.0001f
+
 #include "materialParams.hlsli"
+
+struct OpticalGlass
+{
+    float A0;
+    float A1;
+    float A2;
+    float A3;
+    float A4;
+    float A5;
+    float A6;
+    float A7;
+    float A8;
+
+    //ex computeRefIndex(lambdaNM * 1e-3)
+    float computeRefIndex(float lambdaInMicroMeter)
+    {
+        float lambdaPow2 = lambdaInMicroMeter * lambdaInMicroMeter;
+        float lambdaPow4 = lambdaPow2 * lambdaPow2;
+        float invLambdaPow2 = 1 / lambdaPow2;
+        float invLambdaPow4 = invLambdaPow2 * invLambdaPow2;
+        float invLambdaPow6 = invLambdaPow4 * invLambdaPow2;
+        float invLambdaPow8 = invLambdaPow6 * invLambdaPow2;
+        float invLambdaPow10 = invLambdaPow8 * invLambdaPow2;
+        float invLambdaPow12 = invLambdaPow10 * invLambdaPow2;
+        
+        return sqrt(A0
+		+ A1 * lambdaPow2
+		+ A2 * lambdaPow4
+		+ A3 * invLambdaPow2
+		+ A4 * invLambdaPow4
+		+ A5 * invLambdaPow6
+		+ A6 * invLambdaPow8
+		+ A7 * invLambdaPow10
+		+ A8 * invLambdaPow12);
+    }
+};
+
+static OpticalGlass J_Bak4 =
+{
+    2.42114503E+00,
+    -8.99959341E-03,
+    -9.30006854E-05,
+    1.43071120E-02,
+    1.89993274E-04,
+    6.09602388E-06,
+    2.25737069E-07,
+    0.00000000E+00,
+    0.00000000E+00
+};
 
 struct Payload
 {
@@ -506,6 +561,73 @@ void initializeRNG(uint2 index, out uint seed)
 void finalizeRNG(uint2 index, in uint seed)
 {
     gRandomNumber[index] = seed;
+}
+
+float copysignf(float x, float y)
+{
+    uint ux = asuint(x);
+    uint uy = asuint(y);
+	ux &= 0x7fffffff;
+	ux |= uy & 0x80000000;
+	return asfloat(ux);
+}
+
+//Paper : "Building an Orthonormal Basis, Revisited"
+void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
+{
+  float sign = copysignf(1.0f, normal.z);
+  const float A = -1.0f / (sign + normal.z);
+  const float B = normal.x * normal.y * A;
+  tangent = float3(1.0f + sign * normal.x * normal.x * A, sign * B, -sign * normal.x);
+  bitangent = float3(B, sign + normal.y * normal.y * A, -normal.y);
+}
+
+uint getRandomLightID(inout uint randomSeed)
+{
+    return min(max(0, (uint) (rand(randomSeed) * (getLightNum()) + 0.5)), getLightNum() - 1);
+}
+
+float3 tangentToWorld(float3 N, float3 tangentSpaceVec)
+{
+    float3 tangent;
+    float3 bitangent;
+    ONB(N, tangent, bitangent);
+
+    return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + N * tangentSpaceVec.z);
+}
+
+float3 worldToTangent(float3 N, float3 worldSpaceVec)
+{
+    float3 tangent;
+    float3 bitangent;
+    ONB(N, tangent, bitangent);
+
+    return normalize(float3(dot(tangent, worldSpaceVec), dot(bitangent, worldSpaceVec), dot(N, worldSpaceVec)));
+}
+
+float3 HemisphereORCosineSampling(float3 N, bool isHemi, inout uint randomSeed, out float2 randomUV)
+{
+    float u = rand(randomSeed);
+    float v = rand(randomSeed);
+    randomUV = float2(u, v);
+    float cosT = isHemi ? u : sqrt(u);
+    float sinT = sqrt(1 - cosT * cosT);
+    float P = 2 * PI * v;
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+
+    return tangentToWorld(N, tangentDir);
+}
+
+float3 HemisphereORCosineSamplingWithUV(float3 N, bool isHemi, in float2 randomUV)
+{
+    float u = randomUV.x;
+    float v = randomUV.y;
+    float cosT = isHemi ? u : sqrt(u);
+    float sinT = sqrt(1 - cosT * cosT);
+    float P = 2 * PI * v;
+    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
+
+    return tangentToWorld(N, tangentDir);
 }
 
 #endif//__COMMON_HLSLI__

@@ -4,48 +4,6 @@
 //=========================================================================
 //Sampling
 //=========================================================================
-float3 tangentToWorld(float3 N, float3 tangentSpaceVec)
-{
-    float3 tangent;
-    float3 bitangent;
-    ONB(N, tangent, bitangent);
-
-    return normalize(tangent * tangentSpaceVec.x + bitangent * tangentSpaceVec.y + N * tangentSpaceVec.z);
-}
-
-float3 worldToTangent(float3 N, float3 worldSpaceVec)
-{
-    float3 tangent;
-    float3 bitangent;
-    ONB(N, tangent, bitangent);
-
-    return normalize(float3(dot(tangent, worldSpaceVec), dot(bitangent, worldSpaceVec), dot(N, worldSpaceVec)));
-}
-
-float3 HemisphereORCosineSampling(float3 N, bool isHemi, inout uint randomSeed, out float2 randomUV)
-{
-    float u = rand(randomSeed);
-    float v = rand(randomSeed);
-    randomUV = float2(u, v);
-    float cosT = isHemi ? u : sqrt(u);
-    float sinT = sqrt(1 - cosT * cosT);
-    float P = 2 * PI * v;
-    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
-
-    return tangentToWorld(N, tangentDir);
-}
-
-float3 HemisphereORCosineSamplingWithUV(float3 N, bool isHemi, in float2 randomUV)
-{
-    float u = randomUV.x;
-    float v = randomUV.y;
-    float cosT = isHemi ? u : sqrt(u);
-    float sinT = sqrt(1 - cosT * cosT);
-    float P = 2 * PI * v;
-    float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
-
-    return tangentToWorld(N, tangentDir);
-}
 
 float3 GGX_ImportanceSampling(float3 N, float roughness, inout uint randomSeed)
 {
@@ -179,6 +137,166 @@ float3 RefractionBTDF(float D, float G, float3 F, float3 V, float3 L, float3 N, 
     float3 XYZ = etaOUT * etaOUT * (1 - F) * G * D;
     float B = (etaIN * dotVH + etaOUT * dotLH) * (etaIN * dotVH + etaOUT * dotLH) + BSDF_EPS;
     return A * XYZ / B;
+}
+
+float4 specularBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
+{
+    if (dot(N, wi) <= 0)
+    {
+        return float4(0, 0, 0, 1);
+    }
+
+    const float diffRatio = 1.0 - material.metallic;
+
+    const float specRatio = 1 - diffRatio;
+    const float3 H = normalize(wi + wo);
+
+    const float dotNL = abs(dot(N, wi));
+    const float dotNH = abs(dot(N, H));
+    const float dotVH = abs(dot(wo, H));
+
+    float3 F0 = 0.08.xxx;
+    F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+        
+    const float NDF = GGX_Distribution(N, H, material.roughness);
+    const float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
+    const float3 F = FresnelSchlick(max(dot(wo, H), 0), F0);
+
+    const float3 kS = F;
+    const float3 kD = (1 - kS) * (1 - material.metallic);
+        
+    const float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
+    const float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+    const float diffPDF = CosineSamplingPDF(dotNL);
+    const float3 sumBSDF = (diffBRDF * kD + specBRDF) * dotNL;
+    const float sumPDF = diffRatio * diffPDF + specRatio * specPDF;
+
+    if (sumPDF > 0)
+    {
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
+    }
+    else
+    {
+        return float4(0, 0, 0, 1);
+    }
+}
+
+float4 ForceLambertianBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi)
+{
+    if (dot(N, wi) <= 0)
+    {
+        return float4(0, 0, 0, 1);
+    }
+
+    const float3 H = normalize(wi + wo);
+
+    const float dotNL = abs(dot(N, wi));
+
+    float3 F0 = 0.08.xxx;
+    F0 = lerp(F0 * material.specular, material.albedo.xyz, (material.metallic).xxx);
+    
+    const float3 F = FresnelSchlick(max(dot(wo, H), 0), F0);
+
+    const float3 kS = F;
+    const float3 kD = (1 - kS) * (1 - material.metallic);
+    
+    const float3 diffBRDF = DiffuseBRDF(material.albedo.rgb);
+    const float diffPDF = CosineSamplingPDF(dotNL);
+    const float3 sumBSDF = (diffBRDF * kD) * dotNL;
+    const float sumPDF = diffPDF;
+
+    if (sumPDF > 0)
+    {
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
+    }
+    else
+    {
+        return float4(0, 0, 0, 1);
+    }
+}
+
+float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, in float3 wi, in float3 H, in float etaIN, in float etaOUT)
+{
+    const float specRatio = FresnelReflectance(-wo, N, etaOUT);
+
+    const float dotNL = abs(dot(N, wi));
+    const float dotNV = abs(dot(N, wo));
+    const float dotNH = abs(dot(N, H));
+    const float dotVH = abs(dot(wo, H));
+    const float dotLH = abs(dot(wi, H));
+
+    float3 F0 = 0.08.xxx * material.specular;
+    float3 F = FresnelSchlick(max(dot(H, wo), 0), F0);
+
+    float NDF = GGX_Distribution(N, H, material.roughness);
+    float G = GGX_Geometry_Smith(N, wo, wi, material.roughness);
+
+    float3 specBRDF = SpecularBRDF(NDF, G, F, wo, wi, N);
+    float specPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    float3 refrBTDF = RefractionBTDF(NDF, G, F, wo, wi, N, H, etaIN, etaOUT);
+    float refrPDF = GGX_ImportanceSamplingPDF(NDF, dotNH, dotVH);
+    const float3 sumBSDF = (specBRDF + refrBTDF * material.transColor.rgb) * dotNL;
+    const float sumPDF = specRatio * specPDF + (1 - specRatio) * refrPDF;
+
+    if (sumPDF > 0)
+    {
+        return float4(sumBSDF, sumPDF + BSDF_EPS);
+    }
+    else
+    {
+        return float4(0, 0, 0, 1);
+    }
+}
+
+float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
+{
+    float4 BSDF_PDF = 0.xxxx;
+
+    const float roulette = rand(randomSeed);
+    const float blending = rand(randomSeed);
+    const float probability = 1 - material.transRatio;
+
+    float3 wo_local = worldToTangent(n_global, wo_global);
+    float3 wi_local = worldToTangent(n_global, wi_global);
+
+    if (blending < probability)
+    {
+        if (wo_local.z < 0)
+        {
+            n_global *= -1;
+        }
+
+        wo_local = worldToTangent(n_global, wo_global);
+        
+        const float3 V_local = normalize(wo_local);
+        
+        //compute bsdf    V : wo   L : wi(sample)
+        BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, wi_local);
+    }
+    else
+    {
+        //sample direction
+        bool isFromOutside = wo_local.z > 0;
+
+        //change the normal direction to the incident direction side
+        if (!isFromOutside)
+        {
+            n_global *= -1;
+        }
+
+        wo_local = worldToTangent(n_global, wo_global);
+
+        const float etaOUT = (wavelength > 0) ? J_Bak4.computeRefIndex(wavelength * 1e-3) : 1.7;
+
+        wo_local = normalize(wo_local);
+        const float3 halfVec_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
+
+        //compute bsdf    V : wo   L : wi(sample)
+        BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+    }
+
+    return BSDF_PDF;
 }
 
 #endif//__SAMPLING_BSDF_HLSLI__
