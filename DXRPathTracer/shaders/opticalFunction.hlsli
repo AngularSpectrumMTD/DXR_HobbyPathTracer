@@ -3,8 +3,6 @@
 
 #include "common.hlsli"
 
-#define Z_AXIS float3(0, 0, 1)
-
 void primarySurfaceHasHighPossibilityCausticsGenerate(in MaterialParams params, inout PhotonPayload payload)
 {
     if((payload.recursive == 1) && ((params.transRatio > 0) || (params.metallic > 0.5)))
@@ -29,32 +27,6 @@ bool isPhotonStoreRequired(in MaterialParams params, inout PhotonPayload payload
 //     tangent = normalize(cross(up, normal));
 //     bitangent = cross(normal, tangent);
 // }
-
-float copysignf(float x, float y)
-{
-    uint ux = asuint(x);
-    uint uy = asuint(y);
-	ux &= 0x7fffffff;
-	ux |= uy & 0x80000000;
-	return asfloat(ux);
-}
-
-//Paper : "Building an Orthonormal Basis, Revisited"
-void ONB(in float3 normal, out float3 tangent, out float3 bitangent)
-{
-  float sign = copysignf(1.0f, normal.z);
-  const float A = -1.0f / (sign + normal.z);
-  const float B = normal.x * normal.y * A;
-  tangent = float3(1.0f + sign * normal.x * normal.x * A, sign * B, -sign * normal.x);
-  bitangent = float3(B, sign + normal.y * normal.y * A, -normal.y);
-}
-
-uint getRandomLightID(inout uint randomSeed)
-{
-    return min(max(0, (uint) (rand(randomSeed) * (getLightNum()) + 0.5)), getLightNum() - 1);
-}
-
-#define BSDF_EPS 0.0001f
 
 #include "reservoir.hlsli"
 #include "geometryIntersection.hlsli"

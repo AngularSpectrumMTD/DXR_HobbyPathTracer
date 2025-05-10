@@ -1,4 +1,8 @@
-#include "opticalFunction.hlsli"
+#include "common.hlsli"
+#include "geometryIntersection.hlsli"
+#include "samplingBSDF.hlsli"
+#include "samplingLight.hlsli"
+#include "spectralRenderingHelper.hlsli"
 
 #define SPP 1
 

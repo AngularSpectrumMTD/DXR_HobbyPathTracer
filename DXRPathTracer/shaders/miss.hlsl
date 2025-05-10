@@ -1,5 +1,6 @@
 #include "common.hlsli"
-#include "opticalFunction.hlsli"
+#include "geometryIntersection.hlsli"
+#include "samplingLight.hlsli"
 
 float2 EquirecFetchUV(float3 dir)
 {
