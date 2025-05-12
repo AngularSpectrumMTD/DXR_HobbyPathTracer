@@ -27,12 +27,10 @@ Sponza
 ![Image](https://github.com/user-attachments/assets/4a92bbbc-4fe8-4758-a0ed-7645a4f53758)
 
 BistroExterior
-![Image](https://github.com/user-attachments/assets/67305315-6771-4c90-90fd-35b34a599bb2)
-![Image](https://github.com/user-attachments/assets/cda019d7-532a-48dd-b8d5-7074ac934a89)
+![Image](https://github.com/user-attachments/assets/0ffb207f-f829-4399-878d-0d636cc4bf18)
 
 BistroInterior
-![Image](https://github.com/user-attachments/assets/3570e10b-135a-43ed-940b-f42e4fa7d7dd)
-![Image](https://github.com/user-attachments/assets/d839ecc6-bc7c-4b63-9ea2-f1a09e011d84)
+![Image](https://github.com/user-attachments/assets/0ae9222b-cf1a-4cd8-b5aa-611942ef44d3)
 
 Brick
 ![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)

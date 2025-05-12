@@ -104,6 +104,49 @@ namespace utility {
 
 
 namespace utility {
+    void getTexMetadata(DirectX::TexMetadata& metadata, const std::wstring& fileName, bool& isSuccess, bool isNoExeption)
+    {
+        DirectX::ScratchImage image;
+
+        HRESULT hr = E_FAIL;
+        const std::wstring extDDS(L"dds");
+        const std::wstring extPNG(L"png");
+        const std::wstring extJPG(L"jpg");
+        const std::wstring extLJPG(L"JPG");
+        if (fileName.length() < 3) {
+            OutputDebugString(L"Texture Filename is Invalid.\n");
+            throw std::runtime_error("Texture Filename is Invalid.");
+        }
+
+        if (std::equal(std::rbegin(extDDS), std::rend(extDDS), std::rbegin(fileName))) {
+            hr = LoadFromDDSFile(fileName.c_str(), DDS_FLAGS_NONE, &metadata, image);
+        }
+        if (std::equal(std::rbegin(extPNG), std::rend(extPNG), std::rbegin(fileName)) ||
+            std::equal(std::rbegin(extJPG), std::rend(extJPG), std::rbegin(fileName)) ||
+            std::equal(std::rbegin(extLJPG), std::rend(extLJPG), std::rbegin(fileName))
+            ) {
+            hr = LoadFromWICFile(fileName.c_str(), WIC_FLAGS_NONE, &metadata, image);
+        }
+
+        if (hr == E_FAIL)
+        {
+            OutputDebugString(L"Texture Load Missed.\n");
+            if (!isNoExeption)
+            {
+                throw std::runtime_error("Texture Load Missed.");
+            }
+            else
+            {
+                utility::TextureResource nullRes;
+                isSuccess = false;
+            }
+        }
+        else
+        {
+            isSuccess = true;
+        }
+    }
+
     TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& rdevice, const std::wstring& fileName, bool isNoExeption)
     {
         DirectX::TexMetadata metadata;

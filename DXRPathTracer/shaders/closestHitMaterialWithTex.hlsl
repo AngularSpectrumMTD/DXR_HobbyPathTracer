@@ -13,6 +13,7 @@ StructuredBuffer<VertexPNT> vertexBuffer : register(t1, space1);
 Texture2D<float4> diffuseTex : register(t2, space1);
 Texture2D<float> alphaMask: register(t3, space1);
 Texture2D<float> bumpMap: register(t4, space1);
+Texture2D<float4> normalMap: register(t5, space1);
 
 float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
 {
@@ -57,6 +58,11 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib)
         float nx = nz - bumpValues.y;
         float ny = nz - bumpValues.w;
         float3 localNormal = normalize(float3(nx, ny, nz));
+        v.Normal = tangentToWorld(v.Normal, localNormal);
+    }
+    else if(hasNormalMap(currentMaterial))
+    {
+        float3 localNormal = normalMap.SampleLevel(gSampler, v.UV, 0.0);
         v.Normal = tangentToWorld(v.Normal, localNormal);
     }
 

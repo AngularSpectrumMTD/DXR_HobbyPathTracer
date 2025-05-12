@@ -30,7 +30,8 @@ namespace utility {
 		u32 hasDiffuseTex : 1;
 		u32 hasAlphaMask : 1;
 		u32 hasBumpMap : 1;
-		u32 materialBitsReserved :29;
+		u32 hasNormalMap : 1;
+		u32 materialBitsReserved :28;
 
 		//ctor
 		MaterialParam()
@@ -45,6 +46,7 @@ namespace utility {
 			hasDiffuseTex = 0;
 			hasAlphaMask = 0;
 			hasBumpMap = 0;
+			hasNormalMap = 0;
 		}
 
 		void asDefault()
@@ -93,10 +95,11 @@ namespace utility {
 		f32 opacity;
 		string DiffuseTextureName;
 		string AlphaMaskName;
-		string BumpMapName;
+		string BumpOrNormalMapName;
 		utility::TextureResource DiffuseTexture;
 		utility::TextureResource AlphaMask;
 		utility::TextureResource BumpMap;
+		utility::TextureResource NormalMap;
 		s32 TexID;
 		vector <utility::VertexPNT> TriangleVertexTbl;
 		vector <utility::VertexPNT> QuadrangleVertexTbl;
@@ -122,10 +125,12 @@ namespace utility {
 		bool hasDiffuseTex = false;
 		bool hasAlphaMask = false;
 		bool hasBumpMap = false;
+		bool hasNormalMap = false;
 
 		void setDummyDiffuseTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyBumpMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyNormalMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 
 		bool isTransparent()
 		{

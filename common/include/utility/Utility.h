@@ -14,6 +14,8 @@
 
 #include "RenderDeviceDX12.h"
 
+#include <DirectXTex.h>
+
 namespace dx12 {
     class RenderDeviceDX12;
 }
@@ -110,6 +112,7 @@ namespace utility {
 
     std::vector<char> CompileShaderAtRuntime(const std::filesystem::path& shaderFile);
 
+    void getTexMetadata(DirectX::TexMetadata& metadata, const std::wstring& fileName, bool & isSuccess, bool isNoExeption = false);
     utility::TextureResource LoadTextureFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const std::wstring& fileName, bool isNoExeption = false);
     HRESULT ReadDataFromFile(LPCWSTR filename, byte** dataPtr, u32* sizePtr);
 

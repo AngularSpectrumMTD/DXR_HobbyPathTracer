@@ -355,13 +355,13 @@ namespace utility {
 
 	void OBJMaterial::setDummyBumpMap(std::unique_ptr<dx12::RenderDeviceDX12>& device)
 	{
-		BumpMapName = "DUMMY_BUMP_MAP";
+		BumpOrNormalMapName = "DUMMY_BUMP_MAP";
 		BumpMap.res = device->CreateTexture2D(
 			1, 1, DXGI_FORMAT_R16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			D3D12_HEAP_TYPE_DEFAULT,
-			StringToWString(BumpMapName).c_str()
+			StringToWString(BumpOrNormalMapName).c_str()
 		);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -370,6 +370,25 @@ namespace utility {
 		srvDesc.Texture2D.ResourceMinLODClamp = 0;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		BumpMap.srv = device->CreateShaderResourceView(BumpMap.res.Get(), &srvDesc);
+	}	
+	
+	void OBJMaterial::setDummyNormalMap(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	{
+		BumpOrNormalMapName = "DUMMY_NORMAL_MAP";
+		NormalMap.res = device->CreateTexture2D(
+			1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			D3D12_HEAP_TYPE_DEFAULT,
+			StringToWString(BumpOrNormalMapName).c_str()
+		);
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.ResourceMinLODClamp = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		NormalMap.srv = device->CreateShaderResourceView(NormalMap.res.Get(), &srvDesc);
 	}
 
 	bool OBJMaterialLinkedMesh::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName) {
@@ -437,7 +456,7 @@ namespace utility {
 						isTextureIncluded = false;
 						tempMaterial.DiffuseTextureName = "";
 						tempMaterial.AlphaMaskName = "";
-						tempMaterial.BumpMapName = "";
+						tempMaterial.BumpOrNormalMapName = "";
 					}
 					if (isSameWord(key, "Ka"))
 					{
@@ -508,7 +527,7 @@ namespace utility {
 						{
 							*p = '\0';
 						}
-						tempMaterial.BumpMapName = key;
+						tempMaterial.BumpOrNormalMapName = key;
 					}
 				}
 
@@ -542,7 +561,7 @@ namespace utility {
 		}
 
 		int count = 0;
-		for (auto & cpuMaterial : MaterialTbl)
+		for (auto& cpuMaterial : MaterialTbl)
 		{
 			if (isSameWord(cpuMaterial.DiffuseTextureName.c_str(), ""))
 			{
@@ -602,10 +621,11 @@ namespace utility {
 				}
 			}
 
-			if (isSameWord(cpuMaterial.BumpMapName.c_str(), ""))
+			if (isSameWord(cpuMaterial.BumpOrNormalMapName.c_str(), ""))
 			{
 				cpuMaterial.hasBumpMap = false;
 				cpuMaterial.setDummyBumpMap(device);
+				cpuMaterial.setDummyNormalMap(device);
 			}
 			else
 			{
@@ -619,15 +639,44 @@ namespace utility {
 					cpuMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 				}
 				wchar_t nameTex[512];
-				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.BumpMapName).c_str());
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.BumpOrNormalMapName).c_str());
 				//cpuMaterial.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(cpuMaterial.TextureName));
-				cpuMaterial.hasBumpMap = true;
-				cpuMaterial.BumpMap = utility::LoadTextureFromFile(device, nameTex, true);
 
-				if (cpuMaterial.BumpMap.res == nullptr)
+				DirectX::TexMetadata metadata;
+				bool isSuccess;
+				getTexMetadata(metadata, nameTex, isSuccess, false);
+
+				const bool isBumpMap =
+					(metadata.format == DXGI_FORMAT::DXGI_FORMAT_R8_UNORM) ||
+					(metadata.format == DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM) ||
+					(metadata.format == DXGI_FORMAT::DXGI_FORMAT_R16_FLOAT) ||
+					(metadata.format == DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT);
+
+				if (isBumpMap)
 				{
-					cpuMaterial.hasBumpMap = false;
+					cpuMaterial.BumpMap = utility::LoadTextureFromFile(device, nameTex, true);
+					cpuMaterial.setDummyNormalMap(device);
+					if (cpuMaterial.BumpMap.res == nullptr)
+					{
+						cpuMaterial.setDummyBumpMap(device);
+					}
+					else
+					{
+						cpuMaterial.hasBumpMap = true;
+					}
+				}
+				else
+				{
+					cpuMaterial.NormalMap = utility::LoadTextureFromFile(device, nameTex, true);
 					cpuMaterial.setDummyBumpMap(device);
+					if (cpuMaterial.NormalMap.res == nullptr)
+					{
+						cpuMaterial.setDummyNormalMap(device);
+					}
+					else
+					{
+						cpuMaterial.hasNormalMap = true;
+					}
 				}
 			}
 
@@ -714,6 +763,7 @@ namespace utility {
 				mparams.hasDiffuseTex = cpuMaterial.hasDiffuseTex ? 1 : 0;
 				mparams.hasAlphaMask = cpuMaterial.hasAlphaMask ? 1 : 0;
 				mparams.hasBumpMap = cpuMaterial.hasBumpMap ? 1 : 0;
+				mparams.hasNormalMap = cpuMaterial.hasNormalMap ? 1 : 0;
 
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretMirror") == 0)
 				{
