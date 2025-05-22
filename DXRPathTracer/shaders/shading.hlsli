@@ -33,7 +33,6 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
         nextRay.TMin = RAY_MIN_T;
         nextRay.TMax = RAY_MAX_T;
         
-        const float eps = 0.001;
         const float3 wo_global = -WorldRayDirection();
 
         const float roulette = rand(payload.randomSeed);
@@ -82,7 +81,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                 wi_local = reflect(-wo_local, Ne_local);
             }
 
-            nextRay.Origin = currentRayOrigin + surface.interpolatedNormal * eps;
+            nextRay.Origin = currentRayOrigin + surface.geomNormal * RAY_T_BIAS;
             nextRay.Direction = tangentToWorld(n_global, wi_local);
             
             //compute bsdf    V : wo   L : wi(sample)
@@ -134,7 +133,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                 {
                     wi_local = normalize(refractVec);
                 }
-                nextRay.Origin = currentRayOrigin - surface.interpolatedNormal * eps;
+                nextRay.Origin = currentRayOrigin - surface.geomNormal * RAY_T_BIAS;
                 nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 
@@ -171,7 +170,6 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
         nextRay.TMin = RAY_MIN_T;
         nextRay.TMax = RAY_MAX_T;
         
-        const float eps = 0.001;
         const float3 wo_global = -WorldRayDirection();
 
         const float roulette = rand(payload.randomSeed);
@@ -220,7 +218,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
                 wi_local = reflect(-wo_local, Ne_local);
             }
 
-            nextRay.Origin = currentRayOrigin + surface.interpolatedNormal * eps;
+            nextRay.Origin = currentRayOrigin + surface.geomNormal * RAY_T_BIAS;
             nextRay.Direction = tangentToWorld(n_global, wi_local);
             
             //compute bsdf    V : wo   L : wi(sample)
@@ -260,7 +258,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
                 {
                     wi_local = normalize(refractVec);
                 }
-                nextRay.Origin = currentRayOrigin - surface.interpolatedNormal * eps;
+                nextRay.Origin = currentRayOrigin - surface.geomNormal * RAY_T_BIAS;
                 nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 

@@ -30,6 +30,7 @@
 
 #define Z_AXIS float3(0, 0, 1)
 #define BSDF_EPS 0.0001f
+#define RAY_T_BIAS 0.001
 
 #include "materialParams.hlsli"
 
