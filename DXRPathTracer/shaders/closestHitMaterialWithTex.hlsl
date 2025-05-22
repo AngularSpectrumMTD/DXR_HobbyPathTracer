@@ -27,6 +27,24 @@ float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
     return normalize(cross(positionTbl[1] - positionTbl[0], positionTbl[2] - positionTbl[0]));
 }
 
+float3 getInterpolatedNormal(TriangleIntersectionAttributes attrib)
+{
+    uint start = PrimitiveIndex() * 3;
+    
+    float3 normalTbl[3];
+    for (int i = 0; i < 3; ++i) {
+        uint index = indexBuffer[start + i];
+        normalTbl[i] = vertexBuffer[index].Normal;
+    }
+    return computeInterpolatedAttributeF3(normalTbl, attrib.barys);
+}
+
+//the values of normal map are encoded by this fomula : normalMapColor = (normal + 1) * 0.5
+float3 decodeNormalMap(float3 normalMapValues)
+{
+    return normalMapValues * 2.0 - 1;
+}
+
 VertexPNT getVertex(TriangleIntersectionAttributes attrib)
 {
     VertexPNT v = (VertexPNT) 0;
@@ -48,23 +66,28 @@ VertexPNT getVertex(TriangleIntersectionAttributes attrib)
     
     v.UV = computeInterpolatedAttributeF2(texcoordTbl, attrib.barys);
     v.Normal = computeInterpolatedAttributeF3(normalTbl, attrib.barys);
-    if(hasBumpMap(currentMaterial))
+
+    if(isUseNormalMapping())
     {
-        float4 bumpValues = bumpMap.GatherRed(gSampler, v.UV, 0.0);
-        //GatherOp
-        //w z
-        //x y
-        float nz = bumpValues.x;
-        float nx = nz - bumpValues.y;
-        float ny = nz - bumpValues.w;
-        float3 localNormal = normalize(float3(nx, ny, nz));
-        v.Normal = tangentToWorld(v.Normal, localNormal);
+        if(hasBumpMap(currentMaterial))//checked
+        {
+            float4 bumpValues = bumpMap.GatherRed(gSampler, v.UV, 0.0);
+            //GatherOp
+            //w z
+            //x y
+            float nz = bumpValues.x;
+            float nx = nz - bumpValues.y;
+            float ny = nz - bumpValues.w;
+            float3 localNormal = normalize(float3(nx, ny, nz));
+            v.Normal = tangentToWorld(v.Normal, localNormal);
+        }
+        else if(hasNormalMap(currentMaterial))
+        {
+            float3 localNormal = decodeNormalMap(normalMap.SampleLevel(gSampler, v.UV, 0.0).rgb);
+            v.Normal = tangentToWorld(v.Normal, localNormal);
+        }
     }
-    else if(hasNormalMap(currentMaterial))
-    {
-        float3 localNormal = normalMap.SampleLevel(gSampler, v.UV, 0.0);
-        v.Normal = tangentToWorld(v.Normal, localNormal);
-    }
+
 
     v.Normal = normalize(v.Normal);
     return v;
@@ -164,6 +187,7 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
     surface.position = vertex.Position;
     surface.position = mul(float4(surface.position, 1), ObjectToWorld4x3());
     surface.normal = vertex.Normal;
+    surface.interpolatedNormal = getInterpolatedNormal(attrib);
 
     bool isIgnoreHit = false;
     MaterialParams material = getCurrentMaterial(attrib, vertex.UV, isIgnoreHit);

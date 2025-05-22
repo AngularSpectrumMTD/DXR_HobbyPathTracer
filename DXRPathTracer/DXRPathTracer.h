@@ -426,6 +426,7 @@ private:
         SceneType_PTTestRobot,
         SceneType_PTTestRoom,
         SceneType_PTTestRoom2,
+        SceneType_PTTestRoom3,
         SceneType_MaterialTest,
         SceneType_Corridor,
         SceneType_CausticsTest,
@@ -882,6 +883,8 @@ private:
 
     u32 mMoveFrame = 0;
     f32 mExposure = 1.0f;
+
+    bool mIsUseNormalMapping = true;
 };
 
 #endif

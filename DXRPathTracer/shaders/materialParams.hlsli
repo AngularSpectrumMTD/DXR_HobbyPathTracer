@@ -19,6 +19,7 @@ struct Surface
     float3 position;
     float3 normal;
     float3 geomNormal;
+    float3 interpolatedNormal;
     MaterialParams material;
     bool isIgnoreHit;
 };

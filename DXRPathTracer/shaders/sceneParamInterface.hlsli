@@ -159,6 +159,11 @@ bool isUseMedianFiltering()
     return gSceneParam.additional2.z == 1;
 }
 
+bool isUseNormalMapping()
+{
+    return gSceneParam.additional2.w == 1;
+}
+
 float meanFreePath()
 {
     return gSceneParam.sssParam.x;

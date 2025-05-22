@@ -50,6 +50,7 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
     surface.position = vertex.Position;
     surface.position = mul(float4(surface.position, 1), ObjectToWorld4x3());
     surface.normal = vertex.Normal;
+    surface.interpolatedNormal = vertex.Normal;
 
     MaterialParams material = constantBuffer;
 

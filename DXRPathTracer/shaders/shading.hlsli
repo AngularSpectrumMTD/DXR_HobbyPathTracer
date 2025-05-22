@@ -82,7 +82,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                 wi_local = reflect(-wo_local, Ne_local);
             }
 
-            nextRay.Origin = currentRayOrigin + n_global * eps;
+            nextRay.Origin = currentRayOrigin + surface.interpolatedNormal * eps;
             nextRay.Direction = tangentToWorld(n_global, wi_local);
             
             //compute bsdf    V : wo   L : wi(sample)
@@ -134,7 +134,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
                 {
                     wi_local = normalize(refractVec);
                 }
-                nextRay.Origin = currentRayOrigin - n_global * eps;
+                nextRay.Origin = currentRayOrigin - surface.interpolatedNormal * eps;
                 nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 
@@ -220,7 +220,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
                 wi_local = reflect(-wo_local, Ne_local);
             }
 
-            nextRay.Origin = currentRayOrigin + n_global * eps;
+            nextRay.Origin = currentRayOrigin + surface.interpolatedNormal * eps;
             nextRay.Direction = tangentToWorld(n_global, wi_local);
             
             //compute bsdf    V : wo   L : wi(sample)
@@ -260,7 +260,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
                 {
                     wi_local = normalize(refractVec);
                 }
-                nextRay.Origin = currentRayOrigin - n_global * eps;
+                nextRay.Origin = currentRayOrigin - surface.interpolatedNormal * eps;
                 nextRay.Direction = tangentToWorld(n_global, wi_local);
             }
 

@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom2;
+    mSceneType = SceneType_PTTestRoom3;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -507,6 +507,42 @@ void DXRPathTracer::Setup()
             mCameraSpeed = 10.0f;
 
             mSpatialReuseTap = 3;
+        }
+        break;
+        case SceneType_PTTestRoom3:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 206.f; mThetaDirectional = 112;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //stair side
+            mInitEyePos = XMFLOAT3(-132.1, 73.3, 41.4);
+            mInitTargetPos = XMFLOAT3(-166.6, 72.79, 5.34);
+
+            //chair side
+  /*          mInitEyePos = XMFLOAT3(120.4, 108.6, -54.9);
+            mInitTargetPos = XMFLOAT3(70.6, 105.9, -51.0);*/
+
+            mOBJFileName = "PTTestRoom3Exp.obj";
+            mOBJFolderName = "model/PTTest/PTTestRoom3";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(-150, 65, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 4.0f;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 1.0f;
+
+            mSpatialReuseTap = 3;
+            mIsUseReservoirSpatialReuse = false;
         }
         break;
         case SceneType_MaterialTest:
@@ -1660,6 +1696,7 @@ void DXRPathTracer::Update()
     mSceneParam.additional2.x = mIsUseIBL ? 1 : 0;
     mSceneParam.additional2.y = mIsUseEmissivePolygon ? 1 : 0;
     mSceneParam.additional2.z = mIsUseMedianFiltering ? 1 : 0;
+    mSceneParam.additional2.w = mIsUseNormalMapping ? 1 : 0;
     mSceneParam.toneMappingParam = XMVectorSet(mExposure, 0, 0, 0);
 
     if (!mIsTemporalAccumulationForceDisable)
@@ -1876,6 +1913,7 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         break;
     case VK_F12:
         mExposure = Clamp(-10, 10, mExposure + (mInverseMove ? -1 : 1));
+        //mIsUseNormalMapping = !mIsUseNormalMapping;
         break;
     }
 }
