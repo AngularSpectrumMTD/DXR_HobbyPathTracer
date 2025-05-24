@@ -156,7 +156,11 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, in floa
     getTexColor(diffuseTexColor, isIgnoreHit, uv);
 
     MaterialParams currentMaterial = constantBuffer;
-    currentMaterial.albedo *= float4(diffuseTexColor.rgb, 1);
+
+    if(hasDiffuseTex(currentMaterial))
+    {
+        currentMaterial.albedo = float4(diffuseTexColor.rgb, 1);
+    }
 
     //test metallic surface
     if(isUseMetallicTest())
