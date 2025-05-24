@@ -57,6 +57,8 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     float3 currDI = 0.xxx;
     float3 currGI = 0.xxx;
+
+    MaterialParams material = decompressMaterialParams(ScreenSpaceMaterial[currID.x + dims.x * currID.y]);
     if(isUseNEE() && isUseStreamingRIS())
     {
         const uint serialCurrID = currID.y * dims.x + currID.x;
@@ -66,15 +68,15 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
         float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
         currDI = (isIndirectOnly() ? 0.xxx : resolveDIReservoir(currDIReservoir)) + reservoirElementRemovedDI;
 
+        const float w = material.roughness * material.roughness;
         float3 reservoirElementRemovedGI = CurrentGIBuffer[currID].rgb;
-        currGI = resolveGIReservoir(currGIReservoir) + reservoirElementRemovedGI;
+        currGI = w * resolveGIReservoir(currGIReservoir) + (1 - w) * reservoirElementRemovedGI;
     }
     else
     {
         currDI = CurrentDIBuffer[currID].rgb;
     }
-
-    MaterialParams material = decompressMaterialParams(ScreenSpaceMaterial[currID.x + dims.x * currID.y]);
+    
     const float3 modAlbedo = modulatedAlbedo(material);
 
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;

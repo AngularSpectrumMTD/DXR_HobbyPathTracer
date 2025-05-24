@@ -542,7 +542,6 @@ void DXRPathTracer::Setup()
             mCameraSpeed = 1.0f;
 
             mSpatialReuseTap = 3;
-            mIsUseReservoirSpatialReuse = false;
         }
         break;
         case SceneType_MaterialTest:

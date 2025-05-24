@@ -190,7 +190,8 @@ void rayGen() {
 
     setGIReservoir(giReservoir);
 
-    setGI(0.xxx);
+    //set the value computed by a pure Monte-Calro strategy
+    setGI(elem / primaryPDF);
     
     finalizeRNG(launchIndex.xy, payload.randomSeed);
 }
@@ -467,11 +468,6 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
         baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
         baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
     }
-    else
-    {
-        baseSpatialReusingRadius *= (centerMaterialParams.roughness + 0.5) / 1.5;
-        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius);
-    }
 
     //combine reservoirs
     if(isUseReservoirSpatialReuse())// && (currDIReservoir.M < 5))
@@ -526,17 +522,12 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     combineGIReservoirs(spatGIReservoir, currGIReservoir, currGIReservoir.W_sum, rand(randomSeed));
 
     const bool isTransparent = isTransparentMaterial(centerMaterialParams);
-    float baseSpatialReusingRadius = getDIReservoirSpatialReuseBaseRadius();
+    float baseSpatialReusingRadius = getGIReservoirSpatialReuseBaseRadius();
 
     if(isTransparent)
     {
         baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
         baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
-    }
-    else
-    {
-        baseSpatialReusingRadius *= (centerMaterialParams.roughness + 0.5) / 1.5;
-        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius);
     }
 
     //combine reservoirs
