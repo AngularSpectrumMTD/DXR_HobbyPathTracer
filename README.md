@@ -1,6 +1,24 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
+Room3
+
+![Image](https://github.com/user-attachments/assets/0a4f5a4c-feb6-4456-8e7b-35655c16047b)
+
+![Image](https://github.com/user-attachments/assets/f9638e9d-714f-42c9-888c-b5cce2b5a893)
+
+![Image](https://github.com/user-attachments/assets/ee7a6be7-2abd-4640-b1e9-887cbda02d6c)
+
+![Image](https://github.com/user-attachments/assets/e112bf30-f3a8-408d-996e-6f16db4e569c)
+
+![Image](https://github.com/user-attachments/assets/645d16ef-61cd-4e4e-ad8a-a039f7496a76)
+
+![Image](https://github.com/user-attachments/assets/e5461695-e2b7-48cc-85da-5648bdc6a69c)
+
+![Image](https://github.com/user-attachments/assets/578b1f1d-0e91-41fc-980d-4d054de2c4c2)
+
+![Image](https://github.com/user-attachments/assets/7fc41304-67e1-4850-a08a-6aa26782168b)
+
 CausticsTest  
 ![Image](https://github.com/user-attachments/assets/1ad0a7a3-0843-4a2d-9321-e0990e26e826)
 
@@ -27,10 +45,10 @@ Sponza
 ![Image](https://github.com/user-attachments/assets/4a92bbbc-4fe8-4758-a0ed-7645a4f53758)
 
 BistroExterior
-![Image](https://github.com/user-attachments/assets/0ffb207f-f829-4399-878d-0d636cc4bf18)
+![Image](https://github.com/user-attachments/assets/7989bb54-edeb-4b2d-b6bc-93313647f83c)
 
 BistroInterior
-![Image](https://github.com/user-attachments/assets/0ae9222b-cf1a-4cd8-b5aa-611942ef44d3)
+![Image](https://github.com/user-attachments/assets/337bb238-cfdb-464c-83e0-d896fc3308bb)
 
 Brick
 ![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)
@@ -58,7 +76,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza
