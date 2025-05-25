@@ -592,7 +592,7 @@ namespace utility {
 				}
 			}
 
-			if (isSameWord(cpuMaterial.AlphaMaskName.c_str(), ""))
+			if (isSameWord(cpuMaterial.AlphaMaskName.c_str(), "") || isSameWord(cpuMaterial.AlphaMaskName.c_str(), cpuMaterial.DiffuseTextureName.c_str()))
 			{
 				cpuMaterial.hasAlphaMask = false;
 				cpuMaterial.setDummyAlphaMask(device);
