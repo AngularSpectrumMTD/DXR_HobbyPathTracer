@@ -65,8 +65,7 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR DI/GI  
-![Image](https://github.com/user-attachments/assets/38b3b351-aac5-44bf-a2bb-6f46c003b43d)
-
+![Image](https://github.com/user-attachments/assets/1ab30965-42c8-4ada-8330-37b51093762f)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -135,19 +134,6 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - F11 : enable / disable Median Filter
 - F12 : increase / decrease the value of Exposure
 
-### WIP
-New 3D Scene
-
-![Image](https://github.com/user-attachments/assets/bedf92e5-3321-4167-8f2f-81515c2b97ce)
-
-![Image](https://github.com/user-attachments/assets/5406034b-702f-46d6-babb-62ac0a52a566)
-
-![Image](https://github.com/user-attachments/assets/b5b60064-886a-48bb-8f57-9f45ba2ffac4)
-
-![Image](https://github.com/user-attachments/assets/c7af3d38-bc65-4fff-8e4d-630d6546ccfd)
-
-![Image](https://github.com/user-attachments/assets/4f4c329a-e6fb-4538-a1a6-14e9b0410d89)
-
-![Image](https://github.com/user-attachments/assets/b2289173-cc11-4ae0-bb95-567403a7545e)
-
-![Image](https://github.com/user-attachments/assets/bf724286-f764-489e-ae26-5d05306a6dcc)
+### Textures References
+https://ambientcg.com/
+https://www.cgbookcase.com/
