@@ -427,6 +427,7 @@ private:
         SceneType_PTTestRoom,
         SceneType_PTTestRoom2,
         SceneType_PTTestRoom3,
+        SceneType_PTTestRoom4,
         SceneType_MaterialTest,
         SceneType_Corridor,
         SceneType_CausticsTest,

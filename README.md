@@ -1,6 +1,9 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
+Room 4
+![Image](https://github.com/user-attachments/assets/d7f43e4a-7f5d-409d-a67d-7c82578ffd15)
+
 Room3
 
 ![Image](https://github.com/user-attachments/assets/0a4f5a4c-feb6-4456-8e7b-35655c16047b)
@@ -64,8 +67,8 @@ Room
 - ReSTIR GI
 - Emission Guided Photon Mapping  
 
-Results of the verification of the ReSTIR DI/GI  
-![Image](https://github.com/user-attachments/assets/1ab30965-42c8-4ada-8330-37b51093762f)
+Results of the verification of the ReSTIR (Emissive Polygon Only)  
+![Image](https://github.com/user-attachments/assets/34302ce1-5504-43a5-9329-c7fba60a3ffd)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -75,7 +78,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza
