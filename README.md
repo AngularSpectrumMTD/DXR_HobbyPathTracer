@@ -70,6 +70,14 @@ Room
 Results of the verification of the ReSTIR (Emissive Polygon Only)  
 ![Image](https://github.com/user-attachments/assets/3cb7972f-b771-4a2b-ac7e-85d1aeea36c2)
 
+![Image](https://github.com/user-attachments/assets/195c1821-e38b-4ca9-bf9e-f0056b86b07a)
+1. Initial Sampling
+2. +Temporal Resampling
+3. +Spatial Resampling (x1)
+4. +Spatial Resampling (x2)
+5. +Spatial Resampling (x3)
+6. +Spatial Resampling (x4)
+
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
 
