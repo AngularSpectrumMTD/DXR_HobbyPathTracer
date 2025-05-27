@@ -1,7 +1,7 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
-Room 4
+Room4
 ![Image](https://github.com/user-attachments/assets/d7f43e4a-7f5d-409d-a67d-7c82578ffd15)
 
 Room3
@@ -68,7 +68,7 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR (Emissive Polygon Only)  
-![Image](https://github.com/user-attachments/assets/34302ce1-5504-43a5-9329-c7fba60a3ffd)
+![Image](https://github.com/user-attachments/assets/3cb7972f-b771-4a2b-ac7e-85d1aeea36c2)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     

@@ -505,8 +505,6 @@ void DXRPathTracer::Setup()
 
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 10.0f;
-
-            mSpatialReuseTap = 3;
         }
         break;
         case SceneType_PTTestRoom3:
@@ -540,8 +538,6 @@ void DXRPathTracer::Setup()
 
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 1.0f;
-
-            mSpatialReuseTap = 3;
         }
         break;
         case SceneType_PTTestRoom4:
@@ -575,8 +571,6 @@ void DXRPathTracer::Setup()
 
             mModelTypeTbl[0] = ModelType_Afrodyta;
             mCameraSpeed = 1.0f;
-
-            mSpatialReuseTap = 3;
         }
         break;
         case SceneType_MaterialTest:
