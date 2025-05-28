@@ -550,8 +550,8 @@ void DXRPathTracer::Setup()
             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
 
             //stair side
-            mInitEyePos = XMFLOAT3(-112.2, 66.4, 16.4);
-            mInitTargetPos = XMFLOAT3(-157.0, 75.11, -4.60);
+            mInitEyePos = XMFLOAT3(-112.2, 68.2, 15.6);
+            mInitTargetPos = XMFLOAT3(-158.8, 68.84, -3.65);
 
             //chair side
   /*          mInitEyePos = XMFLOAT3(120.4, 108.6, -54.9);

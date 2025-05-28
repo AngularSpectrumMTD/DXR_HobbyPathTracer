@@ -2,10 +2,9 @@
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
 Room4
-![Image](https://github.com/user-attachments/assets/d7f43e4a-7f5d-409d-a67d-7c82578ffd15)
+![Image](https://github.com/user-attachments/assets/4308a0d8-2649-4947-909a-5b87e9d66003)
 
 Room3
-
 ![Image](https://github.com/user-attachments/assets/0a4f5a4c-feb6-4456-8e7b-35655c16047b)
 
 ![Image](https://github.com/user-attachments/assets/f9638e9d-714f-42c9-888c-b5cce2b5a893)
@@ -32,7 +31,6 @@ CausticsTest
 ![Image](https://github.com/user-attachments/assets/4761162a-5263-4421-9f66-6433c368416d)
 
 Room2
-
 ![Image](https://github.com/user-attachments/assets/306eb43a-a478-49f2-a730-5a3fa13786ce)
 
 ![Image](https://github.com/user-attachments/assets/d7d710eb-7a70-4c6c-ad19-010bc7a04dfa)
@@ -68,15 +66,7 @@ Room
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR (Emissive Polygon Only)  
-![Image](https://github.com/user-attachments/assets/3cb7972f-b771-4a2b-ac7e-85d1aeea36c2)
-
-![Image](https://github.com/user-attachments/assets/195c1821-e38b-4ca9-bf9e-f0056b86b07a)
-1. Initial Sampling
-2. +Temporal Resampling
-3. +Spatial Resampling (x1)
-4. +Spatial Resampling (x2)
-5. +Spatial Resampling (x3)
-6. +Spatial Resampling (x4)
+![Image](https://github.com/user-attachments/assets/dabf56c5-0dc0-4d5b-95b4-b1ef52338e18)
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
