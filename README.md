@@ -13,6 +13,19 @@ Results of the verification of the ReSTIR
 
 ### Results
 
+Room2
+![Image](https://github.com/user-attachments/assets/cbc3c51b-1c8d-49e9-a2ad-88a84905b22c)
+
+![Image](https://github.com/user-attachments/assets/977fa4bc-f0d8-45ea-ba6f-1f3615b9c7e8)
+
+![Image](https://github.com/user-attachments/assets/ebea6f84-9c9f-4129-98e7-5f16ba67b994)
+
+![Image](https://github.com/user-attachments/assets/0fee2bb2-387f-45e7-b842-d4507c5729b3)
+
+![Image](https://github.com/user-attachments/assets/f499963a-942d-4f5c-828b-0ca62b6403a3)
+
+![Image](https://github.com/user-attachments/assets/56e5b708-9f80-413d-8769-c611d123e96a)
+
 Room4
 ![Image](https://github.com/user-attachments/assets/4308a0d8-2649-4947-909a-5b87e9d66003)
 
@@ -41,11 +54,6 @@ CausticsTest
 ![Image](https://github.com/user-attachments/assets/68b0bbf2-ec02-4857-8873-486380debf2b)
 
 ![Image](https://github.com/user-attachments/assets/4761162a-5263-4421-9f66-6433c368416d)
-
-Room2
-![Image](https://github.com/user-attachments/assets/306eb43a-a478-49f2-a730-5a3fa13786ce)
-
-![Image](https://github.com/user-attachments/assets/d7d710eb-7a70-4c6c-ad19-010bc7a04dfa)
 
 MaterialTest  
 ![Image](https://github.com/user-attachments/assets/c0639c7c-a2b8-45f0-bd41-55d1d2165b56)
