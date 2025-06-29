@@ -59,7 +59,6 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_EmissionTest;
     mSceneType = SceneType_PTTestRoom2;
 
     mIsUseIBL = true;

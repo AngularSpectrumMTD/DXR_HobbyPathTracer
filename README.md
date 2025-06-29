@@ -30,6 +30,9 @@ Room2
 
 ![Image](https://github.com/user-attachments/assets/d5c378a9-c034-41d6-9a34-5edaf3cbf943)
 
+EmissionTest
+![Image](https://github.com/user-attachments/assets/64500e4a-599e-4ef2-94e6-6aafb4a17efb)
+
 Room4
 ![Image](https://github.com/user-attachments/assets/4308a0d8-2649-4947-909a-5b87e9d66003)
 
@@ -92,7 +95,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(EmissionTest/CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza
