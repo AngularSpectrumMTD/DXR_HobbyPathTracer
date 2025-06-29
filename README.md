@@ -135,6 +135,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 - C : change photon emitter type (spot light/rectangular light)
 - V : enable / disable debug view
 - F : enable / disable lighting by use of many sphere lights
+- H : set "(1, 1, 1)" to value of albedo
 - MOUSE_RIGHT : rotate the camera around the camera position
 - ↑↓→← : move the camera forward, backward, left, or right
 - SPACE : change the target to edit the material

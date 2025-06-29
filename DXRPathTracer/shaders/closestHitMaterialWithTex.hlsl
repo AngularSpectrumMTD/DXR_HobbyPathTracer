@@ -196,6 +196,11 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
     bool isIgnoreHit = false;
     MaterialParams material = getCurrentMaterial(attrib, vertex.UV, isIgnoreHit);
 
+    if(isAlbedoOne())
+    {
+        material.albedo = 1.xxxx;
+    }
+
     surface.isIgnoreHit = isIgnoreHit;
     surface.material = material;
     surface.geomNormal = getGeometricNormal(attrib);

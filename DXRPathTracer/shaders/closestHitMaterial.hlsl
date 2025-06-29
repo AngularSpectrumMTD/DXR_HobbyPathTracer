@@ -54,6 +54,11 @@ Surface constructSurface(TriangleIntersectionAttributes attrib)
 
     MaterialParams material = constantBuffer;
 
+    if(isAlbedoOne())
+    {
+        material.albedo = 1.xxxx;
+    }
+
     surface.isIgnoreHit = false;
     surface.material = material;
     surface.geomNormal = getGeometricNormal(attrib);

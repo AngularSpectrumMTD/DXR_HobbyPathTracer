@@ -21,6 +21,7 @@ struct SceneCB
     uint4 additional;
     uint4 additional1;
     uint4 additional2;
+    uint4 additional3;
     float4 sssParam;
     float4 toneMappingParam;
 };

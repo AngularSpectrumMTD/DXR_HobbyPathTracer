@@ -59,6 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
+    mSceneType = SceneType_EmissionTest;
     mSceneType = SceneType_PTTestRoom2;
 
     mIsUseIBL = true;
@@ -697,6 +698,49 @@ void DXRPathTracer::Setup()
 
             mIsUseReservoirTemporalReuse = false;
             mIsUseReservoirSpatialReuse = false;
+        }
+        break;
+        case SceneType_EmissionTest:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            //mInitEyePos = XMFLOAT3(-6, 78, 165);
+            //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+            mInitEyePos = XMFLOAT3(169.86, 255.31, -79.07);
+            mInitTargetPos = XMFLOAT3(134.17, 255.2, -58.68);
+
+            mOBJFileName = "EmissionTest.obj";
+            mOBJFolderName = "model";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -0.01f; mLightPosY = 202.5f; mLightPosZ = -5.31f;
+            mPhi = -85.0f; mTheta = 228.0f;
+
+            mLightRange = 5.68f;
+
+            mIntensityBoost *= 0.1;
+            mCausticsBoost = 0.05;
+            mGatherBlockRange = 2;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mIsUseDirectionalLight = false;
+
+            mGatherRadius = 0.1f;
+
+            mIsApplyCaustics = false;
+            mIsUseIBL = false;
         }
         break;
     }
@@ -1725,6 +1769,10 @@ void DXRPathTracer::Update()
     mSceneParam.additional2.y = mIsUseEmissivePolygon ? 1 : 0;
     mSceneParam.additional2.z = mIsUseMedianFiltering ? 1 : 0;
     mSceneParam.additional2.w = mIsUseNormalMapping ? 1 : 0;
+    mSceneParam.additional3.x = mIsAlbedoOne ? 1 : 0;
+    mSceneParam.additional3.y = 0;
+    mSceneParam.additional3.z = 0;
+    mSceneParam.additional3.w = 0;
     mSceneParam.toneMappingParam = XMVectorSet(mExposure, 0, 0, 0);
 
     if (!mIsTemporalAccumulationForceDisable)
@@ -1897,22 +1945,22 @@ void DXRPathTracer::OnKeyDown(UINT8 wparam)
         mIsUseMetallicTest = !mIsUseMetallicTest;
         mIsUseTemporalAccumulation = false;
         break;
-    /*case VK_F6:
+    case 'H':
         mIsAlbedoOne = !mIsAlbedoOne;
         mIsUseTemporalAccumulation = false;
         break;
-    case VK_F7:
-        if (mInverseMove)
-        {
-            mMeanFreePathRatio -= 1;
-        }
-        else
-        {
-            mMeanFreePathRatio += 1;
-        }
-        mMeanFreePathRatio = Clamp(1, 100, mMeanFreePathRatio);
-        mIsUseTemporalAccumulation = false;
-        break;*/
+    //case VK_F7:
+    //    if (mInverseMove)
+    //    {
+    //        mMeanFreePathRatio -= 1;
+    //    }
+    //    else
+    //    {
+    //        mMeanFreePathRatio += 1;
+    //    }
+    //    mMeanFreePathRatio = Clamp(1, 100, mMeanFreePathRatio);
+    //    mIsUseTemporalAccumulation = false;
+    //    break;
     case VK_F6:
         if (mMaterialParamTbl[mTargetModelIndex].isSSSExecutable > 0)
         {

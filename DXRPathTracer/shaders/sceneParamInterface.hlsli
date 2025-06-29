@@ -164,6 +164,11 @@ bool isUseNormalMapping()
     return gSceneParam.additional2.w == 1;
 }
 
+bool isAlbedoOne()
+{
+    return gSceneParam.additional3.x == 1;
+}
+
 float meanFreePath()
 {
     return gSceneParam.sssParam.x;

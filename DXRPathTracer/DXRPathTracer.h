@@ -280,6 +280,7 @@ private:
         XMUINT4 additional;
         XMUINT4 additional1;
         XMUINT4 additional2;
+        XMUINT4 additional3;
         XMVECTOR sssParam;
         XMVECTOR toneMappingParam;
     };
@@ -431,6 +432,7 @@ private:
         SceneType_MaterialTest,
         SceneType_Corridor,
         SceneType_CausticsTest,
+        SceneType_EmissionTest,
     };
 
     enum Spectrum
