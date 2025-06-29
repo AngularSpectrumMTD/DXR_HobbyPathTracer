@@ -11,6 +11,8 @@ Results of the verification of the ReSTIR
 
 ![Image](https://github.com/user-attachments/assets/480066f0-cb5b-4fb5-ad85-f384fe776dc2)
 
+![Image](https://github.com/user-attachments/assets/c42fdae4-03ef-4327-96c5-078cd2357413)
+
 ### Results
 
 Room2
