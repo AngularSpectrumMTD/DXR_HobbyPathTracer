@@ -1,6 +1,8 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
+![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
+
 ### Algorithm
 - ReSTIR DI
 - ReSTIR GI
@@ -16,6 +18,8 @@ Results of the verification of the ReSTIR
 ### Results
 
 Room2
+![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
+
 ![Image](https://github.com/user-attachments/assets/cbc3c51b-1c8d-49e9-a2ad-88a84905b22c)
 
 ![Image](https://github.com/user-attachments/assets/977fa4bc-f0d8-45ea-ba6f-1f3615b9c7e8)
@@ -41,28 +45,8 @@ Room4
 Room3
 ![Image](https://github.com/user-attachments/assets/0a4f5a4c-feb6-4456-8e7b-35655c16047b)
 
-![Image](https://github.com/user-attachments/assets/f9638e9d-714f-42c9-888c-b5cce2b5a893)
-
-![Image](https://github.com/user-attachments/assets/ee7a6be7-2abd-4640-b1e9-887cbda02d6c)
-
-![Image](https://github.com/user-attachments/assets/e112bf30-f3a8-408d-996e-6f16db4e569c)
-
-![Image](https://github.com/user-attachments/assets/645d16ef-61cd-4e4e-ad8a-a039f7496a76)
-
-![Image](https://github.com/user-attachments/assets/e5461695-e2b7-48cc-85da-5648bdc6a69c)
-
-![Image](https://github.com/user-attachments/assets/578b1f1d-0e91-41fc-980d-4d054de2c4c2)
-
-![Image](https://github.com/user-attachments/assets/7fc41304-67e1-4850-a08a-6aa26782168b)
-
 CausticsTest  
 ![Image](https://github.com/user-attachments/assets/1ad0a7a3-0843-4a2d-9321-e0990e26e826)
-
-![Image](https://github.com/user-attachments/assets/6d0e4aa0-c3b9-4ecb-bee9-25b2f34fe474)
-
-![Image](https://github.com/user-attachments/assets/68b0bbf2-ec02-4857-8873-486380debf2b)
-
-![Image](https://github.com/user-attachments/assets/4761162a-5263-4421-9f66-6433c368416d)
 
 MaterialTest  
 ![Image](https://github.com/user-attachments/assets/c0639c7c-a2b8-45f0-bd41-55d1d2165b56)
@@ -91,6 +75,8 @@ Room
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
+
+![Image](https://github.com/user-attachments/assets/2bedc671-c2eb-4b27-8c42-121932bfc6fe)
 
 ### How To Use
 **NOTE : This program can only handle triangular polygons**
