@@ -433,6 +433,8 @@ private:
         SceneType_Corridor,
         SceneType_CausticsTest,
         SceneType_EmissionTest,
+        SceneType_RoughnessTest,
+        SceneType_ResamplingTest,
     };
 
     enum Spectrum

@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom2;
+    mSceneType = SceneType_ResamplingTest;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -740,6 +740,92 @@ void DXRPathTracer::Setup()
 
             mIsApplyCaustics = false;
             mIsUseIBL = false;
+        }
+        break;
+        //case SceneType_RoughnessTest:
+        //{
+        //    mLightAreaScale = 6;
+        //    mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+        //    //near
+        //    //mInitEyePos = XMFLOAT3(-85, 64, -18);
+        //    //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+        //    //far
+        //    //mInitEyePos = XMFLOAT3(-6, 78, 165);
+        //    //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+        //    mInitEyePos = XMFLOAT3(169.86, 255.31, -79.07);
+        //    mInitTargetPos = XMFLOAT3(134.17, 255.2, -58.68);
+
+        //    mOBJFileName = "RoughnessTest.obj";
+        //    mOBJFolderName = "model";
+        //    mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+        //    mStageOffsetX = 0.0f;
+        //    mStageOffsetY = 0.0f;
+        //    mStageOffsetZ = 0.0f;
+
+        //    mLightPosX = -40.0f; mLightPosY = 202.5f; mLightPosZ = -5.31f;
+        //    mPhi = -85.0f; mTheta = 228.0f;
+
+        //    mLightRange = 5.68f;
+
+        //    mIntensityBoost *= 0.1;
+        //    mCausticsBoost = 0.05;
+        //    mGatherBlockRange = 2;
+
+        //    mModelTypeTbl[0] = ModelType_Afrodyta;
+        //    mCameraSpeed = 10.0f;
+
+        //    mIsUseDirectionalLight = false;
+
+        //    mGatherRadius = 0.1f;
+
+        //    mIsApplyCaustics = false;
+        //    mIsUseIBL = true;
+        //}
+        //break;
+         case SceneType_ResamplingTest:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 51.0f; mThetaDirectional = 234;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //far
+            //mInitEyePos = XMFLOAT3(-6, 78, 165);
+            //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+            mInitEyePos = XMFLOAT3(105.74, 241.73, 0);
+            mInitTargetPos = XMFLOAT3(64.1, 235.8, 0);
+
+            mOBJFileName = "ResamplingTest.obj";
+            mOBJFolderName = "model";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -40.0f; mLightPosY = 202.5f; mLightPosZ = -5.31f;
+            mPhi = -85.0f; mTheta = 228.0f;
+
+            mLightRange = 5.68f;
+
+            mIntensityBoost *= 0.1;
+            mCausticsBoost = 0.05;
+            mGatherBlockRange = 2;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 10.0f;
+
+            mIsUseDirectionalLight = false;
+
+            mGatherRadius = 0.1f;
+
+            mIsApplyCaustics = false;
+            mIsUseIBL = true;
         }
         break;
     }
