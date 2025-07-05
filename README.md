@@ -9,11 +9,10 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR
-![Image](https://github.com/user-attachments/assets/dabf56c5-0dc0-4d5b-95b4-b1ef52338e18)
 
-![Image](https://github.com/user-attachments/assets/480066f0-cb5b-4fb5-ad85-f384fe776dc2)
+<img width="3536" height="2011" alt="Image" src="https://github.com/user-attachments/assets/168b09f8-f004-4fb1-8195-432b2ffa34f0" />
 
-![Image](https://github.com/user-attachments/assets/c42fdae4-03ef-4327-96c5-078cd2357413)
+<img width="4421" height="2515" alt="Image" src="https://github.com/user-attachments/assets/0e26ee13-637f-4708-8379-1d51c74d1b64" />
 
 ### Results
 
