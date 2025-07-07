@@ -10,14 +10,16 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 Results of the verification of the ReSTIR
 
-<img width="3536" height="2011" alt="Image" src="https://github.com/user-attachments/assets/168b09f8-f004-4fb1-8195-432b2ffa34f0" />
+![Image](https://github.com/user-attachments/assets/168b09f8-f004-4fb1-8195-432b2ffa34f0)
 
-<img width="4421" height="2515" alt="Image" src="https://github.com/user-attachments/assets/0e26ee13-637f-4708-8379-1d51c74d1b64" />
+![Image](https://github.com/user-attachments/assets/0e26ee13-637f-4708-8379-1d51c74d1b64)
 
 ### Results
 
 Room2
 ![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
+
+![Image](https://github.com/user-attachments/assets/86219a06-59b3-4881-8fc6-d99bc37f89e1)
 
 ![Image](https://github.com/user-attachments/assets/cbc3c51b-1c8d-49e9-a2ad-88a84905b22c)
 
