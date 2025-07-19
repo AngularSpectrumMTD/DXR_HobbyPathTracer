@@ -273,6 +273,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3
         
         //compute bsdf    V : wo   L : wi(sample)
         BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, wi_local);
+        BSDF_PDF.w *= probability;
     }
     else
     {
@@ -294,6 +295,7 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3
 
         //compute bsdf    V : wo   L : wi(sample)
         BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+        BSDF_PDF.w *= (1 - probability);
     }
 
     return BSDF_PDF;

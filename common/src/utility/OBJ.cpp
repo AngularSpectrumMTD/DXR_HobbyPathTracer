@@ -756,7 +756,7 @@ namespace utility {
 				//https://blender.stackexchange.com/questions/149755/changing-the-specular-exponent-of-principled-bsdf-with-texture-when-exporting-to
 				//based on Principled BSDF
 				mparams.roughness = min(1, max(0, 1 - sqrt(cpuMaterial.Shininess) / 30));
-				mparams.transRatio = cpuMaterial.isTransparent() ? (1 - cpuMaterial.opacity) : 0.0f;
+				mparams.transRatio = cpuMaterial.isTransparent() ? min(1, max(0, (1 - cpuMaterial.opacity))) : 0.0f;
 				mparams.emission = XMVectorSet(cpuMaterial.Reflection4Color.emission.x, cpuMaterial.Reflection4Color.emission.y, cpuMaterial.Reflection4Color.emission.z, cpuMaterial.Reflection4Color.emission.w);
 				mparams.transColor = XMVectorSet(1, 1, 1, 1);
 				mparams.isSSSExecutable = 0;

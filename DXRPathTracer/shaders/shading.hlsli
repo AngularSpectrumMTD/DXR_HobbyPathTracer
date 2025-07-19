@@ -86,6 +86,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
             
             //compute bsdf    V : wo   L : wi(sample)
             float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
+            BSDF_PDF.w *= probability;
             const float cosine = max(0, abs(wi_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
 
@@ -139,6 +140,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
 
             //compute bsdf    V : wo   L : wi(sample)
             float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+            BSDF_PDF.w *= (1 - probability);
             const float cosine = max(0, abs(wi_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
 
@@ -223,6 +225,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
             
             //compute bsdf    V : wo   L : wi(sample)
             float4 BSDF_PDF = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
+            BSDF_PDF.w *= probability;
             const float cosine = max(0, abs(wi_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
             payload.updateThroughputByMulitiplicationF3(weight);
@@ -264,6 +267,7 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout PhotonPayload p
 
             //compute bsdf    V : wo   L : wi(sample)
             float4 BSDF_PDF = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+            BSDF_PDF.w *= 1 - probability;
             const float cosine = max(0, abs(wi_local.z));
             const float3 weight = BSDF_PDF.xyz * cosine / BSDF_PDF.w;
             payload.updateThroughputByMulitiplicationF3(weight);
