@@ -257,6 +257,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     }
 
     Surface surface = constructSurface(attrib);
+    if((payload.recursive >= 2) && (surface.material.transRatio > 0))
+    {
+        surface.material.roughness *= 1.5;
+        surface.material.roughness = saturate(surface.material.roughness);
+    }
 
     float3 caustics = 0.xxx;
     if(payload.recursive <= 3)

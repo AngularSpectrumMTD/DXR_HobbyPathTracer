@@ -114,6 +114,11 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
     uint instanceIndex = InstanceIndex();
 
     Surface surface = constructSurface(attrib);
+    if((payload.recursive >= 2) && (surface.material.transRatio > 0))
+    {
+        surface.material.roughness *= 1.5;
+        surface.material.roughness = saturate(surface.material.roughness);
+    }
 
     if(!isUseEmissivePolygon())
     {
