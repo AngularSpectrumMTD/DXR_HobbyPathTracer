@@ -1,7 +1,7 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
-![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
+<img width="1992" height="1121" alt="Image" src="https://github.com/user-attachments/assets/a03f9458-ca04-4dd0-8f10-f7d8c46faaf7" />
 
 ### Algorithm
 - ReSTIR DI
@@ -15,27 +15,20 @@ Results of the verification of the ReSTIR
 ![Image](https://github.com/user-attachments/assets/0e26ee13-637f-4708-8379-1d51c74d1b64)
 
 ### Results
+Room5
+
+<img width="1994" height="1120" alt="Image" src="https://github.com/user-attachments/assets/be39470b-f2a3-4868-814b-e59dfc523078" />
+
+<img width="1994" height="1125" alt="Image" src="https://github.com/user-attachments/assets/6fa602db-4824-4a7a-9c19-0512c94f0be1" />
+
+<img width="1991" height="1122" alt="Image" src="https://github.com/user-attachments/assets/acfde6a6-d8e9-4d39-86e2-9d45563c5be9" />
+
+<img width="1999" height="1122" alt="Image" src="https://github.com/user-attachments/assets/21d340ae-a822-4f9e-8f06-edfd2c93b82b" />
+
+<img width="1990" height="1121" alt="Image" src="https://github.com/user-attachments/assets/eec792bb-60d6-4480-9408-43d2f15ab5cf" />
 
 Room2
 ![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
-
-![Image](https://github.com/user-attachments/assets/86219a06-59b3-4881-8fc6-d99bc37f89e1)
-
-![Image](https://github.com/user-attachments/assets/cbc3c51b-1c8d-49e9-a2ad-88a84905b22c)
-
-![Image](https://github.com/user-attachments/assets/977fa4bc-f0d8-45ea-ba6f-1f3615b9c7e8)
-
-![Image](https://github.com/user-attachments/assets/ebea6f84-9c9f-4129-98e7-5f16ba67b994)
-
-![Image](https://github.com/user-attachments/assets/0fee2bb2-387f-45e7-b842-d4507c5729b3)
-
-![Image](https://github.com/user-attachments/assets/f499963a-942d-4f5c-828b-0ca62b6403a3)
-
-![Image](https://github.com/user-attachments/assets/56e5b708-9f80-413d-8769-c611d123e96a)
-
-![Image](https://github.com/user-attachments/assets/2959e0d0-f00b-4848-b7fc-c76577315c0c)
-
-![Image](https://github.com/user-attachments/assets/d5c378a9-c034-41d6-9a34-5edaf3cbf943)
 
 EmissionTest
 ![Image](https://github.com/user-attachments/assets/64500e4a-599e-4ef2-94e6-6aafb4a17efb)
@@ -84,7 +77,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_CausticsTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(EmissionTest/CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(EmissionTest/CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
 2. Build and Execute  
 ---
 #### With Sponza
