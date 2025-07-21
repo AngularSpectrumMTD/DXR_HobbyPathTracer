@@ -429,12 +429,14 @@ private:
         SceneType_PTTestRoom2,
         SceneType_PTTestRoom3,
         SceneType_PTTestRoom4,
+        SceneType_PTTestRoom5,
         SceneType_MaterialTest,
         SceneType_Corridor,
         SceneType_CausticsTest,
         SceneType_EmissionTest,
         SceneType_RoughnessTest,
         SceneType_ResamplingTest,
+        SceneType_AssetTest,
     };
 
     enum Spectrum

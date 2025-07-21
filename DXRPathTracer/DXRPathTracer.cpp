@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_ResamplingTest;
+    mSceneType = SceneType_PTTestRoom5;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -103,7 +103,7 @@ void DXRPathTracer::Setup()
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
     mSpatialReuseTap = 4;//Most Important Param For Getting High Quality Spatial Resampling Result
-    mExposure = 0;
+    mExposure = 1;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -573,6 +573,39 @@ void DXRPathTracer::Setup()
             mCameraSpeed = 1.0f;
         }
         break;
+        case SceneType_PTTestRoom5:
+        {
+            mLightAreaScale = 6;
+            mPhiDirectional = 312.f; mThetaDirectional = 138;
+
+            //near
+            //mInitEyePos = XMFLOAT3(-85, 64, -18);
+            //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+            //stair side
+            mInitEyePos = XMFLOAT3(-122.7, 70.6, 22.37);
+            mInitTargetPos = XMFLOAT3(-163.6, 71.4, -6.7);
+
+            //chair side
+  /*          mInitEyePos = XMFLOAT3(120.4, 108.6, -54.9);
+            mInitTargetPos = XMFLOAT3(70.6, 105.9, -51.0);*/
+
+            mOBJFileName = "PTTestRoom5.obj";
+            mOBJFolderName = "model/PTTest/PTTestRoom5";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(-150, 65, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 18.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 4.0f;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mCameraSpeed = 1.0f;
+        }
+        break;
         case SceneType_MaterialTest:
         {
             mLightAreaScale = 6;
@@ -828,6 +861,46 @@ void DXRPathTracer::Setup()
             mIsUseIBL = true;
         }
         break;
+         case SceneType_AssetTest:
+         {
+             mLightAreaScale = 6;
+             mPhiDirectional = 168.0f; mThetaDirectional = 248;
+
+             //near
+             //mInitEyePos = XMFLOAT3(-85, 64, -18);
+             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+             //far
+             //mInitEyePos = XMFLOAT3(-6, 78, 165);
+             //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+             mInitEyePos = XMFLOAT3(105.74, 241.73, 0);
+             mInitTargetPos = XMFLOAT3(64.1, 235.8, 0);
+
+             mOBJFileName = "AssetTest.obj";
+             mOBJFolderName = "model";
+             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+             mStageOffsetX = 0.0f;
+             mStageOffsetY = 0.0f;
+             mStageOffsetZ = 0.0f;
+
+             mLightPosX = -40.0f; mLightPosY = 251.5f; mLightPosZ = -5.31f;
+             mPhi = -85.0f; mTheta = 228.0f;
+
+             mLightRange = 5.68f;
+
+             mCausticsBoost = 0.05;
+             mGatherBlockRange = 2;
+
+             mModelTypeTbl[0] = ModelType_Afrodyta;
+             mCameraSpeed = 10.0f;
+
+             mGatherRadius = 0.1f;
+
+             mIsApplyCaustics = false;
+             mIsUseIBL = true;
+         }
+         break;
     }
 
     mCausticsBoost /= causticsPDF;
