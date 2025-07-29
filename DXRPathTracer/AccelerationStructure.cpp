@@ -187,7 +187,7 @@ void DXRPathTracer::CreateSceneInfo()
             material.metallic = 0.3;
             //material.roughness = 0.1;// rndF(mt);
             //material.roughness = 0.0;// rndF(mt);
-            material.roughness = 0.2;// rndF(mt);
+            material.roughness = 0.1;// rndF(mt);
             material.transColor = colorTbl[transIndex % _countof(colorTbl)];
             //material.transColor = (NormalOBJ0s == 1) ? XMVectorSet(1.0f, 0.8f, 1.0f, 0.0f) : colorTbl[transIndex % _countof(colorTbl)];
             if (mModelTypeTbl[0] == ModelType_CurvedMesh)
@@ -199,27 +199,7 @@ void DXRPathTracer::CreateSceneInfo()
             material.transColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
             material.albedo = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 
-            material.transRatio = 0.0;
-
-            if (i == 1)
-            {
-                material.transRatio = 0;
-            }
-
-            if (mSceneType == SceneType_Simple)
-            {
-                material.transRatio = 0;
-            }
-
-            if (mSceneType == SceneType_BistroInterior)
-            {
-                material.transRatio = 0;
-            }
-
-            if (material.transRatio > 0)
-            {
-                material.roughness = max(0.05, material.roughness * 0.1);
-            }
+            material.transRatio = 0.9;
 
 #ifdef GI_TEST
             material.transRatio = 0;// rndF(mt);

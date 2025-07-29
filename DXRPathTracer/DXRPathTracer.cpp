@@ -98,7 +98,7 @@ void DXRPathTracer::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = true;
+    mIsUseReservoirSpatialReuse = false;
     mIsTemporalAccumulationForceDisable = false ;
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;

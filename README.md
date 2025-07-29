@@ -9,10 +9,7 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR
-
-![Image](https://github.com/user-attachments/assets/168b09f8-f004-4fb1-8195-432b2ffa34f0)
-
-![Image](https://github.com/user-attachments/assets/0e26ee13-637f-4708-8379-1d51c74d1b64)
+<img width="2652" height="1508" alt="Image" src="https://github.com/user-attachments/assets/77c42b62-a992-4d6f-89da-4d42ff6d1ce4" />
 
 ### Results
 Room5
@@ -27,6 +24,9 @@ Room5
 
 <img width="1990" height="1121" alt="Image" src="https://github.com/user-attachments/assets/eec792bb-60d6-4480-9408-43d2f15ab5cf" />
 
+BistroExterior
+<img width="1999" height="1118" alt="Image" src="https://github.com/user-attachments/assets/a4855cd1-4e62-4b2c-ba6b-e79bb0aed5ad" />
+
 Room2
 ![Image](https://github.com/user-attachments/assets/cccb9c7f-4f46-4e41-b3a2-3246f3ef1df8)
 
@@ -40,10 +40,10 @@ Room3
 ![Image](https://github.com/user-attachments/assets/0a4f5a4c-feb6-4456-8e7b-35655c16047b)
 
 CausticsTest  
-![Image](https://github.com/user-attachments/assets/1ad0a7a3-0843-4a2d-9321-e0990e26e826)
+<img width="1996" height="1117" alt="Image" src="https://github.com/user-attachments/assets/d65d6905-a0da-4d03-8c64-73e1448ba7f5" />
 
 MaterialTest  
-![Image](https://github.com/user-attachments/assets/c0639c7c-a2b8-45f0-bd41-55d1d2165b56)
+<img width="1995" height="1114" alt="Image" src="https://github.com/user-attachments/assets/f1f65b94-3ce7-4e64-b656-6633c8fd24c3" />
 
 Corridor
 ![Image](https://github.com/user-attachments/assets/f0493f5d-c690-47b9-9e86-ec89efe15070)
@@ -52,20 +52,14 @@ Sponza
 ![Image](https://github.com/user-attachments/assets/ec2c5244-89da-46b2-80f4-4b1b6831e48b)
 ![Image](https://github.com/user-attachments/assets/4a92bbbc-4fe8-4758-a0ed-7645a4f53758)
 
-BistroExterior
-![Image](https://github.com/user-attachments/assets/7989bb54-edeb-4b2d-b6bc-93313647f83c)
-
 BistroInterior
-![Image](https://github.com/user-attachments/assets/337bb238-cfdb-464c-83e0-d896fc3308bb)
+<img width="1993" height="1124" alt="Image" src="https://github.com/user-attachments/assets/3eec9d5f-a26c-43aa-b0fc-39bbb438789e" />
 
 Brick
-![Image](https://github.com/user-attachments/assets/47c50ff5-509d-4b15-8819-631598e45860)
+<img width="1991" height="1117" alt="Image" src="https://github.com/user-attachments/assets/7ecb72c7-4641-4893-9757-8e905be811ad" />
 
 Robot
-![Image](https://github.com/user-attachments/assets/7f7fd6ca-1521-4ab3-ad51-1e5a44171802)
-
-Room
-![Image](https://github.com/user-attachments/assets/4060169f-233c-406c-9e4f-ea0af8c8db94)
+<img width="1999" height="1122" alt="Image" src="https://github.com/user-attachments/assets/19455117-c511-4264-8f17-4f368396160b" />
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     

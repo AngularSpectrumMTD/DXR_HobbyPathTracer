@@ -139,10 +139,10 @@ void editMaterial(inout MaterialParams mat)
     }
     else
     {
-        mat.roughness = 0.03;
+        mat.roughness = 0.1;
         mat.transColor = 1.xxxx;
-        mat.transRatio = 1;
-        mat.metallic = 0;
+        mat.transRatio = 0.9;
+        mat.metallic = 0.3;
         mat.albedo = 1.xxxx;
 
         //mat.emission = float4(1,1,0,0);//test
