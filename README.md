@@ -1,7 +1,7 @@
 # DXR_HobbyPathTracer
 Basic Path Tracer (Implemented in DirectX Raytracing)
 
-<img width="1992" height="1121" alt="Image" src="https://github.com/user-attachments/assets/a03f9458-ca04-4dd0-8f10-f7d8c46faaf7" />
+<img width="1994" height="1122" alt="Image" src="https://github.com/user-attachments/assets/100f9571-7b15-418c-a5c7-1452d8432a23" />
 
 ### Algorithm
 - ReSTIR DI
@@ -14,7 +14,7 @@ Results of the verification of the ReSTIR
 ### Results
 Room5
 
-<img width="1994" height="1120" alt="Image" src="https://github.com/user-attachments/assets/be39470b-f2a3-4868-814b-e59dfc523078" />
+<img width="1994" height="1119" alt="Image" src="https://github.com/user-attachments/assets/b0371a0d-f239-404c-92f8-53d4d186974a" />
 
 <img width="1994" height="1125" alt="Image" src="https://github.com/user-attachments/assets/6fa602db-4824-4a7a-9c19-0512c94f0be1" />
 
