@@ -352,7 +352,7 @@ void photonEmitting()
     finalizeRNG(launchIndex.xy, payload.randomSeed);
 }
 
-void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, inout uint randomState)
+void performTemporalResampling(inout DIReservoir currDIReservoir, in DIReservoir prevDIReservoir, inout uint randomState)
 {
     //Limitting
     if(prevDIReservoir.M > MAX_REUSE_M_DI)
@@ -374,7 +374,7 @@ void DIReservoirTemporalReuse(inout DIReservoir currDIReservoir, in DIReservoir 
     currDIReservoir = tempDIReservoir;
 }
 
-void GIReservoirTemporalReuse(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, inout uint randomState)
+void performTemporalResampling(inout GIReservoir currGIReservoir, in GIReservoir prevGIReservoir, inout uint randomState)
 {
     //Limitting
     if(prevGIReservoir.M > MAX_REUSE_M_GI)
@@ -409,39 +409,36 @@ void temporalReuse()
     initializeRNG(launchIndex.xy, randomSeed);
 
     uint2 currID = launchIndex.xy;
-    uint2 randID = currID;
 
-    float currDepth = gNormalDepthBuffer[currID].w;
-    float3 currNormal = gNormalDepthBuffer[currID].xyz;
-
-    float3 currObjectWorldPos = gPositionBuffer[currID].xyz;
-
-    int2 prevID = gPrevIDBuffer[currID];
-
-    float3 currDI = 0.xxx;
     if(isUseNEE() && isUseStreamingRIS())
     {
+        float currDepth = gNormalDepthBuffer[currID].w;
+        float3 currNormal = gNormalDepthBuffer[currID].xyz;
+        float3 currObjectWorldPos = gPositionBuffer[currID].xyz;
+
+        int2 prevID = gPrevIDBuffer[currID];
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
+         float prevDepth = gPrevNormalDepthBuffer[prevID].w;
+        float3 prevNormal = gPrevNormalDepthBuffer[prevID].xyz;
+        float3 prevObjectWorldPos = gPrevPositionBuffer[prevID].xyz;
+        const bool isTemporalReuseEnable = isTemporalReprojectionSuccessed(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
+        const bool isTemporalResamplingRequired = isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && (isTemporalReuseEnable && (abs(currID.x - prevID.x) <= 1) && (abs(currID.y - prevID.y) <= 1));
+
         DIReservoir currDIReservoir = gDIReservoirBuffer[serialCurrID];
-        GIReservoir currGIReservoir = gGIReservoirBuffer[serialCurrID];
-
-        if (isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims))
+        if (isTemporalResamplingRequired)
         {
-            float prevDepth = gPrevNormalDepthBuffer[prevID].w;
-            float3 prevNormal = gPrevNormalDepthBuffer[prevID].xyz;
-            float3 prevObjectWorldPos = gPrevPositionBuffer[prevID].xyz;
-            const bool isTemporalReuseEnable = isTemporalReprojectionSuccessed(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
-            if(isTemporalReuseEnable && (abs(currID.x - prevID.x) <= 1) && (abs(currID.y - prevID.y) <= 1))
-            {
-                DIReservoir prevDIReservoir = gDIReservoirBufferSrc[serialPrevID];
-                DIReservoirTemporalReuse(currDIReservoir, prevDIReservoir, randomSeed);
-                GIReservoir prevGIReservoir = gGIReservoirBufferSrc[serialPrevID];
-                GIReservoirTemporalReuse(currGIReservoir, prevGIReservoir, randomSeed);
-            }
+            DIReservoir prevDIReservoir = gDIReservoirBufferSrc[serialPrevID];
+            performTemporalResampling(currDIReservoir, prevDIReservoir, randomSeed);
         }
-
         gDIReservoirBuffer[serialCurrID] = currDIReservoir;
+
+        GIReservoir currGIReservoir = gGIReservoirBuffer[serialCurrID];
+        if (isTemporalResamplingRequired)
+        {
+            GIReservoir prevGIReservoir = gGIReservoirBufferSrc[serialPrevID];
+            performTemporalResampling(currGIReservoir, prevGIReservoir, randomSeed);
+        }
         gGIReservoirBuffer[serialCurrID] = currGIReservoir;
     }
 
@@ -450,7 +447,7 @@ void temporalReuse()
 
 #define SPATIAL_REUSE_NUM 4
 
-void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
+void performSpatialResampling(inout DIReservoir spatDIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -511,7 +508,7 @@ void DIReservoirSpatialReuse(inout DIReservoir spatDIReservoir, in float centerD
     spatDIReservoir.applyMCapping();
 }
 
-void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
+void performSpatialResampling(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
 {
     uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
@@ -574,6 +571,64 @@ void GIReservoirSpatialReuse(inout GIReservoir spatGIReservoir, in float centerD
     spatGIReservoir.applyMCapping();
 }
 
+void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial)
+{
+    LightSample lightSample;
+    uint replayRandomSeed = spatDIReservoir.randomSeed;
+    sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample, replayRandomSeed);
+    float3 biasedPosition = centerPos + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+
+    float3 lightNormal = lightSample.normal;
+    float3 wi = lightSample.directionToLight;
+    float receiverCos = dot(centerNormal, wi);
+    float emitterCos = dot(lightNormal, -wi);
+    if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (receiverCos > 0) && (emitterCos > 0))
+    {
+        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
+        float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+        float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+        spatDIReservoir.targetPDF_3f_U32 = compressRGBasU32(FGL);
+    }
+
+    if(!isVisible(biasedPosition, lightSample))
+    {
+        recognizeAsShadowedReservoir(spatDIReservoir);
+    }
+}
+
+void perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial, inout uint randomSeed, in uint serialIndex)
+{
+    const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
+    float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
+
+    const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
+    //const bool isReEvaluateValid = !isTransparentMaterial(screenSpaceMaterial) && (diffRatio > 0.1); 
+    const bool isReEvaluateValid = true;//(diffRatio > 0.1); 
+
+    float cosine = abs(dot(wi, centerNormal));
+    float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);
+
+    const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
+
+    if(isReEvaluateValid && !isIBLSample)
+    {
+        float3 dir = spatGIReservoir.giSample.pos_2nd - centerPos;
+        float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
+        const float termV = isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd) ? 1 : 0;
+        spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * bsdfPDF.xyz * cosine * Lo);
+    }
+    else
+    {
+        spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
+        if(spatGIReservoir.M > MAX_REUSE_M_GI)
+        {
+            float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
+            spatGIReservoir.W_sum *= r;
+            spatGIReservoir.M = MAX_REUSE_M_GI;
+        }
+    }
+}
+
 [shader("raygeneration")]
 void spatialReuse() {
     uint3 launchIndex = DispatchRaysIndex();
@@ -585,87 +640,37 @@ void spatialReuse() {
     uint randomSeed = 0;
     initializeRNG(launchIndex.xy, randomSeed);
 
-    MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
-    const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
-    const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
-    const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
-
-    const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
-    const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
-    const float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
-    const float3 wo = -normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
-
-    //============================================= DI =============================================
-    DIReservoir spatDIReservoir;
-    spatDIReservoir.initialize();
-
-    DIReservoirSpatialReuse(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
-
-    //Reevaluation
+    if(isUseNEE() && isUseStreamingRIS())
     {
-        LightSample lightSample;
-        uint replayRandomSeed = spatDIReservoir.randomSeed;
-        sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample, replayRandomSeed);
-        float3 biasedPosition = centerPos + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+        MaterialParams screenSpaceMaterial = decompressMaterialParams(getScreenSpaceMaterial());
+        const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
+        const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
+        const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
 
-        float3 lightNormal = lightSample.normal;
-        float3 wi = lightSample.directionToLight;
-        float receiverCos = dot(centerNormal, wi);
-        float emitterCos = dot(lightNormal, -wi);
-        if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (receiverCos > 0) && (emitterCos > 0))
-        {
-            float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
-            float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
-            float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
-            spatDIReservoir.targetPDF_3f_U32 = compressRGBasU32(FGL);
-        }
+        const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
+        const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
+        const float4 target = mul(gSceneParam.mtxProjInv, float4(d.x, -d.y, 1, 1));
+        const float3 wo = -normalize(mul(gSceneParam.mtxViewInv, float4(target.xyz, 0)).xyz);
 
-        if(!isVisible(biasedPosition, lightSample))
-        {
-            recognizeAsShadowedReservoir(spatDIReservoir);
-        }
+        DIReservoir spatDIReservoir;
+        spatDIReservoir.initialize();
+
+        performSpatialResampling(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
+        perfromReconnection(spatDIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial);
+
+        gDIReservoirBuffer[serialIndex] = spatDIReservoir;
+        
+        GIReservoir spatGIReservoir;
+        spatGIReservoir.initialize();
+
+        performSpatialResampling(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
+        perfromReconnection(spatGIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial, randomSeed, serialIndex);
+
+        gGIReservoirBuffer[serialIndex] = spatGIReservoir;
     }
-
-    gDIReservoirBuffer[serialIndex] = spatDIReservoir;
-    
-    //============================================= GI =============================================
-    GIReservoir spatGIReservoir;
-    spatGIReservoir.initialize();
-
-    GIReservoirSpatialReuse(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
-
-    //Reevaluation
+    else
     {
-        const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
-        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
-
-        const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
-        //const bool isReEvaluateValid = !isTransparentMaterial(screenSpaceMaterial) && (diffRatio > 0.1); 
-        const bool isReEvaluateValid = true;//(diffRatio > 0.1); 
-
-        float cosine = abs(dot(wi, centerNormal));
-        float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);
-
-        const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
-
-        if(isReEvaluateValid && !isIBLSample)
-        {
-            float3 dir = spatGIReservoir.giSample.pos_2nd - centerPos;
-            float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
-            const float termV = isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd) ? 1 : 0;
-            spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * bsdfPDF.xyz * cosine * Lo);
-        }
-        else
-        {
-            spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
-            if(spatGIReservoir.M > MAX_REUSE_M_GI)
-            {
-                float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
-                spatGIReservoir.W_sum *= r;
-                spatGIReservoir.M = MAX_REUSE_M_GI;
-            }
-        }
+         gDIReservoirBuffer[serialIndex] = gDIReservoirBufferSrc[serialIndex];
+         gGIReservoirBuffer[serialIndex] = gGIReservoirBufferSrc[serialIndex];
     }
-
-    gGIReservoirBuffer[serialIndex] = spatGIReservoir;
 }
