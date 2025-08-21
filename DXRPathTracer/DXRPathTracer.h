@@ -436,7 +436,8 @@ private:
         SceneType_EmissionTest,
         SceneType_RoughnessTest,
         SceneType_ResamplingTest,
-        SceneType_AssetTest,
+        SceneType_CornellBox,
+        //SceneType_AssetTest,
     };
 
     enum Spectrum

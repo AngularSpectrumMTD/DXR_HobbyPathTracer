@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_PTTestRoom5;
+    mSceneType = SceneType_CornellBox;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -861,7 +861,7 @@ void DXRPathTracer::Setup()
             mIsUseIBL = true;
         }
         break;
-         case SceneType_AssetTest:
+         case SceneType_CornellBox:
          {
              mLightAreaScale = 6;
              mPhiDirectional = 168.0f; mThetaDirectional = 248;
@@ -874,10 +874,10 @@ void DXRPathTracer::Setup()
              //mInitEyePos = XMFLOAT3(-6, 78, 165);
              //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
 
-             mInitEyePos = XMFLOAT3(105.74, 241.73, 0);
-             mInitTargetPos = XMFLOAT3(64.1, 235.8, 0);
+             mInitEyePos = XMFLOAT3(12.232, 210.32, 1.94);
+             mInitTargetPos = XMFLOAT3(-29.06, 203.12, -1.5);
 
-             mOBJFileName = "AssetTest.obj";
+             mOBJFileName = "CornellBox.obj";
              mOBJFolderName = "model";
              mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
              mStageOffsetX = 0.0f;

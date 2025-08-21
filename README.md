@@ -12,6 +12,9 @@ Results of the verification of the ReSTIR
 <img width="2652" height="1508" alt="Image" src="https://github.com/user-attachments/assets/77c42b62-a992-4d6f-89da-4d42ff6d1ce4" />
 
 ### Results
+Cornell Box
+<img width="833" height="466" alt="Image" src="https://github.com/user-attachments/assets/fa238900-6e15-45d1-bba6-344b7b574470" />
+
 Room5
 
 <img width="1994" height="1119" alt="Image" src="https://github.com/user-attachments/assets/b0371a0d-f239-404c-92f8-53d4d186974a" />
@@ -71,7 +74,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp]  **(EmissionTest/CausticsTest/MaterialTest/Corridor/Kitchen/GITest/PTTest/PTTestBrick/PTTestRobot/PTTestRoom/PTTestRoom2/PTTestRoom3Exp/PTTestRoom4Exp.mtl/obj are made by owner of this repository(AngularSpectrumMTD))**
+1. Set SceneType_CornellBox" or "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] 
 2. Build and Execute  
 ---
 #### With Sponza
