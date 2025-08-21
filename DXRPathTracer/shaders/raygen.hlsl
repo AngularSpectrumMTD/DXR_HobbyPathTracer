@@ -614,7 +614,7 @@ void perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in flo
     {
         float3 dir = spatGIReservoir.giSample.pos_2nd - centerPos;
         float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
-        const float termV = isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd) ? 1 : 0;
+        const float termV = 1;//isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd) ? 1 : 0;
         spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * bsdfPDF.xyz * cosine * Lo);
     }
     else
