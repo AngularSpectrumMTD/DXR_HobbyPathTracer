@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_CornellBox;
+    mSceneType = SceneType_PTTestRoom5;
 
     mIsUseIBL = true;
     mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
@@ -98,7 +98,7 @@ void DXRPathTracer::Setup()
     //mCubeMapTextureFileName = L"model/ForestEquirec.png";
     mIsUseStreamingRIS = true;
     mIsUseReservoirTemporalReuse = true;
-    mIsUseReservoirSpatialReuse = false;
+    mIsUseReservoirSpatialReuse = true;
     mIsTemporalAccumulationForceDisable = false ;
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
@@ -876,6 +876,9 @@ void DXRPathTracer::Setup()
 
              mInitEyePos = XMFLOAT3(12.232, 210.32, 1.94);
              mInitTargetPos = XMFLOAT3(-29.06, 203.12, -1.5);
+
+             mInitEyePos = XMFLOAT3(12.743, 210.32, -0.8);
+             mInitTargetPos = XMFLOAT3(-28.85, 204.37, 0.028);
 
              mOBJFileName = "CornellBox.obj";
              mOBJFolderName = "model";

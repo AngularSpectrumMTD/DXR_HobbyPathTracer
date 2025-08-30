@@ -40,6 +40,17 @@ float computeLuminance(const float3 linearRGB)
     return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
 }
 
+float3 getClampedValue(in float3 v, in float limitingValue)
+{
+    float3 cValue = 0;
+    cValue.x = min(v.x, limitingValue);
+    cValue.y = min(v.y, limitingValue);
+    cValue.z = min(v.z, limitingValue);
+    return cValue;
+}
+
+#define MAX_VALUE 1
+
 [numthreads(THREAD_NUM, THREAD_NUM, 1)]
 void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 {
@@ -80,7 +91,6 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
     const float3 modAlbedo = modulatedAlbedo(material);
 
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
-
     //modulate
     currDI /= modAlbedo;
     currGI /= modAlbedo;

@@ -5,6 +5,7 @@
 #include "spectralRenderingHelper.hlsli"
 
 #define SPP 1
+#define CLAMP_VALUE 1000
 
 void clearEmissionGuideMap(int3 launchIndex)
 {
@@ -164,7 +165,8 @@ void rayGen() {
     }
 
     //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
-    const float3 gi = getGI();
+    float3 gi = getGI();
+    gi = clamp(gi, 0.xxx, CLAMP_VALUE.xxx);
 
     GIReservoir giInitialReservoir = getGIReservoir();
 
@@ -180,14 +182,16 @@ void rayGen() {
     compressedMaterial = giInitialReservoir.compressedMaterial;
 
     const float3 primaryBSDF = decompressU32asRGB(payload.primaryBSDFU32);
-    const float primaryPDF = payload.primaryPDF;
-
-    const float3 elem = gi * primaryBSDF;
+    const float safeEPS = 0.001f;
+    const float primaryPDF = payload.primaryPDF + safeEPS;
+    float3 elem = gi * primaryBSDF;
+    elem = clamp(elem, 0.xxx, CLAMP_VALUE.xxx);
     const float p_hat = computeLuminance(elem);
     const float updateW = p_hat / primaryPDF;
-
-    updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, compressRGBasU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
-
+    if((primaryPDF > 0.001) && (updateW < 100))
+    {
+        updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, compressRGBasU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
+    }
     setGIReservoir(giReservoir);
 
     //set the value computed by a pure Monte-Calro strategy
