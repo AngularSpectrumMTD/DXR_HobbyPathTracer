@@ -298,6 +298,17 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
         return;
     }
 
+    const float execP = 0.6;
+    if(rand(payload.randomSeed) < (1 - execP))
+    {
+        payload.terminate();
+        return;
+    }
+    else
+    {
+        payload.updateThroughputByMulitiplicationF1(1 / execP);
+    }
+
     //debug
     // if(isDirectRay(payload))
     // {

@@ -116,6 +116,8 @@ namespace ComputeShaders {
 
     const LPCWSTR TemporalAccumulation = L"temporalAccumulation.cso";
     const LPCWSTR FinalizePathtracedResult = L"finalizePathtracedResult.cso";
+    const LPCWSTR ResolveReservoir = L"resolveReservoir.cso";
+    const LPCWSTR PerformModulation = L"performModulation.cso";
     //const LPCWSTR TemporalReuse = L"temporalReuse.cso";
 
     const LPCWSTR ClearPhotonEmissionGuideMap = L"clearPhotonEmissionGuideMap.cso";
@@ -758,6 +760,14 @@ private:
     ComPtr<ID3D12RootSignature> mRsFinalizePathtracedResult;
     std::unordered_map < std::string, u32> mRegisterMapFinalizePathtracedResult;
     ComPtr<ID3D12PipelineState> mFinalizePathtracedResultPSO;
+
+    ComPtr<ID3D12RootSignature> mRsResolveReservoir;
+    std::unordered_map < std::string, u32> mRegisterMapResolveReservoir;
+    ComPtr<ID3D12PipelineState> mResolveReservoirPSO;
+
+    ComPtr<ID3D12RootSignature> mRsPerformModulation;
+    std::unordered_map < std::string, u32> mRegisterMapPerformModulation;
+    ComPtr<ID3D12PipelineState> mPerformModulationPSO;
 
     //Emission Guiding
     ComPtr<ID3D12RootSignature> mRsClearPhotonEmissionGuideMap;

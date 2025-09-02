@@ -15,10 +15,8 @@ Texture2D<float4> NormalDepthBuffer : register(t3);
 Texture2D<float4> PrevNormalDepthBuffer : register(t4);
 Texture2D<float2> PrevIDBuffer : register(t5);
 Texture2D<float2> LuminanceMomentBufferSrc : register(t6);
-StructuredBuffer<DIReservoir> DIReservoirBufferSrc : register(t7);
-Texture2D<float4> PositionBuffer : register(t8);
-Texture2D<float4> PrevPositionBuffer : register(t9);
-StructuredBuffer<GIReservoir> GIReservoirBufferSrc : register(t10);
+Texture2D<float4> PositionBuffer : register(t7);
+Texture2D<float4> PrevPositionBuffer : register(t8);
 
 RWTexture2D<float4> CurrentDIBuffer : register(u0);
 RWTexture2D<float4> CurrentGIBuffer : register(u1);
@@ -27,7 +25,6 @@ RWTexture2D<float4> DIGIBuffer : register(u3);
 RWTexture2D<uint> AccumulationCountBuffer : register(u4);
 RWTexture2D<float2> LuminanceMomentBufferDst : register(u5);
 RWTexture2D<uint> PrevAccumulationCountBuffer : register(u6);
-RWStructuredBuffer<CompressedMaterialParams> ScreenSpaceMaterial : register(u7);
 
 //restrict
 bool isWithinBounds(int2 id, int2 size)
@@ -66,35 +63,9 @@ void temporalAccumulation(uint3 dtid : SV_DispatchThreadID)
 
     int2 prevID = PrevIDBuffer[currID];
 
-    float3 currDI = 0.xxx;
-    float3 currGI = 0.xxx;
-
-    MaterialParams material = decompressMaterialParams(ScreenSpaceMaterial[currID.x + dims.x * currID.y]);
-    if(isUseNEE() && isUseStreamingRIS())
-    {
-        const uint serialCurrID = currID.y * dims.x + currID.x;
-        DIReservoir currDIReservoir = DIReservoirBufferSrc[serialCurrID];
-        GIReservoir currGIReservoir = GIReservoirBufferSrc[serialCurrID];
-
-        float3 reservoirElementRemovedDI = CurrentDIBuffer[currID].rgb;
-        currDI = (isIndirectOnly() ? 0.xxx : resolveDIReservoir(currDIReservoir)) + reservoirElementRemovedDI;
-
-        const float w = material.roughness;// * material.roughness;
-        float3 reservoirElementRemovedGI = CurrentGIBuffer[currID].rgb;
-        currGI = w * resolveGIReservoir(currGIReservoir) + (1 - w) * reservoirElementRemovedGI;
-    }
-    else
-    {
-        currDI = CurrentDIBuffer[currID].rgb;
-    }
-    
-    const float3 modAlbedo = modulatedAlbedo(material);
-
+    float3 currDI = CurrentDIBuffer[currID].rgb;
+    float3 currGI = CurrentGIBuffer[currID].rgb;
     float3 currCaustics = CurrentCausticsBuffer[currID].rgb;
-    //modulate
-    currDI /= modAlbedo;
-    currGI /= modAlbedo;
-    currCaustics /= modAlbedo;
 
     if(isWithinBounds(prevID, dims) && isAccumulationApply())
     {

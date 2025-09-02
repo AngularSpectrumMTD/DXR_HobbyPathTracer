@@ -159,6 +159,18 @@ void materialClosestHit(inout Payload payload, TriangleIntersectionAttributes at
         payload.terminate();
         return;
     }
+
+    const float execP = 0.6;
+    if(rand(payload.randomSeed) < (1 - execP))
+    {
+        payload.terminate();
+        return;
+    }
+    else
+    {
+        payload.updateThroughputByMulitiplicationF1(1 / execP);
+    }
+
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xff;
     TraceDefaultRay(flags, rayMask, nextRay, payload);

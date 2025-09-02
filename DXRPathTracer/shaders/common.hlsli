@@ -34,6 +34,11 @@
 
 #include "materialParams.hlsli"
 
+float computeLuminance(const float3 linearRGB)
+{
+    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
+}
+
 struct OpticalGlass
 {
     float A0;
@@ -104,6 +109,11 @@ struct Payload
     void updateThroughputByMulitiplicationF3(in float3 color)
     {
         throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * color);
+    }
+
+    void updateThroughputByMulitiplicationF1(in float v)
+    {
+        throughputU32 = compressRGBasU32(decompressU32asRGB(throughputU32) * v);
     }
 };
 
@@ -494,11 +504,6 @@ float depthLoad(uint2 index)
 float lengthSqr(float3 v)
 {
     return v.x * v.x + v.y * v.y + v.z * v.z;
-}
-
-float computeLuminance(const float3 linearRGB)
-{
-    return dot(float3(0.2126, 0.7152, 0.0722), linearRGB);
 }
 
 bool isCompletelyMissRay(in Payload payload)

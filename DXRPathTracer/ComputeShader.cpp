@@ -291,8 +291,6 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 8);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 9);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 10);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
@@ -300,7 +298,6 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 4);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 5);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 6);
-        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 7);
         mRsTemporalAccumulation = rsCreater.Create(mDevice, false, L"rsTemporalAccumulation");
         CreateComputeShaderStateObject(ComputeShaders::TemporalAccumulation, mTemporalAccumulationPSO, mRsTemporalAccumulation);
         mRegisterMapTemporalAccumulation.clear();
@@ -312,10 +309,8 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["PrevNormalDepthBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevIDBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"] = mRegisterMapTemporalAccumulation.size();
-        mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PositionBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevPositionBuffer"] = mRegisterMapTemporalAccumulation.size();
-        mRegisterMapTemporalAccumulation["GIReservoirBufferSrc"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentDIBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentGIBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["CurrentCausticsBuffer"] = mRegisterMapTemporalAccumulation.size();
@@ -323,7 +318,6 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         mRegisterMapTemporalAccumulation["AccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"] = mRegisterMapTemporalAccumulation.size();
         mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"] = mRegisterMapTemporalAccumulation.size();
-        mRegisterMapTemporalAccumulation["ScreenSpaceMaterial"] = mRegisterMapTemporalAccumulation.size();
     }
 
     {
@@ -343,5 +337,41 @@ void DXRPathTracer::CreateComputeRootSignatureAndPSO()
         mRegisterMapFinalizePathtracedResult["AccumulationCountBuffer"] = mRegisterMapFinalizePathtracedResult.size();
         mRegisterMapFinalizePathtracedResult["NativePathtracedResult"] = mRegisterMapFinalizePathtracedResult.size();
         mRegisterMapFinalizePathtracedResult["FinalizedPathtracedResult"] = mRegisterMapFinalizePathtracedResult.size();
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        mRsResolveReservoir = rsCreater.Create(mDevice, false, L"rsResolveReservoir");
+        CreateComputeShaderStateObject(ComputeShaders::ResolveReservoir, mResolveReservoirPSO, mRsResolveReservoir);
+        mRegisterMapResolveReservoir.clear();
+        mRegisterMapResolveReservoir["gSceneParam"] = mRegisterMapResolveReservoir.size();
+        mRegisterMapResolveReservoir["DIReservoirBufferSrc"] = mRegisterMapResolveReservoir.size();
+        mRegisterMapResolveReservoir["GIReservoirBufferSrc"] = mRegisterMapResolveReservoir.size();
+        mRegisterMapResolveReservoir["CurrentDIBuffer"] = mRegisterMapResolveReservoir.size();
+        mRegisterMapResolveReservoir["CurrentGIBuffer"] = mRegisterMapResolveReservoir.size();
+        mRegisterMapResolveReservoir["ScreenSpaceMaterial"] = mRegisterMapResolveReservoir.size();
+    }
+
+    {
+        utility::RootSignatureCreater rsCreater;
+        rsCreater.Push(utility::RootSignatureCreater::RootType::CBV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 0);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 1);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 2);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::UAV, 3);
+        mRsPerformModulation = rsCreater.Create(mDevice, false, L"rsPerformModulation");
+        CreateComputeShaderStateObject(ComputeShaders::PerformModulation, mPerformModulationPSO, mRsPerformModulation);
+        mRegisterMapPerformModulation.clear();
+        mRegisterMapPerformModulation["gSceneParam"] = mRegisterMapPerformModulation.size();
+        mRegisterMapPerformModulation["CurrentDIBuffer"] = mRegisterMapPerformModulation.size();
+        mRegisterMapPerformModulation["CurrentGIBuffer"] = mRegisterMapPerformModulation.size();
+        mRegisterMapPerformModulation["CurrentCausticsBuffer"] = mRegisterMapPerformModulation.size();
+        mRegisterMapPerformModulation["ScreenSpaceMaterial"] = mRegisterMapPerformModulation.size();
     }
 }

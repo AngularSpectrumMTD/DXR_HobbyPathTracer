@@ -235,6 +235,12 @@
     <FxCompile Include="shaders\copyPhotonEmissionGuideMap.hlsl">
       <Filter>ソース ファイル\shaders\PhotonMap</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\resolveReservoir.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\performModulation.hlsl">
+      <Filter>ソース ファイル\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DXRPathTracer.rc">

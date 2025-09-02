@@ -1647,7 +1647,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mDISpatialReservoirPingPongTbl[prev].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mDISpatialReservoirPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mGISpatialReservoirPingPongTbl[prev].Get()),
-            CD3DX12_RESOURCE_BARRIER::UAV(mGISpatialReservoirPingPongTbl[curr].Get()),
+                CD3DX12_RESOURCE_BARRIER::UAV(mGISpatialReservoirPingPongTbl[curr].Get()),
         };
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
@@ -1722,7 +1722,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->ResourceBarrier(u32(_countof(uavBRandom)), uavBRandom);
 
         //feedback
- #ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
+#ifdef USE_SPATIAL_RESERVOIR_FEEDBACK
         D3D12_RESOURCE_BARRIER copyReservoirBarrier2[] = {
             CD3DX12_RESOURCE_BARRIER::Transition(mDIReservoirPingPongTbl[curr].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST),
             CD3DX12_RESOURCE_BARRIER::Transition(mDISpatialReservoirPingPongTbl[finalSpatialID].Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE),
@@ -1746,6 +1746,48 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->ResourceBarrier(u32(_countof(UAVToSRVReservoirBarrier)), UAVToSRVReservoirBarrier);
     }
 
+    //resolve reservoir
+    {
+        mCommandList->SetComputeRootSignature(mRsResolveReservoir.Get());
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapResolveReservoir["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["GIReservoirBufferSrc"], mGISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
+        mCommandList->SetPipelineState(mResolveReservoirPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "ResolveReservoir");
+        mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
+
+        D3D12_RESOURCE_BARRIER DIGIuavB[] = {
+        CD3DX12_RESOURCE_BARRIER::UAV(mDIBufferPingPongTbl[curr].Get()),
+        CD3DX12_RESOURCE_BARRIER::UAV(mGIBufferPingPongTbl[curr].Get()),
+        };
+        mCommandList->ResourceBarrier(u32(_countof(DIGIuavB)), DIGIuavB);
+    }
+
+    //perform modulation
+    {
+        mCommandList->SetComputeRootSignature(mRsPerformModulation.Get());
+        mCommandList->SetComputeRootConstantBufferView(mRegisterMapPerformModulation["gSceneParam"], sceneCB->GetGPUVirtualAddress());
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[curr].hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetPipelineState(mPerformModulationPSO.Get());
+        PIXBeginEvent(mCommandList.Get(), 0, "PerformModulation");
+        mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
+        PIXEndEvent(mCommandList.Get());
+
+        D3D12_RESOURCE_BARRIER DIGIuavB[] = {
+        CD3DX12_RESOURCE_BARRIER::UAV(mDIBufferPingPongTbl[curr].Get()),
+        CD3DX12_RESOURCE_BARRIER::UAV(mGIBufferPingPongTbl[curr].Get()),
+        CD3DX12_RESOURCE_BARRIER::UAV(mCausticsBufferPingPongTbl[curr].Get()),
+        };
+        mCommandList->ResourceBarrier(u32(_countof(DIGIuavB)), DIGIuavB);
+    }
+
     //temporal accumulation
     {
         mCommandList->SetComputeRootSignature(mRsTemporalAccumulation.Get());
@@ -1766,9 +1808,6 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["PrevAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferSrc"], mLuminanceMomentBufferDescriptorSRVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["LuminanceMomentBufferDst"], mLuminanceMomentBufferDescriptorUAVTbl[curr].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapTemporalAccumulation["GIReservoirBufferSrc"], mGISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetPipelineState(mTemporalAccumulationPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "TemporalAccumulation");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);

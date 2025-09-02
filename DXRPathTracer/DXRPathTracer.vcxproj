@@ -335,6 +335,14 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\%(Filename).dxlib</ObjectFileOutput>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
     </FxCompile>
+    <FxCompile Include="shaders\performModulation.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">performModulation</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">performModulation</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
+    </FxCompile>
     <FxCompile Include="shaders\raygen.hlsl">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\shaders</AdditionalIncludeDirectories>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -349,6 +357,14 @@ copy "$(WindowsSdkDir)Redist\D3D\$(PlatformTarget)\dxil.dll" $(ProjectDir)dxil.d
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\%(Filename).dxlib</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\%(Filename).dxlib</ObjectFileOutput>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="shaders\resolveReservoir.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">resolveReservoir</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">resolveReservoir</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\temporalAccumulation.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">temporalAccumulation</EntryPointName>
