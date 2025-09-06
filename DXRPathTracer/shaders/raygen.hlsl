@@ -516,8 +516,6 @@ void performSpatialResampling(inout DIReservoir spatDIReservoir, in float center
             combineDIReservoirs(spatDIReservoir, nearDIReservoir, nearUpdateW, rand(randomSeed));
         }
     }
-
-    spatDIReservoir.applyMCapping();
 }
 
 void performSpatialResampling(inout GIReservoir spatGIReservoir, in float centerDepth, in float3 centerNormal, in float3 centerPos, inout uint randomSeed, in MaterialParams centerMaterialParams)
@@ -579,8 +577,6 @@ void performSpatialResampling(inout GIReservoir spatGIReservoir, in float center
             combineGIReservoirs(spatGIReservoir, nearGIReservoir, nearUpdateW, rand(randomSeed));
         }
     }
-
-    spatGIReservoir.applyMCapping();
 }
 
 void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial)
@@ -609,8 +605,9 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
     }
 }
 
-void perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial, inout uint randomSeed, in uint serialIndex)
+bool perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial)
 {
+    uint randomSeed = spatGIReservoir.randomSeed;
     const float3 wi = normalize(spatGIReservoir.giSample.pos2 - centerPos);
     const float4 f0p0 = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
     const float3 f0 = f0p0.xyz;
@@ -630,17 +627,10 @@ void perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in flo
         float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
         const float termV = 1;//isVisible(biasedPosition, spatGIReservoir.giSample.pos2) ? 1 : 0;
         spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * f0 * cosine * Lo);
+
+        return true;
     }
-    else
-    {
-        spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
-        if(spatGIReservoir.M > MAX_REUSE_M_GI)
-        {
-            float r = max(0, ((float)MAX_REUSE_M_GI / spatGIReservoir.M));
-            spatGIReservoir.W_sum *= r;
-            spatGIReservoir.M = MAX_REUSE_M_GI;
-        }
-    }
+    return false;
 }
 
 [shader("raygeneration")]
@@ -672,14 +662,19 @@ void spatialReuse() {
         performSpatialResampling(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
         perfromReconnection(spatDIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial);
 
+        spatDIReservoir.applyMCapping();
         gDIReservoirBuffer[serialIndex] = spatDIReservoir;
         
         GIReservoir spatGIReservoir;
         spatGIReservoir.initialize();
 
         performSpatialResampling(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
-        perfromReconnection(spatGIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial, randomSeed, serialIndex);
+        if(!perfromReconnection(spatGIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial))
+        {
+            spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
+        }
 
+        spatGIReservoir.applyMCapping();
         gGIReservoirBuffer[serialIndex] = spatGIReservoir;
     }
     else
