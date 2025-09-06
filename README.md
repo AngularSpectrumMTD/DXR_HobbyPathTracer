@@ -17,6 +17,8 @@ Results of the verification of the ReSTIR
 
 <img width="1276" height="717" alt="Image" src="https://github.com/user-attachments/assets/8425f7af-69fb-4227-aa45-9522344ab069" />
 
+<img width="1275" height="717" alt="Image" src="https://github.com/user-attachments/assets/1bbe75ae-86af-4e9d-80df-f1d2f3765da5" />
+
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
 
