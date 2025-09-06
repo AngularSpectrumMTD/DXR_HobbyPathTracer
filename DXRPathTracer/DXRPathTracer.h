@@ -222,9 +222,9 @@ private:
 
     struct GISample
     {
-        u32 Lo_2nd_U32;
-        float3 pos_2nd;
-        float3 nml_2nd;
+        u32 Lo2_U32;
+        float3 pos2;
+        float3 nml2;
     };
 
     struct GIReservoir
@@ -236,7 +236,7 @@ private:
         f32 M; //number of ligts processed for this reservoir
 
         GISample giSample;
-        CompressedMaterialParams compressedMaterial;
+        //CompressedMaterialParams compressedMaterial;
     };
 
     enum SphereTypeCount {

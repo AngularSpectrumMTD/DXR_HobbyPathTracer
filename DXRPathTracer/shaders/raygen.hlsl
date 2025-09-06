@@ -143,8 +143,8 @@ void rayGen() {
         payload.recursive = 0;
         payload.flags = 0;//empty
         payload.T = 0;
-        payload.primaryBSDFU32 = 0u;
-        payload.primaryPDF = 1;
+        payload.f0 = 0u;
+        payload.p0 = 1;
         payload.randomSeed = randomSeed;
 
         RAY_FLAG flags = RAY_FLAG_NONE;
@@ -165,37 +165,45 @@ void rayGen() {
     }
 
     //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
-    float3 gi = getGI();
-    gi = clamp(gi, 0.xxx, CLAMP_VALUE.xxx);
-
-    GIReservoir giInitialReservoir = getGIReservoir();
+    float3 f1p1_from = getGI();
+    f1p1_from = clamp(f1p1_from, 0.xxx, CLAMP_VALUE.xxx);
 
     GISample giSample = (GISample)0;
-    giSample.Lo_2nd_U32 = compressRGBasU32(gi);
-    giSample.pos_2nd = giInitialReservoir.giSample.pos_2nd;
-    giSample.nml_2nd = giInitialReservoir.giSample.nml_2nd;
+    //CompressedMaterialParams compressedMaterial = (CompressedMaterialParams)0;
+    
+    {
+        GIReservoir giInitialReservoir = getGIReservoir();
+
+        giSample.Lo2_U32 = compressRGBasU32(f1p1_from);
+        giSample.pos2 = giInitialReservoir.giSample.pos2;
+        giSample.nml2 = giInitialReservoir.giSample.nml2;
+        //compressedMaterial = giInitialReservoir.compressedMaterial;
+    }
+
+    const float3 f0 = decompressU32asRGB(payload.f0);
+    const float safeEPS = 0.001f;
+    const float p0 = payload.p0 + safeEPS;
+    float3 f0f1p1_from = f1p1_from * f0;
+    f0f1p1_from = clamp(f0f1p1_from, 0.xxx, CLAMP_VALUE.xxx);
+    const float p_hat = computeLuminance(f0f1p1_from);
+    const float updateW = p_hat / p0;
 
     GIReservoir giReservoir;
     giReservoir.initialize();
-
-    CompressedMaterialParams compressedMaterial = (CompressedMaterialParams)0;
-    compressedMaterial = giInitialReservoir.compressedMaterial;
-
-    const float3 primaryBSDF = decompressU32asRGB(payload.primaryBSDFU32);
-    const float safeEPS = 0.001f;
-    const float primaryPDF = payload.primaryPDF + safeEPS;
-    float3 elem = gi * primaryBSDF;
-    elem = clamp(elem, 0.xxx, CLAMP_VALUE.xxx);
-    const float p_hat = computeLuminance(elem);
-    const float updateW = p_hat / primaryPDF;
-    if((primaryPDF > 0.001) && (updateW < 100))
+    if((p0 > 0.001) && (updateW < 100))
     {
-        updateGIReservoir(giReservoir, payload.bsdfRandomSeed, updateW, p_hat, compressRGBasU32(elem), giSample, compressedMaterial, 1u, rand(payload.randomSeed));
+        giReservoir.W_sum = updateW;
+        giReservoir.M = 1u;
+        giReservoir.targetPDF = p_hat;
+        giReservoir.targetPDF_3f_U32 = compressRGBasU32(f0f1p1_from);
+        giReservoir.randomSeed = payload.bsdfRandomSeed;
+        giReservoir.giSample = giSample;
+        //giReservoir.compressedMaterial = compressedMaterial;
     }
     setGIReservoir(giReservoir);
 
     //set the value computed by a pure Monte-Calro strategy
-    setGI(elem / primaryPDF);
+    setGI(f0f1p1_from / p0);
     
     finalizeRNG(launchIndex.xy, payload.randomSeed);
 }
@@ -588,9 +596,10 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
     float emitterCos = dot(lightNormal, -wi);
     if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (receiverCos > 0) && (emitterCos > 0))
     {
-        float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
+        const float4 f0p0 = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
+        const float3 f0 = f0p0.xyz;
         float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
-        float3 FGL = saturate(bsdfPDF.xyz * G) * lightSample.emission / lightSample.pdf;
+        float3 FGL = saturate(f0 * G) * lightSample.emission / lightSample.pdf;
         spatDIReservoir.targetPDF_3f_U32 = compressRGBasU32(FGL);
     }
 
@@ -602,24 +611,25 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
 
 void perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial, inout uint randomSeed, in uint serialIndex)
 {
-    const float3 wi = normalize(spatGIReservoir.giSample.pos_2nd - centerPos);
-    float4 bsdfPDF = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
+    const float3 wi = normalize(spatGIReservoir.giSample.pos2 - centerPos);
+    const float4 f0p0 = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, randomSeed);
+    const float3 f0 = f0p0.xyz;
 
     const float diffRatio = 1.0 - screenSpaceMaterial.metallic;
     //const bool isReEvaluateValid = !isTransparentMaterial(screenSpaceMaterial) && (diffRatio > 0.1); 
     const bool isReEvaluateValid = true;//(diffRatio > 0.1); 
 
     float cosine = abs(dot(wi, centerNormal));
-    float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo_2nd_U32);
+    float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo2_U32);
 
-    const bool isIBLSample = (length(spatGIReservoir.giSample.pos_2nd) == 0);
+    const bool isIBLSample = (length(spatGIReservoir.giSample.pos2) == 0);
 
     if(isReEvaluateValid && !isIBLSample)
     {
-        float3 dir = spatGIReservoir.giSample.pos_2nd - centerPos;
+        float3 dir = spatGIReservoir.giSample.pos2 - centerPos;
         float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
-        const float termV = 1;//isVisible(biasedPosition, spatGIReservoir.giSample.pos_2nd) ? 1 : 0;
-        spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * bsdfPDF.xyz * cosine * Lo);
+        const float termV = 1;//isVisible(biasedPosition, spatGIReservoir.giSample.pos2) ? 1 : 0;
+        spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * f0 * cosine * Lo);
     }
     else
     {

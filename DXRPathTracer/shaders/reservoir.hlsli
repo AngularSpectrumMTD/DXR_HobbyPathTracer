@@ -81,9 +81,9 @@ void recognizeAsShadowedReservoir(inout DIReservoir reservoir)
 
 struct GISample
 {
-    uint Lo_2nd_U32;
-    float3 pos_2nd;
-    float3 nml_2nd;
+    uint Lo2_U32;
+    float3 pos2;
+    float3 nml2;
 };
 
 struct GIReservoir
@@ -95,7 +95,7 @@ struct GIReservoir
     float M; //number of ligts processed for this reservoir
 
     GISample giSample;
-    CompressedMaterialParams compressedMaterial;
+    //CompressedMaterialParams compressedMaterial;
 
     void initialize()
     {
@@ -106,7 +106,7 @@ struct GIReservoir
         M = 0;
 
         giSample = (GISample)0;
-        compressedMaterial = (CompressedMaterialParams)0;
+        //compressedMaterial = (CompressedMaterialParams)0;
     }
 
     void applyMCapping()
@@ -120,7 +120,7 @@ struct GIReservoir
     }
 };
 
-bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in GISample giSample, in CompressedMaterialParams compressedMaterial, in uint c, in float rnd01)
+bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float w, in float p_hat, in uint p_hat_3f, in GISample giSample, in uint c, in float rnd01)
 {
     reservoir.W_sum += w;
     reservoir.M += c;
@@ -131,7 +131,6 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
         reservoir.targetPDF_3f_U32 = p_hat_3f;
         reservoir.randomSeed = randomSeed;
         reservoir.giSample = giSample;
-        reservoir.compressedMaterial = compressedMaterial;
         return true;
     }
     return false;
@@ -139,7 +138,7 @@ bool updateGIReservoir(inout GIReservoir reservoir, in uint randomSeed, in float
 
 bool combineGIReservoirs(inout GIReservoir reservoir, in GIReservoir reservoirCombineElem, in float w, in float rnd01)
 {
-    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.giSample, reservoirCombineElem.compressedMaterial  , reservoirCombineElem.M, rnd01);
+    return updateGIReservoir(reservoir, reservoirCombineElem.randomSeed, w, reservoirCombineElem.targetPDF, reservoirCombineElem.targetPDF_3f_U32, reservoirCombineElem.giSample, reservoirCombineElem.M, rnd01);
 }
 
 float3 resolveGIReservoir(in GIReservoir reservoir)

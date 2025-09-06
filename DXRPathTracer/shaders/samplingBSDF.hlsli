@@ -251,7 +251,7 @@ float4 transmitBSDF_PDF(in MaterialParams material, in float3 N, in float3 wo, i
 
 float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3 wo_global, in float3 wi_global, inout uint randomSeed, in float wavelength = 0)
 {
-    float4 BSDF_PDF = 0.xxxx;
+    float4 fp = 0.xxxx;
 
     const float roulette = rand(randomSeed);
     const float blending = rand(randomSeed);
@@ -272,8 +272,8 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3
         const float3 V_local = normalize(wo_local);
         
         //compute bsdf    V : wo   L : wi(sample)
-        BSDF_PDF = specularBSDF_PDF(material, Z_AXIS, V_local, wi_local);
-        BSDF_PDF.w *= probability;
+        fp = specularBSDF_PDF(material, Z_AXIS, V_local, wi_local);
+        fp.w *= probability;
     }
     else
     {
@@ -294,11 +294,11 @@ float4 computeBSDF_PDF(in MaterialParams material, in float3 n_global, in float3
         const float3 halfVec_local = GGX_ImportanceSampling(Z_AXIS, material.roughness, randomSeed);
 
         //compute bsdf    V : wo   L : wi(sample)
-        BSDF_PDF = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
-        BSDF_PDF.w *= (1 - probability);
+        fp = transmitBSDF_PDF(material, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
+        fp.w *= (1 - probability);
     }
 
-    return BSDF_PDF;
+    return fp;
 }
 
 #endif//__SAMPLING_BSDF_HLSLI__

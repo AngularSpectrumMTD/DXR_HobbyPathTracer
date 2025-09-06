@@ -96,8 +96,8 @@ struct Payload
     float T;//for SSS
     uint hitCount;//for SSS
     float3 SSSnormal;//for SSS
-    uint primaryBSDFU32;//for ReSTIR GI
-    float primaryPDF;//for ReSTIR GI
+    uint f0;//for ReSTIR GI
+    float p0;//for ReSTIR GI
     uint bsdfRandomSeed;//for ReSTIR GI
     uint randomSeed;
 
