@@ -21,6 +21,8 @@ Results of the verification of the ReSTIR
 
 <img width="1276" height="718" alt="Image" src="https://github.com/user-attachments/assets/64c9dbcf-9e24-49dd-9afe-fb88ee5dc046" />
 
+<img width="1220" height="685" alt="Image" src="https://github.com/user-attachments/assets/03e98943-e8cb-4c9d-abaf-eb0a61a8c858" />
+
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
 
@@ -29,7 +31,7 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 
 ---
 #### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set SceneType_CornellBox" or "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] 
+1. Set SceneType_CornellBox" or "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest"  or "SceneType_MetallicTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] 
 2. Build and Execute  
 ---
 #### With Sponza
