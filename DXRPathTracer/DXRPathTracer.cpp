@@ -59,10 +59,10 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_CornellBox;
+    mSceneType = SceneType_MetallicTest;
 
     mIsUseIBL = true;
-    mRecursionDepth = min(6, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(3, REAL_MAX_RECURSION_DEPTH);
     mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
@@ -899,6 +899,49 @@ void DXRPathTracer::Setup()
              mCameraSpeed = 10.0f;
 
              mGatherRadius = 0.1f;
+
+             mIsApplyCaustics = false;
+             mIsUseIBL = true;
+         }
+         break;
+         case SceneType_MetallicTest:
+         {
+             mLightAreaScale = 6;
+             mPhiDirectional = 168.0f; mThetaDirectional = 248;
+
+             //near
+             //mInitEyePos = XMFLOAT3(-85, 64, -18);
+             //mInitTargetPos = XMFLOAT3(-73.4,68, -52);
+
+             //far
+             //mInitEyePos = XMFLOAT3(-6, 78, 165);
+             //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
+
+             mInitEyePos = XMFLOAT3(12.232, 210.32, 1.94);
+             mInitTargetPos = XMFLOAT3(-29.06, 203.12, -1.5);
+
+             mInitEyePos = XMFLOAT3(12.743, 210.32, -0.8);
+             mInitTargetPos = XMFLOAT3(-28.85, 204.37, 0.028);
+
+             mOBJFileName = "MetallicTest.obj";
+             mOBJFolderName = "model/MetallicTest";
+             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+             mStageOffsetX = 0.0f;
+             mStageOffsetY = 0.0f;
+             mStageOffsetZ = 0.0f;
+
+             mLightPosX = -40.0f; mLightPosY = 251.5f; mLightPosZ = -5.31f;
+             mPhi = -85.0f; mTheta = 228.0f;
+
+             mLightRange = 5.68f;
+
+             mCausticsBoost = 0.05;
+             mGatherBlockRange = 2;
+
+             mModelTypeTbl[0] = ModelType_Afrodyta;
+             mCameraSpeed = 0.1f;
+
+             mGatherRadius = 0.5f;
 
              mIsApplyCaustics = false;
              mIsUseIBL = true;

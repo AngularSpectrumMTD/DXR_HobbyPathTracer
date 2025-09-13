@@ -310,6 +310,8 @@ void DXRPathTracer::CreateRootSignatureLocal()
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 3, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 4, regSpace);
         rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 5, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 6, regSpace);
+        rsCreater.Push(utility::RootSignatureCreater::RangeType::SRV, 7, regSpace);
         mLocalRootSigMaterialWithTex = rsCreater.Create(mDevice, true, L"lrsMaterialWithTex");
         mRegisterMapGlobalLocalRootSigMaterialWithTex.clear();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["constantBuffer"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
@@ -319,5 +321,7 @@ void DXRPathTracer::CreateRootSignatureLocal()
         mRegisterMapGlobalLocalRootSigMaterialWithTex["alphaMask"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["bumpMap"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
         mRegisterMapGlobalLocalRootSigMaterialWithTex["normalMap"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
+        mRegisterMapGlobalLocalRootSigMaterialWithTex["roughnessMap"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
+        mRegisterMapGlobalLocalRootSigMaterialWithTex["metalnessMap"] = mRegisterMapGlobalLocalRootSigMaterialWithTex.size();
     }
 }

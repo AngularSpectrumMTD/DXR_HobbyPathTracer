@@ -3,7 +3,10 @@
 #include <fstream>
 
 #define PREPARE_ELEMENTS 10000
-#define MIN_ROUGHNESS 0.001f
+#define MIN_ROUGHNESS 0.01f
+#define MIN_METALLIC 0.01f
+#define MAX_ROUGHNESS 0.99f
+#define MAX_METALLIC 0.99f
 
 bool isSameWord(const char* v0, const char* v1)
 {
@@ -391,6 +394,44 @@ namespace utility {
 		NormalMap.srv = device->CreateShaderResourceView(NormalMap.res.Get(), &srvDesc);
 	}
 
+	void OBJMaterial::setDummyRoughnessMap(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	{
+		RoughnessMapName = "DUMMY_Roughness_MAP";
+		RoughnessMap.res = device->CreateTexture2D(
+			1, 1, DXGI_FORMAT_R16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			D3D12_HEAP_TYPE_DEFAULT,
+			StringToWString(RoughnessMapName).c_str()
+		);
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.ResourceMinLODClamp = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		RoughnessMap.srv = device->CreateShaderResourceView(RoughnessMap.res.Get(), &srvDesc);
+	}
+
+	void OBJMaterial::setDummyMetallnessMap(std::unique_ptr<dx12::RenderDeviceDX12>& device)
+	{
+		MetallnessMapName = "DUMMY_METALLNESS_MAP";
+		MetallnessMap.res = device->CreateTexture2D(
+			1, 1, DXGI_FORMAT_R16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			D3D12_HEAP_TYPE_DEFAULT,
+			StringToWString(MetallnessMapName).c_str()
+		);
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.ResourceMinLODClamp = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		MetallnessMap.srv = device->CreateShaderResourceView(MetallnessMap.res.Get(), &srvDesc);
+	}
+
 	bool OBJMaterialLinkedMesh::LoadMaterialFromFile(std::unique_ptr<dx12::RenderDeviceDX12>& device, const char* folderPath, const char* FileName) {
 		FILE* fp = NULL;
 		char fileName[256];
@@ -457,6 +498,8 @@ namespace utility {
 						tempMaterial.DiffuseTextureName = "";
 						tempMaterial.AlphaMaskName = "";
 						tempMaterial.BumpOrNormalMapName = "";
+						tempMaterial.RoughnessMapName = "";
+						tempMaterial.MetallnessMapName = "";
 					}
 					if (isSameWord(key, "Ka"))
 					{
@@ -529,6 +572,30 @@ namespace utility {
 						}
 						tempMaterial.BumpOrNormalMapName = key;
 					}
+					if (isSameWord(key, "map_Ns"))
+					{
+						//fscanf_s(fp, "%s ", key, sizeof(key));
+						fgets(key, 512, fp);
+						char* p;
+						p = strchr(key, '\n');
+						if (p)
+						{
+							*p = '\0';
+						}
+						tempMaterial.RoughnessMapName = key;
+					}
+					if (isSameWord(key, "map_refl"))
+					{
+						//fscanf_s(fp, "%s ", key, sizeof(key));
+						fgets(key, 512, fp);
+						char* p;
+						p = strchr(key, '\n');
+						if (p)
+						{
+							*p = '\0';
+						}
+						tempMaterial.MetallnessMapName = key;
+					}
 				}
 
 				fclose(fp);
@@ -599,15 +666,6 @@ namespace utility {
 			}
 			else
 			{
-				if (
-					cpuMaterial.Reflection4Color.diffuse.x == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.y == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.z == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.w == 0
-					)
-				{
-					cpuMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-				}
 				wchar_t nameTex[512];
 				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.AlphaMaskName).c_str());
 				//cpuMaterial.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(cpuMaterial.TextureName));
@@ -629,15 +687,6 @@ namespace utility {
 			}
 			else
 			{
-				if (
-					cpuMaterial.Reflection4Color.diffuse.x == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.y == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.z == 0 &&
-					cpuMaterial.Reflection4Color.diffuse.w == 0
-					)
-				{
-					cpuMaterial.Reflection4Color.diffuse = DirectX::XMFLOAT4(1.0, 1.0, 1.0, 1.0);
-				}
 				wchar_t nameTex[512];
 				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.BumpOrNormalMapName).c_str());
 				//cpuMaterial.DiffuseTexture = utility::LoadTextureFromFile(device, StringToWString(cpuMaterial.TextureName));
@@ -677,6 +726,46 @@ namespace utility {
 					{
 						cpuMaterial.hasNormalMap = true;
 					}
+				}
+			}
+
+			if (isSameWord(cpuMaterial.RoughnessMapName.c_str(), ""))
+			{
+				cpuMaterial.hasRoughnessMap = false;
+				cpuMaterial.setDummyRoughnessMap(device);
+			}
+			else
+			{
+				wchar_t nameTex[512];
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.RoughnessMapName).c_str());
+
+				cpuMaterial.hasRoughnessMap = true;
+				cpuMaterial.RoughnessMap = utility::LoadTextureFromFile(device, nameTex, true);
+
+				if (cpuMaterial.RoughnessMap.res == nullptr)
+				{
+					cpuMaterial.hasRoughnessMap = false;
+					cpuMaterial.setDummyRoughnessMap(device);
+				}
+			}
+
+			if (isSameWord(cpuMaterial.MetallnessMapName.c_str(), ""))
+			{
+				cpuMaterial.hasMetallnessMap = false;
+				cpuMaterial.setDummyMetallnessMap(device);
+			}
+			else
+			{
+				wchar_t nameTex[512];
+				swprintf(nameTex, 512, L"%ls/%ls", StringToWString(folderPath).c_str(), StringToWString(cpuMaterial.MetallnessMapName).c_str());
+
+				cpuMaterial.hasMetallnessMap = true;
+				cpuMaterial.MetallnessMap = utility::LoadTextureFromFile(device, nameTex, true);
+
+				if (cpuMaterial.MetallnessMap.res == nullptr)
+				{
+					cpuMaterial.hasMetallnessMap = false;
+					cpuMaterial.setDummyMetallnessMap(device);
 				}
 			}
 
@@ -764,6 +853,8 @@ namespace utility {
 				mparams.hasAlphaMask = cpuMaterial.hasAlphaMask ? 1 : 0;
 				mparams.hasBumpMap = cpuMaterial.hasBumpMap ? 1 : 0;
 				mparams.hasNormalMap = cpuMaterial.hasNormalMap ? 1 : 0;
+				mparams.hasRoughnessMap = cpuMaterial.hasRoughnessMap ? 1 : 0;
+				mparams.hasMetallnessMap = cpuMaterial.hasMetallnessMap ? 1 : 0;
 
 				if (std::strcmp(cpuMaterial.MaterialName.c_str(), "ReinterpretMirror") == 0)
 				{
@@ -785,6 +876,9 @@ namespace utility {
 				}
 
 				mparams.roughness = max(mparams.roughness, MIN_ROUGHNESS);
+				mparams.roughness = min(mparams.roughness, MAX_ROUGHNESS);
+				mparams.metallic = max(mparams.metallic, MIN_METALLIC);
+				mparams.metallic = min(mparams.metallic, MAX_METALLIC);
 
 				cpuMaterial.materialCB = device->CreateConstantBuffer(sizeof(MaterialParam));
 				device->ImmediateBufferUpdateHostVisible(cpuMaterial.materialCB.Get(), &mparams, sizeof(MaterialParam));

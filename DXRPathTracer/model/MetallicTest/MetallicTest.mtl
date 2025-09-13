@@ -1,0 +1,24 @@
+# Blender 4.2.2 LTS MTL File: 'MetallicTest.blend'
+# www.blender.org
+
+newmtl Metal
+Ka 1.000000 1.000000 1.000000
+Ks 0.649606 0.649606 0.649606
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal052C_1K-JPG_Color.jpg
+map_Ns textures/Metal052C_1K-JPG_Roughness.jpg
+map_refl textures/Metal052C_1K-JPG_Metalness.jpg
+map_Bump -bm 1.000000 textures/Metal052C_1K-JPG_NormalDX.jpg
+
+newmtl MetallicBall
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2

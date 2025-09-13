@@ -14,6 +14,13 @@ Texture2D<float4> diffuseTex : register(t2, space1);
 Texture2D<float> alphaMask: register(t3, space1);
 Texture2D<float> bumpMap: register(t4, space1);
 Texture2D<float4> normalMap: register(t5, space1);
+Texture2D<float> roughnessMap: register(t6, space1);
+Texture2D<float> metalnessMap: register(t7, space1);
+
+#define MIN_ROUGHNESS 0.01f
+#define MIN_METALLIC 0.01f
+#define MAX_ROUGHNESS 0.99f
+#define MAX_METALLIC 0.99f
 
 float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
 {
@@ -128,6 +135,26 @@ void getTexColor(out float4 diffuseTexColor, out bool isIgnoreHit, in float2 UV)
     isIgnoreHit = (diffuseTexColor.a < 1) || (hasAlphaMask(currentMaterial) && alpMask < 1);
 }
 
+void applyRoughnessMap(inout MaterialParams mat, in float2 UV)
+{
+    if(hasRoughnessMap(mat))
+    {
+        mat.roughness = roughnessMap.SampleLevel(gSampler, UV, 0.0);
+        mat.roughness = max(mat.roughness, MIN_ROUGHNESS);
+        mat.roughness = min(mat.roughness, MAX_ROUGHNESS);
+    }
+}
+
+void applyMetallnessMap(inout MaterialParams mat, in float2 UV)
+{
+    if(hasMetallnessMap(mat))
+    {
+        mat.metallic = metalnessMap.SampleLevel(gSampler, UV, 0.0);
+        mat.metallic = max(mat.metallic, MIN_METALLIC);
+        mat.metallic = min(mat.metallic, MAX_METALLIC);
+    }
+}
+
 void editMaterial(inout MaterialParams mat)
 {
     //I can't decide these params to recognize material as glass
@@ -161,6 +188,9 @@ MaterialParams getCurrentMaterial(TriangleIntersectionAttributes attrib, in floa
     {
         currentMaterial.albedo = float4(diffuseTexColor.rgb, 1);
     }
+
+    applyRoughnessMap(currentMaterial, uv);
+    applyMetallnessMap(currentMaterial, uv);
 
     //test metallic surface
     if(isUseMetallicTest())
@@ -261,6 +291,11 @@ void materialWithTexClosestHit(inout Payload payload, TriangleIntersectionAttrib
     {
         surface.material.roughness *= 1.5;
         surface.material.roughness = saturate(surface.material.roughness);
+    }
+
+    if(isUseNormalMapping() && (dot(-WorldRayDirection(), surface.normal) < 0))
+    {
+        surface.normal *= -1;
     }
 
     float3 caustics = 0.xxx;

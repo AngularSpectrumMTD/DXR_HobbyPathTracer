@@ -31,7 +31,9 @@ namespace utility {
 		u32 hasAlphaMask : 1;
 		u32 hasBumpMap : 1;
 		u32 hasNormalMap : 1;
-		u32 materialBitsReserved :28;
+		u32 hasRoughnessMap : 1;
+		u32 hasMetallnessMap : 1;
+		u32 materialBitsReserved :24;
 
 		//ctor
 		MaterialParam()
@@ -47,6 +49,8 @@ namespace utility {
 			hasAlphaMask = 0;
 			hasBumpMap = 0;
 			hasNormalMap = 0;
+			hasRoughnessMap = 0;
+			hasRoughnessMap = 0;
 		}
 
 		void asDefault()
@@ -96,10 +100,14 @@ namespace utility {
 		string DiffuseTextureName;
 		string AlphaMaskName;
 		string BumpOrNormalMapName;
+		string RoughnessMapName;
+		string MetallnessMapName;
 		utility::TextureResource DiffuseTexture;
 		utility::TextureResource AlphaMask;
 		utility::TextureResource BumpMap;
 		utility::TextureResource NormalMap;
+		utility::TextureResource RoughnessMap;
+		utility::TextureResource MetallnessMap;
 		s32 TexID;
 		vector <utility::VertexPNT> TriangleVertexTbl;
 		vector <utility::VertexPNT> QuadrangleVertexTbl;
@@ -126,11 +134,15 @@ namespace utility {
 		bool hasAlphaMask = false;
 		bool hasBumpMap = false;
 		bool hasNormalMap = false;
+		bool hasRoughnessMap = false;
+		bool hasMetallnessMap = false;
 
 		void setDummyDiffuseTexture(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyAlphaMask(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyBumpMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 		void setDummyNormalMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyRoughnessMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
+		void setDummyMetallnessMap(std::unique_ptr<dx12::RenderDeviceDX12>& device);
 
 		bool isTransparent()
 		{
