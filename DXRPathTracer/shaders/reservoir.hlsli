@@ -1,8 +1,8 @@
 #ifndef __RESERVOIR_HLSLI__
 #define __RESERVOIR_HLSLI__
 
-#define MAX_REUSE_M_DI 15
-#define MAX_REUSE_M_GI 15
+#define MAX_REUSE_M_DI 5
+#define MAX_REUSE_M_GI 30
 
 #include "compressionUtility.hlsli"
 #include "materialParams.hlsli"
