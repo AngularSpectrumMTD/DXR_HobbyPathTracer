@@ -431,11 +431,11 @@ void temporalReuse()
         int2 prevID = gPrevIDBuffer[currID];
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
-         float prevDepth = gPrevNormalDepthBuffer[prevID].w;
+        float prevDepth = gPrevNormalDepthBuffer[prevID].w;
         float3 prevNormal = gPrevNormalDepthBuffer[prevID].xyz;
         float3 prevObjectWorldPos = gPrevPositionBuffer[prevID].xyz;
         const bool isTemporalReuseEnable = isTemporalReprojectionSuccessed(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
-        const bool isTemporalResamplingRequired = isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && (isTemporalReuseEnable && (abs(currID.x - prevID.x) <= 1) && (abs(currID.y - prevID.y) <= 1));
+        const bool isTemporalResamplingRequired = isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isTemporalReuseEnable;
 
         DIReservoir currDIReservoir = gDIReservoirBuffer[serialCurrID];
         if (isTemporalResamplingRequired)
