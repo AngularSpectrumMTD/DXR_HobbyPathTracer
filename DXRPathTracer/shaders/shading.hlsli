@@ -89,14 +89,14 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
             //compute bsdf    V : wo   L : wi(sample)
             float4 fp = specularBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local);
             fp.w *= probability;
-            const float cosine = max(0, abs(wi_local.z));
-            const float3 weight = fp.xyz * cosine / fp.w;
+            //const float cosine = max(0, abs(wi_local.z));//computed in specularBSDF_PDF
+            const float3 weight = fp.xyz / fp.w;
 
             if(isDirectRay(payload))
             {
                 //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
                 //So, we DON'T update the value of the throughput at this time
-                payload.f0 = compressRGBasU32(fp.xyz * cosine);
+                payload.f0 = compressRGBasU32(fp.xyz);
                 payload.p0 = fp.w;
                 payload.bsdfRandomSeed = currentSeed;
             }
@@ -143,14 +143,14 @@ void sampleBSDF(in Surface surface, inout RayDesc nextRay, inout Payload payload
             //compute bsdf    V : wo   L : wi(sample)
             float4 fp = transmitBSDF_PDF(currMaterial, Z_AXIS, wo_local, wi_local, halfVec_local, ETA_AIR, etaOUT);
             fp.w *= (1 - probability);
-            const float cosine = max(0, abs(wi_local.z));
-            const float3 weight = fp.xyz * cosine / fp.w;
+            //const float cosine = max(0, abs(wi_local.z));//computed in transmitBSDF_PDF
+            const float3 weight = fp.xyz / fp.w;
 
             if(isDirectRay(payload))
             {
                 //The influence of the initial BSDF on indirect element is evaluated at the end of ray generation shader
                 //So, we DON'T update the value of the throughput at this time
-                payload.f0 = compressRGBasU32(fp.xyz * cosine);
+                payload.f0 = compressRGBasU32(fp.xyz);
                 payload.p0 = fp.w;
                 payload.bsdfRandomSeed = currentSeed;
             }
@@ -319,7 +319,7 @@ void sampleLightStreamingRIS(in Surface surface, inout LightSample lightSample, 
 
         float3 lightNormal = lightSample.normal;
         float3 wi = lightSample.directionToLight;
-        float receiverCos = dot(surface.normal, wi);
+        //float receiverCos = dot(surface.normal, wi);//computed in computeBSDF_PDF
         float emitterCos = dot(lightNormal, -wi);
 
         float4 fp = 0.xxxx;
@@ -333,7 +333,7 @@ void sampleLightStreamingRIS(in Surface surface, inout LightSample lightSample, 
         {
             fp = computeBSDF_PDF(surface.material, surface.normal, -WorldRayDirection(), wi, randomSeed);
         }
-        float G = max(0, receiverCos) * max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
+        float G = max(0, emitterCos) / getModifiedSquaredDistance(lightSample);
 
         if((i > 0) && (G < 0.00001f))
         {

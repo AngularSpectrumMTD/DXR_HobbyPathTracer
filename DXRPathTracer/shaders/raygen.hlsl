@@ -588,13 +588,13 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
 
     float3 lightNormal = lightSample.normal;
     float3 wi = lightSample.directionToLight;
-    float receiverCos = dot(centerNormal, wi);
+    //float receiverCos = dot(centerNormal, wi);//computed in computeBSDF_PDF
     float emitterCos = dot(lightNormal, -wi);
-    if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (receiverCos > 0) && (emitterCos > 0))
+    if ((spatDIReservoir.targetPDF_3f_U32 > 0) && (emitterCos > 0))
     {
         const float4 f0p0 = computeBSDF_PDF(screenSpaceMaterial, centerNormal, wo, wi, replayRandomSeed);
         const float3 f0 = f0p0.xyz;
-        float G = receiverCos * emitterCos / getModifiedSquaredDistance(lightSample);
+        float G = emitterCos / getModifiedSquaredDistance(lightSample);
         float3 FGL = saturate(f0 * G) * lightSample.emission / lightSample.pdf;
         spatDIReservoir.targetPDF_3f_U32 = compressRGBasU32(FGL);
     }
@@ -616,7 +616,7 @@ bool perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in flo
     //const bool isReEvaluateValid = !isTransparentMaterial(screenSpaceMaterial) && (diffRatio > 0.1); 
     const bool isReEvaluateValid = true;//(diffRatio > 0.1); 
 
-    float cosine = abs(dot(wi, centerNormal));
+    //float cosine = abs(dot(wi, centerNormal));//computed in computeBSDF_PDF
     float3 Lo = decompressU32asRGB(spatGIReservoir.giSample.Lo2_U32);
 
     const bool isIBLSample = (length(spatGIReservoir.giSample.pos2) == 0);
@@ -626,7 +626,7 @@ bool perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in flo
         float3 dir = spatGIReservoir.giSample.pos2 - centerPos;
         float3 biasedPosition = centerPos + 0.01f * sqrt(dot(dir, dir)) * normalize(dir);
         const float termV = 1;//isVisible(biasedPosition, spatGIReservoir.giSample.pos2) ? 1 : 0;
-        spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * f0 * cosine * Lo);
+        spatGIReservoir.targetPDF_3f_U32 = compressRGBasU32(termV * f0 * Lo);
 
         return true;
     }
