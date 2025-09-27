@@ -526,7 +526,7 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     }
 
     float3 DIGIelement = 0.xxx;
-    const bool isTerminate = performLighting(payload, surface, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
+    bool isTerminate = performLighting(payload, surface, hitLe, hitPosition, hitNormal, originalSurfaceNormal, originalScatterPosition, DIGIelement, isSSSSample);
     if(isDirectRay(payload))
     {
         setDI(DIGIelement);
@@ -547,6 +547,10 @@ bool shadeAndSampleRay(in Surface surface, inout Payload payload, inout RayDesc 
     nextRay.Direction = 0.xxx;
     sampleBSDF(surface, nextRay, payload);
 
+    if(!isTransparentMaterial(surface.material) && dot(surface.normal, nextRay.Direction) < 1e-2)
+    {
+        isTerminate = true;
+    }
     //debug
     // if(isDirectRay(payload))
     // {

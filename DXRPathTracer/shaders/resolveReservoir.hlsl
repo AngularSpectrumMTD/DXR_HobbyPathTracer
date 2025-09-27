@@ -43,8 +43,12 @@ void resolveReservoir(uint3 dtid : SV_DispatchThreadID)
         currDI = (isIndirectOnly() ? 0.xxx : resolveDIReservoir(currDIReservoir)) + reservoirElementRemovedDI;
 
         const float wBase = (material.roughness < 0.4) ? material.roughness : 0.7;
-        const float w = isTransparentMaterial(material) ? 0 : wBase;
+        float w = isTransparentMaterial(material) ? 0 : wBase;
         float3 reservoirElementRemovedGI = CurrentGIBuffer[currID].rgb;
+        if(!isUseReservoirSpatialReuse() && !isTransparentMaterial(material))
+        {
+            w = 1;
+        }
         currGI = w * resolveGIReservoir(currGIReservoir) + (1 - w) * reservoirElementRemovedGI;
     }
     else
