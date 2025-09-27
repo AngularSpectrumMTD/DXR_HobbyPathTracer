@@ -17,10 +17,10 @@ Texture2D<float4> normalMap: register(t5, space1);
 Texture2D<float> roughnessMap: register(t6, space1);
 Texture2D<float> metalnessMap: register(t7, space1);
 
-#define MIN_ROUGHNESS 0.01f
-#define MIN_METALLIC 0.01f
-#define MAX_ROUGHNESS 0.99f
-#define MAX_METALLIC 0.99f
+#define MIN_ROUGHNESS 0.05f
+#define MIN_METALLIC 0.05f
+#define MAX_ROUGHNESS 0.95f
+#define MAX_METALLIC 0.95f
 
 float3 getGeometricNormal(TriangleIntersectionAttributes attrib)
 {
@@ -139,9 +139,7 @@ void applyRoughnessMap(inout MaterialParams mat, in float2 UV)
 {
     if(hasRoughnessMap(mat))
     {
-        mat.roughness = roughnessMap.SampleLevel(gSampler, UV, 0.0);
-        mat.roughness = max(mat.roughness, MIN_ROUGHNESS);
-        mat.roughness = min(mat.roughness, MAX_ROUGHNESS);
+        mat.roughness = clamp(roughnessMap.SampleLevel(gSampler, UV, 0.0), MIN_ROUGHNESS, MAX_ROUGHNESS);
     }
 }
 
@@ -149,9 +147,7 @@ void applyMetallnessMap(inout MaterialParams mat, in float2 UV)
 {
     if(hasMetallnessMap(mat))
     {
-        mat.metallic = metalnessMap.SampleLevel(gSampler, UV, 0.0);
-        mat.metallic = max(mat.metallic, MIN_METALLIC);
-        mat.metallic = min(mat.metallic, MAX_METALLIC);
+        mat.metallic = clamp(metalnessMap.SampleLevel(gSampler, UV, 0.0), MIN_METALLIC, MAX_METALLIC);
     }
 }
 
