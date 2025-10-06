@@ -558,10 +558,8 @@ void TraceDefaultPhoton(in bool flags, in uint rayMask, inout RayDesc ray, inout
 
 void initializeRNG(uint2 index, out uint seed)
 {
-    uint3 launchIndex = DispatchRaysIndex();
     uint3 dispatchDimensions = DispatchRaysDimensions();
-    int serialIndex = serialRaysIndex(launchIndex, dispatchDimensions);
-    seed = gRandomNumber[index] + serialIndex;
+    seed = gRandomNumber[index] + generateRandomSeed(index, dispatchDimensions.x);
 }
 
 void finalizeRNG(uint2 index, in uint seed)

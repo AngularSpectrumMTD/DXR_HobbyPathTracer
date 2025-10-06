@@ -584,7 +584,7 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
     LightSample lightSample;
     uint replayRandomSeed = spatDIReservoir.randomSeed;
     sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample, replayRandomSeed);
-    float3 biasedPosition = centerPos + 0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+    float3 biasedPosition = centerPos + 0.05f * centerNormal;// +0.01f * lightSample.distance * normalize(lightSample.directionToLight);
 
     float3 lightNormal = lightSample.normal;
     float3 wi = lightSample.directionToLight;
