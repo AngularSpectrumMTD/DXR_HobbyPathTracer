@@ -579,12 +579,12 @@ void performSpatialResampling(inout GIReservoir spatGIReservoir, in float center
     }
 }
 
-void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial)
+void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in float3 geomNormal, in MaterialParams screenSpaceMaterial)
 {
     LightSample lightSample;
     uint replayRandomSeed = spatDIReservoir.randomSeed;
     sampleLightWithID(centerPos, spatDIReservoir.lightID, lightSample, replayRandomSeed);
-    float3 biasedPosition = centerPos + 0.05f * centerNormal;// +0.01f * lightSample.distance * normalize(lightSample.directionToLight);
+    float3 biasedPosition = centerPos + (0.01f * lightSample.distance) * geomNormal;
 
     float3 lightNormal = lightSample.normal;
     float3 wi = lightSample.directionToLight;
@@ -605,7 +605,7 @@ void perfromReconnection(inout DIReservoir spatDIReservoir, in float3 wo, in flo
     }
 }
 
-bool perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in MaterialParams screenSpaceMaterial)
+bool perfromReconnection(inout GIReservoir spatGIReservoir, in float3 wo, in float3 centerPos, in float3 centerNormal, in float3 geomNormal, in MaterialParams screenSpaceMaterial)
 {
     uint randomSeed = spatGIReservoir.randomSeed;
     const float3 wi = normalize(spatGIReservoir.giSample.pos2 - centerPos);
@@ -650,6 +650,9 @@ void spatialReuse() {
         const float centerDepth = gNormalDepthBuffer[launchIndex.xy].w;
         const float3 centerNormal = gNormalDepthBuffer[launchIndex.xy].xyz;
         const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
+        const float3 centerPos1 = gPositionBuffer[launchIndex.xy + int2(1, 0)].xyz;
+        const float3 centerPos2 = gPositionBuffer[launchIndex.xy + int2(0, 1)].xyz;
+        const float3 geomNormal = normalize(cross(centerPos1 - centerPos, centerPos2 - centerPos));
 
         const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
         const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;
@@ -660,7 +663,7 @@ void spatialReuse() {
         spatDIReservoir.initialize();
 
         performSpatialResampling(spatDIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
-        perfromReconnection(spatDIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial);
+        perfromReconnection(spatDIReservoir, wo, centerPos, centerNormal, geomNormal, screenSpaceMaterial);
 
         spatDIReservoir.applyMCapping();
         gDIReservoirBuffer[serialIndex] = spatDIReservoir;
@@ -669,7 +672,7 @@ void spatialReuse() {
         spatGIReservoir.initialize();
 
         performSpatialResampling(spatGIReservoir, centerDepth, centerNormal, centerPos, randomSeed, screenSpaceMaterial);
-        if(!perfromReconnection(spatGIReservoir, wo, centerPos, centerNormal, screenSpaceMaterial))
+        if(!perfromReconnection(spatGIReservoir, wo, centerPos, centerNormal, geomNormal, screenSpaceMaterial))
         {
             spatGIReservoir = gGIReservoirBufferSrc[serialIndex];
         }
