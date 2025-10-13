@@ -7,21 +7,11 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR   
-<img width="2063" height="1161" alt="Image" src="https://github.com/user-attachments/assets/7af23cac-bbe7-4aba-ac78-6f8faabffcce" />
+<img width="2738" height="1546" alt="Image" src="https://github.com/user-attachments/assets/5add5743-143a-4406-92d2-714166f768cc" />
 
-<img width="2064" height="1161" alt="Image" src="https://github.com/user-attachments/assets/61b1aced-ce00-4245-98f3-3f17ffc89be0" />
+### Results (SceneType_Room)
 
-### Results
-
-<img width="1278" height="718" alt="Image" src="https://github.com/user-attachments/assets/ee34cedf-dc1d-498b-8a64-a108f3cc342d" />
-
-<img width="1276" height="717" alt="Image" src="https://github.com/user-attachments/assets/676c9d5a-bf81-45fe-9c63-d49a778ad229" />
-
-<img width="1274" height="713" alt="Image" src="https://github.com/user-attachments/assets/4cabfa70-10e9-4eb1-9c7c-3c8556c77ef6" />
-
-<img width="1276" height="718" alt="Image" src="https://github.com/user-attachments/assets/64c9dbcf-9e24-49dd-9afe-fb88ee5dc046" />
-
-<img width="1216" height="681" alt="Image" src="https://github.com/user-attachments/assets/503382f0-27c2-4d78-bf78-a29b6fccfae0" />
+<img width="2731" height="1536" alt="Image" src="https://github.com/user-attachments/assets/82320c42-28e4-47c3-b5eb-24ff06b26f19" />
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
@@ -30,10 +20,27 @@ Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Tran
 **NOTE : This program can only handle triangular polygons**
 
 ---
-#### With Simple Scene (Easy. These 3D models are made by AngularSpectrumMTD))
-1. Set SceneType_CornellBox" or "SceneType_CausticsTest" or "SceneType_EmissionTest"or "SceneType_ResamplingTest" or "SceneType_Corridor" or "SceneType_PTTestRoom" or "SceneType_PTTestRoom2"  or "SceneType_PTTestRoom3" or "SceneType_PTTestRoom4" or "SceneType_PTTestRoom5" or "SceneType_PTTestRobot" or "SceneType_PTTestBrick" or SceneType_MaterialTest" or "SceneType_PTTest"  or "SceneType_MetallicTest" to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] 
-2. Build and Execute  
----
+#### With Simple Scene (Easy. These 3D models(,obj/.mtl) are made by AngularSpectrumMTD))
+1. Set 
+"SceneType_PTTest (PTTest.obj/mtl)"  ,
+"SceneType_PTTestBrick (PTTestBrick.obj/mtl)"  ,
+"SceneType_PTTestRobot (PTTestRobot.obj/mtl)"  ,
+"SceneType_PTTestRoom (PTTestRoom.obj/mtl)"  ,
+"SceneType_PTTestRoom2 (PTTestRoom2.obj/mtl)"  ,
+"SceneType_PTTestRoom3 (PTTestRoom3Exp.obj/mtl)"  ,
+"SceneType_PTTestRoom4 (PTTestRoom4Exp.obj/mtl)"  ,
+"SceneType_PTTestRoom5 (PTTestRoom5.obj/mtl)"  ,
+"SceneType_MaterialTest (MaterialTest.obj/mtl)"  ,
+"SceneType_Corridor (Corridor.obj/mtl)"  ,
+"SceneType_CausticsTest (CausticsTest.obj/mtl)"  ,
+"SceneType_EmissionTest (EmissionTest.obj/mtl)"  ,
+"SceneType_ResamplingTest (ResamplingTest.obj/mtl)"  ,
+"SceneType_CornellBox (CornellBox.obj/mtl)"  ,
+"SceneType_MetallicTest (MetallicTest.obj/mtl)"  ,
+"SceneType_Room (room.obj/mtl)"  [Recommended]
+to the variable "mSceneType" at void DxrPhotonMapper::Setup()[DxrPhotonMapper.cpp] 
+2. Build and Execute 
+ ---
 #### With Sponza
 1. Download model(sponza) from "McGuire Computer Graphics Archive"(https://casual-effects.com/data/)  
 2. Open sponza.obj on blender. Set the size to 0.1 -> Execute Triangulation.  
