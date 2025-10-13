@@ -59,10 +59,10 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_MetallicTest;
+    mSceneType = SceneType_Room;
 
     mIsUseIBL = true;
-    mRecursionDepth = min(3, REAL_MAX_RECURSION_DEPTH);
+    mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
     mIntensityBoost = 300;
     mGatherRadius = 0.061f;
     mGatherBlockRange = 1;
@@ -103,7 +103,7 @@ void DXRPathTracer::Setup()
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
     mSpatialReuseTap = 4;//Most Important Param For Getting High Quality Spatial Resampling Result
-    mExposure = 1;
+    mExposure = 5;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -947,6 +947,48 @@ void DXRPathTracer::Setup()
              mIsUseIBL = true;
          }
          break;
+         case SceneType_Room:
+         {
+             mLightAreaScale = 6;
+             mPhiDirectional = 335.0f; mThetaDirectional = 163;
+
+             //mInitEyePos = XMFLOAT3(4.65, 204.93, -11.00);
+             //mInitTargetPos = XMFLOAT3(-12.554, 199.1, 26.86);
+
+             //mInitEyePos = XMFLOAT3(9.85, 205.93, -12.77);
+             //mInitTargetPos = XMFLOAT3(-25.69, 196.3, 7.39);
+
+             mInitEyePos = XMFLOAT3(-6.45, 207.22, -13.49);
+             mInitTargetPos = XMFLOAT3(13.089, 196.97, 17.94);
+
+             mOBJFileName = "room.obj";
+             mOBJFolderName = "model/room";
+             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(0, 200, 0));
+             mStageOffsetX = 0.0f;
+             mStageOffsetY = 0.0f;
+             mStageOffsetZ = 0.0f;
+
+             mLightPosX = -40.0f; mLightPosY = 251.5f; mLightPosZ = -5.31f;
+             mPhi = -85.0f; mTheta = 228.0f;
+
+             mLightRange = 5.68f;
+
+             mCausticsBoost = 0.05;
+             mGatherBlockRange = 2;
+
+             mModelTypeTbl[0] = ModelType_Afrodyta;
+             mCameraSpeed = 0.3f;
+
+             mGatherRadius = 0.5f;
+
+             mIsApplyCaustics = false;
+             mIsUseIBL = true;
+             mIsUseReservoirTemporalReuse = false;
+             mIsUseReservoirSpatialReuse = false;
+             mIntensityBoost *= 0.1;
+             mExposure = 6;
+         }
+         break;
     }
 
     mCausticsBoost /= causticsPDF;
@@ -1704,10 +1746,10 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         {
             ReSTIRParam cb;
             XMUINT4 d;
-            d.x = max(1, 8 - 2 * i);//DIReservoirSpatialReuseNum
-            d.y = max(1, 6 - 1 * i);//GIReservoirSpatialReuseNum
-            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 2 * (i + 1));//DIReservoirSpatialReuseBaseRadius
-            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 4 * (i + 1));//GIReservoirSpatialReuseBaseRadius
+            d.x = max(1, 4);//DIReservoirSpatialReuseNum
+            d.y = max(1, 4);//GIReservoirSpatialReuseNum
+            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 1 * (i + 1));//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 1 * (i + 1));//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();

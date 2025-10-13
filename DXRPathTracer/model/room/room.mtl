@@ -1,0 +1,1387 @@
+# Blender 4.2.2 LTS MTL File: 'room.blend'
+# www.blender.org
+
+newmtl Bark.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Bark002_1K-JPG_Color.jpg
+map_Ns textures/Bark002_1K-JPG_Roughness.jpg
+map_Bump textures/Bark002_1K-JPG_NormalDX.jpg
+
+newmtl Bark.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Bark002_1K-JPG_Color.jpg
+map_Ns textures/Bark002_1K-JPG_Roughness.jpg
+map_Bump textures/Bark002_1K-JPG_NormalDX.jpg
+
+newmtl Bark.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Bark002_1K-JPG_Color.jpg
+map_Ns textures/Bark002_1K-JPG_Roughness.jpg
+map_Bump textures/Bark002_1K-JPG_NormalDX.jpg
+
+newmtl BlueFabric
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric075_1K-JPG_Color.jpg
+map_Ns textures/Fabric075_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric075_1K-JPG_NormalDX.jpg
+
+newmtl Emission
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 5.000000 5.000000 5.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Emission.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 5.000000 5.000000 5.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Fabric
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric029_1K-JPG_Color.jpg
+map_Ns textures/Fabric029_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric029_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric029_1K-JPG_Color.jpg
+map_Ns textures/Fabric029_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric029_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.006
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl Fabric.008
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric039_1K-JPG_Color.jpg
+map_Ns textures/Fabric039_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric039_1K-JPG_NormalDX.jpg
+
+newmtl FabricCurtain
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric082A_1K-JPG_Color.jpg
+map_Ns textures/Fabric082A_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric040_1K-JPG_NormalDX.jpg
+
+newmtl FabricWhite
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric036_1K-JPG_Color.jpg
+map_Ns textures/Fabric036_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric036_1K-JPG_NormalDX.jpg
+
+newmtl GrayFabric
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric030_1K-JPG_Color.jpg
+map_Ns textures/Fabric030_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric030_1K-JPG_NormalDX.jpg
+
+newmtl Heater
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.113793 0.113793 0.113793
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Heater.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.113793 0.113793 0.113793
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Heater.003
+Ns 773.186707
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.113793 0.113793 0.113793
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Heater.005
+Ns 773.186707
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.113793 0.113793 0.113793
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Heater.006
+Ns 773.186707
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.113793 0.113793 0.113793
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Leaf.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet022_1K-JPG_Color.jpg
+map_Ns textures/LeafSet022_1K-JPG_Roughness.jpg
+map_d textures/LeafSet022_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet022_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.006
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet022_1K-JPG_Color.jpg
+map_Ns textures/LeafSet022_1K-JPG_Roughness.jpg
+map_d textures/LeafSet022_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet022_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.008
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.009
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.010
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.012
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet023_1K-JPG_Color.jpg
+map_Ns textures/LeafSet023_1K-JPG_Roughness.jpg
+map_d textures/LeafSet023_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet023_1K-JPG_NormalDX.jpg
+
+newmtl Leaf.014
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/LeafSet022_1K-JPG_Color.jpg
+map_Ns textures/LeafSet022_1K-JPG_Roughness.jpg
+map_d textures/LeafSet022_1K-JPG_Opacity.jpg
+map_Bump textures/LeafSet022_1K-JPG_NormalDX.jpg
+
+newmtl LeatherBlack
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather031_1K-JPG_Color.jpg
+map_Ns textures/Leather031_1K-JPG_Roughness.jpg
+map_Bump textures/Leather031_1K-JPG_NormalDX.jpg
+
+newmtl LeatherBlack.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather031_1K-JPG_Color.jpg
+map_Ns textures/Leather031_1K-JPG_Roughness.jpg
+map_Bump textures/Leather031_1K-JPG_NormalDX.jpg
+
+newmtl LeatherBlack.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather031_1K-JPG_Color.jpg
+map_Ns textures/Leather031_1K-JPG_Roughness.jpg
+map_Bump textures/Leather031_1K-JPG_NormalDX.jpg
+
+newmtl LeatherBlack.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather031_1K-JPG_Color.jpg
+map_Ns textures/Leather031_1K-JPG_Roughness.jpg
+map_Bump textures/Leather031_1K-JPG_NormalDX.jpg
+
+newmtl LeatherBlack.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather031_1K-JPG_Color.jpg
+map_Ns textures/Leather031_1K-JPG_Roughness.jpg
+map_Bump textures/Leather031_1K-JPG_NormalDX.jpg
+
+newmtl LeatherRed
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather024_1K-JPG_Color.jpg
+map_Ns textures/Leather024_1K-JPG_Roughness.jpg
+map_Bump textures/Leather024_1K-JPG_NormalDX.jpg
+
+newmtl LeatherRed.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Leather024_1K-JPG_Color.jpg
+map_Ns textures/Leather024_1K-JPG_Roughness.jpg
+map_Bump textures/Leather024_1K-JPG_NormalDX.jpg
+
+newmtl Marble
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble006_1K-JPG_Color.jpg
+map_Ns textures/Marble006_1K-JPG_Roughness.jpg
+map_Bump textures/Marble006_1K-JPG_NormalDX.jpg
+
+newmtl Marble.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble025_1K-JPG_Color.jpg
+map_Ns textures/Marble025_1K-JPG_Roughness.jpg
+map_Bump textures/Marble025_1K-JPG_NormalDX.jpg
+
+newmtl Marble.006
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble025_1K-JPG_Color.jpg
+map_Ns textures/Marble025_1K-JPG_Roughness.jpg
+map_Bump textures/Marble025_1K-JPG_NormalDX.jpg
+
+newmtl Marble.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble025_1K-JPG_Color.jpg
+map_Ns textures/Marble025_1K-JPG_Roughness.jpg
+map_Bump textures/Marble025_1K-JPG_NormalDX.jpg
+
+newmtl MarbleWhite
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble001_1K-JPG_Color.jpg
+map_Ns textures/Marble001_1K-JPG_Roughness.jpg
+map_Bump textures/Marble001_1K-JPG_NormalDX.jpg
+
+newmtl MarbleWhite.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Marble001_1K-JPG_Color.jpg
+map_Ns textures/Marble001_1K-JPG_Roughness.jpg
+map_Bump textures/Marble001_1K-JPG_NormalDX.jpg
+
+newmtl Material
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Material.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Material.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Metal
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.006
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.008
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.009
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.010
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.011
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.012
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.013
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.014
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.015
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.016
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.017
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.018
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.019
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.020
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.021
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.025
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Metal.026
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Metal028_1K-JPG_Color.jpg
+map_Ns textures/Metal028_1K-JPG_Roughness.jpg
+map_refl textures/Metal028_1K-JPG_Metalness.jpg
+map_Bump textures/Metal028_1K-JPG_NormalDX.jpg
+
+newmtl Porcelain
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Porcelain001_1K-JPG_Color.jpg
+map_Ns textures/Porcelain001_1K-JPG_Roughness.jpg
+map_Bump textures/Porcelain001_1K-JPG_NormalDX.jpg
+
+newmtl SofaFabric
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Fabric028_1K-JPG_Color.jpg
+map_Ns textures/Fabric028_1K-JPG_Roughness.jpg
+map_Bump textures/Fabric028_1K-JPG_NormalDX.jpg
+
+newmtl Soil
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Ground066_1K-JPG_Color.jpg
+map_Ns textures/Ground066_1K-JPG_Roughness.jpg
+map_Bump textures/Ground066_1K-JPG_NormalDX.jpg
+
+newmtl Soil.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Ground066_1K-JPG_Color.jpg
+map_Ns textures/Ground066_1K-JPG_Roughness.jpg
+map_Bump textures/Ground066_1K-JPG_NormalDX.jpg
+
+newmtl Soil.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Ground066_1K-JPG_Color.jpg
+map_Ns textures/Ground066_1K-JPG_Roughness.jpg
+map_Bump textures/Ground066_1K-JPG_NormalDX.jpg
+
+newmtl Soil.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Ground066_1K-JPG_Color.jpg
+map_Ns textures/Ground066_1K-JPG_Roughness.jpg
+map_Bump textures/Ground066_1K-JPG_NormalDX.jpg
+
+newmtl Soil.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Ground066_1K-JPG_Color.jpg
+map_Ns textures/Ground066_1K-JPG_Roughness.jpg
+map_Bump textures/Ground066_1K-JPG_NormalDX.jpg
+
+newmtl Tile
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Tiles045_1K-JPG_Color.jpg
+map_Ns textures/Tiles045_1K-JPG_Roughness.jpg
+map_Bump textures/Tiles045_1K-JPG_NormalDX.jpg
+
+newmtl White
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Plastic013A_1K-JPG_Color.jpg
+map_Ns textures/Plastic013A_1K-JPG_Roughness.jpg
+map_Bump textures/Plastic013A_1K-JPG_NormalDX.jpg
+
+newmtl White.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Plastic013A_1K-JPG_Color.jpg
+map_Ns textures/Plastic013A_1K-JPG_Roughness.jpg
+map_Bump textures/Plastic013A_1K-JPG_NormalDX.jpg
+
+newmtl White.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Plastic013A_1K-JPG_Color.jpg
+map_Ns textures/Plastic013A_1K-JPG_Roughness.jpg
+map_Bump textures/Plastic013A_1K-JPG_NormalDX.jpg
+
+newmtl White.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Plastic013A_1K-JPG_Color.jpg
+map_Ns textures/Plastic013A_1K-JPG_Roughness.jpg
+map_Bump textures/Plastic013A_1K-JPG_NormalDX.jpg
+
+newmtl White.006
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Plastic013A_1K-JPG_Color.jpg
+map_Ns textures/Plastic013A_1K-JPG_Roughness.jpg
+map_Bump textures/Plastic013A_1K-JPG_NormalDX.jpg
+
+newmtl Wood
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood092_1K-JPG_Color.jpg
+map_Ns textures/Wood092_1K-JPG_Roughness.jpg
+map_Bump textures/Wood092_1K-JPG_NormalDX.jpg
+
+newmtl Wood.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood093_1K-JPG_Color.jpg
+map_Ns textures/Wood093_1K-JPG_Roughness.jpg
+map_Bump textures/Wood093_1K-JPG_NormalDX.jpg
+
+newmtl Wood.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood092_1K-JPG_Color.jpg
+map_Ns textures/Wood092_1K-JPG_Roughness.jpg
+map_Bump textures/Wood092_1K-JPG_NormalDX.jpg
+
+newmtl Wood.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood049_1K-JPG_Color.jpg
+map_Ns textures/Wood049_1K-JPG_Roughness.jpg
+map_Bump textures/Wood049_1K-JPG_NormalDX.jpg
+
+newmtl Wood.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood092_1K-JPG_Color.jpg
+map_Ns textures/Wood092_1K-JPG_Roughness.jpg
+map_Bump textures/Wood092_1K-JPG_NormalDX.jpg
+
+newmtl Wood.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood049_1K-JPG_Color.jpg
+map_Ns textures/Wood049_1K-JPG_Roughness.jpg
+map_Bump textures/Wood049_1K-JPG_NormalDX.jpg
+
+newmtl Wood.007
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood049_1K-JPG_Color.jpg
+map_Ns textures/Wood049_1K-JPG_Roughness.jpg
+map_Bump textures/Wood049_1K-JPG_NormalDX.jpg
+
+newmtl Wood.008
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood049_1K-JPG_Color.jpg
+map_Ns textures/Wood049_1K-JPG_Roughness.jpg
+map_Bump textures/Wood049_1K-JPG_NormalDX.jpg
+
+newmtl Wood.010
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood093_1K-JPG_Color.jpg
+map_Ns textures/Wood093_1K-JPG_Roughness.jpg
+map_Bump textures/Wood093_1K-JPG_NormalDX.jpg
+
+newmtl Wood.013
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood093_1K-JPG_Color.jpg
+map_Ns textures/Wood093_1K-JPG_Roughness.jpg
+map_Bump textures/Wood093_1K-JPG_NormalDX.jpg
+
+newmtl WoodFloor
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/WoodFloor053_1K-JPG_Color.jpg
+map_Ns textures/WoodFloor053_1K-JPG_Roughness.jpg
+map_Bump textures/WoodFloor053_1K-JPG_NormalDX.jpg
+
+newmtl WoodPlate
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood023_1K-JPG_Color.jpg
+map_Ns textures/Wood023_1K-JPG_Roughness.jpg
+map_Bump textures/Wood023_1K-JPG_NormalDX.jpg
+
+newmtl WoodPlate.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood023_1K-JPG_Color.jpg
+map_Ns textures/Wood023_1K-JPG_Roughness.jpg
+map_Bump textures/Wood023_1K-JPG_NormalDX.jpg
+
+newmtl WoodTVStand
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.011
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.012
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.013
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.014
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.015
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.016
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.017
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.018
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.019
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.020
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.021
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.022
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.023
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.024
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl WoodTVStand.025
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Wood001_1K-JPG_Color.jpg
+map_Ns textures/Wood001_1K-JPG_Roughness.jpg
+
+newmtl fan
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Porcelain001_1K-JPG_Color.jpg
+map_Ns textures/Porcelain001_1K-JPG_Roughness.jpg
+map_Bump textures/Porcelain001_1K-JPG_NormalDX.jpg
+
+newmtl stem.004
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.005
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.006
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.007
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.008
+Ns 529.381653
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.009
+Ns 529.381653
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.010
+Ns 529.381653
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl stem.011
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.246203 0.462676 0.039195
+Ks 0.265517 0.265517 0.265517
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
