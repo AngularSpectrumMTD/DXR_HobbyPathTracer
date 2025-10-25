@@ -102,7 +102,7 @@ void DXRPathTracer::Setup()
     mIsTemporalAccumulationForceDisable = false ;
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
-    mSpatialReuseTap = 4;//Most Important Param For Getting High Quality Spatial Resampling Result
+    mSpatialReuseTap = 2;//Most Important Param For Getting High Quality Spatial Resampling Result
     mExposure = 5;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
@@ -983,8 +983,8 @@ void DXRPathTracer::Setup()
 
              mIsApplyCaustics = false;
              mIsUseIBL = true;
-             mIsUseReservoirTemporalReuse = false;
-             mIsUseReservoirSpatialReuse = false;
+             mIsUseReservoirTemporalReuse = true;
+             mIsUseReservoirSpatialReuse = true;
              mIntensityBoost *= 0.1;
              mExposure = 6;
          }
@@ -1748,8 +1748,8 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             XMUINT4 d;
             d.x = max(1, 4);//DIReservoirSpatialReuseNum
             d.y = max(1, 4);//GIReservoirSpatialReuseNum
-            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 1 * (i + 1));//DIReservoirSpatialReuseBaseRadius
-            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS + 1 * (i + 1));//GIReservoirSpatialReuseBaseRadius
+            d.z = max(1, DI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS);//DIReservoirSpatialReuseBaseRadius
+            d.w = max(1, GI_RESERVOIR_MAX_SPATIAL_REUSE_RADIUS);//GIReservoirSpatialReuseBaseRadius
             cb.data = d;
 
             auto restirCB = mReSTIRParamCBTbl.at(i).Get();

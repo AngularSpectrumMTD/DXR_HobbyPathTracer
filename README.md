@@ -7,11 +7,12 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - Emission Guided Photon Mapping  
 
 Results of the verification of the ReSTIR   
-<img width="2738" height="1546" alt="Image" src="https://github.com/user-attachments/assets/5add5743-143a-4406-92d2-714166f768cc" />
+
+<img width="2571" height="1449" alt="Image" src="https://github.com/user-attachments/assets/cf15a3de-5387-4908-be5b-bb7dd96bd38b" />
 
 ### Results (SceneType_Room)
 
-<img width="2731" height="1536" alt="Image" src="https://github.com/user-attachments/assets/82320c42-28e4-47c3-b5eb-24ff06b26f19" />
+<img width="2224" height="1251" alt="Image" src="https://github.com/user-attachments/assets/671aa755-f8af-4046-bc4b-e5f54b7dc987" />
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     

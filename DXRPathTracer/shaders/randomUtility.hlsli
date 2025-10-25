@@ -36,6 +36,15 @@ uint generateRandomSeed(uint2 xy, uint dimX)
     return generateHash(v);
 }
 
+float2 sampleUniformDisk(in float rand0, in float rand1)
+{
+    const float r = rand0;
+    const float phi = 2.0f * PI * rand1;
+    float2 sncs = 0.xx;
+    sincos(phi, sncs.x, sncs.y);
+    return r * float2(sncs.y, sncs.x);
+}
+
 float2 sample2DGaussianBoxMuller(in float rand0, in float rand1)
 {
     const float r = sqrt(max(-2.0f * log(rand0), 0.0f));

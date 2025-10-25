@@ -472,21 +472,17 @@ void performSpatialResampling(inout DIReservoir spatDIReservoir, in float center
     const bool isTransparent = isTransparentMaterial(centerMaterialParams);
     float baseSpatialReusingRadius = getDIReservoirSpatialReuseBaseRadius();
 
-    if(isTransparent)
-    {
-        baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
-        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
-    }
-
     //combine reservoirs
     if(isUseReservoirSpatialReuse())// && (currDIReservoir.M < 5))
     {
         for(int s = 0; s < getDIReservoirSpatialReuseNum(); s++)
         {
-            float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
-            float2 pos;
-            pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
-            pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
+            // float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
+            // float2 pos;
+            // pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
+            // pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
+
+            float2 pos = baseSpatialReusingRadius * sampleUniformDisk(rand(randomSeed), rand(randomSeed));
 
             int3 nearIndex = launchIndex + int3(pos, 0);
             
@@ -531,21 +527,17 @@ void performSpatialResampling(inout GIReservoir spatGIReservoir, in float center
     const bool isTransparent = isTransparentMaterial(centerMaterialParams);
     float baseSpatialReusingRadius = getGIReservoirSpatialReuseBaseRadius();
 
-    if(isTransparent)
-    {
-        baseSpatialReusingRadius *= (1.5 - centerMaterialParams.transRatio) / 1.5;
-        baseSpatialReusingRadius = max(1, baseSpatialReusingRadius - 1);
-    }
-
     //combine reservoirs
     if(isUseReservoirSpatialReuse())// && (currGIReservoir.M < 5))
     {
         for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {
-            float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
-            float2 pos;
-            pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
-            pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
+            // float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
+            // float2 pos;
+            // pos.x = baseSpatialReusingRadius / 1.96 * gauss.x;
+            // pos.y = baseSpatialReusingRadius / 1.96 * gauss.y;
+
+            float2 pos = baseSpatialReusingRadius * sampleUniformDisk(rand(randomSeed), rand(randomSeed));
 
             int3 nearIndex = launchIndex + int3(pos, 0);
             
