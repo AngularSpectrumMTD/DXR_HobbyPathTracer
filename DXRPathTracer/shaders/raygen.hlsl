@@ -408,6 +408,17 @@ void performTemporalResampling(inout GIReservoir currGIReservoir, in GIReservoir
     currGIReservoir = tempGIReservoir;
 }
 
+void applyOffsetForPermutationSampling(inout int2 prevID, inout uint randomSeed)
+{
+    uint seed = generateHash(randomSeed);
+    const uint xorValues = 3;
+    int2 offset = int2(seed & xorValues, (seed >> 2) & xorValues);
+    prevID += offset;
+    prevID.x ^= xorValues;
+    prevID.y ^= xorValues;
+    prevID -= offset;
+}
+
 [shader("raygeneration")]
 void temporalReuse()
 {
@@ -429,6 +440,8 @@ void temporalReuse()
         float3 currObjectWorldPos = gPositionBuffer[currID].xyz;
 
         int2 prevID = gPrevIDBuffer[currID];
+        applyOffsetForPermutationSampling(prevID, randomSeed);
+
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
         float prevDepth = gPrevNormalDepthBuffer[prevID].w;
