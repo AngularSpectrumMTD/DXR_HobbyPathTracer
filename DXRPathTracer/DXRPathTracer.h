@@ -424,6 +424,7 @@ private:
         //SceneType_Room,
         //SceneType_GITest,
         //SceneType_Kitchen,
+        //SceneType_Sibenik,
         SceneType_PTTest,
         SceneType_PTTestBrick,
         SceneType_PTTestRobot,

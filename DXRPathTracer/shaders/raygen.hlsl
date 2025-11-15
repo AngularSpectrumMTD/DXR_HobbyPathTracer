@@ -408,11 +408,10 @@ void performTemporalResampling(inout GIReservoir currGIReservoir, in GIReservoir
     currGIReservoir = tempGIReservoir;
 }
 
-void applyOffsetForPermutationSampling(inout int2 prevID, inout uint randomSeed)
+void applyOffsetForPermutationSampling(inout int2 prevID)
 {
-    uint seed = generateHash(randomSeed);
     const uint xorValues = 3;
-    int2 offset = int2(seed & xorValues, (seed >> 2) & xorValues);
+    int2 offset = int2(getGlobalRandomNumber() & xorValues, (getGlobalRandomNumber() >> 2) & xorValues);
     prevID += offset;
     prevID.x ^= xorValues;
     prevID.y ^= xorValues;
@@ -440,14 +439,17 @@ void temporalReuse()
         float3 currObjectWorldPos = gPositionBuffer[currID].xyz;
 
         int2 prevID = gPrevIDBuffer[currID];
-        applyOffsetForPermutationSampling(prevID, randomSeed);
+        applyOffsetForPermutationSampling(prevID);
 
         const uint serialCurrID = currID.y * dims.x + currID.x;
         const uint serialPrevID = clamp(prevID.y * dims.x + prevID.x, 0, dims.x * dims.y - 1);
         float prevDepth = gPrevNormalDepthBuffer[prevID].w;
         float3 prevNormal = gPrevNormalDepthBuffer[prevID].xyz;
         float3 prevObjectWorldPos = gPrevPositionBuffer[prevID].xyz;
-        const bool isTemporalReuseEnable = isTemporalReprojectionSuccessed(currDepth, prevDepth, currNormal, prevNormal, currObjectWorldPos, prevObjectWorldPos);
+
+        const bool isNearDepth = ((currDepth * 0.95 < prevDepth) && (prevDepth < currDepth * 1.05)) && (currDepth > 0) && (prevDepth > 0);
+        const bool isNearNormal = dot(currNormal, prevNormal) > 0.95;
+        const bool isTemporalReuseEnable = isNearDepth && isNearNormal;
         const bool isTemporalResamplingRequired = isUseReservoirTemporalReuse() && isWithinBounds(prevID, dims) && isTemporalReuseEnable;
 
         DIReservoir currDIReservoir = gDIReservoirBuffer[serialCurrID];
@@ -513,7 +515,7 @@ void performSpatialResampling(inout DIReservoir spatDIReservoir, in float center
             MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
-            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.7;
             const bool isNearMaterial = (abs(centerMaterialParams.roughness - screenSpaceMaterialNear.roughness) < 0.1) && (abs(centerMaterialParams.metallic - screenSpaceMaterialNear.metallic) < 0.1);
 
             const bool isSimilar = isNearDepth && isNearNormal && isNearMaterial;
@@ -543,6 +545,29 @@ void performSpatialResampling(inout GIReservoir spatGIReservoir, in float center
     //combine reservoirs
     if(isUseReservoirSpatialReuse())// && (currGIReservoir.M < 5))
     {
+        float minDot = 1;
+        uint counter = 0;
+        for(int s = 0; s < 9; s++)
+        {
+            int2 nearIndex = launchIndex.xy + int2(s / 3, s % 3);
+            if(!isWithinBounds(nearIndex.xy, dims))
+            {
+                continue;
+            }
+            float innerProduct = dot(centerNormal, gNormalDepthBuffer[nearIndex].xyz);
+            if((innerProduct < 0.1))
+            {
+                counter++;
+            }
+        }
+
+        const bool isHighFreqSurface = counter > 4;
+        float normalWeight = 1;
+        // if(isHighFreqSurface)
+        // {
+        //     normalWeight = 0.5;
+        // }
+
         for(int s = 0; s < getGIReservoirSpatialReuseNum(); s++)
         {
             // float2 gauss = sample2DGaussianBoxMuller(rand(randomSeed), rand(randomSeed));
@@ -570,7 +595,7 @@ void performSpatialResampling(inout GIReservoir spatGIReservoir, in float center
             MaterialParams screenSpaceMaterialNear = decompressMaterialParams(getScreenSpaceMaterial(nearIndex.xy));
 
             const bool isNearDepth = ((centerDepth * 0.95 < nearDepth) && (nearDepth < centerDepth * 1.05)) && (centerDepth > 0) && (nearDepth > 0);
-            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.9;
+            const bool isNearNormal = dot(centerNormal, nearNormal) > 0.75 * normalWeight;
             const bool isNearMaterial = (abs(centerMaterialParams.roughness - screenSpaceMaterialNear.roughness) < 0.1) && (abs(centerMaterialParams.metallic - screenSpaceMaterialNear.metallic) < 0.1);
 
             const bool isSimilar = isNearDepth && isNearNormal && isNearMaterial;
@@ -657,7 +682,8 @@ void spatialReuse() {
         const float3 centerPos = gPositionBuffer[launchIndex.xy].xyz;
         const float3 centerPos1 = gPositionBuffer[launchIndex.xy + int2(1, 0)].xyz;
         const float3 centerPos2 = gPositionBuffer[launchIndex.xy + int2(0, 1)].xyz;
-        const float3 geomNormal = normalize(cross(centerPos1 - centerPos, centerPos2 - centerPos));
+        const float crossV = cross(centerPos1 - centerPos, centerPos2 - centerPos);
+        const float3 geomNormal = normalize(crossV);
 
         const float2 IJ = int2(0 / (1 / 2.f), 0 % (1 / 2.f)) - 0.5.xx;
         const float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0 + IJ / dims.xy;

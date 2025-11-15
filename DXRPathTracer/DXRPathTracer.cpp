@@ -103,7 +103,7 @@ void DXRPathTracer::Setup()
     mIsUseEmissivePolygon = true;
     mIsUseMedianFiltering = false;
     mSpatialReuseTap = 2;//Most Important Param For Getting High Quality Spatial Resampling Result
-    mExposure = 5;
+    mExposure = 1;
 
     mInitTargetPos = XMFLOAT3(0, 0, 0);
 
@@ -959,7 +959,7 @@ void DXRPathTracer::Setup()
              //mInitTargetPos = XMFLOAT3(-25.69, 196.3, 7.39);
 
              mInitEyePos = XMFLOAT3(-6.45, 207.22, -13.49);
-             mInitTargetPos = XMFLOAT3(13.089, 196.97, 17.94);
+             mInitTargetPos = XMFLOAT3(10.744, 197.13, 19.33);
 
              mOBJFileName = "room.obj";
              mOBJFolderName = "model/room";
@@ -988,6 +988,48 @@ void DXRPathTracer::Setup()
              mIntensityBoost *= 0.1;
              mExposure = 6;
          }
+         break;
+         //case SceneType_Sibenik:
+         //{
+         //    mLightAreaScale = 6;
+         //    mPhiDirectional = 289.0f; mThetaDirectional = 117;
+
+         //    //mInitEyePos = XMFLOAT3(4.65, 204.93, -11.00);
+         //    //mInitTargetPos = XMFLOAT3(-12.554, 199.1, 26.86);
+
+         //    //mInitEyePos = XMFLOAT3(9.85, 205.93, -12.77);
+         //    //mInitTargetPos = XMFLOAT3(-25.69, 196.3, 7.39);
+
+         //    mInitEyePos = XMFLOAT3(-18.45, 187.22, 3.6);
+         //    mInitTargetPos = XMFLOAT3(16.77, 186.52, -11.08);
+
+         //    mOBJFileName = "sibenik.obj";
+         //    mOBJFolderName = "model/sibenik";
+         //    mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(0, 200, 0));
+         //    mStageOffsetX = 0.0f;
+         //    mStageOffsetY = 0.0f;
+         //    mStageOffsetZ = 0.0f;
+
+         //    mLightPosX = -40.0f; mLightPosY = 251.5f; mLightPosZ = -5.31f;
+         //    mPhi = -85.0f; mTheta = 228.0f;
+
+         //    mLightRange = 5.68f;
+
+         //    mCausticsBoost = 0.05;
+         //    mGatherBlockRange = 2;
+
+         //    mModelTypeTbl[0] = ModelType_Afrodyta;
+         //    mCameraSpeed = 0.3f;
+
+         //    mGatherRadius = 0.5f;
+
+         //    mIsApplyCaustics = false;
+         //    mIsUseIBL = true;
+         //    mIsUseReservoirTemporalReuse = true;
+         //    mIsUseReservoirSpatialReuse = true;
+         //    mIntensityBoost *= 0.1;
+         //    mExposure = 4;
+         //}
          break;
     }
 
@@ -2022,6 +2064,11 @@ void DXRPathTracer::Update()
         }
     }
 
+    std::random_device seedGen;
+    std::mt19937 mtEngine(seedGen());
+    std::uniform_int_distribution<> randomRange(0, 1000000);
+    const u32 frameRandom = randomRange(mtEngine);
+
     mSceneParam.mtxViewPrev = mSceneParam.mtxView;
     mSceneParam.mtxProjPrev = mSceneParam.mtxProj;
     mSceneParam.mtxViewInvPrev = mSceneParam.mtxViewInv;
@@ -2055,7 +2102,7 @@ void DXRPathTracer::Update()
     mSceneParam.additional2.z = mIsUseMedianFiltering ? 1 : 0;
     mSceneParam.additional2.w = mIsUseNormalMapping ? 1 : 0;
     mSceneParam.additional3.x = mIsAlbedoOne ? 1 : 0;
-    mSceneParam.additional3.y = 0;
+    mSceneParam.additional3.y = frameRandom;
     mSceneParam.additional3.z = 0;
     mSceneParam.additional3.w = 0;
     mSceneParam.toneMappingParam = XMVectorSet(mExposure, 0, 0, 0);
