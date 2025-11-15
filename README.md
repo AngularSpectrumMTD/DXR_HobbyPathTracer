@@ -8,11 +8,11 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 
 Results of the verification of the ReSTIR   
 
-<img width="1242" height="695" alt="Image" src="https://github.com/user-attachments/assets/84b9df98-0420-429e-bac8-08b63eecb912" />
+<img width="2657" height="1478" alt="Image" src="https://github.com/user-attachments/assets/6c7c55b6-3fb3-43d8-9057-b1b79731c261" />
 
 ### Results (SceneType_Room)
 
-<img width="1269" height="712" alt="Image" src="https://github.com/user-attachments/assets/b9110711-ff09-4aef-8088-1eaca89f2ab7" />
+<img width="2635" height="1479" alt="Image" src="https://github.com/user-attachments/assets/76f339cd-0de2-4a8a-918a-908afd04bb62" />
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
