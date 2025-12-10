@@ -485,8 +485,8 @@ bool isVisible(in float3 scatterPosition, in float3 targetPosition)
 void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out float2 randomUV, out float pdf, inout uint randomSeed)
 {
     const uint lightID = getRandomLightID(randomSeed);
-    LightGenerateParam param = gLightGenerateParams[0];
-    //LightGenerateParam param = gLightGenerateParams[lightID];
+    //LightGenerateParam param = gLightGenerateParams[0];
+    LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (isSphereLight(param))
     {
@@ -518,8 +518,8 @@ void sampleLightEmitDirAndPosition(inout float3 dir, inout float3 position, out 
 void sampleLightEmitDirAndPositionWithUV(inout float3 dir, inout float3 position, in float2 randomUV, inout uint randomSeed)
 {
     const uint lightID = getRandomLightID(randomSeed);
-    LightGenerateParam param = gLightGenerateParams[0];
-    //LightGenerateParam param = gLightGenerateParams[lightID];
+    //LightGenerateParam param = gLightGenerateParams[0];
+    LightGenerateParam param = gLightGenerateParams[lightID];
 
     if (isSphereLight(param))
     {

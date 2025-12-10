@@ -217,7 +217,9 @@ void DXRPathTracer::Setup()
             mCausticsBoost = 0.004f;
             mPhiDirectional = 480; mThetaDirectional = 302;
             mOBJFileName = "exterior.obj";
+            //mOBJFileName = "Country-Kitchen.obj";
             mOBJFolderName = "model/bistro/Exterior";
+            //mOBJFolderName = "model/country_kitchen";
             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(0.5, 0.5, 0.5), XMMatrixTranslation(20, 0, 0));
             mStageOffsetX = 20;
             mStageOffsetY = 0;
@@ -237,7 +239,7 @@ void DXRPathTracer::Setup()
                 mInitEyePos = XMFLOAT3(-18, 6.46, 0.66);
                 mInitTargetPos = XMFLOAT3(16.4, 5.2, 0.02);
 #endif
-                mModelTypeTbl[0] = ModelType_Dragon;
+                mModelTypeTbl[0] = ModelType_Buddha;
             }
             else
             {
@@ -925,7 +927,7 @@ void DXRPathTracer::Setup()
 
              mOBJFileName = "MetallicTest.obj";
              mOBJFolderName = "model/MetallicTest";
-             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(10, 10, 10), XMMatrixTranslation(0, 200, 0));
+             mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(1000, 1000, 1000), XMMatrixTranslation(0, 200, 0));
              mStageOffsetX = 0.0f;
              mStageOffsetY = 0.0f;
              mStageOffsetZ = 0.0f;
@@ -1058,7 +1060,7 @@ void DXRPathTracer::Setup()
 
     mIsTemporalAccumulationForceDisable = true;
 #endif
-
+    mCameraSpeed = 100;
     switch (mModelTypeTbl[0])
     {
     case  ModelType::ModelType_Crab:
@@ -2411,15 +2413,13 @@ void DXRPathTracer::InitializeLightGenerateParams()
 void DXRPathTracer::UpdateLightGenerateParams()
 {
     XMFLOAT3 colorTbl[] = {
-        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.0f, mIntensityBoost * 0.0f),
-        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.0f),
-        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.0f),
-        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
-        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 1.0f),
-        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.8f, mIntensityBoost * 0.0f),
-        XMFLOAT3(mIntensityBoost * 0.0f, mIntensityBoost * 1.0f, mIntensityBoost * 0.8f),
-        XMFLOAT3(mIntensityBoost * 1.0f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
-        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.0f, mIntensityBoost * 1.0f),
+        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.8f, mIntensityBoost * 0.8f),
+        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.8f, mIntensityBoost * 0.2f),
+        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.2f, mIntensityBoost * 0.8f),
+        XMFLOAT3(mIntensityBoost * 0.2f, mIntensityBoost * 0.8f, mIntensityBoost * 0.8f),
+        XMFLOAT3(mIntensityBoost * 0.8f, mIntensityBoost * 0.2f, mIntensityBoost * 0.2f),
+        XMFLOAT3(mIntensityBoost * 0.2f, mIntensityBoost * 0.2f, mIntensityBoost * 0.8f),
+        XMFLOAT3(mIntensityBoost * 0.2f, mIntensityBoost * 0.8f, mIntensityBoost * 0.2f)
     };
 
     const f32 scale = mLightRange;
@@ -2427,8 +2427,14 @@ void DXRPathTracer::UpdateLightGenerateParams()
     mLightGenerationParamTbl.resize(0);
     u32 count = 0;
     const f32 cellSize = 2 * 0.9 * PLANE_SIZE * mLightAreaScale / STAGE_DIVISION_FOR_LIGHT_POSITION;
+
+    u32 colorOffset = 0;
+    std::mt19937 mt;
+    std::uniform_int_distribution rnd(0, 15);
+
     for (u32 i = 0; i < LightCount_Rect; i++)
     {
+        u32 colorIndex = rnd(mt);
         if (i == 0 && !mIsSpotLightPhotonMapper)
         {
             LightGenerateParam param;
@@ -2463,14 +2469,19 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsRectLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
+            XMFLOAT3 c = colorTbl[colorIndex % _countof(colorTbl)];
+            c.x *= mIntensityBoost;
+            c.y *= mIntensityBoost;
+            c.z *= mIntensityBoost;
+            param.setParamAsRectLight(XMFLOAT3(x, y, z),c, tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
     }
-    count = 0;
+
     for (u32 i = 0; i < LightCount_Spot; i++)
     {
+        u32 colorIndex = rnd(mt);
         if (i == 0 && mIsSpotLightPhotonMapper)
         {
             LightGenerateParam param;
@@ -2505,44 +2516,37 @@ void DXRPathTracer::UpdateLightGenerateParams()
             bitangent.x *= scale;
             bitangent.y *= scale;
             bitangent.z *= scale;
-            param.setParamAsSpotLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), tangent, bitangent);
+            XMFLOAT3 c = colorTbl[colorIndex % _countof(colorTbl)];
+            c.x *= mIntensityBoost;
+            c.y *= mIntensityBoost;
+            c.z *= mIntensityBoost;
+            param.setParamAsSpotLight(XMFLOAT3(x, y, z), c, tangent, bitangent);
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
     }
-    count = 0;
-    u32 colorOffset = 0;
-    std::mt19937 mt;
-    std::uniform_int_distribution rnd(0, 15);
+
     for (u32 i = 0; i < LightCount_Sphere; i++)
     {
         u32 colorIndex = rnd(mt);
         if (mIsUseManySphereLightLighting)
         {
             f32 y = mLightPosY;
-            if (i == LightCount_Sphere / 2)
-            {
-                count = 0;
-                colorOffset++;
-            }
-
-            if (i > LightCount_Sphere / 2)
-            {
-                y = mLightPosY + 15;
-            }
            
             f32 x = mStageOffsetX + cellSize * 0.5f + cellSize * (count / STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             f32 z = mStageOffsetZ + cellSize * 0.5f + cellSize * (count % STAGE_DIVISION_FOR_LIGHT_POSITION) - PLANE_SIZE * mLightAreaScale;
             LightGenerateParam param;
-            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), colorTbl[colorIndex % _countof(colorTbl)], mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
-            param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), mLightRange* SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(x, y, z), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost * 0.4), mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
-            //param.setParamAsSphereLight(XMFLOAT3(mLightPosX, mLightPosY, mLightPosZ), XMFLOAT3(mIntensityBoost, mIntensityBoost, mIntensityBoost), 10, 150);
+            XMFLOAT3 c = colorTbl[colorIndex % _countof(colorTbl)];
+            c.x *= mIntensityBoost;
+            c.y *= mIntensityBoost;
+            c.z *= mIntensityBoost;
+            param.setParamAsSphereLight(XMFLOAT3(x, y, z), c, mLightRange * SPHERE_LIGHTS_SIZE_RATIO);
+
             mLightGenerationParamTbl.push_back(param);
         }
         count++;
     }
-    count = 0;
+
     if (mIsUseDirectionalLight)
     {
         for (u32 i = 0; i < LightCount_Directional; i++)

@@ -10,6 +10,8 @@ Results of the verification of the ReSTIR
 
 <img width="4394" height="2469" alt="Image" src="https://github.com/user-attachments/assets/84786f60-69b2-43a4-ab5b-3c0c71737038" />
 
+<img width="3070" height="1725" alt="Image" src="https://github.com/user-attachments/assets/e8269fad-f0b8-49c0-934b-f0c711fd0d15" />
+
 ### Results
 
 <img width="2635" height="1479" alt="Image" src="https://github.com/user-attachments/assets/76f339cd-0de2-4a8a-918a-908afd04bb62" />
