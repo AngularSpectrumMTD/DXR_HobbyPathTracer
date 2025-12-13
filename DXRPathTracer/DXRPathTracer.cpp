@@ -1060,7 +1060,7 @@ void DXRPathTracer::Setup()
 
     mIsTemporalAccumulationForceDisable = true;
 #endif
-    mCameraSpeed = 100;
+    //mCameraSpeed = 100;
     switch (mModelTypeTbl[0])
     {
     case  ModelType::ModelType_Crab:
