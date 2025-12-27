@@ -59,7 +59,7 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_Room;
+    mSceneType = SceneType_MetallicTest;
 
     mIsUseIBL = true;
     mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
@@ -919,11 +919,8 @@ void DXRPathTracer::Setup()
              //mInitEyePos = XMFLOAT3(-6, 78, 165);
              //mInitTargetPos = XMFLOAT3(8.9, 90.29, 104.7);
 
-             mInitEyePos = XMFLOAT3(12.232, 210.32, 1.94);
-             mInitTargetPos = XMFLOAT3(-29.06, 203.12, -1.5);
-
-             mInitEyePos = XMFLOAT3(12.743, 210.32, -0.8);
-             mInitTargetPos = XMFLOAT3(-28.85, 204.37, 0.028);
+             mInitEyePos = XMFLOAT3(791.232, 445.32, -1144.94);
+             mInitTargetPos = XMFLOAT3(758.06, 440.12, -1119.5);
 
              mOBJFileName = "MetallicTest.obj";
              mOBJFolderName = "model/MetallicTest";
@@ -941,12 +938,15 @@ void DXRPathTracer::Setup()
              mGatherBlockRange = 2;
 
              mModelTypeTbl[0] = ModelType_Afrodyta;
-             mCameraSpeed = 0.1f;
+             mCameraSpeed = 10.0f;
 
              mGatherRadius = 0.5f;
 
              mIsApplyCaustics = false;
              mIsUseIBL = true;
+
+             mIsUseDirectionalLight = false;
+             mExposure = -3;
          }
          break;
          case SceneType_Room:
