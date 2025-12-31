@@ -740,25 +740,36 @@ void DXRPathTracer::CreateRegularBuffer()
     }
     //Screen Space Material
     {
+        const u32 size = 2;
+
+        mScreenSpaceMaterialBufferTbl.resize(size);
+        mScreenSpaceMaterialBufferDescriptorSRVTbl.resize(size);
+        mScreenSpaceMaterialBufferDescriptorUAVTbl.resize(size);
+
         const u32 ScreenSpaceMaterialElements = GetWidth() * GetHeight();
         const u32 ScreenSpaceMaterialSizeInBytes = ScreenSpaceMaterialElements * sizeof(CompressedMaterialParams);
 
-        mScreenSpaceMaterialBuffer = mDevice->CreateBuffer(ScreenSpaceMaterialSizeInBytes, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_DEFAULT, nullptr, L"ScreenSpaceMaterial");
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Buffer.NumElements = ScreenSpaceMaterialElements;
-        srvDesc.Buffer.FirstElement = 0;
-        srvDesc.Buffer.StructureByteStride = sizeof(CompressedMaterialParams);
-        mScreenSpaceMaterialBufferDescriptorSRV = mDevice->CreateShaderResourceView(mScreenSpaceMaterialBuffer.Get(), &srvDesc);
-        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-        uavDesc.Buffer.NumElements = ScreenSpaceMaterialElements;
-        uavDesc.Buffer.FirstElement = 0;
-        uavDesc.Buffer.StructureByteStride = sizeof(CompressedMaterialParams);
-        mScreenSpaceMaterialBufferDescriptorUAV = mDevice->CreateUnorderedAccessView(mScreenSpaceMaterialBuffer.Get(), &uavDesc);
+        for (u32 i = 0; i < size; i++)
+        {
+            wchar_t name[30];
+            swprintf(name, 30, L"ScreenSpaceMaterialTbl[%d]", i);
+            mScreenSpaceMaterialBufferTbl[i] = mDevice->CreateBuffer(ScreenSpaceMaterialSizeInBytes, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_HEAP_TYPE_DEFAULT, nullptr, name);
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+            srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            srvDesc.Buffer.NumElements = ScreenSpaceMaterialElements;
+            srvDesc.Buffer.FirstElement = 0;
+            srvDesc.Buffer.StructureByteStride = sizeof(CompressedMaterialParams);
+            mScreenSpaceMaterialBufferDescriptorSRVTbl[i] = mDevice->CreateShaderResourceView(mScreenSpaceMaterialBufferTbl[i].Get(), &srvDesc);
+            D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+            uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+            uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+            uavDesc.Buffer.NumElements = ScreenSpaceMaterialElements;
+            uavDesc.Buffer.FirstElement = 0;
+            uavDesc.Buffer.StructureByteStride = sizeof(CompressedMaterialParams);
+            mScreenSpaceMaterialBufferDescriptorUAVTbl[i] = mDevice->CreateUnorderedAccessView(mScreenSpaceMaterialBufferTbl[i].Get(), &uavDesc);
+        }
     }
     //DebugTexture
     {

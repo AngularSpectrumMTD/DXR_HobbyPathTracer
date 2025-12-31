@@ -262,8 +262,9 @@ RWStructuredBuffer<GIReservoir> gGIReservoirBufferSrc : register(u21);
 
 RWTexture2D<float4> gPrevNormalDepthBuffer : register(u22);
 RWTexture2D<float4> gPrevPositionBuffer : register(u23);
+RWStructuredBuffer<CompressedMaterialParams> gPrevScreenSpaceMaterial : register(u24);
 
-RWTexture2D<uint> gRandomNumber : register(u24);
+RWTexture2D<uint> gRandomNumber : register(u25);
 
 struct ReSTIRParam
 {
@@ -632,6 +633,18 @@ float3 HemisphereORCosineSamplingWithUV(float3 N, bool isHemi, in float2 randomU
     float3 tangentDir = float3(cos(P) * sinT, sin(P) * sinT, cosT);
 
     return tangentToWorld(N, tangentDir);
+}
+
+bool isNearMaterial(in MaterialParams mat0, in MaterialParams mat1)
+{
+    return 
+    (sqrt(length(mat0.albedo.rgb - mat1.albedo.rgb)) < 0.1) &&
+    (abs(mat0.metallic - mat1.metallic) < 0.1) &&
+    (abs(mat0.roughness - mat1.roughness) < 0.1) &&
+    (abs(mat0.specular - mat1.specular) < 0.1) &&
+    (abs(mat0.transRatio - mat1.transRatio) < 0.1) &&
+    (sqrt(length(mat0.transColor.rgb - mat1.transColor.rgb)) < 0.1) &&
+    (sqrt(length(mat0.emission.rgb - mat1.emission.rgb)) < 0.1);
 }
 
 #endif//__COMMON_HLSLI__

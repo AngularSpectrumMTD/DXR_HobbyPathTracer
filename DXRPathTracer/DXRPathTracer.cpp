@@ -59,7 +59,9 @@ void DXRPathTracer::UpdateWindowText()
 
 void DXRPathTracer::Setup()
 {
-    mSceneType = SceneType_MetallicTest;
+    //mSceneType = SceneType_CountryKitchen;
+    mSceneType = SceneType_Room;
+    //mSceneType = SceneType_CornellBox;
 
     mIsUseIBL = true;
     mRecursionDepth = min(4, REAL_MAX_RECURSION_DEPTH);
@@ -368,6 +370,28 @@ void DXRPathTracer::Setup()
             mIntensityBoost *= 3;
         }
         break;*/
+        case SceneType_CountryKitchen:
+        {
+            mPhiDirectional = 10.0f; mThetaDirectional = 325.0f;
+            mInitEyePos = XMFLOAT3(48.13, 30.04, 49.98f);
+            mInitTargetPos = XMFLOAT3(25.7, 24.53, 25.3f);
+
+            mOBJFileName = "Country-Kitchen.obj";
+            mOBJFolderName = "model/country_kitchen";
+            mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(15, 15, 15), XMMatrixTranslation(0, 0, 0));
+            mStageOffsetX = 0.0f;
+            mStageOffsetY = 0.0f;
+            mStageOffsetZ = 0.0f;
+
+            mLightPosX = -1.21f; mLightPosY = 88.0f; mLightPosZ = 12.78f;
+            mPhi = 46.0f; mTheta = 239.0f;
+
+            mLightRange = 0.79f;
+
+            mModelTypeTbl[0] = ModelType_Afrodyta;
+            mIntensityBoost *= 0.5;
+        }
+        break;
         case SceneType_PTTest:
         {
             mPhiDirectional = 51.0f; mThetaDirectional = 293.0f;
@@ -963,6 +987,9 @@ void DXRPathTracer::Setup()
              mInitEyePos = XMFLOAT3(-6.45, 207.22, -13.49);
              mInitTargetPos = XMFLOAT3(10.744, 197.13, 19.33);
 
+             mInitEyePos = XMFLOAT3(-0.006, 204.83, -5.98);
+             mInitTargetPos = XMFLOAT3(-7.3, 197.84, 31.05);
+
              mOBJFileName = "room.obj";
              mOBJFolderName = "model/room";
              mOBJMaterialLinkedMeshTRS = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(0, 200, 0));
@@ -1507,11 +1534,12 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gPrevScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[prev].hGpu);
         //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigPhoton["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetPipelineState1(mRTPSOPhoton.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PhotonMapping");
@@ -1655,11 +1683,12 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
-    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
     mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+    mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gPrevScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[prev].hGpu);
     //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSig["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
     mCommandList->SetPipelineState1(mRTPSO.Get());
     PIXBeginEvent(mCommandList.Get(), 0, "PathTracing");
@@ -1682,7 +1711,8 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mGIReservoirPingPongTbl[curr].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[prev].Get()),
             CD3DX12_RESOURCE_BARRIER::UAV(mNormalDepthBufferTbl[curr].Get()),
-            CD3DX12_RESOURCE_BARRIER::UAV(mScreenSpaceMaterialBuffer.Get())
+            CD3DX12_RESOURCE_BARRIER::UAV(mScreenSpaceMaterialBufferTbl[prev].Get()),
+            CD3DX12_RESOURCE_BARRIER::UAV(mScreenSpaceMaterialBufferTbl[curr].Get()),
         };
 
         mCommandList->ResourceBarrier(u32(_countof(uavB)), uavB);
@@ -1732,11 +1762,12 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gPrevScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[prev].hGpu);
         //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirTemporalReuse["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirTemporalReuse["gReSTIRParam"], mReSTIRParamCBTbl[0]->GetGPUVirtualAddress());
         mCommandList->SetPipelineState1(mRTPSOReservoirTemporalReuse.Get());
@@ -1825,11 +1856,12 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap4"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[4].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap5"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[5].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPhotonEmissionGuideMap6"], mPhotonEmissionGuideMipMapDescriptorUAVTbl[6].hGpu);
-            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gDebugTexture"], mDebugTexture0DescriptorUAV.hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevNormalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevPositionBuffer"], mPositionBufferDescriptorUAVTbl[prev].hGpu);
             mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gRandomNumber"], mRandomNumberBufferDescriptorUAV.hGpu);
+            mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gPrevScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[prev].hGpu);
             //mCommandList->SetComputeRootDescriptorTable(mRegisterMapGlobalRootSigReservoirSpatialReuse["gAccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
             mCommandList->SetComputeRootConstantBufferView(mRegisterMapGlobalRootSigReservoirSpatialReuse["gReSTIRParam"], mReSTIRParamCBTbl[i]->GetGPUVirtualAddress());
             mCommandList->SetPipelineState1(mRTPSOReservoirSpatialReuse.Get());
@@ -1881,7 +1913,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapResolveReservoir["gSceneParam"], sceneCB->GetGPUVirtualAddress());
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["DIReservoirBufferSrc"], mDISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapResolveReservoir["GIReservoirBufferSrc"], mGISpatialReservoirDescriptorSRVPingPongTbl[finalSpatialID].hGpu);//"dst"
         mCommandList->SetPipelineState(mResolveReservoirPSO.Get());
@@ -1903,7 +1935,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentDIBuffer"], mDIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentGIBuffer"], mGIBufferDescriptorUAVPingPongTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["CurrentCausticsBuffer"], mCausticsBufferDescriptorUAVPingPongTbl[curr].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapPerformModulation["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetPipelineState(mPerformModulationPSO.Get());
         PIXBeginEvent(mCommandList.Get(), 0, "PerformModulation");
         mCommandList->Dispatch(GetWidth() / 16, GetHeight() / 16, 1);
@@ -1964,7 +1996,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->SetComputeRootSignature(mRsFinalizePathtracedResult.Get());
         mCommandList->SetComputeRootConstantBufferView(mRegisterMapFinalizePathtracedResult["gSceneParam"], sceneCB->GetGPUVirtualAddress());
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["NormalDepthBuffer"], mNormalDepthBufferDescriptorSRVTbl[curr].hGpu);
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["ScreenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["AccumulationCountBuffer"], mAccumulationCountBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["NativePathtracedResult"], mPathtracedRenderDescriptorUAV.hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapFinalizePathtracedResult["FinalizedPathtracedResult"], mFinalRenderResultDescriptorUAV.hGpu);
@@ -1984,7 +2016,7 @@ CD3DX12_RESOURCE_BARRIER::UAV(mFinalRenderResult.Get()),
         mCommandList->ResourceBarrier(u32(uavBarriers.size()), uavBarriers.data());
 
         mCommandList->SetComputeRootSignature(mRsDebugView.Get());
-        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["screenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAV.hGpu);
+        mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["screenSpaceMaterial"], mScreenSpaceMaterialBufferDescriptorUAVTbl[curr].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["normalDepthBuffer"], mNormalDepthBufferDescriptorUAVTbl[prev].hGpu);
         mCommandList->SetComputeRootDescriptorTable(mRegisterMapDebugView["finalColor"], mFinalRenderResultDescriptorUAV.hGpu);
         mCommandList->SetPipelineState(mDebugViewPSO.Get());

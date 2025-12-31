@@ -423,7 +423,8 @@ private:
         SceneType_SanMiguel,
         //SceneType_Room,
         //SceneType_GITest,
-        //SceneType_Kitchen,
+        SceneType_Kitchen,
+        SceneType_CountryKitchen,
         //SceneType_Sibenik,
         SceneType_PTTest,
         SceneType_PTTestBrick,
@@ -801,9 +802,9 @@ private:
     ComPtr<ID3D12PipelineState> mGeneratePhotonEmissionGuideMipMap4x4PSO;
 
     //Screen Space Material
-    ComPtr<ID3D12Resource> mScreenSpaceMaterialBuffer;
-    dx12::Descriptor mScreenSpaceMaterialBufferDescriptorSRV;
-    dx12::Descriptor mScreenSpaceMaterialBufferDescriptorUAV;
+    std::vector < ComPtr<ID3D12Resource>> mScreenSpaceMaterialBufferTbl;
+    std::vector < dx12::Descriptor> mScreenSpaceMaterialBufferDescriptorSRVTbl;
+    std::vector < dx12::Descriptor> mScreenSpaceMaterialBufferDescriptorUAVTbl;
 
     u32 mRenderFrame = 0;
     u32 mSeedFrame = 0;

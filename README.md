@@ -6,17 +6,9 @@ Basic Path Tracer (Implemented in DirectX Raytracing)
 - ReSTIR GI
 - Emission Guided Photon Mapping  
 
-Results of the verification of the ReSTIR   
-
-<img width="4394" height="2469" alt="Image" src="https://github.com/user-attachments/assets/84786f60-69b2-43a4-ab5b-3c0c71737038" />
-
-<img width="3070" height="1725" alt="Image" src="https://github.com/user-attachments/assets/e8269fad-f0b8-49c0-934b-f0c711fd0d15" />
-
 ### Results
 
-<img width="2635" height="1479" alt="Image" src="https://github.com/user-attachments/assets/76f339cd-0de2-4a8a-918a-908afd04bb62" />
-
-<img width="1275" height="716" alt="Image" src="https://github.com/user-attachments/assets/6970e096-e434-433d-bca5-c33b487da0f7" />
+<img width="1277" height="717" alt="Image" src="https://github.com/user-attachments/assets/9b1f7283-1a12-4daf-8eeb-464af4c43b4d" />
 
 ### Debug View
 Enable to check Albedo / Depth / Normal / Roughness / Metallic / Specular / Translucent Color / Emission Color     
